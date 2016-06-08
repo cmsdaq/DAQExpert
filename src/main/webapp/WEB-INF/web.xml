@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+	<display-name>DAQAggregator</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+
+	<listener>
+		<listener-class>rcms.utilities.daqaggregator.servlets.ServletListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>DashboardServlet</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.DashboardServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>DashboardServlet</servlet-name>
+		<url-pattern>/dashboard</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>API</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.API</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>API</servlet-name>
+		<url-pattern>/api</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ReasonsAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.ReasonsAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReasonsAPI</servlet-name>
+		<url-pattern>/reasons</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RawAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.RawAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RawAPI</servlet-name>
+		<url-pattern>/raw</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>SnapshotAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.SnapshotAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SnapshotAPI</servlet-name>
+		<url-pattern>/snapshot</url-pattern>
+	</servlet-mapping>
+		<servlet>
+		<servlet-name>RaportAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqaggregator.servlets.RaportAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RaportAPI</servlet-name>
+		<url-pattern>/raport</url-pattern>
+	</servlet-mapping>
+
+
+
+</web-app>

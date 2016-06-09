@@ -62,6 +62,9 @@ body, html {
 	src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 
+<script type="text/javascript"
+	src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
 </head>
 
 <body>
@@ -115,38 +118,34 @@ body, html {
 			content : 'flowchart M4'
 		} ]);
 		var timeline = new vis.Timeline(container, items, groups, options);
-		
-
 
 		/** Refresh data on timeline event */
 		var runDataUpdateFromTimeline = function(properties) {
 			var byUser = properties["byUser"];
-			if(byUser){
+			if (byUser) {
 				loadNewData('rangechange', properties);
 			}
 		};
 
-        	/** Refresh views on timeline event */
+		/** Refresh views on timeline event */
 		var runSyncFromTimeline = function(properties) {
 			var start = properties["start"];
 			var end = properties["end"];
 
 			var byUser = properties["byUser"];
-			if(byUser){
+			if (byUser) {
 				graph2d.setWindow(start, end, {
 					animation : false
 				});
-			}
-			else{
+			} else {
 				//here event propagation is stopped			
 			}
 		};
-		
 
 		/** Refresh data on graph event */
 		var runDataUpdateFromGraph = function(properties) {
 			var byUser = properties["byUser"];
-			if(byUser){
+			if (byUser) {
 				loadNewData('rangechange', properties);
 			}
 		};
@@ -157,25 +156,23 @@ body, html {
 			var end = properties["end"];
 
 			var byUser = properties["byUser"];
-			if(byUser){
+			if (byUser) {
 				timeline.setWindow(start, end, {
 					animation : false
 				});
-			}
-			else{
+			} else {
 				//here event propagation is stopped			
 			}
 		};
-		
+
 		/** Load new data on event */
 		function loadNewData(event, properties) {
-			
+
 			getData(JSON.stringify(properties["start"]), JSON
 					.stringify(properties["end"]));
 			getRawData(JSON.stringify(properties["start"]), JSON
 					.stringify(properties["end"]));
 		};
-
 
 		/** Register event listener and throttle firing */
 		timeline.on('rangechange', _.throttle(runDataUpdateFromTimeline, 500, {
@@ -185,24 +182,43 @@ body, html {
 			leading : false
 		}));
 
-		timeline.on('click', function(properties) {
+		timeline
+				.on(
+						'click',
+						function(properties) {
 
-			$('#reasonModal').modal('show')
-			var parameters = {};
-			parameters['id'] = properties['item'];
-			$.getJSON("raport", parameters, function(data) {
-				var preetified = JSON.stringify(data['elements'], null, 2);
-				document.getElementById("raport-name").innerHTML = data['name'];
-				document.getElementById("raport-description").innerHTML = data['description'];
-				document.getElementById("raport-action").innerHTML = data['action'];
-				document.getElementById("raport-body").innerHTML = preetified;
-			}).error(function(jqXHR, textStatus, errorThrown) {
-				console.log("error " + textStatus);
-				console.log("errorThrown " + errorThrown);
-				console.log("incoming Text " + jqXHR.responseText);
-			});
+							$('#reasonModal').modal('show')
+							var parameters = {};
+							parameters['id'] = properties['item'];
+							$
+									.getJSON(
+											"raport",
+											parameters,
+											function(data) {
+												var preetified = JSON
+														.stringify(
+																data['elements'],
+																null, 2);
+												document
+														.getElementById("raport-name").innerHTML = data['name'];
+												document
+														.getElementById("raport-description").innerHTML = data['description'];
+												document
+														.getElementById("raport-action").innerHTML = data['action'];
+												document
+														.getElementById("raport-body").innerHTML = preetified;
+											}).error(
+											function(jqXHR, textStatus,
+													errorThrown) {
+												console.log("error "
+														+ textStatus);
+												console.log("errorThrown "
+														+ errorThrown);
+												console.log("incoming Text "
+														+ jqXHR.responseText);
+											});
 
-		});
+						});
 
 		function load(data) {
 
@@ -211,8 +227,6 @@ body, html {
 
 		};
 
-
-		
 		function getData(start, end) {
 
 			parameters = {};
@@ -252,9 +266,13 @@ body, html {
 		var rawdataset = new vis.DataSet(rawitems);
 		var rawoptions = {};
 		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawoptions);
-		
-		graph2d.on('rangechange',  _.throttle(runDataUpdateFromGraph, 500,{leading: false}));
-        graph2d.on('rangechange',  _.throttle(runSyncFromGraph, 50,{leading: false}));
+
+		graph2d.on('rangechange', _.throttle(runDataUpdateFromGraph, 500, {
+			leading : false
+		}));
+		graph2d.on('rangechange', _.throttle(runSyncFromGraph, 50, {
+			leading : false
+		}));
 
 		graph2d.on('click', function(properties) {
 			console.log("Clicked " + JSON.stringify(properties['time']));
@@ -276,6 +294,75 @@ body, html {
 			rawdataset.add(data);
 
 		};
+
+		$(document)
+				.ready(
+						function() {
+
+							var defaultEnd = moment().add(1, 'hours');
+							var defaultStart = moment().subtract(2, 'days');
+							var useDefault = true;
+
+							var requestedStart = getUrlParameter('start');
+							var requestedEnd = getUrlParameter('end');
+							var parsedStart = new Date(requestedStart);
+							var parsedEnd = new Date(requestedEnd);
+
+							console.log("requested params: " + parsedStart
+									+ ", " + parsedEnd);
+
+							if (Object.prototype.toString.call(parsedStart) === "[object Date]"
+									&& Object.prototype.toString
+											.call(parsedEnd) === "[object Date]") {
+								// it is a date
+								if (isNaN(parsedStart.getTime())
+										|| isNaN(parsedEnd.getTime())) {
+									// date is not valid
+									useDefault = true;
+								} else {
+									useDefault = false;
+								}
+							} else {
+								// not a date
+								useDefault = true;
+							}
+
+							console.log("Initing with using default ranges: "
+									+ useDefault);
+							properties = {};
+							if (useDefault) {
+								properties['start'] = defaultStart;
+								properties['end'] = defaultEnd;
+							} else {
+								properties['start'] = parsedStart;
+								properties['end'] = parsedEnd;
+							}
+
+							loadNewData('rangechange', properties);
+							timeline.setWindow(properties['start'],
+									properties['end'], {
+										animation : false
+									});
+							graph2d.setWindow(properties['start'],
+									properties['end'], {
+										animation : false
+									});
+
+						});
+
+		var getUrlParameter = function getUrlParameter(sParam) {
+			var sPageURL = decodeURIComponent(window.location.search
+					.substring(1)), sURLVariables = sPageURL.split('&'), sParameterName, i;
+
+			for (i = 0; i < sURLVariables.length; i++) {
+				sParameterName = sURLVariables[i].split('=');
+
+				if (sParameterName[0] === sParam) {
+					return sParameterName[1] === undefined ? true
+							: sParameterName[1];
+				}
+			}
+		};
 	</script>
 
 
@@ -291,7 +378,9 @@ body, html {
 					<h4 class="modal-title">Snapshot</h4>
 				</div>
 				<div class="modal-body">
-					<p>Snapshot <span id="snapshotDate">/date/</span> in JSON format:</p>
+					<p>
+						Snapshot <span id="snapshotDate">/date/</span> in JSON format:
+					</p>
 					<pre class="prettyprint lang-json" id="json-body"></pre>
 				</div>
 				<div class="modal-footer"></div>
@@ -303,7 +392,7 @@ body, html {
 	<!-- /.modal -->
 
 
-<div id="reasonModal" class="modal fade" tabindex="-1" role="dialog">
+	<div id="reasonModal" class="modal fade" tabindex="-1" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -315,12 +404,12 @@ body, html {
 				</div>
 				<div class="modal-body">
 					<h4 id="raport-name">/Name/</h4>
-					<p id= "raport-description">/description/</p>
+					<p id="raport-description">/description/</p>
 
-					<h4 >Action</h4>
-					<p id= "raport-action">/action/</p>
+					<h4>Action</h4>
+					<p id="raport-action">/action/</p>
 
-					<h4 >Details</h4>
+					<h4>Details</h4>
 					<pre id="raport-body"></pre>
 
 				</div>

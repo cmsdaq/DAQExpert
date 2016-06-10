@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.PersistorManager;
+import rcms.utilities.daqexpert.ExpertPersistorManager;
 
 public class SnapshotAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -32,7 +32,7 @@ public class SnapshotAPI extends HttpServlet {
 		Date timeDate = objectMapper.readValue(time, Date.class);
 		logger.info("Parsed requested snapshot date: " + timeDate);
 
-		DAQ result = PersistorManager.get().findSnapshot(timeDate);
+		DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
 
 		String json = objectMapper.writeValueAsString(result);
 		// TODO: externalize the Allow-Origin

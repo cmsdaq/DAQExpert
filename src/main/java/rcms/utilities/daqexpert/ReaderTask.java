@@ -42,7 +42,7 @@ public class ReaderTask extends TimerTask {
 
 		try {
 
-			ExpertPersistorManager.get().getUnprocessedSnapshots(filesProcessed, checkManager);
+			boolean breaked = ExpertPersistorManager.get().getUnprocessedSnapshots(filesProcessed, checkManager);
 			int all = filesProcessed.size();
 			logger.debug("files processed in this round " + (all - last));
 			last = all;

@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,13 +19,13 @@ import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.Level;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
 
-public class Message3 extends Aware implements Condition {
+public class Message5 extends Aware implements Condition {
 
-	private static Logger logger = Logger.getLogger(Message3.class);
+	private static Logger logger = Logger.getLogger(Message5.class);
 	private final String ERROR_STATE = "ERROR";
-	private static final String name = "TTCP in error or out of sync";
-	private static final String description = "TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
-	private static final String action = "Issue a TTCHardReset, If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)";
+	private static final String name = "TTCP in busy or warning, and fed not backpressured by cDAQ";
+	private static final String description = "The problem is caused by FED in Busy/Warning";
+	private static final String action = "";
 
 	@Override
 	public Boolean satisfied(DAQ daq) {
@@ -37,10 +38,18 @@ public class Message3 extends Aware implements Condition {
 			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
+				if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-					logger.debug("M3: " + name + " at " + daq.getLastUpdate());
-					return true;
+					for (FED fed : ttcp.getFeds()) {
+						TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+						if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+								&& fed.getPercentBackpressure() == 0F) {
+
+							logger.debug("M5: " + name + " with fed " + fed.getId() + " in backpressure at "
+									+ new Date(daq.getLastUpdate()));
+							return true;
+						}
+					}
 				}
 			}
 		}
@@ -50,12 +59,12 @@ public class Message3 extends Aware implements Condition {
 
 	@Override
 	public Level getLevel() {
-		return Level.FL3; // change to flowchart
+		return Level.FL5; // change to flowchart
 	}
 
 	@Override
 	public String getText() {
-		return "M3: TTCP error or OOS";
+		return "M5" + name;
 	}
 
 	@Override
@@ -71,22 +80,27 @@ public class Message3 extends Aware implements Condition {
 			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.ERROR || currentState == TTSState.OUT_OF_SYNC) {
+				if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+
 					HashMap<String, Object> ttcpRaport = new HashMap<>();
 					ttcpRaport.put("name", ttcp.getName());
 					ttcpRaport.put("subsystem", ttcp.getSubsystem().getName());
 					ttcpRaport.put("ttsState", TTSState.getByCode(ttcp.getTtsState()));
-					List<Object> oosFeds = new ArrayList<>();
+					List<Object> problemFeds = new ArrayList<>();
 					for (FED fed : ttcp.getFeds()) {
-						if (fed.getRuFedOutOfSync() > 0) {
+
+						TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+						if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+								&& fed.getPercentBackpressure() == 0F) {
 							HashMap<String, String> fedraport = new HashMap<>();
 							fedraport.put("sourceId", fed.getSrcIdExpected() + "");
-							fedraport.put("noOfEventsOOS", fed.getRuFedOutOfSync() + "");
-							oosFeds.add(fedraport);
+							fedraport.put("ttsState", TTSState.getByCode(fed.getTtsState()).name());
+							problemFeds.add(fedraport);
 						}
 					}
-					eventRaport.getSetByCode("fedsInOOS").add(oosFeds);
 					eventRaport.getSetByCode("problemTTCPs").add(ttcpRaport);
+					eventRaport.getSetByCode("problemFEDs").add(problemFeds);
+
 				}
 			}
 		}

@@ -25,9 +25,10 @@ public class ServletListener implements ServletContextListener {
 	Timer t = new Timer();
 
 	public void contextInitialized(ServletContextEvent e) {
-		long last = walkAllFilesProcessAndStoreInMemory();
+		long last = 0;
+		//last = walkAllFilesProcessAndStoreInMemory();
 		
-		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator,last), 10000, 10000);
+		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator,last), 0, 3000);
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

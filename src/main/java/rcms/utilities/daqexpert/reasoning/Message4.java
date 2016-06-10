@@ -1,10 +1,13 @@
 package rcms.utilities.daqexpert.reasoning;
 
+import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.reasoning.base.Aware;
 import rcms.utilities.daqexpert.reasoning.base.Condition;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventClass;
@@ -12,7 +15,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.Level;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
 
-public class Message4 implements Condition {
+public class Message4 extends Aware implements Condition {
 
 	private static Logger logger = Logger.getLogger(Message4.class);
 	private final String ERROR_STATE = "ERROR";
@@ -22,13 +25,7 @@ public class Message4 implements Condition {
 
 	@Override
 	public Boolean satisfied(DAQ daq) {
-		if (!"Stable Beams".equalsIgnoreCase(daq.getLhcBeamMode()))
-			return false;
-
-		// TODO: this code is duplicated, rate zero is already checked in other
-		// logic modules
-		float rate = daq.getFedBuilderSummary().getRate();
-		if (rate != 0)
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
@@ -38,8 +35,7 @@ public class Message4 implements Condition {
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
 				if (currentState == TTSState.DISCONNECTED) {
 
-					logger.debug(
-							"M4 DAQ and level 0 in error state, exists TTCP in state non ready " + daq.getLastUpdate());
+					logger.debug("M4: " + name + " at " + daq.getLastUpdate());
 					return true;
 				}
 			}
@@ -72,8 +68,13 @@ public class Message4 implements Condition {
 
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
 				if (currentState == TTSState.DISCONNECTED) {
-					eventRaport.getSetByCode("ttcpDisconnected")
-							.add(subSystem.getName() + ": " + ttcp.getName() + ": " + ttcp.getTtsState());
+
+					HashMap<String, Object> ttcpRaport = new HashMap<>();
+					ttcpRaport.put("name", ttcp.getName());
+					ttcpRaport.put("subsystem", ttcp.getSubsystem().getName());
+					ttcpRaport.put("ttsState", TTSState.getByCode(ttcp.getTtsState()));
+					eventRaport.getSetByCode("problemTTCP").add(ttcpRaport);
+
 				}
 			}
 		}

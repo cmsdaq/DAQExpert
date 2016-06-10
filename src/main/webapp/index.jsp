@@ -116,6 +116,12 @@ body, html {
 		}, {
 			id : 'fl4',
 			content : 'flowchart M4'
+		}, {
+			id : 'fl5',
+			content : 'flowchart M5'
+		}, {
+			id : 'fl6',
+			content : 'flowchart M6'
 		} ]);
 		var timeline = new vis.Timeline(container, items, groups, options);
 

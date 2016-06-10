@@ -11,7 +11,9 @@ public enum Level {
 	FL1("fl1"),
 	FL2("fl2"),
 	FL3("fl3"),
-	FL4("fl4");
+	FL4("fl4"),
+	FL5("fl5"),
+	FL6("fl6");
 
 	private final String code;
 

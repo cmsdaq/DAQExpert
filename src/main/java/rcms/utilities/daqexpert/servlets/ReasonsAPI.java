@@ -31,33 +31,6 @@ public class ReasonsAPI extends HttpServlet {
 
 	ObjectMapper objectMapper = new ObjectMapper();
 
-	@Deprecated
-	private void addToGrouped(Map<String, Entry> groupedMap, Map<String, Integer> groupedQuantities, Entry entry,
-			Date startDate, Date endDate) {
-
-		// create group entry if there is no in given row (group)
-		if (!groupedMap.containsKey(entry.getGroup())) {
-			Entry newGroup = new Entry();
-			newGroup.setContent("Grouped");
-			newGroup.setEnd(startDate);
-			newGroup.setStart(endDate);
-			newGroup.setGroup(entry.getGroup());
-			groupedMap.put(entry.getGroup(), newGroup);
-			groupedQuantities.put(entry.getGroup(), 0);
-		}
-
-		Entry existingGroup = groupedMap.get(entry.getGroup());
-		groupedQuantities.put(entry.getGroup(), groupedQuantities.get(entry.getGroup()) + 1);
-
-		/* merge current filtered entry with existing group entry */
-		if (entry.getStart().before(existingGroup.getStart())) {
-			existingGroup.setStart(entry.getStart());
-		} else if (entry.getEnd().after(existingGroup.getEnd())) {
-			existingGroup.setEnd(entry.getEnd());
-		}
-
-	}
-
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -136,16 +109,9 @@ public class ReasonsAPI extends HttpServlet {
 					}
 				}
 			} catch (NullPointerException e) {
-				logger.error("Problem with walking through Reasons stream:");
-				logger.error("Entry: " + entry);
-				if (entry != null) {
-					logger.error("Entry start: " + entry.getStart());
-					logger.error("Entry end: " + entry.getEnd());
-				}
-
-				logger.error("Requested start: " + startDate);
-				logger.error("Requested end: " + endDate);
-				e.printStackTrace();
+				// it means that some of reasons are being builed by event
+				// builder, just dont show them yet, they will be ready on next
+				// request
 			}
 
 		}

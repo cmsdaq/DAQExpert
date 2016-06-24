@@ -1,7 +1,9 @@
 package rcms.utilities.daqexpert;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -38,9 +40,8 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	private static ExpertPersistorManager instance;
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	private static final String updatedDir = "/tmp/mgladki/snapshots/";
-	
+
+	private static String updatedDir;
 
 	public static ExpertPersistorManager get() {
 		if (instance == null)
@@ -50,35 +51,41 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	public boolean getUnprocessedSnapshots(Map<String, File> processed, CheckManager checkManager) throws IOException {
 
-		List<File> fileList = getFiles(updatedDir);
-		Collections.sort(fileList, FileComparator);
+		try {
+			List<File> fileList = getFiles(updatedDir);
+			Collections.sort(fileList, FileComparator);
 
-		StructureSerializer structurePersistor = new StructureSerializer();
-		DAQ daq = null;
-		logger.debug("Processing files from " + updatedDir + "...");
+			StructureSerializer structurePersistor = new StructureSerializer();
+			DAQ daq = null;
+			logger.debug("Processing files from " + updatedDir + "...");
 
-		int max = 5000;
-		int i = 0;
-		boolean breaked = false;
-		for (File path : fileList) {
-			if (!processed.containsKey(path.getName())) {
-				i++;
-				daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
-				checkManager.runCheckers(daq);
-				TaskManager.get().rawData.add(new DummyDAQ(daq));
-				processed.put(path.getName(), path);
-				if(i>max){
-					breaked = true;
-					break;
+			int max = 5000;
+			int i = 0;
+			boolean breaked = false;
+			for (File path : fileList) {
+				if (!processed.containsKey(path.getName())) {
+					i++;
+					daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
+					checkManager.runCheckers(daq);
+					TaskManager.get().rawData.add(new DummyDAQ(daq));
+					processed.put(path.getName(), path);
+					if (i > max) {
+						breaked = true;
+						break;
+					}
 				}
 			}
-		}
 
-		// temporarly finish
-		if (daq != null)
-			EventProducer.get().finish(new Date(daq.getLastUpdate()));
-		
-		return breaked;
+			// temporarly finish
+			if (daq != null)
+				EventProducer.get().finish(new Date(daq.getLastUpdate()));
+
+			return breaked;
+		} catch (NullPointerException e) {
+			logger.error("Problem getting snapthot files from: " + updatedDir);
+			e.printStackTrace();
+		}
+		return false;
 
 	}
 
@@ -128,14 +135,25 @@ public class ExpertPersistorManager extends PersistorManager {
 					+ " snapshots) finished in " + result + "ms. (1h of data processed in " + result / hours + "ms)");
 		logger.debug("Current producer state: " + EventProducer.get().toString());
 	}
-	
 
 	public DAQ findSnapshot(Date date) {
 		StructureSerializer structurePersistor = new StructureSerializer();
 		try {
-			List<File> fileList = getFiles(persistenceDir);
-			List<File> updatedList = getFiles(updatedDir);
-			fileList.addAll(updatedList);
+			List<File> fileList = new ArrayList<>();
+			try {
+				fileList.addAll(getFiles(persistenceDir));
+			} catch (FileNotFoundException e) {
+				fileList = new ArrayList<>();
+				logger.warn("Cannot access persisence dir, ignoring...");
+			}
+
+			try {
+				fileList.addAll(getFiles(updatedDir));
+			} catch (FileNotFoundException e) {
+				fileList = new ArrayList<>();
+				logger.warn("Cannot access snapshots dir, ignoring...");
+			}
+
 			if (fileList.size() == 0) {
 				logger.error("No files to process");
 				return null;
@@ -181,6 +199,10 @@ public class ExpertPersistorManager extends PersistorManager {
 
 		return null;
 
+	}
+
+	public static void setUpdatedDir(String updatedDir) {
+		ExpertPersistorManager.updatedDir = updatedDir;
 	}
 
 }

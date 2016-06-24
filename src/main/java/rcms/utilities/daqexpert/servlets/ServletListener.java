@@ -6,6 +6,9 @@ import java.util.Timer;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.DataResolutionManager;
@@ -20,15 +23,40 @@ public class ServletListener implements ServletContextListener {
 
 	ExpertPersistorManager persistorManager = new ExpertPersistorManager("/tmp/mgladki/persistence");
 	DataResolutionManager dataSegmentator = new DataResolutionManager();
-	
 
 	Timer t = new Timer();
 
 	public void contextInitialized(ServletContextEvent e) {
-		long last = 0;
-		//last = walkAllFilesProcessAndStoreInMemory();
-		
-		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator,last), 0, 3000);
+
+		try {
+			String snapshotsDir = null;
+			String snapshotsDirFromEnv = System.getenv("SNAPSHOTS");
+			if (snapshotsDirFromEnv != null) {
+				logger.info("Snapshots directory from env variable: SNAPSHOTS=" + snapshotsDirFromEnv);
+				snapshotsDir = snapshotsDirFromEnv;
+			} else {
+				logger.info("Loading snapshots directory from config.properties...");
+				Configuration config = new PropertiesConfiguration("config.properties");
+				snapshotsDir = config.getString("snapshots");
+			}
+
+			if (snapshotsDir != null)
+				logger.info("Loading snapshots from directory: " + snapshotsDir);
+			else {
+				logger.warn(
+						"Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
+				return;
+			}
+
+			ExpertPersistorManager.setUpdatedDir(snapshotsDir);
+			long last = 0;
+			// last = walkAllFilesProcessAndStoreInMemory();
+			t.scheduleAtFixedRate(new ReaderTask(dataSegmentator, last), 0, 3000);
+
+		} catch (ConfigurationException e1) {
+			e1.printStackTrace();
+		}
+
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {
@@ -47,18 +75,16 @@ public class ServletListener implements ServletContextListener {
 		}
 
 		dataSegmentator.prepareMultipleResolutionData();
-		
+
 		long last = 0;
-		
-		for(Entry e: EventProducer.get().getResult()){
-			if(e.getStart().getTime() > last){
+
+		for (Entry e : EventProducer.get().getResult()) {
+			if (e.getStart().getTime() > last) {
 				last = e.getStart().getTime();
 			}
 		}
 		return last;
-		
+
 	}
-
-
 
 }

@@ -11,9 +11,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
@@ -30,12 +30,10 @@ public class FlowchartCase3 extends ExtendedCondition {
 	public FlowchartCase3() {
 		this.name = "CASE 3";
 		this.description = "TTCP in error or out of sync</br>TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
-		this.action = "<ul>" + "<li>Issue a TTCHardReset</li>"
-				+ "<li>If DAQ is still stuck after a few seconds, issue another TTCHardReset"
-				+ "(HardReset includes a Resync, so it may be used for both OOS and ERROR)</li>"
+		this.action = "<ul><li>Issue a TTCHardReset</li>"
+				+ "<li>If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)</li>"
 				+ "<li>Problem fixed: Make an e-log entry</li>"
-				+ "<li>Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem."
-				+ "Start a new run. Try up to 2 times.</li>"
+				+ "<li>Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem. Start a new run. Try up to 2 times.</li>"
 				+ "<li>Problem still not fixed after recover: Call the DOC for the partition in error/OOS</li>"
 				+ "<li>Problem fixed after recover: Make an e-log entry. Call the DOC for the partition in error/OOS to inform</li></ul>";
 

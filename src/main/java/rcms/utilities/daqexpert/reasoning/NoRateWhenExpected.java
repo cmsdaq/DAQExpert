@@ -8,6 +8,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.states.LHCBeamMode;
 
+//TODO: should not be satisfied when FixingSoftError
 public class NoRateWhenExpected extends Condition {
 
 	public NoRateWhenExpected() {

@@ -29,10 +29,9 @@ public class FlowchartCase2 extends ExtendedCondition {
 		this.description = "DAQ and level 0 in error state</br>"
 				+ "A RU is in Failded state. A FED has sent corrupted data to the DAQ. "
 				+ "Ru in failed state and subsystem attached below.";
-		this.action = "cDAQ is stack during STABLE BEAMS, no events flowing. "
-				+ "DAQ and Level-0 are in Error state, exists RU in Failed state.</br>"
-				+ "A FED has sent corrupted data to the DAQ. "
-				+ "Corresponding system of the FED and RU in Failde state attached below.";
+		this.action = "<ul><li>Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem. Start new Run. (Try up to 2 times)</li>"
+				+ "<li>Problem fixed: Make an e-log entry. Call the DOC for the subsystem that sent corrupted data to inform about the problem</li>"
+				+ "<li>Problem not fixed: Call the DOC for the subsystem that sent corrupted data</li></ul>";
 		this.group = EventGroup.FL2;
 		this.priority = EventPriority.critical;
 	}

@@ -32,8 +32,14 @@ public class FlowchartCase6 extends ExtendedCondition {
 	public FlowchartCase6() {
 		this.name = "CASE 6";
 		this.description = "TTCP in busy or warning, and FED backpressured</br>"
-				+ "Backpressure is going through the FED in Busy/Warning but there is NOTHING wrong with the FED in Busy/Warning.";
-		this.action = "";
+				+ "Backpressure is going through the FED in Busy/Warning but there is NOTHING wrong with the FED in Busy/Warning.</br>"
+				+ "A FED stopped sending data (attached below)"
+				+ "Note that Expert has access only to legacy FEDs, follow Flowchart if no FED attached below";
+		this.action = "<ul><li>Try to recover: Stop the run</li>"
+				+ "<li>Red & green recycle the subsystem whose FED stopped sending data.</li>"
+				+ "<li>Start new Run (Try 1 time)</li>"
+				+ "<li>Problem fixed: Make an e-log entry. Call the DOC of the subsystem whose FED stopped sending data to inform</li>"
+				+ "<li>Problem not fixed: Call the OC for the subsystem whose FED stopped sending data</li></ul>";
 		this.group = EventGroup.FL6;
 		this.priority = EventPriority.critical;
 	}

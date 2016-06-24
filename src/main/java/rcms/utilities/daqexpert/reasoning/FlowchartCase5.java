@@ -12,9 +12,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
@@ -31,9 +31,14 @@ public class FlowchartCase5 extends ExtendedCondition {
 
 	public FlowchartCase5() {
 		this.name = "CASE 5";
-		this.description = "TTCP in busy or warning, and fed not backpressured by cDAQ</br>"
-				+ "The problem is caused by FED in Busy/Warning";
-		this.action = "";
+		this.description = "TTCP blocking trigger in busy or warning TTS state, FED not backpressured by cDAQ</br>"
+				+ "The problem is caused by FED in Busy/Warning (see FED attached below)</br>"
+				+ "Note that Expert has access only to legacy FEDs, follow Flowchart if no FED attached below";
+		this.action = "<ul><li>Stop the run</li>"
+				+ "<li>If the problem is caused by an ECAL FED in Busy proceed to 3rd step. Otherwise red & green recycle the subsystem.</li>"
+				+ "<li>Start new run (try up to 2 times)</li>"
+				+ "<li>Problem fixed: Make an e-log entry. Call the DOC of the subsystem in Warning/Busy to inform</li>"
+				+ "<li>Call the DOC for the subsystem in Warning/Busy</li></ul>";
 		this.group = EventGroup.FL5;
 		this.priority = EventPriority.critical;
 	}

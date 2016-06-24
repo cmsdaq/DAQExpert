@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
@@ -30,8 +30,10 @@ public class FlowchartCase4 extends ExtendedCondition {
 		this.description = "Exists TTCP in disconnected</br>"
 				+ "TTS state of partition blocking trigger is Disconnected,"
 				+ "The PI of the subsystem may be suffering from a firmware problem";
-		this.action = "Stop the run, red & green recycle the subsystem corresponding to the partition,"
-				+ "Start new run";
+		this.action = "<ul><li>Stop the run</li>"
+				+ "<li>red & green recycle the subsystem corresponding to the partition</li>" + "<li>Start new run</li>"
+				+ "<li>Problem fixed: You are done make an e-log entry</li>"
+				+ "<li>Problem not fixed: Call the DOC for the partition in disconnected</li></ul>";
 		this.group = EventGroup.FL4;
 		this.priority = EventPriority.critical;
 	}

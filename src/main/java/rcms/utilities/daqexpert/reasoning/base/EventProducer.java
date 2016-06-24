@@ -18,7 +18,7 @@ public class EventProducer {
 	private static EventProducer instance;
 
 	/** All produced reasons are kept in this list */
-	private final List<Entry> result =  Collections.synchronizedList(new ArrayList<Entry>());
+	private final List<Entry> result = Collections.synchronizedList(new ArrayList<Entry>());
 
 	/** All events without end date are kept here (unfinished) */
 	private final Map<String, Entry> unfinished = new HashMap<>();
@@ -56,7 +56,7 @@ public class EventProducer {
 	 * corresponding to 1 start and end time
 	 */
 	public Entry produce(Condition checker, boolean value, Date date) {
-		return produce(checker, value, date, checker.getLevel());
+		return produce(checker, value, date, checker.getGroup());
 	}
 
 	/**
@@ -67,16 +67,16 @@ public class EventProducer {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
-			produce(comparator, !value, current, comparator.getLevel());
-			produce(comparator, value, current, comparator.getLevel());
+			produce(comparator, !value, current, comparator.getGroup());
+			produce(comparator, value, current, comparator.getGroup());
 		}
 	}
 
-	private Entry produce(Classificable classificable, boolean value, Date date, Level level) {
+	private Entry produce(EventFinder classificable, boolean value, Date date, EventGroup level) {
 		// get current state
 		String className = classificable.getClass().getSimpleName();
-		String content = classificable.getText();
-		EventClass eventClass = classificable.getClassName();
+		String content = classificable.getName();
+		EventPriority eventClass = classificable.getPriority();
 		Entry result = null;
 		if (states.containsKey(className)) {
 			boolean currentState = states.get(className);
@@ -97,8 +97,8 @@ public class EventProducer {
 		return result;
 	}
 
-	private Entry finishOldAddNew(String className, String content, Boolean value, Date date, Level level,
-			EventClass eventClass) {
+	private Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
+			EventPriority eventClass) {
 
 		/* finish old entry */
 		if (unfinished.containsKey(className)) {

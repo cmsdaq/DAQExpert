@@ -2,7 +2,7 @@ package rcms.utilities.daqexpert.reasoning.base;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 
-public abstract class Comparator implements Classificable {
+public abstract class Comparator extends EventFinder {
 
 	private DAQ last;
 

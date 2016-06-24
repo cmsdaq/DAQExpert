@@ -1,32 +1,23 @@
 package rcms.utilities.daqexpert.reasoning;
 
+import java.util.Map;
+
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Aware;
 import rcms.utilities.daqexpert.reasoning.base.Condition;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.states.LHCBeamMode;
 
-public class NoRateWhenExpected extends Aware implements Condition {
+public class NoRateWhenExpected extends Condition {
 
-	@Override
-	public Level getLevel() {
-		return Level.Error;
+	public NoRateWhenExpected() {
+		this.name = "No rate when expected";
+		this.group = EventGroup.Error;
+		this.priority = EventPriority.critical;
 	}
 
 	@Override
-	public String getText() {
-		return "No rate when expected";
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.critical;
-	}
-
-	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		boolean stableBeams = false;
 		boolean runOngoing = false;
 		boolean noRate = false;
@@ -38,11 +29,6 @@ public class NoRateWhenExpected extends Aware implements Condition {
 		if (stableBeams && runOngoing && noRate)
 			return true;
 		return false;
-	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-
 	}
 
 }

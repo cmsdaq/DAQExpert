@@ -8,14 +8,18 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 
 public class EVMComparator extends Comparator {
 
-	private static Logger logger = Logger.getLogger(EVMComparator.class);
+	public EVMComparator() {
+		this.name = "n/a";
+		this.group = EventGroup.Info;
+		this.priority = EventPriority.defaultt;
+	}
 
-	private String message;
+	private static Logger logger = Logger.getLogger(EVMComparator.class);
 
 	public boolean compare(DAQ previous, DAQ current) {
 		boolean result = false;
@@ -33,31 +37,17 @@ public class EVMComparator extends Comparator {
 			if (ru.isEVM())
 				previousEVM = ru;
 		}
-		if(currentEVM == null || previousEVM == null){
+		if (currentEVM == null || previousEVM == null) {
 			logger.error("EVM not found for shapshot " + new Date(current.getLastUpdate()));
 			return false;
 		}
 
 		if (!currentEVM.getStatus().equals(previousEVM.getStatus())) {
 			logger.debug("EVM state " + currentEVM.getStatus());
-			message = "EVM state: " + currentEVM.getStatus();
+			this.name = "EVM state: " + currentEVM.getStatus();
 			result = true;
 		}
 		return result;
-	}
-
-	@Override
-	public String getText() {
-		return message;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.Info;
-	}
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
 	}
 
 }

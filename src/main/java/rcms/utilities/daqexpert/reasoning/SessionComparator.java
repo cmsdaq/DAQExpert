@@ -6,41 +6,28 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 
 public class SessionComparator extends Comparator {
 
+	public SessionComparator() {
+		this.name = "n/a";
+		this.group = EventGroup.Run;
+		this.priority = EventPriority.defaultt;
+	}
+
 	private static Logger logger = Logger.getLogger(SessionComparator.class);
-
-	private String sessionId;
-
 
 	public boolean compare(DAQ previous, DAQ current) {
 		boolean result = false;
-		
+
 		if (current.getSessionId() != previous.getSessionId()) {
 			logger.debug("New session identified " + new Date(current.getLastUpdate()));
-			sessionId = "session id: " + current.getSessionId();
+			name = "session id: " + current.getSessionId();
 			result = true;
 		}
 		return result;
 	}
-
-
-	@Override
-	public String getText() {
-		return sessionId;
-	}
-	@Override
-	public Level getLevel() {
-		return Level.Run;
-	}
-	
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
-	}
-
 
 }

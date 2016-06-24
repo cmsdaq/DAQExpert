@@ -1,35 +1,51 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Aware;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
-public class Message1 extends Aware implements Condition {
+/**
+ * Logic module identifying 1 flowchart case.
+ * 
+ * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
+public class FlowchartCase1 extends ExtendedCondition {
 
-	private static final Logger logger = Logger.getLogger(Message1.class);
+	public FlowchartCase1() {
+		this.name = "CASE 1";
+		this.description = "Run blocked by OOS FED data and RU in SYNCLOSS</br>"
+				+ "DAQ and Level-0 are in RunBlocked state. A FED has sent out-of-sequence data to the DAQ. "
+				+ "Corresponding subsystem and RU in SyncLoss state are attached below.";
+		this.action = "Try to recover (try up to 2 times): "
+				+ "If the subsystem is TRACKER: Stop the run, Start a new run. "
+				+ "For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run.</br>"
+				+ "Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below)</br>"
+				+ "Problem fixed: Make an e-log entry. "
+				+ "Call the DOC for the subsystem that caused the SyncLoss (attached below) to inform about the problem";
+		this.group = EventGroup.FL1;
+		this.priority = EventPriority.critical;
+	}
+
+	private static final Logger logger = Logger.getLogger(FlowchartCase1.class);
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
-	private static final String message = "CASE 1";
-	private static final String name = "cDAQ is stuck during STABLE BEAMS, no events flowing. DAQ and Level-0 are in RunBlocked state"; // events
-	private static final String description = "A FED has sent out-of-sequence data to the DAQ. Corresponding subsystem and RU in SyncLoss state are attached below.";
-	private static final String action = "Try to recover (try up to 2 times): If the subsystem is TRACKER: Stop the run, Start a new run. For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run. Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below), Problem fixed: Make an e-log entry. Call the DOC for the subsystem that caused the SyncLoss (attached below) to informa about the problem";
-
 	private RU problemRu;
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
@@ -46,20 +62,10 @@ public class Message1 extends Aware implements Condition {
 
 			}
 
-			logger.debug(message);
+			logger.debug(name);
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.FL1;
-	}
-
-	@Override
-	public String getText() {
-		return message;
 	}
 
 	@Override
@@ -90,11 +96,6 @@ public class Message1 extends Aware implements Condition {
 			}
 
 		}
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.critical;
 	}
 
 }

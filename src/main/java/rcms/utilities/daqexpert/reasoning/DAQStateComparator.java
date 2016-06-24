@@ -4,39 +4,28 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
 public class DAQStateComparator extends Comparator {
 
-	private static Logger logger = Logger.getLogger(DAQStateComparator.class);
+	public DAQStateComparator() {
+		this.name = "n/a";
+		this.group = EventGroup.DAQ;
+		this.priority = EventPriority.defaultt;
+	}
 
-	private String runId;
+	private static Logger logger = Logger.getLogger(DAQStateComparator.class);
 
 	public boolean compare(DAQ previous, DAQ current) {
 		boolean result = false;
 
 		if (!current.getDaqState().equals(previous.getDaqState())) {
 			logger.debug("DAQ state " + current.getDaqState());
-			runId = "DAQ state: " + current.getDaqState();
+			this.name = "DAQ state: " + current.getDaqState();
 			result = true;
 		}
 		return result;
-	}
-
-	@Override
-	public String getText() {
-		return runId;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.DAQ;
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
 	}
 
 }

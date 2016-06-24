@@ -1,30 +1,28 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.text.NumberFormat;
-import java.util.HashSet;
-
-import org.apache.log4j.Logger;
+import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
-public class WarningInSubsystem implements Condition {
-	private final static Logger logger = Logger.getLogger(WarningInSubsystem.class);
+public class WarningInSubsystem extends ExtendedCondition {
 
-	private static final String name = "Exists TTCP with warning > 0%";
-	private static final String description = "One or more TTCP (attached below) has warning above 0%, it may affect rate.";
-	private static final String action = "No action";
-
-	private String text = "";
+	public WarningInSubsystem() {
+		this.name = "Exists TTCP with warning > 0%";
+		this.description = "One or more TTCP (attached below) has warning above 0%, it may affect rate.";
+		this.action = "No action";
+		this.group = EventGroup.Warning;
+		this.priority = EventPriority.defaultt;
+	}
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean result = false;
 
@@ -34,22 +32,11 @@ public class WarningInSubsystem implements Condition {
 
 				if (ttcp.getPercentWarning() != 0F) {
 					result = true;
-					text = "TTCP in warning";
 				}
 			}
 		}
 
 		return result;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.Warning;
-	}
-
-	@Override
-	public String getText() {
-		return text;
 	}
 
 	@Override
@@ -73,11 +60,6 @@ public class WarningInSubsystem implements Condition {
 				}
 			}
 		}
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
 	}
 
 }

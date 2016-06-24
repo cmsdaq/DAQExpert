@@ -6,48 +6,31 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
 public class LHCBeamModeComparator extends Comparator {
 
+	public LHCBeamModeComparator() {
+		this.name = "n/a";
+		this.group = EventGroup.LHC;
+		this.priority = EventPriority.defaultt;
+	}
+
 	private static Logger logger = Logger.getLogger(LHCBeamModeComparator.class);
-
-	private String beamMode;
-
-	private boolean stable = false;
 
 	public boolean compare(DAQ previous, DAQ current) {
 		boolean result = false;
 
 		if (!current.getLhcBeamMode().equals(previous.getLhcBeamMode())) {
 			logger.debug("New LHC Beam mode " + new Date(current.getLastUpdate()));
-			beamMode = "Beam mode: " + current.getLhcBeamMode();
+			this.name = "Beam mode: " + current.getLhcBeamMode();
 			if (current.getLhcBeamMode().equalsIgnoreCase("Stable Beams"))
-				stable = true;
-			else
-				stable = false;
+				this.priority = EventPriority.critical;
+
 			result = true;
 		}
 		return result;
-	}
-
-	@Override
-	public String getText() {
-		return beamMode;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.LHC;
-	}
-
-	@Override
-	public EventClass getClassName() {
-		if (stable)
-			return EventClass.critical;
-		else
-			return EventClass.defaultt;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -11,24 +12,36 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.Aware;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
 
-public class Message5 extends Aware implements Condition {
+/**
+ * Logic module identifying 5 flowchart case.
+ * 
+ * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
+public class FlowchartCase5 extends ExtendedCondition {
 
-	private static Logger logger = Logger.getLogger(Message5.class);
-	private final String ERROR_STATE = "ERROR";
-	private static final String name = "TTCP in busy or warning, and fed not backpressured by cDAQ";
-	private static final String description = "The problem is caused by FED in Busy/Warning";
-	private static final String action = "";
+	public FlowchartCase5() {
+		this.name = "CASE 5";
+		this.description = "TTCP in busy or warning, and fed not backpressured by cDAQ</br>"
+				+ "The problem is caused by FED in Busy/Warning";
+		this.action = "";
+		this.group = EventGroup.FL5;
+		this.priority = EventPriority.critical;
+	}
+
+	private static final Logger logger = Logger.getLogger(FlowchartCase5.class);
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
@@ -55,16 +68,6 @@ public class Message5 extends Aware implements Condition {
 		}
 
 		return false;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.FL5; // change to flowchart
-	}
-
-	@Override
-	public String getText() {
-		return "M5" + name;
 	}
 
 	@Override
@@ -104,11 +107,6 @@ public class Message5 extends Aware implements Condition {
 				}
 			}
 		}
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.critical;
 	}
 
 }

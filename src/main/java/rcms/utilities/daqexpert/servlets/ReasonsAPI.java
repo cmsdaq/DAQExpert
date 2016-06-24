@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 
 public class ReasonsAPI extends HttpServlet {
@@ -92,7 +92,7 @@ public class ReasonsAPI extends HttpServlet {
 						if (base == null) {
 							base = new Entry(entry);
 							base.setContent("filtered");
-							base.setClassName(EventClass.filtered.getCode());
+							base.setClassName(EventPriority.filtered.getCode());
 						}
 
 						// merge

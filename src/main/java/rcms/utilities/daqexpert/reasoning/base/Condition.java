@@ -1,12 +1,26 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import java.util.Map;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 
-public interface Condition extends Classificable {
+/**
+ * Base element of analysis results
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
+public abstract class Condition extends EventFinder {
 
-	public Boolean satisfied(DAQ daq);
-	
-	public void gatherInfo(DAQ daq, Entry entry);
-	
-	
+	/**
+	 * Is condition satisfied
+	 * 
+	 * @param daq
+	 *            snapshot which is checked
+	 * @param results
+	 *            current results
+	 * @return condition satisfied
+	 */
+	public abstract boolean satisfied(DAQ daq, Map<String, Boolean> results);
+
 }

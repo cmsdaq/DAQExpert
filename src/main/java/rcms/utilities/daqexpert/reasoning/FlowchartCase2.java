@@ -1,32 +1,47 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Aware;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
 import rcms.utilities.daqexpert.reasoning.base.EventRaport;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
-public class Message2 extends Aware implements Condition {
+/**
+ * Logic module identifying 1 flowchart case.
+ * 
+ * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
+public class FlowchartCase2 extends ExtendedCondition {
 
-	private static Logger logger = Logger.getLogger(Message2.class);
+	public FlowchartCase2() {
+		this.name = "CASE 2";
+		this.description = "DAQ and level 0 in error state</br>"
+				+ "A RU is in Failded state. A FED has sent corrupted data to the DAQ. "
+				+ "Ru in failed state and subsystem attached below.";
+		this.action = "cDAQ is stack during STABLE BEAMS, no events flowing. "
+				+ "DAQ and Level-0 are in Error state, exists RU in Failed state.</br>"
+				+ "A FED has sent corrupted data to the DAQ. "
+				+ "Corresponding system of the FED and RU in Failde state attached below.";
+		this.group = EventGroup.FL2;
+		this.priority = EventPriority.critical;
+	}
+
+	private static Logger logger = Logger.getLogger(FlowchartCase2.class);
 	private final String ERROR_STATE = "ERROR";
-	private static final String name = "DAQ and level 0 in error state";
-	private static final String description = "cDAQ is stack during STABLE BEAMS, no events flowing. DAQ and Level-0 are in Error state, exists RU in Failed state. A FED has sent corrupted data to the DAQ. Corresponding system of the FED and RU in Failde state attached below.";
-	private static final String action = "Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem. Start new Run. (try up to 2 times). Problem not fixed: Call the DOC for the subsystem that sent currupted data, Problem fixed: Make an e-log entry. Call the DOC for the subsystem that sent corrupted data to informa about the problem.";
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
@@ -47,16 +62,6 @@ public class Message2 extends Aware implements Condition {
 			return false;
 		}
 		return false;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.FL2;
-	}
-
-	@Override
-	public String getText() {
-		return "CASE 2";
 	}
 
 	@Override
@@ -90,11 +95,6 @@ public class Message2 extends Aware implements Condition {
 
 			}
 		}
-	}
-
-	@Override
-	public EventClass getClassName() {
-		return EventClass.critical;
 	}
 
 }

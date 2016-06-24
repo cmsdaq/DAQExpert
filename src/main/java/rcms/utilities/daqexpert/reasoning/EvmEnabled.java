@@ -1,22 +1,25 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.reasoning.base.Condition;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
-public class EvmEnabled implements Condition {
-	private final static Logger logger = Logger.getLogger(EvmEnabled.class);
+public class EvmEnabled extends Condition {
+
+	public EvmEnabled() {
+		this.name = "Enabled EVM";
+		this.group = EventGroup.Warning;
+		this.priority = EventPriority.defaultt;
+	}
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		List<FEDBuilder> a = daq.getFedBuilders();
 		for (FEDBuilder b : a) {
 			RU ru = b.getRu();
@@ -26,27 +29,6 @@ public class EvmEnabled implements Condition {
 		boolean result = false;
 
 		return result;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.Warning;
-	}
-
-	@Override
-	public String getText() {
-		return EvmEnabled.class.getSimpleName();
-	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-		// nothing to do
-
-	}
-	
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
 	}
 
 }

@@ -1,6 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
-public enum Level {
+public enum EventGroup {
 	LHC("lhc"),
 	Info("info"),
 	Warning("warning"),
@@ -17,7 +17,7 @@ public enum Level {
 
 	private final String code;
 
-	private Level(String code) {
+	private EventGroup(String code) {
 		this.code = code;
 	}
 

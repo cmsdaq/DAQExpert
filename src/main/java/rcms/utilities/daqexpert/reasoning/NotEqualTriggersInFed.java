@@ -1,21 +1,25 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import org.apache.log4j.Logger;
+import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FMM;
 import rcms.utilities.daqaggregator.data.FMMApplication;
 import rcms.utilities.daqexpert.reasoning.base.Condition;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventClass;
-import rcms.utilities.daqexpert.reasoning.base.Level;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
-public class NotEqualTriggersInFed implements Condition {
-	private final static Logger logger = Logger.getLogger(NotEqualTriggersInFed.class);
+public class NotEqualTriggersInFed extends Condition {
+
+	public NotEqualTriggersInFed() {
+		this.name = "Not equal triggers in fed";
+		this.group = EventGroup.Error;
+		this.priority = EventPriority.defaultt;
+	}
 
 	@Override
-	public Boolean satisfied(DAQ daq) {
+	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		boolean result = false;
 
 		Long fedTriggers = null;
@@ -33,26 +37,6 @@ public class NotEqualTriggersInFed implements Condition {
 		}
 
 		return result;
-	}
-
-	@Override
-	public Level getLevel() {
-		return Level.Error;
-	}
-
-	@Override
-	public String getText() {
-		return NotEqualTriggersInFed.class.getSimpleName();
-	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-		// nothing to do
-	}
-	
-	@Override
-	public EventClass getClassName() {
-		return EventClass.defaultt;
 	}
 
 }

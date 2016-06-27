@@ -13,11 +13,10 @@ http://dev-daq-expert.cern.ch/?start=2016-05-31T12:26&end=2016-05-31T12:33
 Note that cases before 2016-06-02 are based on incomplete snapshots thus may miss some details.
 
 ##### Flowchart case 2:
-no case yet
+Not available (spotlight access necessary)
 
 ##### Flowchart case 3:
 http://dev-daq-expert.cern.ch/?start=2016-06-20T12:50&end=2016-06-20T12:56
-
 
 ##### Flowchart case 4:
 no case yet
@@ -26,7 +25,7 @@ no case yet
 http://dev-daq-expert.cern.ch/?start=2016-06-15T08:53&end=2016-06-15T08:58
 
 ##### Flowchart case 6:
-no case yet
+http://dev-daq-expert.cern.ch/?start=2016-06-25T21:41&end=2016-06-25T21:43
 
 
 ##### Known issues:

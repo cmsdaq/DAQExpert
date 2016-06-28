@@ -44,7 +44,7 @@ public class FlowchartCase6 extends ExtendedCondition {
 		this.priority = EventPriority.critical;
 	}
 
-	private static Logger logger = Logger.getLogger(FlowchartCase6.class);
+	private static final Logger logger = Logger.getLogger(FlowchartCase6.class);
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
@@ -60,7 +60,9 @@ public class FlowchartCase6 extends ExtendedCondition {
 				if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
 					for (FED fed : ttcp.getFeds()) {
-						if (fed.getPercentBackpressure() > 0F) {
+						TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+						if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+								&& fed.getPercentBackpressure() > 0F) {
 
 							logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
 									+ new Date(daq.getLastUpdate()));

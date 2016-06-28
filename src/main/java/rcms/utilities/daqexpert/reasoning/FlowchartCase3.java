@@ -29,7 +29,7 @@ public class FlowchartCase3 extends ExtendedCondition {
 
 	public FlowchartCase3() {
 		this.name = "CASE 3";
-		this.description = "TTCP in error or out of sync</br>TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
+		this.description = "TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
 		this.action = "<ul><li>Issue a TTCHardReset</li>"
 				+ "<li>If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)</li>"
 				+ "<li>Problem fixed: Make an e-log entry</li>"

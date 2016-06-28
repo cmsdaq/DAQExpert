@@ -14,7 +14,7 @@ public class NoRateWhenExpected extends Condition {
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
 		this.group = EventGroup.Error;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.important;
 	}
 
 	@Override
@@ -27,7 +27,9 @@ public class NoRateWhenExpected extends Condition {
 		runOngoing = results.get(RunOngoing.class.getSimpleName());
 		noRate = results.get(NoRate.class.getSimpleName());
 
-		if (stableBeams && runOngoing && noRate)
+		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
+
+		if (stableBeams && runOngoing && noRate && !fixingSoftError)
 			return true;
 		return false;
 	}

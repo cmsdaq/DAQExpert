@@ -8,10 +8,10 @@ package rcms.utilities.daqexpert.servlets;
  */
 public enum DataResolution {
 
-	Full(60 * 60 * 1000), // show full resoltion when range less than 60 min.
-	Minute(48* 60 * 60 * 1000), // show minute resolution when range less than 48h
-	Hour(5* 24 * 60 * 60 * 1000), // show hour range when range less than 5 d
-	Day(6* 30 * 24 * 60 * 60 * 1000), // show day range when range less than 6m
+	Full(60 * 60 * 1000L), // full resoltion when range less than 60 min.
+	Minute(48 * 60 * 60 * 1000L), // minute resolution when range less than 48h
+	Hour(60 * 24 * 60 * 60 * 1000L), // hour range when range less than 60 d
+	Day(48 * 30 * 24 * 60 * 60 * 1000L), // day range when range less than 48m
 	Month(Long.MAX_VALUE);
 
 	/**

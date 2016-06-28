@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqaggregator.TaskManager;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
+import rcms.utilities.daqexpert.TaskManager;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.

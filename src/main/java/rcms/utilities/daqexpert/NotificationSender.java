@@ -92,7 +92,7 @@ public class NotificationSender {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			// HttpPost postRequest = new
 			// HttpPost("https://dvbu-pcintelsz.cern.ch/nm-1.0.ALPHA/rest/events/");
-			HttpPost postRequest = new HttpPost("http://localhost:8081/nm-1.1/rest/events/");
+			HttpPost postRequest = new HttpPost("http://localhost:8080/nm/rest/events/");
 
 			String notificationString = objectMapper.writeValueAsString(notification);
 

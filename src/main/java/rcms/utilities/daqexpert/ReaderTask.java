@@ -10,7 +10,6 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DataResolutionManager;
 import rcms.utilities.daqexpert.reasoning.base.CheckManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;

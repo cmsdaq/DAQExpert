@@ -11,7 +11,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DataResolutionManager;
+import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.ReaderTask;
 import rcms.utilities.daqexpert.reasoning.base.Entry;

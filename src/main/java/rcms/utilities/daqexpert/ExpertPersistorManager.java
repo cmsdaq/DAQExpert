@@ -14,13 +14,12 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqaggregator.DummyDAQ;
-import rcms.utilities.daqaggregator.TaskManager;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistorManager;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.reasoning.base.CheckManager;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
+import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
  * This class reads the persisted DAQ snapshots and

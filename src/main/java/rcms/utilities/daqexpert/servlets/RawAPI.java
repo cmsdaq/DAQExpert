@@ -15,8 +15,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqaggregator.DummyDAQ;
-import rcms.utilities.daqaggregator.TaskManager;
+import rcms.utilities.daqexpert.TaskManager;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.
@@ -50,8 +49,6 @@ public class RawAPI extends HttpServlet {
 
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution range = rangeResolver.resolve(startDate, endDate);
-		
-
 
 		List<DummyDAQ> rawData = null;
 		switch (range) {
@@ -65,22 +62,33 @@ public class RawAPI extends HttpServlet {
 			rawData = TaskManager.get().rawDataHour;
 			break;
 		case Day:
-			rawData = TaskManager.get().rawDataHour;// TODO: change to DAY
+			rawData = TaskManager.get().rawDataDay;
 			break;
 		default:
-			rawData = TaskManager.get().rawDataHour; // TODO: change to MONTH
+			rawData = TaskManager.get().rawDataMonth; // TODO: change to MONTH
 			break;
 		}
-
 
 		for (DummyDAQ daq : rawData) {
 			if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {
-				HashMap<String, Long> object = new HashMap<>();
-				object.put("y", (long) daq.getValue());
-				object.put("x", daq.getLastUpdate());
-				data.add(object);
+				HashMap<String, Long> rateObject = new HashMap<>();
+				HashMap<String, Long> eventObject = new HashMap<>();
+				
+				// rate in kHz
+				rateObject.put("y", (long) daq.getRate() / 1000);
+				
+				// milions of events
+				eventObject.put("y", (long) daq.getEvents() /1000000);
+				rateObject.put("x", daq.getLastUpdate());
+				eventObject.put("x", daq.getLastUpdate());
+				rateObject.put("group", 0L);
+				eventObject.put("group", 1L);
+				data.add(rateObject);
+				data.add(eventObject);
 			}
 		}
+
+		logger.info("Range: " + range + ", elements to process: " + rawData.size());
 
 		ObjectMapper objectMapper = new ObjectMapper();
 

@@ -31,10 +31,18 @@ body, html {
 	font-size: 0pt; /* there is no text */
 	border-width: 0px; /* there is no border */
 }
+
+.vis-item.important {
+	background-color: darkblue;
+	border-color: darkblue;
+	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
 </style>
 
 <script src="external/jquery.min.js"></script>
-<script src="external/vis.min.js"></script>
+<script src="external/vis.external.js"></script>
 <link href="external/vis.min.css" rel="stylesheet" type="text/css" />
 
 
@@ -66,8 +74,11 @@ body, html {
 	src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/css/bootstrap-tour.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/js/bootstrap-tour.min.js"></script>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/css/bootstrap-tour.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/js/bootstrap-tour.min.js"></script>
 
 
 </head>
@@ -89,11 +100,12 @@ body, html {
 					horizontal : 0
 				}
 			}
+		
 		};
 
 		var groups = new vis.DataSet([ {
 			id : 'lhc',
-			content : 'lhc'
+			content : 'LHC'
 		}, {
 			id : 'daq',
 			content : 'daq'
@@ -275,8 +287,39 @@ body, html {
 		var rawitems = [];
 
 		var rawdataset = new vis.DataSet(rawitems);
-		var rawoptions = {};
-		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawoptions);
+
+		var rawgroups = new vis.DataSet();
+		rawgroups.add({
+			id : 0,
+			content : "rate [kHz]",
+			options : {
+				yAxisOrientation : 'left'
+			}
+		})
+		rawgroups.add({
+			id : 1,
+			content : "events (x10^6)",
+			options : {
+				yAxisOrientation : 'right',
+				shaded: {
+	                orientation: 'zero'
+	            }
+			}
+		})
+		var rawoptions = {
+			drawPoints : true,
+	        orientation:'top',
+			dataAxis : {
+				title : { text : "aa" },
+				width:  '50px',
+				icons : false
+			},
+			legend: {left:{position:"bottom-left"}},
+
+		};
+
+		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawgroups,
+				rawoptions);
 
 		graph2d.on('rangechange', _.throttle(runDataUpdateFromGraph, 500, {
 			leading : false
@@ -374,47 +417,46 @@ body, html {
 				}
 			}
 		};
-		
-		
+
 		// Instance the tour
-		var tour = new Tour({
+		var tour = new Tour(
+				{
 
-		  container: "body",
-		  smartPlacement: true,
-		  placement: "left",
-		  keyboard: true,
-		  storage: window.localStorage,
-		  debug: false,
-		  backdrop: true,
-		  backdropContainer: 'body',
-		  backdropPadding: 0,
-		  redirect: true,
-		  orphan: false,
-		  duration: false,
-		  delay: false,
-		  steps: [
-		  {
-		    element: "#visualization",
-		    title: "Analysis result",
-		    placement: 'bottom',
-		    content: "Results of the Expert analysis will be displayed here.</br>For zooming in/out use scroll. For changing time range use click&drop. </br> You can click on each block to get more details."
-		  },
-		  {
-		    element: "#raw",
-		    title: "Raw data",
-		    placement: 'top',
-		    content: "Raw data from DAQAggregator will be displayed here. </br>For zooming in/out use scroll. For changing time range use click&drop. Time range is always synchronized with Analysis result block above. </br> You can click at any point in time to get the full snapshot. "
-		  }
-		]});
+					container : "body",
+					smartPlacement : true,
+					placement : "left",
+					keyboard : true,
+					storage : window.localStorage,
+					debug : false,
+					backdrop : true,
+					backdropContainer : 'body',
+					backdropPadding : 0,
+					redirect : true,
+					orphan : false,
+					duration : false,
+					delay : false,
+					steps : [
+							{
+								element : "#visualization",
+								title : "Analysis result",
+								placement : 'bottom',
+								content : "Results of the Expert analysis will be displayed here.</br>For zooming in/out use scroll. For changing time range use click&drop. </br> You can click on each block to get more details."
+							},
+							{
+								element : "#raw",
+								title : "Raw data",
+								placement : 'top',
+								content : "Raw data from DAQAggregator will be displayed here. </br>For zooming in/out use scroll. For changing time range use click&drop. Time range is always synchronized with Analysis result block above. </br> You can click at any point in time to get the full snapshot. "
+							} ]
+				});
 
+		$(document).ready(function() {
+			console.log("initializing tour");
+			// Initialize the tour
+			tour.init();
 
-		$( document ).ready(function() {
-		console.log("initializing tour");
-		// Initialize the tour
-		tour.init();
-
-		// Start the tour
-		tour.start();
+			// Start the tour
+			tour.start();
 		});
 	</script>
 

@@ -24,7 +24,7 @@ no case yet
 ##### Flowchart case 5:
 http://dev-daq-expert.cern.ch/?start=2016-06-26T18:07&end=2016-06-26T18:16
 
-Note that ~2 minutes of stable beams was lost due to bad decision.
+Note that ~2 minutes of stable beams was lost due to wrong decision.
 
 ##### Flowchart case 6:
 http://dev-daq-expert.cern.ch/?start=2016-06-25T21:41&end=2016-06-25T21:43

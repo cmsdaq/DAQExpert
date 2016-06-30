@@ -36,3 +36,5 @@ http://dev-daq-expert.cern.ch/?start=2016-06-16&end=2016-06-21
 
 Data not persisted for 20h due to DAQAggregator fail (during NO BEAM):
 http://dev-daq-expert.cern.ch/?start=2016-06-08T04:00&end=2016-06-09T12:00
+
+Rate overflow before 29 June

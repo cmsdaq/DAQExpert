@@ -28,6 +28,8 @@ public class NoRateWhenExpected extends Condition {
 		noRate = results.get(NoRate.class.getSimpleName());
 
 		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
+		//TODO: dcs pause resume
+		//TODO: ! tcds paused + pausing + resuming
 
 		if (stableBeams && runOngoing && noRate && !fixingSoftError)
 			return true;

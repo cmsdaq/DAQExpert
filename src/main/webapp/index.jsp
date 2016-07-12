@@ -4,48 +4,10 @@
 <head>
 <title>DAQ Expert</title>
 
-<style type="text/css">
-body, html {
-	font-family: sans-serif;
-}
-
-.vis-item {
-	height: 16px;
-	font-size: 8pt;
-}
-
-/* create a custom sized dot at the bottom of the red item */
-.vis-item.critical {
-	background-color: red;
-	border-color: darkred;
-	color: white;
-	font-family: monospace;
-	box-shadow: 0 0 10px gray;
-}
-
-.vis-item.filtered {
-	background-color: darkorange;
-	height: 4px; //
-	box-shadow: 0 0 10px gray;
-	color: white; /* text color */
-	font-size: 0pt; /* there is no text */
-	border-width: 0px; /* there is no border */
-}
-
-.vis-item.important {
-	background-color: darkblue;
-	border-color: darkblue;
-	color: white;
-	font-family: monospace;
-	box-shadow: 0 0 10px gray;
-}
-</style>
 
 <script src="external/jquery.min.js"></script>
 <script src="external/vis.external.js"></script>
 <link href="external/vis.min.css" rel="stylesheet" type="text/css" />
-
-
 
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet"
@@ -81,9 +43,109 @@ body, html {
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/js/bootstrap-tour.min.js"></script>
 
 
+<style type="text/css">
+body, html {
+	font-family: sans-serif;
+}
+
+.vis-item {
+	height: 16px;
+	font-size: 8pt;
+}
+
+/* create a custom sized dot at the bottom of the red item */
+.vis-item.critical {
+	background-color: red;
+	border-color: darkred;
+	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+.vis-item.filtered {
+	background-color: darkorange;
+	height: 4px; //
+	box-shadow: 0 0 10px gray;
+	color: white; /* text color */
+	font-size: 0pt; /* there is no text */
+	border-width: 0px; /* there is no border */
+}
+
+.vis-item.important {
+	background-color: darkblue;
+	border-color: darkblue;
+	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+/* navbar */
+.navbar-xs {
+	min-height: 22px;
+	border-radius: 0
+}
+
+.navbar-xs .navbar-brand {
+	padding: 2px 8px;
+	font-size: 14px;
+	line-height: 14px;
+}
+
+.navbar-xs .navbar-nav>li>a {
+	border-right: 1px solid #ddd;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	line-height: 16px
+}
+
+.navbar-nav>li>a, .navbar-brand {
+	padding-top: 5px !important;
+	padding-bottom: 0 !important;
+	height: 30px;
+}
+
+.navbar {
+	min-height: 30px !important;
+	margin: 0px;
+}
+</style>
+
+
+
+
 </head>
 
 <body>
+
+	<nav class="navbar navbar-default navbar-xs" role="navigation">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#"><b>DAQ</b> Expert</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse"
+			id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li><a
+					href="https://dvbu-pcintelsz.cern.ch/nm-1.16/event_occurrences"><i
+						class="glyphicon glyphicon-bell"></i> Notification Manager</a></li>
+				<li><a href="https://github.com/cmsdaq/DAQExpert"><i
+						class="glyphicon glyphicon-tags"></i> Project repo</a></li>
+				<li><a id="tour" href="#"><i
+						class="glyphicon glyphicon-question-sign"></i> Tour</a></li>
+
+			</ul>
+		</div>
+		<!-- /.navbar-collapse -->
+	</nav>
+	
 	<div id="visualization"></div>
 	<div id="raw"></div>
 	<p></p>
@@ -100,7 +162,7 @@ body, html {
 					horizontal : 0
 				}
 			}
-		
+
 		};
 
 		var groups = new vis.DataSet([ {
@@ -301,20 +363,27 @@ body, html {
 			content : "events (x10^6)",
 			options : {
 				yAxisOrientation : 'right',
-				shaded: {
-	                orientation: 'zero'
-	            }
+				shaded : {
+					orientation : 'zero'
+				}
 			}
 		})
 		var rawoptions = {
 			drawPoints : true,
-	        orientation:'top',
+			height: '300px',
+			orientation : 'top',
 			dataAxis : {
-				title : { text : "aa" },
-				width:  '50px',
+				title : {
+					text : "aa"
+				},
+				width : '50px',
 				icons : false
 			},
-			legend: {left:{position:"bottom-left"}},
+			legend : {
+				left : {
+					position : "bottom-left"
+				}
+			},
 
 		};
 
@@ -440,15 +509,24 @@ body, html {
 								element : "#visualization",
 								title : "Analysis result",
 								placement : 'bottom',
-								content : "Results of the Expert analysis will be displayed here.</br>For zooming in/out use scroll. For changing time range use click&drop. </br> You can click on each block to get more details."
+								content : "Results of the Expert analysis will be displayed here.</br>For zooming in/out use scroll. For changing time range use click&drag. </br> You can click on each block to get more details."
 							},
 							{
 								element : "#raw",
 								title : "Raw data",
 								placement : 'top',
-								content : "Raw data from DAQAggregator will be displayed here. </br>For zooming in/out use scroll. For changing time range use click&drop. Time range is always synchronized with Analysis result block above. </br> You can click at any point in time to get the full snapshot. "
+								content : "Raw data from DAQAggregator will be displayed here. </br>For zooming in/out use scroll. For changing time range use click&drag. Time range is always synchronized with Analysis result block above. </br> You can click at any point in time to get the full snapshot. "
 							} ]
 				});
+		$('#tour').click(function(e) {
+			console.log("Start tour");
+			
+			tour.restart();
+
+			// it's also good practice to preventDefault on the click event
+			// to avoid the click triggering whatever is within href:
+			e.preventDefault();
+		});
 
 		$(document).ready(function() {
 			console.log("initializing tour");
@@ -457,6 +535,8 @@ body, html {
 
 			// Start the tour
 			tour.start();
+
+			
 		});
 	</script>
 

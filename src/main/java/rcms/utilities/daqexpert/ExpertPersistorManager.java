@@ -63,14 +63,18 @@ public class ExpertPersistorManager extends PersistorManager {
 			boolean breaked = false;
 			for (File path : fileList) {
 				if (!processed.containsKey(path.getName())) {
-					i++;
-					daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
-					checkManager.runCheckers(daq);
-					TaskManager.get().rawData.add(new DummyDAQ(daq));
-					processed.put(path.getName(), path);
-					if (i > max) {
-						breaked = true;
-						break;
+					try {
+						i++;
+						daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
+						checkManager.runCheckers(daq);
+						TaskManager.get().rawData.add(new DummyDAQ(daq));
+						processed.put(path.getName(), path);
+						if (i > max) {
+							breaked = true;
+							break;
+						}
+					} catch (RuntimeException e) {
+						logger.error("Cannot deserialize " + path.getAbsolutePath().toString());
 					}
 				}
 			}

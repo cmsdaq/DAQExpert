@@ -116,6 +116,7 @@ body, html {
 </head>
 
 <body>
+	<%@  page import="rcms.utilities.daqexpert.Application"%>
 
 	<nav class="navbar navbar-default navbar-xs" role="navigation">
 		<!-- Brand and toggle get grouped for better mobile display -->
@@ -134,7 +135,7 @@ body, html {
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li><a
-					href="http://daq-expert.cms:8080/nm-1.17/event_occurrences"><i
+					href="<%out.println(Application.get().getProp().getProperty(Application.NM_URL));%>"><i
 						class="glyphicon glyphicon-bell"></i> Notification Manager</a></li>
 				<li><a href="https://github.com/cmsdaq/DAQExpert"><i
 						class="glyphicon glyphicon-tags"></i> Project repo</a></li>
@@ -145,7 +146,7 @@ body, html {
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
-	
+
 	<div id="visualization"></div>
 	<div id="raw"></div>
 	<p></p>
@@ -370,8 +371,8 @@ body, html {
 		})
 		var rawoptions = {
 			drawPoints : true,
-			height: '300px',
-			interpolation: false,
+			height : '300px',
+			interpolation : false,
 			orientation : 'top',
 			dataAxis : {
 				title : {
@@ -521,7 +522,7 @@ body, html {
 				});
 		$('#tour').click(function(e) {
 			console.log("Start tour");
-			
+
 			tour.restart();
 
 			// it's also good practice to preventDefault on the click event
@@ -537,7 +538,6 @@ body, html {
 			// Start the tour
 			tour.start();
 
-			
 		});
 	</script>
 

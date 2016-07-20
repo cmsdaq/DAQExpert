@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.cern</groupId>
 	<artifactId>DAQExpert</artifactId>
-	<version>0.26</version>
+	<version>1.0.0</version>
 	<name>DAQExpert</name>
 
 
@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>ch.cern</groupId>
 			<artifactId>DAQAggregator</artifactId>
-			<version>0.43</version>
+			<version>1.1.4</version>
 		</dependency>
 
 		<!-- JSP -->
@@ -35,12 +35,6 @@
 			<version>1.2</version>
 		</dependency>
 
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>javax.servlet.jsp-api</artifactId>
-			<version>2.3.1</version>
-			<scope>provided</scope>
-		</dependency>
 
 
 		<dependency>

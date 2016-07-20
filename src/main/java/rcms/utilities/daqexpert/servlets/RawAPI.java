@@ -88,7 +88,7 @@ public class RawAPI extends HttpServlet {
 			}
 		}
 
-		logger.info("Range: " + range + ", elements to process: " + rawData.size());
+		logger.debug("Range: " + range + ", elements to process: " + rawData.size());
 
 		ObjectMapper objectMapper = new ObjectMapper();
 

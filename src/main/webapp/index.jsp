@@ -134,7 +134,7 @@ body, html {
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li><a
-					href="https://dvbu-pcintelsz.cern.ch/nm-1.16/event_occurrences"><i
+					href="http://daq-expert.cms:8080/nm-1.17/event_occurrences"><i
 						class="glyphicon glyphicon-bell"></i> Notification Manager</a></li>
 				<li><a href="https://github.com/cmsdaq/DAQExpert"><i
 						class="glyphicon glyphicon-tags"></i> Project repo</a></li>
@@ -371,6 +371,7 @@ body, html {
 		var rawoptions = {
 			drawPoints : true,
 			height: '300px',
+			interpolation: false,
 			orientation : 'top',
 			dataAxis : {
 				title : {

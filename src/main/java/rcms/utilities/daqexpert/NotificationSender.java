@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -33,7 +35,8 @@ public class NotificationSender {
 	}
 
 	public void send(List<Entry> list) {
-		int sent = 0;
+		int successfullySent = 0;
+		int unsuccessfullySent = 0;
 		for (Entry event : list) {
 			if ("critical".equals(event.getClassName())) {
 				logger.debug("Sending notification: " + event.getContent());
@@ -50,15 +53,18 @@ public class NotificationSender {
 				notification.setMessage(message);
 				notification.setType_id(1);
 				try {
-					sent++;
 					sendEntry(notification);
+					successfullySent++;
 				} catch (RuntimeException e) {
 					logger.error(e);
+					unsuccessfullySent++;
 				}
 			}
 		}
-		if (sent != 0)
-			logger.info(sent + " notifications sent");
+		if (successfullySent != 0)
+			logger.info(successfullySent + " notifications sent");
+		if (unsuccessfullySent != 0)
+			logger.warn(unsuccessfullySent + " notifications NOT sent");
 	}
 
 	public static void main(String[] args) {
@@ -88,15 +94,13 @@ public class NotificationSender {
 	public void sendEntry(Notification notification) {
 
 		try {
-
 			DefaultHttpClient httpClient = new DefaultHttpClient();
-			// HttpPost postRequest = new
-			// HttpPost("https://dvbu-pcintelsz.cern.ch/nm-1.0.ALPHA/rest/events/");
-			HttpPost postRequest = new HttpPost("http://dvbu-pcintelsz.cern.ch/nm-1.16/rest/events/");
+			HttpPost postRequest = new HttpPost("http://daq-expert.cms:8080/nm-1.17/rest/events/");
 
-			String notificationString = objectMapper.writeValueAsString(notification);
+			String notificationString;
+			notificationString = objectMapper.writeValueAsString(notification);
 
-			logger.info("sending notification: " + notificationString);
+			logger.debug("sending notification: " + notificationString);
 			StringEntity input = new StringEntity(notificationString);
 
 			input.setContentType("application/json");
@@ -118,17 +122,13 @@ public class NotificationSender {
 			}
 
 			httpClient.getConnectionManager().shutdown();
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Problem processing notification json " + e.getMessage());
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Problem encoding notification json " + e.getMessage());
 		} catch (IOException e) {
-
-			e.printStackTrace();
-
+			throw new RuntimeException("Problem sending notification POST request, " + e.getMessage());
 		}
-
 	}
 
 }

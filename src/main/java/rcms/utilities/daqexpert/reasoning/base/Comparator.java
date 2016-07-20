@@ -10,7 +10,11 @@ public abstract class Comparator extends EventFinder {
 		boolean result = false;
 
 		if (last != null) {
-			result = compare(last, daq);
+			try {
+				result = compare(last, daq);
+			} catch (NullPointerException e) {
+				//e.printStackTrace();
+			}
 		}
 
 		last = daq;

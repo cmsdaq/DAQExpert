@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
 public class RunComparator extends Comparator {
 

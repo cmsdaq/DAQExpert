@@ -8,8 +8,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
 public class EVMComparator extends Comparator {
 

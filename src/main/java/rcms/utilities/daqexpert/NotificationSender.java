@@ -4,14 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -29,9 +27,12 @@ public class NotificationSender {
 
 	private ObjectMapper objectMapper;
 
+	private String destinationAddress;
+
 	public NotificationSender() {
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		destinationAddress = Application.get().getProp().getProperty(Application.NM_API);
 	}
 
 	public void send(List<Entry> list) {
@@ -52,19 +53,19 @@ public class NotificationSender {
 				}
 				notification.setMessage(message);
 				notification.setType_id(1);
-				try {
-					sendEntry(notification);
+				boolean result = sendEntry(notification, destinationAddress);
+				if (result)
 					successfullySent++;
-				} catch (RuntimeException e) {
-					logger.error(e);
+				else
 					unsuccessfullySent++;
-				}
+
 			}
 		}
 		if (successfullySent != 0)
-			logger.info(successfullySent + " notifications sent");
+			logger.info(successfullySent + " notifications sent to:" + destinationAddress);
 		if (unsuccessfullySent != 0)
-			logger.warn(unsuccessfullySent + " notifications NOT sent");
+			logger.warn("Failed to send " + unsuccessfullySent + " notifications to: " + destinationAddress);
+
 	}
 
 	public static void main(String[] args) {
@@ -91,7 +92,7 @@ public class NotificationSender {
 		notificationSender.send(entries);
 	}
 
-	public void sendEntry(Notification notification) {
+	public boolean sendEntry(Notification notification, String destinationAddress) {
 
 		try {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -122,12 +123,13 @@ public class NotificationSender {
 			}
 
 			httpClient.getConnectionManager().shutdown();
+			return true;
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Problem processing notification json " + e.getMessage());
+			return false;
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Problem encoding notification json " + e.getMessage());
+			return false;
 		} catch (IOException e) {
-			throw new RuntimeException("Problem sending notification POST request, " + e.getMessage());
+			return false;
 		}
 	}
 

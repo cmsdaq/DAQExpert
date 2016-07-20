@@ -1,21 +1,16 @@
 package rcms.utilities.daqexpert.servlets;
 
-import java.io.IOException;
 import java.util.Timer;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.ReaderTask;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 
 public class ServletListener implements ServletContextListener {
 
@@ -28,63 +23,33 @@ public class ServletListener implements ServletContextListener {
 
 	public void contextInitialized(ServletContextEvent e) {
 
-		try {
-			String snapshotsDir = null;
-			String snapshotsDirFromEnv = System.getenv("SNAPSHOTS");
-			if (snapshotsDirFromEnv != null) {
-				logger.info("Snapshots directory from env variable: SNAPSHOTS=" + snapshotsDirFromEnv);
-				snapshotsDir = snapshotsDirFromEnv;
-			} else {
-				logger.info("Loading snapshots directory from config.properties...");
-				Configuration config = new PropertiesConfiguration("config.properties");
-				snapshotsDir = config.getString("snapshots");
-			}
-
-			if (snapshotsDir != null)
-				logger.info("Loading snapshots from directory: " + snapshotsDir);
-			else {
-				logger.warn(
-						"Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
-				return;
-			}
-
-			ExpertPersistorManager.setUpdatedDir(snapshotsDir);
-			long last = 0;
-			// last = walkAllFilesProcessAndStoreInMemory();
-			t.scheduleAtFixedRate(new ReaderTask(dataSegmentator, last), 0, 3000);
-
-		} catch (ConfigurationException e1) {
-			e1.printStackTrace();
+		String propertyFilePath = System.getenv("EXPERT_CONF");
+		if (propertyFilePath == null) {
+			logger.fatal(
+					"No configuration file supplied. Set the path to configuration file in environment variable EXPERT_CONF");
+			throw new RuntimeException("EXPERT_CONF variable is empty");
 		}
+
+		Application.initialize(propertyFilePath);
+
+		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
+
+		if (snapshotsDir != null)
+			logger.info("Loading snapshots from directory: " + snapshotsDir);
+		else {
+			logger.warn("Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
+			return;
+		}
+
+		ExpertPersistorManager.setUpdatedDir(snapshotsDir);
+		long last = 0;
+		// last = walkAllFilesProcessAndStoreInMemory();
+		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator, last), 0, 3000);
 
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {
 		t.cancel();
-	}
-
-	/**
-	 * Will walk all files, analyze all snapshots and results will be in memory
-	 */
-	private long walkAllFilesProcessAndStoreInMemory() {
-		try {
-			logger.info("Walking through all data..");
-			persistorManager.walkAll();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		dataSegmentator.prepareMultipleResolutionData();
-
-		long last = 0;
-
-		for (Entry e : EventProducer.get().getResult()) {
-			if (e.getStart().getTime() > last) {
-				last = e.getStart().getTime();
-			}
-		}
-		return last;
-
 	}
 
 }

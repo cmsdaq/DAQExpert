@@ -54,12 +54,10 @@ public class FlowchartCase1 extends ExtendedCondition {
 
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
 
-			for (FEDBuilder fb : daq.getFedBuilders()) {
-				RU ru = fb.getRu();
-				if (ru.getStatus().equalsIgnoreCase("SyncLoss")) {
+			for (RU ru : daq.getRus()) {
+				if ("SyncLoss".equalsIgnoreCase(ru.getStatus())) {
 					problemRu = ru;
 				}
-
 			}
 
 			logger.debug(name);
@@ -78,7 +76,7 @@ public class FlowchartCase1 extends ExtendedCondition {
 
 		if (problemRu != null) {
 			eventRaport.getSetByCode("problemRu").add(problemRu.getHostname() + ": " + problemRu.getStatus());
-			for (FED fed : daq.getAllFeds()) {
+			for (FED fed : daq.getFeds()) {
 				if (fed.getRuFedOutOfSync() > 0) {
 					HashMap<String, String> fedraport = new HashMap<>();
 					fedraport.put("sourceId", fed.getSrcIdExpected() + "");

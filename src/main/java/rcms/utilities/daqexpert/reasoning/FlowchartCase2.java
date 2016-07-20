@@ -78,7 +78,7 @@ public class FlowchartCase2 extends ExtendedCondition {
 			}
 		}
 
-		for (FED fed : daq.getAllFeds()) {
+		for (FED fed : daq.getFeds()) {
 			if (fed.getRuFedDataCorruption() > 0) {
 
 				HashMap<String, String> fedraport = new HashMap<>();

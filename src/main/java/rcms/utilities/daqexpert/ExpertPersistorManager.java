@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistorManager;
+import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.reasoning.base.CheckManager;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
@@ -33,7 +34,7 @@ public class ExpertPersistorManager extends PersistorManager {
 	private static final Logger logger = Logger.getLogger(ExpertPersistorManager.class);
 
 	public ExpertPersistorManager(String persistenceDir) {
-		super(persistenceDir);
+		super(persistenceDir, SnapshotFormat.SMILE);
 		instance = this;
 	}
 
@@ -66,15 +67,21 @@ public class ExpertPersistorManager extends PersistorManager {
 					try {
 						i++;
 						daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
-						checkManager.runCheckers(daq);
+						
+						if(daq == null){
+							logger.error("Snapshot not deserialized " + path.getAbsolutePath());
+						}
+						
 						TaskManager.get().rawData.add(new DummyDAQ(daq));
+
+						checkManager.runCheckers(daq);
 						processed.put(path.getName(), path);
 						if (i > max) {
 							breaked = true;
 							break;
 						}
 					} catch (RuntimeException e) {
-						logger.error("Cannot deserialize " + path.getAbsolutePath().toString());
+						logger.error("Problem processing snapshot " + path.getAbsolutePath().toString() , e);
 					}
 				}
 			}

@@ -7,6 +7,16 @@
 	<name>DAQExpert</name>
 
 
+	<repositories>
+		<repository>
+			<id>libs-release-local</id>
+			<url>http://dev-daq-expert.cern.ch/artifactory/libs-release-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>

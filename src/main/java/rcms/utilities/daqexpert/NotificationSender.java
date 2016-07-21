@@ -38,6 +38,7 @@ public class NotificationSender {
 	public void send(List<Entry> list) {
 		int successfullySent = 0;
 		int unsuccessfullySent = 0;
+		List<Integer> errors = new ArrayList<>();
 		for (Entry event : list) {
 			if ("critical".equals(event.getClassName())) {
 				logger.debug("Sending notification: " + event.getContent());
@@ -53,18 +54,23 @@ public class NotificationSender {
 				}
 				notification.setMessage(message);
 				notification.setType_id(1);
-				boolean result = sendEntry(notification, destinationAddress);
-				if (result)
+				int httpResponseCode = sendEntry(notification, destinationAddress);
+
+				if (httpResponseCode == 201)
 					successfullySent++;
-				else
+				else {
 					unsuccessfullySent++;
+					errors.add(httpResponseCode);
+				}
 
 			}
 		}
 		if (successfullySent != 0)
 			logger.info(successfullySent + " notifications sent to:" + destinationAddress);
-		if (unsuccessfullySent != 0)
-			logger.warn("Failed to send " + unsuccessfullySent + " notifications to: " + destinationAddress);
+		if (unsuccessfullySent != 0){
+			logger.error("Failed to send " + unsuccessfullySent + " notifications to: " + destinationAddress);
+			logger.error("Notification requests results: " + errors);
+		}
 
 	}
 
@@ -92,11 +98,11 @@ public class NotificationSender {
 		notificationSender.send(entries);
 	}
 
-	public boolean sendEntry(Notification notification, String destinationAddress) {
+	public int sendEntry(Notification notification, String destinationAddress) {
 
 		try {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
-			HttpPost postRequest = new HttpPost("http://daq-expert.cms:8080/nm-1.17/rest/events/");
+			HttpPost postRequest = new HttpPost(destinationAddress);
 
 			String notificationString;
 			notificationString = objectMapper.writeValueAsString(notification);
@@ -109,9 +115,9 @@ public class NotificationSender {
 
 			HttpResponse response = httpClient.execute(postRequest);
 			// TODO:should be either 201 or 200
-			if (response.getStatusLine().getStatusCode() != 201 && response.getStatusLine().getStatusCode() != 200) {
-
-				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != 201) {
+				return statusCode;
 			}
 
 			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
@@ -123,13 +129,13 @@ public class NotificationSender {
 			}
 
 			httpClient.getConnectionManager().shutdown();
-			return true;
+			return statusCode;
 		} catch (JsonProcessingException e) {
-			return false;
+			return 0;
 		} catch (UnsupportedEncodingException e) {
-			return false;
+			return 0;
 		} catch (IOException e) {
-			return false;
+			return 0;
 		}
 	}
 

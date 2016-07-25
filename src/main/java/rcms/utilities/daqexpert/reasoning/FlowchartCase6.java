@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,11 +36,10 @@ public class FlowchartCase6 extends ExtendedCondition {
 				+ "Backpressure is going through the FED in Busy/Warning but there is NOTHING wrong with the FED in Busy/Warning.</br>"
 				+ "A FED stopped sending data (attached below)"
 				+ "Note that Expert has access only to legacy FEDs, follow Flowchart if no FED attached below";
-		this.action = "<ul><li>Try to recover: Stop the run</li>"
-				+ "<li>Red & green recycle the subsystem whose FED stopped sending data.</li>"
-				+ "<li>Start new Run (Try 1 time)</li>"
-				+ "<li>Problem fixed: Make an e-log entry. Call the DOC of the subsystem whose FED stopped sending data to inform</li>"
-				+ "<li>Problem not fixed: Call the OC for the subsystem whose FED stopped sending data</li></ul>";
+		this.action = Arrays.asList("Try to recover: Stop the run",
+				"Red & green recycle the subsystem whose FED stopped sending data", "Start new Run (Try 1 time)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem whose FED stopped sending data to inform",
+				"Problem not fixed: Call the OC for the subsystem whose FED stopped sending data");
 		this.group = EventGroup.FL6;
 		this.priority = EventPriority.critical;
 	}

@@ -4,6 +4,11 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore

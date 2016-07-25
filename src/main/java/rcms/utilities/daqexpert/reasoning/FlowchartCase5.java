@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +35,11 @@ public class FlowchartCase5 extends ExtendedCondition {
 		this.description = "TTCP blocking trigger in busy or warning TTS state, FED not backpressured by cDAQ</br>"
 				+ "The problem is caused by FED in Busy/Warning (see FED attached below)</br>"
 				+ "Note that Expert has access only to legacy FEDs, follow Flowchart if no FED attached below";
-		this.action = "<ul><li>Stop the run</li>"
-				+ "<li>If the problem is caused by an ECAL FED in Busy proceed to 3rd step. Otherwise red & green recycle the subsystem.</li>"
-				+ "<li>Start new run (try up to 2 times)</li>"
-				+ "<li>Problem fixed: Make an e-log entry. Call the DOC of the subsystem in Warning/Busy to inform</li>"
-				+ "<li>Call the DOC for the subsystem in Warning/Busy</li></ul>";
+		this.action = Arrays.asList("Stop the run",
+				"If the problem is caused by an ECAL FED in Busy proceed to 3rd step. Otherwise red & green recycle the subsystem.",
+				"Start new run (try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem in Warning/Busy to inform",
+				"Call the DOC for the subsystem in Warning/Busy");
 		this.group = EventGroup.FL5;
 		this.priority = EventPriority.critical;
 	}

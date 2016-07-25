@@ -285,14 +285,14 @@ body, html {
 														.stringify(
 																data['elements'],
 																null, 2);
-												document
-														.getElementById("raport-name").innerHTML = data['name'];
-												document
-														.getElementById("raport-description").innerHTML = data['description'];
-												document
-														.getElementById("raport-action").innerHTML = data['action'];
-												document
-														.getElementById("raport-body").innerHTML = preetified;
+												$("#raport-name").html(data['name']);
+												$("#raport-description").html(data['description']);
+												$("#raport-action").html("<ol id='curr-action'></ol>");
+												
+												$.each( data['action'], function( key, value ) {
+													$("#curr-action").append($("<li>").text(value))
+												});
+												$("#raport-body").html(preetified);
 											}).error(
 											function(jqXHR, textStatus,
 													errorThrown) {

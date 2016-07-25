@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +30,12 @@ public class FlowchartCase1 extends ExtendedCondition {
 		this.description = "Run blocked by OOS FED data and RU in SYNCLOSS</br>"
 				+ "DAQ and Level-0 are in RunBlocked state. A FED has sent out-of-sequence data to the DAQ. "
 				+ "Corresponding subsystem and RU in SyncLoss state are attached below.";
-		this.action = "<ul><li>Try to recover (try up to 2 times)"
-				+ "If the subsystem is TRACKER: Stop the run, Start a new run. "
-				+ "For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run.</li>"
-				+ "<li>Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below)</li>"
-				+ "<li>Problem fixed: Make an e-log entry."
-				+ "Call the DOC for the subsystem that caused the SyncLoss (attached below) to inform about the problem</li></ul>";
+		this.action = Arrays.asList("Try to recover (try up to 2 times)",
+				"If the subsystem is TRACKER: Stop the run, Start a new run. ",
+				"For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run",
+				"Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below)",
+				"Problem fixed: Make an e-log entry."
+						+ "Call the DOC for the subsystem that caused the SyncLoss (attached below) to inform about the problem");
 		this.group = EventGroup.FL1;
 		this.priority = EventPriority.critical;
 	}

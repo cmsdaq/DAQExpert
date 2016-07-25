@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +31,12 @@ public class FlowchartCase3 extends ExtendedCondition {
 	public FlowchartCase3() {
 		this.name = "CASE 3";
 		this.description = "TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
-		this.action = "<ul><li>Issue a TTCHardReset</li>"
-				+ "<li>If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)</li>"
-				+ "<li>Problem fixed: Make an e-log entry</li>"
-				+ "<li>Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem. Start a new run. Try up to 2 times.</li>"
-				+ "<li>Problem still not fixed after recover: Call the DOC for the partition in error/OOS</li>"
-				+ "<li>Problem fixed after recover: Make an e-log entry. Call the DOC for the partition in error/OOS to inform</li></ul>";
+		this.action = Arrays.asList("Issue a TTCHardReset",
+				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
+				"Problem fixed: Make an e-log entry",
+				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem. Start a new run. Try up to 2 times",
+				"Problem still not fixed after recover: Call the DOC for the partition in error/OOS",
+				"Problem fixed after recover: Make an e-log entry. Call the DOC for the partition in error/OOS to inform");
 
 		this.group = EventGroup.FL3;
 		this.priority = EventPriority.critical;

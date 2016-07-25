@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -16,7 +17,7 @@ public class WarningInSubsystem extends ExtendedCondition {
 	public WarningInSubsystem() {
 		this.name = "Exists TTCP with warning > 0%";
 		this.description = "One or more TTCP (attached below) has warning above 0%, it may affect rate.";
-		this.action = "No action";
+		this.action = Arrays.asList("No action");
 		this.group = EventGroup.Warning;
 		this.priority = EventPriority.defaultt;
 	}

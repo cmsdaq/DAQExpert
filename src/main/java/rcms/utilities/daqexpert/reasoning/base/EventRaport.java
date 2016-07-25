@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.base;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class EventRaport {
 
 	private String name;
 
-	private String action;
+	private List<String> actionSteps;
 
 	@JsonIgnore
 	private boolean initialized;
@@ -54,24 +55,24 @@ public class EventRaport {
 		this.name = name;
 	}
 
-	public String getAction() {
-		return action;
+	public List<String> getAction() {
+		return actionSteps;
 	}
 
-	public void setAction(String action) {
-		this.action = action;
+	public void setAction(List<String> action) {
+		this.actionSteps = action;
 	}
 
-	public void initialize(String name, String description, String action) {
+	public void initialize(String name, String description, List<String> action) {
 		this.name = name;
 		this.description = description;
-		this.action = action;
+		this.actionSteps = action;
 		this.initialized = true;
 	}
 
 	@Override
 	public String toString() {
-		return "EventRaport [description=" + description + ", name=" + name + ", action=" + action + ", elements="
+		return "EventRaport [description=" + description + ", name=" + name + ", action=" + actionSteps + ", elements="
 				+ elements + "]";
 	}
 

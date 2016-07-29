@@ -17,20 +17,17 @@ public abstract class ExtendedCondition extends Condition {
 	 */
 	protected List<String> action;
 
-	/**
-	 * Condition description
-	 */
-	protected String description;
 
 	/**
-	 * Update entry with useful details related to this condition
-	 * 
-	 * @param daq
-	 *            current DAQ snapshot
-	 * @param entry
-	 *            current analysis entry to be updated
+	 * Context is used to parameterize action and description fields with
+	 * specific context information. Variables will be replaced with values from
+	 * this context
 	 */
-	public abstract void gatherInfo(DAQ daq, Entry entry);
+	protected final ContextCollector context;
+
+	public ExtendedCondition() {
+		this.context = new ContextCollector();
+	}
 
 	public List<String> getAction() {
 		return action;
@@ -39,13 +36,9 @@ public abstract class ExtendedCondition extends Condition {
 	public void setAction(List<String> action) {
 		this.action = action;
 	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	
+	public ContextCollector getContext() {
+		return context;
 	}
 
 }

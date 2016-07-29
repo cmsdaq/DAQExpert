@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -9,10 +8,9 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
 /**
@@ -26,10 +24,11 @@ import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 public class FlowchartCase1 extends ExtendedCondition {
 
 	public FlowchartCase1() {
-		this.name = "CASE 1";
-		this.description = "Run blocked by OOS FED data and RU in SYNCLOSS</br>"
-				+ "DAQ and Level-0 are in RunBlocked state. A FED has sent out-of-sequence data to the DAQ. "
-				+ "Corresponding subsystem and RU in SyncLoss state are attached below.";
+		this.name = "FC1";
+
+		this.description = "FC1: Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss "
+				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";
+
 		this.action = Arrays.asList("Try to recover (try up to 2 times)",
 				"If the subsystem is TRACKER: Stop the run, Start a new run. ",
 				"For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run",
@@ -42,7 +41,6 @@ public class FlowchartCase1 extends ExtendedCondition {
 
 	private static final Logger logger = Logger.getLogger(FlowchartCase1.class);
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
-	private RU problemRu;
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
@@ -53,47 +51,35 @@ public class FlowchartCase1 extends ExtendedCondition {
 			return false;
 
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
-
 			for (RU ru : daq.getRus()) {
 				if ("SyncLoss".equalsIgnoreCase(ru.getStatus())) {
-					problemRu = ru;
+					context.register("RU", ru.getHostname());
 				}
 			}
 
-			logger.debug(name);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-
-		EventRaport eventRaport = entry.getEventRaport();
-		if (!eventRaport.isInitialized()) {
-			eventRaport.initialize(name, description, action);
-		}
-
-		if (problemRu != null) {
-			eventRaport.getSetByCode("problemRu").add(problemRu.getHostname() + ": " + problemRu.getStatus());
 			for (FED fed : daq.getFeds()) {
 				if (fed.getRuFedOutOfSync() > 0) {
-					HashMap<String, String> fedraport = new HashMap<>();
-					fedraport.put("sourceId", fed.getSrcIdExpected() + "");
-					fedraport.put("noOfEventsOOS", fed.getRuFedOutOfSync() + "");
-					fedraport.put("ttcp", fed.getTtcp() != null ? fed.getTtcp().getName() : "unavailable ttcp");
-					fedraport.put("subsystem",
-							fed.getTtcp() != null ? fed.getTtcp().getSubsystem() != null
-									? fed.getTtcp().getSubsystem().getName() : "unavailable subsystem"
-									: "unavailable ttcp");
 
-					eventRaport.getSetByCode("fedsOutOfSync").add(fedraport);
+					TTCPartition ttcp = fed.getTtcp();
+					String ttcpName = "-";
+					String subsystemName = "-";
+
+					if (ttcp != null) {
+						ttcpName = ttcp.getName();
+						if (ttcp.getSubsystem() != null)
+							subsystemName = ttcp.getSubsystem().getName();
+					}
+					context.register("FED", fed.getSrcIdExpected());
+					context.register("TTCP", ttcpName);
+					context.register("SUBSYSTEM", subsystemName);
 
 				}
 
 			}
-
+			return true;
 		}
+
+		return false;
 	}
 
 }

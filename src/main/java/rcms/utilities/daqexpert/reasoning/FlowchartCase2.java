@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -10,14 +9,13 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
 /**
- * Logic module identifying 1 flowchart case.
+ * Logic module identifying 1st flowchart case.
  * 
  * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
@@ -26,10 +24,10 @@ import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 public class FlowchartCase2 extends ExtendedCondition {
 
 	public FlowchartCase2() {
-		this.name = "CASE 2";
-		this.description = "DAQ and level 0 in error state</br>"
-				+ "A RU is in Failded state. A FED has sent corrupted data to the DAQ. "
-				+ "Ru in failed state and subsystem attached below.";
+		this.name = "FC2";
+		this.description = "FC2: DAQ and level 0 in error state</br>"
+				+ "A RU {{RU}} is in Failded state. A FED {{FED}} has sent corrupted data to the DAQ. "
+				+ "Problem FED belongs to subsystem {{SUBSYSTEM}}";
 		this.action = Arrays.asList(
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem. Start new Run. (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC for the subsystem that sent corrupted data to inform about the problem",
@@ -45,6 +43,8 @@ public class FlowchartCase2 extends ExtendedCondition {
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
+		boolean result = false;
+		int i = 0;
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
@@ -55,47 +55,33 @@ public class FlowchartCase2 extends ExtendedCondition {
 				RU ru = fb.getRu();
 				if (ru.getStatus().equalsIgnoreCase("Failed")) {
 
-					logger.debug("M2 DAQ and level 0 in error state, exists RU in failed state");
-					return true;
+					i++;
+					context.register("RU", ru.getHostname());
+					result = true;
 				}
 			}
 
-			return false;
-		}
-		return false;
-	}
+			for (FED fed : daq.getFeds()) {
+				if (fed.getRuFedDataCorruption() > 0) {
 
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
+					TTCPartition ttcp = fed.getTtcp();
+					String ttcpName = "-";
+					String subsystemName = "-";
 
-		EventRaport eventRaport = entry.getEventRaport();
-		if (!eventRaport.isInitialized()) {
-			eventRaport.initialize(name, description, action);
-		}
-
-		for (FEDBuilder fb : daq.getFedBuilders()) {
-			RU ru = fb.getRu();
-			if (ru.getStatus().equalsIgnoreCase("Failed")) {
-				eventRaport.getSetByCode("problemRu").add(ru.getHostname() + ": " + ru.getStatus());
+					if (ttcp != null) {
+						ttcpName = ttcp.getName();
+						if (ttcp.getSubsystem() != null)
+							subsystemName = ttcp.getSubsystem().getName();
+					}
+					context.register("FED", fed.getSrcIdExpected());
+					context.register("TTCP", ttcpName);
+					context.register("SUBSYSTEM", subsystemName);
+					i++;
+				}
 			}
+
+			logger.info("FC2 " + i);
 		}
-
-		for (FED fed : daq.getFeds()) {
-			if (fed.getRuFedDataCorruption() > 0) {
-
-				HashMap<String, String> fedraport = new HashMap<>();
-				fedraport.put("expectedId", fed.getSrcIdExpected() + "");
-				fedraport.put("corrupted", fed.getRuFedDataCorruption() + "");
-				fedraport.put("ttcp", fed.getTtcp() != null ? fed.getTtcp().getName() : "unavailable ttcp");
-				fedraport.put("subsystem",
-						fed.getTtcp() != null ? fed.getTtcp().getSubsystem() != null
-								? fed.getTtcp().getSubsystem().getName() : "unavailable subsystem"
-								: "unavailable ttcp");
-
-				eventRaport.getSetByCode("corruptedFeds").add(fedraport);
-
-			}
-		}
+		return result;
 	}
-
 }

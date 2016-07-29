@@ -1,21 +1,15 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
 
@@ -29,8 +23,8 @@ import rcms.utilities.daqexpert.reasoning.base.TTSState;
 public class FlowchartCase3 extends ExtendedCondition {
 
 	public FlowchartCase3() {
-		this.name = "CASE 3";
-		this.description = "TTS state of partition blocking trigger is OutOfSync (OOS) or ERROR";
+		this.name = "FC3";
+		this.description = "FC3: Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking trigger.";
 		this.action = Arrays.asList("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -47,6 +41,8 @@ public class FlowchartCase3 extends ExtendedCondition {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
+		boolean result = false;
+
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
@@ -57,47 +53,14 @@ public class FlowchartCase3 extends ExtendedCondition {
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
 				if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
-					logger.debug("M3: " + name + " at " + daq.getLastUpdate());
-					return true;
+					context.register("SUBSYSTEM", subSystem.getName());
+					context.register("TTCP", subSystem.getName());
+					context.register("STATE", currentState.name());
+					result = true;
 				}
 			}
 		}
-
-		return false;
-	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-
-		EventRaport eventRaport = entry.getEventRaport();
-		if (!eventRaport.isInitialized()) {
-			eventRaport.initialize(name, description, action);
-		}
-
-		for (SubSystem subSystem : daq.getSubSystems()) {
-
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
-
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.ERROR || currentState == TTSState.OUT_OF_SYNC) {
-					HashMap<String, Object> ttcpRaport = new HashMap<>();
-					ttcpRaport.put("name", ttcp.getName());
-					ttcpRaport.put("subsystem", ttcp.getSubsystem().getName());
-					ttcpRaport.put("ttsState", TTSState.getByCode(ttcp.getTtsState()));
-					List<Object> oosFeds = new ArrayList<>();
-					for (FED fed : ttcp.getFeds()) {
-						if (fed.getRuFedOutOfSync() > 0) {
-							HashMap<String, String> fedraport = new HashMap<>();
-							fedraport.put("sourceId", fed.getSrcIdExpected() + "");
-							fedraport.put("noOfEventsOOS", fed.getRuFedOutOfSync() + "");
-							oosFeds.add(fedraport);
-						}
-					}
-					eventRaport.getSetByCode("fedsInOOS").add(oosFeds);
-					eventRaport.getSetByCode("problemTTCPs").add(ttcpRaport);
-				}
-			}
-		}
+		return result;
 	}
 
 }

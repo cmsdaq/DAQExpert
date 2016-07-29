@@ -11,8 +11,9 @@ public class NoRate extends Condition {
 
 	public NoRate() {
 		this.name = "No rate";
-		this.group = EventGroup.Info;
+		this.group = EventGroup.NO_RATE;
 		this.priority = EventPriority.defaultt;
+		this.description = "Rate value is 0";
 	}
 
 	@Override

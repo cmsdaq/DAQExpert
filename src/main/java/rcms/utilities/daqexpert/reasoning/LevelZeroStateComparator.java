@@ -11,8 +11,9 @@ public class LevelZeroStateComparator extends Comparator {
 
 	public LevelZeroStateComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.DAQ;
+		this.group = EventGroup.LEVEL_ZERO;
 		this.priority = EventPriority.defaultt;
+		this.description = "New Level zero state identified";
 	}
 
 	private static Logger logger = Logger.getLogger(LevelZeroStateComparator.class);
@@ -22,7 +23,7 @@ public class LevelZeroStateComparator extends Comparator {
 
 		if (!current.getLevelZeroState().equals(previous.getLevelZeroState())) {
 			logger.debug("New L0 state " + current.getLevelZeroState());
-			this.name = "L0 state: " + current.getLevelZeroState();
+			this.name = current.getLevelZeroState();
 			result = true;
 		}
 		return result;

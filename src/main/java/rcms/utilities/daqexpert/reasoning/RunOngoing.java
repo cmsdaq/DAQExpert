@@ -12,8 +12,9 @@ public class RunOngoing extends Condition {
 
 	public RunOngoing() {
 		this.name = "Run ongoing";
-		this.group = EventGroup.Run;
+		this.group = EventGroup.RUN_ONGOING;
 		this.priority = EventPriority.defaultt;
+		this.description = "Run is ongoing according to TCDS state";
 	}
 
 	@Override

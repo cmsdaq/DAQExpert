@@ -11,8 +11,9 @@ public class DAQStateComparator extends Comparator {
 
 	public DAQStateComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.DAQ;
+		this.group = EventGroup.DAQ_STATE;
 		this.priority = EventPriority.defaultt;
+		this.description = "New DAQ state identified";
 	}
 
 	private static Logger logger = Logger.getLogger(DAQStateComparator.class);
@@ -22,7 +23,7 @@ public class DAQStateComparator extends Comparator {
 
 		if (!current.getDaqState().equals(previous.getDaqState())) {
 			logger.debug("DAQ state " + current.getDaqState());
-			this.name = "DAQ state: " + current.getDaqState();
+			this.name = current.getDaqState();
 			result = true;
 		}
 		return result;

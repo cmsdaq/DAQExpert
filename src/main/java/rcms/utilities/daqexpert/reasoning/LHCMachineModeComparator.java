@@ -13,8 +13,9 @@ public class LHCMachineModeComparator extends Comparator {
 
 	public LHCMachineModeComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.LHC;
+		this.group = EventGroup.LHC_MACHINE;
 		this.priority = EventPriority.defaultt;
+		this.description = "New LHC Machine mode identified";
 	}
 
 	private static Logger logger = Logger.getLogger(LHCMachineModeComparator.class);
@@ -24,7 +25,7 @@ public class LHCMachineModeComparator extends Comparator {
 
 		if (!current.getLhcMachineMode().equals(previous.getLhcMachineMode())) {
 			logger.debug("New LHC Machine mode " + new Date(current.getLastUpdate()));
-			this.name = "Machine mode: " + current.getLhcMachineMode();
+			this.name = current.getLhcMachineMode();
 			result = true;
 		}
 		return result;

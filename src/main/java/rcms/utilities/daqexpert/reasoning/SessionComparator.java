@@ -13,8 +13,9 @@ public class SessionComparator extends Comparator {
 
 	public SessionComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.Run;
+		this.group = EventGroup.SESSION_NUMBER;
 		this.priority = EventPriority.defaultt;
+		this.description = "DAQ session";
 	}
 
 	private static Logger logger = Logger.getLogger(SessionComparator.class);
@@ -24,7 +25,7 @@ public class SessionComparator extends Comparator {
 
 		if (current.getSessionId() != previous.getSessionId()) {
 			logger.debug("New session identified " + new Date(current.getLastUpdate()));
-			name = "session id: " + current.getSessionId();
+			name = "" + current.getSessionId();
 			result = true;
 		}
 		return result;

@@ -15,8 +15,9 @@ public class EVMComparator extends Comparator {
 
 	public EVMComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.Info;
+		this.group = EventGroup.OTHER;
 		this.priority = EventPriority.defaultt;
+		this.description = "New EVM state identified";
 	}
 
 	private static Logger logger = Logger.getLogger(EVMComparator.class);

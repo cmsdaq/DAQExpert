@@ -9,6 +9,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * From checker & comparator boolean results creates events
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class EventProducer {
 
 	/** Logger */
@@ -25,6 +34,8 @@ public class EventProducer {
 
 	/** Current states are kept here */
 	private final Map<String, Boolean> states = new HashMap<>();
+
+	private final List<Entry> finishedThisRound = new ArrayList<>();
 
 	/** Singleton constructor */
 	private EventProducer() {
@@ -77,12 +88,19 @@ public class EventProducer {
 		String className = classificable.getClass().getSimpleName();
 		String content = classificable.getName();
 		EventPriority eventClass = classificable.getPriority();
+
+		ContextCollector context = null;
+
+		if (classificable instanceof ExtendedCondition) {
+			context = ((ExtendedCondition) classificable).getContext();
+		}
+
 		Entry result = null;
 		if (states.containsKey(className)) {
 			boolean currentState = states.get(className);
 
 			if (currentState != value) {
-				result = finishOldAddNew(className, content, value, date, level, eventClass);
+				result = finishOldAddNew(className, content, value, date, level, eventClass, context);
 				states.put(className, value);
 			} else {
 				result = unfinished.get(className);
@@ -92,19 +110,24 @@ public class EventProducer {
 		// no prior states
 		else {
 			states.put(className, value);
-			result = finishOldAddNew(className, content, value, date, level, eventClass);
+			result = finishOldAddNew(className, content, value, date, level, eventClass, context);
 		}
+		result.setEventFinder(classificable);
 		return result;
 	}
 
 	private Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
-			EventPriority eventClass) {
+			EventPriority eventClass, ContextCollector context) {
 
 		/* finish old entry */
 		if (unfinished.containsKey(className)) {
 			Entry toFinish = unfinished.get(className);
+			toFinish.setState(EntryState.FINISHED);
 			toFinish.setEnd(date);
 			toFinish.calculateDuration();
+			ContextCollector clone = (ContextCollector) org.apache.commons.lang.SerializationUtils.clone(context);
+			toFinish.setFinishedContext(clone);
+			finishedThisRound.add(toFinish);
 		}
 
 		/* add new entry */
@@ -132,6 +155,14 @@ public class EventProducer {
 	@Override
 	public String toString() {
 		return "EventProducer [result=" + result + ", states=" + states + ", unfinished=" + unfinished + "]";
+	}
+
+	public List<Entry> getFinishedThisRound() {
+		return finishedThisRound;
+	}
+
+	public void clearFinishedThisRound() {
+		finishedThisRound.clear();
 	}
 
 }

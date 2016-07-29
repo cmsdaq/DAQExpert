@@ -13,8 +13,9 @@ public class LHCBeamModeComparator extends Comparator {
 
 	public LHCBeamModeComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.LHC;
+		this.group = EventGroup.LHC_BEAM;
 		this.priority = EventPriority.defaultt;
+		this.description = "New LHC beam mode identified";
 	}
 
 	private static Logger logger = Logger.getLogger(LHCBeamModeComparator.class);
@@ -24,7 +25,7 @@ public class LHCBeamModeComparator extends Comparator {
 
 		if (!current.getLhcBeamMode().equals(previous.getLhcBeamMode())) {
 			logger.debug("New LHC Beam mode " + new Date(current.getLastUpdate()));
-			this.name = "Beam mode: " + current.getLhcBeamMode();
+			this.name = current.getLhcBeamMode();
 			if (current.getLhcBeamMode().equalsIgnoreCase("Stable Beams"))
 				this.priority = EventPriority.important;
 			else

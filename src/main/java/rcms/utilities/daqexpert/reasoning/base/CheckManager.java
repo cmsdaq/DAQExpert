@@ -15,7 +15,6 @@ import rcms.utilities.daqexpert.reasoning.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.FlowchartCase5;
-import rcms.utilities.daqexpert.reasoning.FlowchartCase6;
 import rcms.utilities.daqexpert.reasoning.LHCBeamModeComparator;
 import rcms.utilities.daqexpert.reasoning.LHCMachineModeComparator;
 import rcms.utilities.daqexpert.reasoning.LevelZeroStateComparator;
@@ -40,7 +39,8 @@ public class CheckManager {
 	private final List<Comparator> comparators = new ArrayList<>();
 
 	/**
-	 * Constructor
+	 * Constructor, order of checker matters. Checkers may use results of
+	 * checkers added before.
 	 * 
 	 * @param daq
 	 *            daq object to analyze
@@ -61,7 +61,7 @@ public class CheckManager {
 		checkers.add(new FlowchartCase3());
 		checkers.add(new FlowchartCase4());
 		checkers.add(new FlowchartCase5());
-		checkers.add(new FlowchartCase6());
+		// checkers.add(new FlowchartCase6());
 
 		// comparators
 		comparators.add(new SessionComparator());
@@ -74,22 +74,72 @@ public class CheckManager {
 	}
 
 	/**
-	 * Run all checkers
+	 * Run all logic modules for current snapshot
+	 * 
+	 * @param daq
+	 *            current snapshot
+	 * @return results of logic modules analysis
 	 */
-	public void runCheckers(DAQ daq) {
+	public List<Entry> runLogicModules(DAQ daq) {
+
+		List<Entry> results = new ArrayList<>();
 
 		logger.debug("Running analysis modules for run " + daq.getSessionId());
+
+		results.addAll(runCheckers(daq));
+		results.addAll(runComparators(daq));
+
+		return results;
+	}
+
+	/**
+	 * Run checkers for current snapshot
+	 * 
+	 * @param daq
+	 *            current snapshot
+	 * @return results of checkers analysis
+	 */
+	private List<Entry> runCheckers(DAQ daq) {
+		List<Entry> results = new ArrayList<>();
 		Date curr = null;
-		HashMap<String, Boolean> results = new HashMap<>();
+		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
 
 		for (Condition checker : checkers) {
-			boolean result = checker.satisfied(daq, results);
-			results.put(checker.getClass().getSimpleName(), result);
+			boolean result = checker.satisfied(daq, checkerResultMap);
+
+			checkerResultMap.put(checker.getClass().getSimpleName(), result);
 			curr = new Date(daq.getLastUpdate());
 			Entry entry = EventProducer.get().produce(checker, result, curr);
-			if (entry != null && result && checker instanceof ExtendedCondition)
-				((ExtendedCondition) checker).gatherInfo(daq, entry);
+
+			/*
+			 * The event finishes (result = false), Context to be cleared for
+			 * next events. Note that this is performed after
+			 * EventProducer.produce so that context can be used to close the
+			 * event
+			 */
+			if (!result && checker instanceof ExtendedCondition) {
+				((ExtendedCondition) checker).context.clearContext();
+			}
+
+			if (entry != null) {
+				results.add(entry);
+			}
 		}
+		results.addAll(EventProducer.get().getFinishedThisRound());
+		EventProducer.get().clearFinishedThisRound();
+
+		return results;
+	}
+
+	/**
+	 * Run comparators for current snapshot
+	 * 
+	 * @param daq
+	 *            current snapshot
+	 * @return results of checkers analysis
+	 */
+	private List<Entry> runComparators(DAQ daq) {
+		List<Entry> results = new ArrayList<>();
 		for (Comparator comparator : comparators) {
 			Date last = null;
 			if (comparator.getLast() != null)
@@ -106,7 +156,9 @@ public class CheckManager {
 			boolean result = comparator.compare(daq);
 			Date current = new Date(comparator.getLast().getLastUpdate());
 
+			// TODO: comparators may also return entry
 			EventProducer.get().produce(comparator, result, last, current);
 		}
+		return results;
 	}
 }

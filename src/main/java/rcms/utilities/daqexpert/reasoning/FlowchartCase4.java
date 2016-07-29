@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -9,10 +8,8 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.EventRaport;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
 
@@ -27,9 +24,8 @@ import rcms.utilities.daqexpert.reasoning.base.TTSState;
 public class FlowchartCase4 extends ExtendedCondition {
 
 	public FlowchartCase4() {
-		this.name = "CASE 4";
-		this.description = "Exists TTCP in disconnected</br>"
-				+ "TTS state of partition blocking trigger is Disconnected,"
+		this.name = "FC4";
+		this.description = "FC4: TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
 				+ "The PI of the subsystem may be suffering from a firmware problem";
 		this.action = Arrays.asList("Stop the run", "red & green recycle the subsystem corresponding to the partition",
 				"Start new run", "Problem fixed: You are done make an e-log entry",
@@ -42,6 +38,7 @@ public class FlowchartCase4 extends ExtendedCondition {
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+		boolean result = false;
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
@@ -52,39 +49,14 @@ public class FlowchartCase4 extends ExtendedCondition {
 				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
 				if (currentState == TTSState.DISCONNECTED) {
 
-					logger.debug("M4: " + name + " at " + daq.getLastUpdate());
-					return true;
+					context.register("SUBSYSTEM", subSystem.getName());
+					context.register("TTCP", subSystem.getName());
+					context.register("STATE", currentState.name());
+					result = true;
 				}
 			}
 		}
 
-		return false;
+		return result;
 	}
-
-	@Override
-	public void gatherInfo(DAQ daq, Entry entry) {
-
-		EventRaport eventRaport = entry.getEventRaport();
-		if (!eventRaport.isInitialized()) {
-			eventRaport.initialize(name, description, action);
-		}
-
-		for (SubSystem subSystem : daq.getSubSystems()) {
-
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
-
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.DISCONNECTED) {
-
-					HashMap<String, Object> ttcpRaport = new HashMap<>();
-					ttcpRaport.put("name", ttcp.getName());
-					ttcpRaport.put("subsystem", ttcp.getSubsystem().getName());
-					ttcpRaport.put("ttsState", TTSState.getByCode(ttcp.getTtsState()));
-					eventRaport.getSetByCode("problemTTCP").add(ttcpRaport);
-
-				}
-			}
-		}
-	}
-
 }

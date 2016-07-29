@@ -1,20 +1,22 @@
 package rcms.utilities.daqexpert.reasoning;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.states.LHCBeamMode;
 
-//TODO: should not be satisfied when FixingSoftError
-public class NoRateWhenExpected extends Condition {
+public class NoRateWhenExpected extends ExtendedCondition {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
 		this.group = EventGroup.Error;
-		this.priority = EventPriority.important;
+		this.priority = EventPriority.critical;
+		this.description = "No rate when expected";
+		this.action = Arrays.asList("Wake up!", "Suggestions should be be delivered shortly.");
 	}
 
 	@Override
@@ -28,8 +30,8 @@ public class NoRateWhenExpected extends Condition {
 		noRate = results.get(NoRate.class.getSimpleName());
 
 		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
-		//TODO: dcs pause resume
-		//TODO: ! tcds paused + pausing + resuming
+		// TODO: dcs pause resume
+		// TODO: ! tcds paused + pausing + resuming
 
 		if (stableBeams && runOngoing && noRate && !fixingSoftError)
 			return true;

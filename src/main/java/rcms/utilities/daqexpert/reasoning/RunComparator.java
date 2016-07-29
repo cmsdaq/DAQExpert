@@ -11,8 +11,9 @@ public class RunComparator extends Comparator {
 
 	public RunComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.Run;
+		this.group = EventGroup.RUN_NUMBER;
 		this.priority = EventPriority.defaultt;
+		this.description = "New run has been identified";
 	}
 
 	private static Logger logger = Logger.getLogger(RunComparator.class);
@@ -22,7 +23,7 @@ public class RunComparator extends Comparator {
 
 		if (current.getRunNumber() != previous.getRunNumber()) {
 			logger.debug("New run identified " + current.getRunNumber());
-			this.name = "run number: " + current.getRunNumber();
+			this.name = "" + current.getRunNumber();
 			result = true;
 		}
 		return result;

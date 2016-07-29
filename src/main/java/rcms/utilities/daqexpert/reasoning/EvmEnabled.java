@@ -16,6 +16,7 @@ public class EvmEnabled extends Condition {
 		this.name = "Enabled EVM";
 		this.group = EventGroup.Warning;
 		this.priority = EventPriority.defaultt;
+		this.description = "EVM is enabled";
 	}
 
 	@Override
@@ -24,6 +25,7 @@ public class EvmEnabled extends Condition {
 		for (FEDBuilder b : a) {
 			RU ru = b.getRu();
 			if (ru.isEVM()) {
+				//TODO: how to check if EVM is enabled? not masked?
 			}
 		}
 		boolean result = false;

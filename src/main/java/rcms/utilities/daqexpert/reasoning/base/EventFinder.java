@@ -15,7 +15,12 @@ public abstract class EventFinder {
 	 * Priority of the event found
 	 */
 	protected EventPriority priority;
-
+	
+	/**
+	 * Condition description
+	 */
+	protected String description;
+	
 	/**
 	 * Get name of the condition
 	 * 
@@ -72,4 +77,13 @@ public abstract class EventFinder {
 	public void setPriority(EventPriority priority) {
 		this.priority = priority;
 	}
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 }

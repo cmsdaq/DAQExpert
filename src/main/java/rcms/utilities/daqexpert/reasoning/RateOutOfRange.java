@@ -11,8 +11,9 @@ public class RateOutOfRange extends Condition {
 
 	public RateOutOfRange() {
 		this.name = "Rate out of range";
-		this.group = EventGroup.Info;
+		this.group = EventGroup.RATE_OUT_OF_RANGE;
 		this.priority = EventPriority.defaultt;
+		this.description = "Rate is considered out of range when less than 50kHz";
 	}
 
 	@Override

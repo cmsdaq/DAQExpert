@@ -171,18 +171,42 @@ body, html {
 	<script type="text/javascript">
 		var items = new vis.DataSet([]);
 
+
+		/* containers */
 		var container = document.getElementById('visualization');
+		var rawcontainer = document.getElementById('raw');
+		
+		var rawitems = [];
+		
+		
 		var options = {
 			editable : false,
-			throttleRedraw : 100,
-			groupsOnRight : true,
 			margin : {
 				item : {
 					horizontal : 0
 				}
 			}
-
 		};
+		
+		var rawoptions = {
+				drawPoints : true,
+				height : '300px',
+				interpolation : false,
+				orientation : 'top',
+				throttleRedraw : 100,
+				dataAxis : {
+					title : {
+						text : "aa"
+					},
+					width : '50px',
+					icons : false
+				},
+				legend : {
+					left : {
+						position : "bottom-left"
+					}
+				}
+			};
 
 		var groupsList = [ {
 			id : 'lhc-beam',
@@ -277,10 +301,49 @@ body, html {
 		} ];
 
 		var groups = new vis.DataSet(groupsList);
+		
+
+
+		var rawdataset = new vis.DataSet(rawitems);
+
+		var rawgroups = new vis.DataSet();
+		rawgroups.add({
+			id : 0,
+			content : "rate [kHz]",
+			options : {
+				yAxisOrientation : 'left'
+			}
+		})
+		rawgroups.add({
+			id : 1,
+			content : "events (x10^6)",
+			options : {
+				yAxisOrientation : 'right',
+				shaded : {
+					orientation : 'zero'
+				}
+			}
+		})
+		
+		
+		
 		var timeline = new vis.Timeline(container, items, groups, options);
+		
+		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawgroups,
+				rawoptions);
+		
+		
 
 		/** Refresh data on timeline event */
 		var runDataUpdateFromTimeline = function(properties) {
+			var byUser = properties["byUser"];
+			if (byUser) {
+				loadNewData('rangechange', properties);
+			}
+		};
+		
+		/** Refresh data on graph event */
+		var runDataUpdateFromGraph = function(properties) {
 			var byUser = properties["byUser"];
 			if (byUser) {
 				loadNewData('rangechange', properties);
@@ -299,14 +362,6 @@ body, html {
 				});
 			} else {
 				//here event propagation is stopped			
-			}
-		};
-
-		/** Refresh data on graph event */
-		var runDataUpdateFromGraph = function(properties) {
-			var byUser = properties["byUser"];
-			if (byUser) {
-				loadNewData('rangechange', properties);
 			}
 		};
 
@@ -470,60 +525,18 @@ body, html {
 			});
 		};
 
-		var rawcontainer = document.getElementById('raw');
-		var rawitems = [];
-
-		var rawdataset = new vis.DataSet(rawitems);
-
-		var rawgroups = new vis.DataSet();
-		rawgroups.add({
-			id : 0,
-			content : "rate [kHz]",
-			options : {
-				yAxisOrientation : 'left'
-			}
-		})
-		rawgroups.add({
-			id : 1,
-			content : "events (x10^6)",
-			options : {
-				yAxisOrientation : 'right',
-				shaded : {
-					orientation : 'zero'
-				}
-			}
-		})
-		var rawoptions = {
-			drawPoints : true,
-			height : '300px',
-			interpolation : false,
-			orientation : 'top',
-			throttleRedraw : 100,
-			dataAxis : {
-				title : {
-					text : "aa"
-				},
-				width : '50px',
-				icons : false
-			},
-			legend : {
-				left : {
-					position : "bottom-left"
-				}
-			},
-
-		};
-
-		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawgroups,
-				rawoptions);
+		
 
 		graph2d.on('rangechange', _.throttle(runDataUpdateFromGraph, 500, {
 			leading : false
 		}));
+		
+		
 		graph2d.on('rangechange', _.throttle(runSyncFromGraph, 50, {
 			leading : false
 		}));
 
+		/* Raw data click event handling */
 		graph2d.on('click', function(properties) {
 			console.log("Clicked " + JSON.stringify(properties['time']));
 			var parameters = {};
@@ -539,66 +552,65 @@ body, html {
 
 		});
 
+		/* Load raw data to grap chart */
 		function rawload(data) {
 			rawdataset.clear();
 			rawdataset.add(data);
 
 		};
 
-		$(document)
-				.ready(
-						function() {
+		/* Initialize */
+		$(document).ready(function() {
+			var defaultEnd = moment().add(1, 'hours');
+			var defaultStart = moment().subtract(2, 'days');
+			var useDefault = true;
 
-							var defaultEnd = moment().add(1, 'hours');
-							var defaultStart = moment().subtract(2, 'days');
-							var useDefault = true;
+			var requestedStart = getUrlParameter('start');
+			var requestedEnd = getUrlParameter('end');
+			var parsedStart = new Date(requestedStart);
+			var parsedEnd = new Date(requestedEnd);
 
-							var requestedStart = getUrlParameter('start');
-							var requestedEnd = getUrlParameter('end');
-							var parsedStart = new Date(requestedStart);
-							var parsedEnd = new Date(requestedEnd);
+			console.log("requested params: " + parsedStart
+					+ ", " + parsedEnd);
 
-							console.log("requested params: " + parsedStart
-									+ ", " + parsedEnd);
+			if (Object.prototype.toString.call(parsedStart) === "[object Date]"
+					&& Object.prototype.toString
+							.call(parsedEnd) === "[object Date]") {
+				// it is a date
+				if (isNaN(parsedStart.getTime())
+						|| isNaN(parsedEnd.getTime())) {
+					// date is not valid
+					useDefault = true;
+				} else {
+					useDefault = false;
+				}
+			} else {
+				// not a date
+				useDefault = true;
+			}
 
-							if (Object.prototype.toString.call(parsedStart) === "[object Date]"
-									&& Object.prototype.toString
-											.call(parsedEnd) === "[object Date]") {
-								// it is a date
-								if (isNaN(parsedStart.getTime())
-										|| isNaN(parsedEnd.getTime())) {
-									// date is not valid
-									useDefault = true;
-								} else {
-									useDefault = false;
-								}
-							} else {
-								// not a date
-								useDefault = true;
-							}
+			console.log("Initing with using default ranges: "
+					+ useDefault);
+			properties = {};
+			if (useDefault) {
+				properties['start'] = defaultStart;
+				properties['end'] = defaultEnd;
+			} else {
+				properties['start'] = parsedStart;
+				properties['end'] = parsedEnd;
+			}
 
-							console.log("Initing with using default ranges: "
-									+ useDefault);
-							properties = {};
-							if (useDefault) {
-								properties['start'] = defaultStart;
-								properties['end'] = defaultEnd;
-							} else {
-								properties['start'] = parsedStart;
-								properties['end'] = parsedEnd;
-							}
+			loadNewData('rangechange', properties);
+			timeline.setWindow(properties['start'],
+					properties['end'], {
+						animation : false
+					});
+			graph2d.setWindow(properties['start'],
+					properties['end'], {
+						animation : false
+					});
 
-							loadNewData('rangechange', properties);
-							timeline.setWindow(properties['start'],
-									properties['end'], {
-										animation : false
-									});
-							graph2d.setWindow(properties['start'],
-									properties['end'], {
-										animation : false
-									});
-
-						});
+		});
 
 		var getUrlParameter = function getUrlParameter(sParam) {
 			var sPageURL = decodeURIComponent(window.location.search

@@ -62,13 +62,12 @@ body, html {
 	box-shadow: 0 0 10px gray;
 }
 
-.vis-item.filtered {
-	background-color: darkorange;
-	height: 4px; //
-	box-shadow: 0 0 10px gray;
-	color: white; /* text color */
-	font-size: 0pt; /* there is no text */
-	border-width: 0px; /* there is no border */
+.vis-item.vis-background.filtered {
+	background-color: rgba(0, 136, 204, 0.1);
+}
+
+.vis-item.vis-background.filtered-important {
+	background-color: rgba(189, 54, 47, 0.1);
 }
 
 .vis-item.important {
@@ -77,6 +76,23 @@ body, html {
 	color: white;
 	font-family: monospace;
 	box-shadow: 0 0 10px gray;
+}
+
+/* gray background in weekends, white text color */
+.vis-time-axis .vis-grid.vis-saturday, .vis-time-axis .vis-grid.vis-sunday
+	{
+	background: rgba(244, 244, 244, .4);
+}
+
+.vis-time-axis .vis-grid.vis-h0-h4, .vis-time-axis .vis-grid.vis-h4-h8 {
+	background: rgba(244, 244, 244, .4);
+}
+
+.vis-time-axis .vis-grid.vis-h0, .vis-time-axis .vis-grid.vis-h1,
+	.vis-time-axis .vis-grid.vis-h2, .vis-time-axis .vis-grid.vis-h3,
+	.vis-time-axis .vis-grid.vis-h4, .vis-time-axis .vis-grid.vis-h5,
+	.vis-time-axis .vis-grid.vis-h6, .vis-time-axis .vis-grid.vis-h7 {
+	background: rgba(244, 244, 244, .4);
 }
 
 /* navbar */
@@ -158,6 +174,8 @@ body, html {
 		var container = document.getElementById('visualization');
 		var options = {
 			editable : false,
+			throttleRedraw : 100,
+			groupsOnRight : true,
 			margin : {
 				item : {
 					horizontal : 0
@@ -166,43 +184,99 @@ body, html {
 
 		};
 
-		var groups = new vis.DataSet([ {
-			id : 'lhc',
-			content : 'LHC'
+		var groupsList = [ {
+			id : 'lhc-beam',
+			content : 'Beam (0)',
+			name : 'Beam',
+			title : 'LHC beam mode'
 		}, {
-			id : 'daq',
-			content : 'daq'
+			id : 'lhc-machine',
+			content : 'Machine (0)',
+			name : 'Machine',
+			title : 'LHC machine mode'
 		}, {
-			id : 'run',
-			content : 'run'
+			id : 'daq-state',
+			content : 'DAQ (0)',
+			name : 'DAQ',
+			title : 'DAQ state'
 		}, {
+			id : 'level-zero',
+			content : 'L0 (0)',
+			name : 'L0',
+			title : 'Level zero state'
+		}, {
+			id : 'session-no',
+			content : 'Session (0)',
+			name : 'Session',
+			title : 'Session number'
+		}, {
+			id : 'run-no',
+			content : 'Run NO (0)',
+			name : 'Run NO',
+			title : 'Run number'
+		}, {
+			id : 'run-on',
+			content : 'Run on (0)',
+			name : 'Run on',
+			title : 'Run ongoing'
+		},  {
 			id : 'error',
-			content : 'error'
+			content : 'Error (0)',
+			name : 'Error',
+			title : 'Errors'
 		}, {
 			id : 'warning',
-			content : 'warning'
+			content : 'Warn (0)',
+			name : 'Warn',
+			title : 'Warnings'
 		}, {
-			id : 'info',
-			content : 'info'
+			id : 'no-rate',
+			content : 'No rate (0)',
+			name : 'No rate',
+			title : 'No rate condition'
+		}, {
+			id : 'rate-oor',
+			content : 'Rate OOR (0)',
+			name : 'Rate OOR',
+			title : 'Rate out of range'
+		}, {
+			id : 'other',
+			content : 'Other (0)',
+			name : 'Other',
+			title : 'Other conditions'
 		}, {
 			id : 'fl1',
-			content : 'flowchart M1'
+			content : 'FC1 (0)',
+			name : 'FC1',
+			title : 'Flowchart events, case 1'
 		}, {
 			id : 'fl2',
-			content : 'flowchart M2'
+			content : 'FC2 (0)',
+			name : 'FC2',
+			title : 'Flowchart events, case 2'
 		}, {
 			id : 'fl3',
-			content : 'flowchart M3'
+			content : 'FC3 (0)',
+			name : 'FC3',
+			title : 'Flowchart events, case 3'
 		}, {
 			id : 'fl4',
-			content : 'flowchart M4'
+			content : 'FC4 (0)',
+			name : 'FC4',
+			title : 'Flowchart events, case 4'
 		}, {
 			id : 'fl5',
-			content : 'flowchart M5'
+			content : 'FC5 (0)',
+			name : 'FC5',
+			title : 'Flowchart events, case 5'
 		}, {
 			id : 'fl6',
-			content : 'flowchart M6'
-		} ]);
+			content : 'FC6 (0)',
+			name : 'FC6',
+			title : 'Flowchart events, case 6'
+		} ];
+
+		var groups = new vis.DataSet(groupsList);
 		var timeline = new vis.Timeline(container, items, groups, options);
 
 		/** Refresh data on timeline event */
@@ -268,45 +342,95 @@ body, html {
 			leading : false
 		}));
 
-		timeline
-				.on(
-						'click',
-						function(properties) {
-
-							$('#reasonModal').modal('show')
-							var parameters = {};
-							parameters['id'] = properties['item'];
-							$
-									.getJSON(
-											"raport",
-											parameters,
-											function(data) {
-												var preetified = JSON
-														.stringify(
-																data['elements'],
-																null, 2);
-												$("#raport-name").html(data['name']);
-												$("#raport-description").html(data['description']);
-												$("#raport-action").html("<ol id='curr-action'></ol>");
-												
-												$.each( data['action'], function( key, value ) {
-													$("#curr-action").append($("<li>").text(value))
-												});
-												$("#raport-body").html(preetified);
-											}).error(
-											function(jqXHR, textStatus,
-													errorThrown) {
-												console.log("error "
-														+ textStatus);
-												console.log("errorThrown "
-														+ errorThrown);
-												console.log("incoming Text "
-														+ jqXHR.responseText);
-											});
-
+		timeline.on('click', function(properties) {
+			
+			console.log("Properties: "  + properties['what']);
+			
+			if(properties['what'] == 'item'){
+				$('#reasonModal').modal('show');
+				var parameters = {};
+				parameters['id'] = properties['item'];
+				
+				$.getJSON("raport", parameters, function(data) {
+	
+					$("#raport-name").html(data['name']);
+					$("#raport-description").html(data['description']);
+	
+					if (data['elements'] == null) {
+						$("#context-section").addClass("hidden");
+					} else {
+						$("#context-section").removeClass("hidden");
+						var preetified = JSON.stringify(data['elements'], null, 2);
+						$("#raport-body").html(preetified);
+					}
+	
+					if (data['action'] == null) {
+						$("#action-section").addClass("hidden");
+					} else {
+						$("#action-section").removeClass("hidden");
+						$("#raport-action").html("<ol id='curr-action'></ol>");
+						$.each(data['action'], function(key, value) {
+							$("#curr-action").append($("<li>").text(value))
 						});
+					}
+	
+				}).error(function(jqXHR, textStatus, errorThrown) {
+					console.log("error " + textStatus);
+					console.log("errorThrown " + errorThrown);
+					console.log("incoming Text " + jqXHR.responseText);
+				});
+
+			} else{
+				console.log("No event selected...");	
+				return;
+			}
+
+		});
 
 		function load(data) {
+
+			countPerGroup = {};
+
+			/* Traverse new data to count events per group */
+			$.each(data, function(index, value) {
+				var groupName = value['group'];
+				var currCount = 0;
+
+				/* Get current count */
+				if (groupName in countPerGroup) {
+					currCount = countPerGroup[groupName];
+				}
+
+				/* add current element */
+				if (value['className'] == 'filtered'
+						|| value['className'] == 'filtered-important') {
+					countPerGroup[groupName] = currCount
+							+ parseInt(value['content']);
+					value['type'] = 'background';
+				} else {
+					countPerGroup[groupName] = currCount + 1;
+				}
+			});
+
+			/* If no data put zero in countPerGroup map */
+			$.each(groupsList, function(index, value) {
+				var groupName = value['id'];
+				if (!(groupName in countPerGroup)) {
+					countPerGroup[groupName] = 0;
+				}
+			});
+
+			//console.log(JSON.stringify(data));
+
+			$.each(countPerGroup, function(index, value) {
+				var current = groups.get(index);
+				//console.log("Current: "+JSON.stringify(current));
+				groups.update({
+					id : index,
+					content : current['name'] + " (" + value + ")"
+				});
+
+			});
 
 			items.clear();
 			items.add(data);
@@ -374,6 +498,7 @@ body, html {
 			height : '300px',
 			interpolation : false,
 			orientation : 'top',
+			throttleRedraw : 100,
 			dataAxis : {
 				title : {
 					text : "aa"
@@ -490,36 +615,39 @@ body, html {
 		};
 
 		// Instance the tour
-		var tour = new Tour(
+		var tour = new Tour({
+			container : "body",
+			smartPlacement : true,
+			placement : "left",
+			keyboard : true,
+			storage : window.localStorage,
+			debug : false,
+			backdrop : true,
+			backdropContainer : 'body',
+			backdropPadding : 0,
+			redirect : true,
+			orphan : false,
+			duration : false,
+			delay : false,
+			steps : [
+			    {
+			    	title : "Introduction",
+			    	orphan : true,
+			    	content : "The DAQExpert provides interactive visualization tool.</br>It visualizes DAQ data and expert analysis in time.</br>You can freely move and zoom in the timeline by dragging and scrolling in the timelines"
+			    },
 				{
-
-					container : "body",
-					smartPlacement : true,
-					placement : "left",
-					keyboard : true,
-					storage : window.localStorage,
-					debug : false,
-					backdrop : true,
-					backdropContainer : 'body',
-					backdropPadding : 0,
-					redirect : true,
-					orphan : false,
-					duration : false,
-					delay : false,
-					steps : [
-							{
-								element : "#visualization",
-								title : "Analysis result",
-								placement : 'bottom',
-								content : "Results of the Expert analysis will be displayed here.</br>For zooming in/out use scroll. For changing time range use click&drag. </br> You can click on each block to get more details."
-							},
-							{
-								element : "#raw",
-								title : "Raw data",
-								placement : 'top',
-								content : "Raw data from DAQAggregator will be displayed here. </br>For zooming in/out use scroll. For changing time range use click&drag. Time range is always synchronized with Analysis result block above. </br> You can click at any point in time to get the full snapshot. "
-							} ]
-				});
+					element : "#visualization",
+					title : "Analysis result",
+					placement : 'bottom',
+					content : "Results of the Expert analysis will be displayed here.</br>You can click on each block to get more details."
+				},
+				{
+					element : "#raw",
+					title : "Raw data",
+					placement : 'top',
+					content : "Raw data from DAQAggregator will be displayed here. </br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot. "
+				} ]
+			});
 		$('#tour').click(function(e) {
 			console.log("Start tour");
 
@@ -576,28 +704,36 @@ body, html {
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Event report</h4>
+					<h4 class="modal-title">Event details</h4>
 				</div>
 				<div class="modal-body">
 					<h4 id="raport-name">/Name/</h4>
 					<p id="raport-description">/description/</p>
 
-					<h4>Action</h4>
-					<p id="raport-action">/action/</p>
 
-					<h4>Details</h4>
-					<pre id="raport-body"></pre>
+					<div id="action-section">
+						<h4>Action</h4>
+						<p id="raport-action">/action/</p>
+					</div>
 
+						<div id="context-section" >
+						
+							<button type="button" class="btn btn-info" data-toggle="collapse"
+								data-target="#context-collapse">Show raw context</button>
+							<div id="context-collapse" class="collapse">
+								<h4>Context</h4>
+								<pre id="raport-body"></pre>
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer"></div>
 				</div>
-				<div class="modal-footer"></div>
+				<!-- /.modal-content -->
 			</div>
-			<!-- /.modal-content -->
+			<!-- /.modal-dialog -->
 		</div>
-		<!-- /.modal-dialog -->
-	</div>
-	<!-- /.modal -->
-
-
+		<!-- /.modal -->
 </body>
 
 </html>

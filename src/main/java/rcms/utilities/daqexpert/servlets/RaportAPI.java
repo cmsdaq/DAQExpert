@@ -1,7 +1,9 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,8 +14,11 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.base.EventFinder;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -31,11 +36,39 @@ public class RaportAPI extends HttpServlet {
 		try {
 			int id = Integer.parseInt(idString);
 
-			Object result = null;
+			Map<String, Object> result = new HashMap<>();
 			List<Entry> entries = EventProducer.get().getResult();
 			for (Entry entry : entries) {
-				if (entry.getId() == id)
-					result = entry.getEventRaport();
+				// FIXME: map should be used
+				if (entry.getId() == id) {
+
+					String description;
+					EventFinder eventFinder = entry.getEventFinder();
+
+					/* Case of Extended condition */
+					if (eventFinder instanceof ExtendedCondition) {
+						ExtendedCondition extendedCondition = (ExtendedCondition) eventFinder;
+						ContextCollector context = entry.getFinishedContext();
+						if (context != null) {
+							description = context.getMessageWithContext(extendedCondition.getDescription());
+						} else {
+							description = extendedCondition.getDescription();
+						}
+
+						result.put("description", description);
+						result.put("action", extendedCondition.getAction());
+						result.put("elements", entry.getFinishedContext().getContext());
+					}
+
+					/* case of every other condition */
+					else {
+						description = eventFinder.getDescription();
+					}
+
+					result.put("description", description);
+					result.put("name", entry.getContent());
+				}
+
 			}
 
 			String json = objectMapper.writeValueAsString(result);

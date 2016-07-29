@@ -14,15 +14,8 @@ import rcms.utilities.daqexpert.ReaderTask;
 
 public class ServletListener implements ServletContextListener {
 
-	private static final Logger logger = Logger.getLogger(ServletListener.class);
-
-	ExpertPersistorManager persistorManager = new ExpertPersistorManager("/tmp/mgladki/persistence");
-	DataResolutionManager dataSegmentator = new DataResolutionManager();
-
-	Timer t = new Timer();
-
-	public void contextInitialized(ServletContextEvent e) {
-
+	public ServletListener() {
+		super();
 		String propertyFilePath = System.getenv("EXPERT_CONF");
 		if (propertyFilePath == null) {
 			logger.fatal(
@@ -32,6 +25,21 @@ public class ServletListener implements ServletContextListener {
 
 		Application.initialize(propertyFilePath);
 
+		// TODO: persistence argument is not necessary
+		persistorManager = new ExpertPersistorManager("");
+		dataSegmentator = new DataResolutionManager();
+		t = new Timer();
+	}
+
+	private static final Logger logger = Logger.getLogger(ServletListener.class);
+
+	ExpertPersistorManager persistorManager;
+	DataResolutionManager dataSegmentator;
+
+	Timer t;
+
+	public void contextInitialized(ServletContextEvent e) {
+
 		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
 		if (snapshotsDir != null)
@@ -40,12 +48,8 @@ public class ServletListener implements ServletContextListener {
 			logger.warn("Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
 			return;
 		}
-
 		ExpertPersistorManager.setUpdatedDir(snapshotsDir);
-		long last = 0;
-		// last = walkAllFilesProcessAndStoreInMemory();
-		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator, last), 0, 3000);
-
+		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator), 0, 3000);
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

@@ -54,7 +54,7 @@ public class ReasonsAPI extends HttpServlet {
 		 * minimum width for filtering the blocks is calculated based on this.
 		 * This amount of sequential blocks of the same width is the threshold
 		 */
-		int elementsInRow = 50;
+		int elementsInRow = 100;
 		int filtered = 0;
 
 		/*
@@ -70,7 +70,7 @@ public class ReasonsAPI extends HttpServlet {
 					if (entry.getDuration() > durationThreshold) {
 						result.add(entry);
 					} else {
-						logger.debug("Entry " + entry.getContent() + " with duration " + entry.getDuration()
+						logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
 								+ " will be filtered");
 						if (!groupedMap.containsKey(entry.getGroup())) {
 							groupedMap.put(entry.getGroup(), new HashSet<Entry>());
@@ -91,8 +91,14 @@ public class ReasonsAPI extends HttpServlet {
 						// create base from this if not found
 						if (base == null) {
 							base = new Entry(entry);
-							base.setContent("filtered");
-							base.setClassName(EventPriority.filtered.getCode());
+							if(EventPriority.critical.getCode().equals(entry.getClassName())){
+								base.setClassName(EventPriority.filtered_important.getCode());
+							}
+							else{
+								base.setClassName(EventPriority.filtered.getCode());
+							}
+							//type: 'background',
+							base.setContent("1");
 						}
 
 						// merge
@@ -103,6 +109,12 @@ public class ReasonsAPI extends HttpServlet {
 								base.setEnd(entry.getEnd());
 							}
 							base.calculateDuration();
+							int filteredElements = Integer.parseInt(base.getContent());
+							base.setContent((filteredElements+1) + "");
+
+							if(EventPriority.critical.getCode().equals(entry.getClassName())){
+								base.setClassName(EventPriority.filtered_important.getCode());
+							}
 						}
 
 						groupedMap.get(entry.getGroup()).add(base);
@@ -122,8 +134,8 @@ public class ReasonsAPI extends HttpServlet {
 				if (groupedEntry.getDuration() < durationThreshold) {
 					int append = (int) (durationThreshold - groupedEntry.getDuration());
 
-					Date alteredStart = new Date(groupedEntry.getStart().getTime() - append);
-					Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append);
+					Date alteredStart = new Date(groupedEntry.getStart().getTime() - append/2);
+					Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append/2);
 					groupedEntry.setStart(alteredStart);
 					groupedEntry.setEnd(alteredEnd);
 					groupedEntry.calculateDuration();

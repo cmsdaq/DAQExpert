@@ -25,15 +25,13 @@ public class ReaderTask extends TimerTask {
 	private static final Logger logger = Logger.getLogger(ReaderTask.class);
 	int last = 0;
 
-	CheckManager checkManager = new CheckManager();
 
 	private DataResolutionManager dataSegmentator;
 
-	private long dontSendBefore = 0;
+	//private long dontSendBefore = 0;
 
-	public ReaderTask(DataResolutionManager dataSegmentator, long mostRecentSnapshot) {
+	public ReaderTask(DataResolutionManager dataSegmentator) {
 		this.dataSegmentator = dataSegmentator;
-		dontSendBefore = mostRecentSnapshot;
 	}
 
 	@Override
@@ -41,29 +39,9 @@ public class ReaderTask extends TimerTask {
 
 		try {
 
-			boolean breaked = ExpertPersistorManager.get().getUnprocessedSnapshots(filesProcessed, checkManager);
+			ExpertPersistorManager.get().getUnprocessedSnapshots(filesProcessed);
 			int all = filesProcessed.size();
 			logger.debug("files processed in this round " + (all - last));
-			last = all;
-
-			NotificationSender notificationSender = new NotificationSender();
-
-			List<Entry> events = EventProducer.get().getResult();
-			List<Entry> recentEvents = new ArrayList<>();
-			long latest = dontSendBefore;
-			for (Entry event : events) {
-				if (event.getStart().getTime() > dontSendBefore && event.isShow()) {
-					recentEvents.add(event);
-					if (event.getStart().getTime() > latest)
-						latest = event.getStart().getTime();
-
-				}
-			}
-
-			logger.debug(recentEvents.size() + " notifications can be sent in this round");
-			notificationSender.send(recentEvents);
-			dontSendBefore = latest;
-
 			dataSegmentator.prepareMultipleResolutionData();
 
 		} catch (IOException e) {

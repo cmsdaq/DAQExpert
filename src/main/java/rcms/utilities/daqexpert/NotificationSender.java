@@ -3,11 +3,12 @@ package rcms.utilities.daqexpert;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -18,8 +19,10 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqaggregator.Notification;
+import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.base.EntryState;
+import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
 public class NotificationSender {
 
@@ -27,52 +30,54 @@ public class NotificationSender {
 
 	private ObjectMapper objectMapper;
 
-	private String destinationAddress;
+	private String createAPIAddress;
+
+	private String finishAPIAddress;
 
 	public NotificationSender() {
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		destinationAddress = Application.get().getProp().getProperty(Application.NM_API);
+		createAPIAddress = Application.get().getProp().getProperty(Application.NM_API_CREATE);
+		finishAPIAddress = Application.get().getProp().getProperty(Application.NM_API_CLOSE);
 	}
 
-	public void send(List<Entry> list) {
-		int successfullySent = 0;
-		int unsuccessfullySent = 0;
-		List<Integer> errors = new ArrayList<>();
-		for (Entry event : list) {
-			if ("critical".equals(event.getClassName())) {
-				logger.debug("Sending notification: " + event.getContent());
+	public void rtSend(Entry entry) {
 
-				Notification notification = new Notification();
-				notification.setDate(event.getStart());
-				String message = "Event: " + event.getContent();
-				message = message + ", date: " + event.getStart();
-				try {
-					message = message + ", raport: " + objectMapper.writeValueAsString(event.getEventRaport());
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
+		if ("critical".equals(entry.getClassName())) {
+			EntryState state = entry.getState();
+			switch (state) {
+			case NEW:
+				// imediately in 2nd snapshot becomes stable
+				// may check date here
+				entry.setState(EntryState.NEW_STABLE);
+				break;
+			case NEW_STABLE:
+				entry.setState(EntryState.STARTED);
+				// send started notification
+				logger.info("Send entry notification, id: " + entry.getId());
+				sendEntry(entry);
+				sentIds.add(entry.getId());
+				break;
+			case STARTED:
+				// send update
+				if (entry.hasChanged())
+					logger.info("Send entry update, id: " + entry.getId());
+				break;
+			case FINISHED:
+				// send finished
+				if (sentIds.contains(entry.getId())) {
+					logger.info("Send entry finish, id: " + entry);
+					sendFinish(entry);
+					sentIds.remove(entry.getId());
 				}
-				notification.setMessage(message);
-				notification.setType_id(1);
-				int httpResponseCode = sendEntry(notification, destinationAddress);
-
-				if (httpResponseCode == 201)
-					successfullySent++;
-				else {
-					unsuccessfullySent++;
-					errors.add(httpResponseCode);
-				}
-
+				break;
+			default:
+				break;
 			}
 		}
-		if (successfullySent != 0)
-			logger.info(successfullySent + " notifications sent to:" + destinationAddress);
-		if (unsuccessfullySent != 0){
-			logger.error("Failed to send " + unsuccessfullySent + " notifications to: " + destinationAddress);
-			logger.error("Notification requests results: " + errors);
-		}
-
 	}
+
+	private Set<Long> sentIds = new HashSet<>();
 
 	public static void main(String[] args) {
 		NotificationSender notificationSender = new NotificationSender();
@@ -91,24 +96,70 @@ public class NotificationSender {
 			entry.setStart(cal.getTime());
 			cal.add(Calendar.MINUTE, 1);
 			entry.setEnd(cal.getTime());
-			entry.setContent("Event from java " + i);
+			// entry.setContent("Event from java " + i);
 			entries.add(entry);
+
+			notificationSender.rtSend(entry);
 		}
 
-		notificationSender.send(entries);
 	}
 
-	public int sendEntry(Notification notification, String destinationAddress) {
+	private int sendEntry(Entry event) {
 
-		try {
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			HttpPost postRequest = new HttpPost(destinationAddress);
+		if (event.getEventFinder() instanceof ExtendedCondition) {
+
+			ExtendedCondition finder = (ExtendedCondition) event.getEventFinder();
+			Notification notification = new Notification();
+			notification.setDate(event.getStart());
+
+			String message = finder.getDescription();
+
+			logger.info("Now working on: " + message);
+			logger.info("Now working on: " + event);
+
+			if (finder instanceof ExtendedCondition) {
+				ContextCollector context = ((ExtendedCondition) finder).getContext();
+				message = context.getMessageWithContext(message);
+			}
+
+			notification.setMessage(message);
+			notification.setAction(finder.getAction());
+			notification.setType_id(1);
+			notification.setId(event.getId());
+
+			logger.info("To be sent: " + notification);
 
 			String notificationString;
-			notificationString = objectMapper.writeValueAsString(notification);
+			try {
+				notificationString = objectMapper.writeValueAsString(notification);
+				return send(createAPIAddress, notificationString);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return 0;
 
-			logger.debug("sending notification: " + notificationString);
-			StringEntity input = new StringEntity(notificationString);
+	}
+
+	private void sendFinish(Entry entry) {
+		FinishNotification finishNotification = new FinishNotification();
+		finishNotification.setId(entry.getId());
+		finishNotification.setDate(entry.getEnd());
+		try {
+			String notificationAsString = objectMapper.writeValueAsString(finishNotification);
+			send(finishAPIAddress, notificationAsString);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private int send(String address, String content) {
+		try {
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			HttpPost postRequest = new HttpPost(address);
+
+			logger.debug("sending content: " + content);
+			StringEntity input = new StringEntity(content);
 
 			input.setContentType("application/json");
 			postRequest.setEntity(input);
@@ -130,10 +181,6 @@ public class NotificationSender {
 
 			httpClient.getConnectionManager().shutdown();
 			return statusCode;
-		} catch (JsonProcessingException e) {
-			return 0;
-		} catch (UnsupportedEncodingException e) {
-			return 0;
 		} catch (IOException e) {
 			return 0;
 		}

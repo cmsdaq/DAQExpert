@@ -8,7 +8,8 @@ import java.util.Properties;
 public class Application {
 
 	public static final String NM_URL = "nm.url";
-	public static final String NM_API = "nm.api";
+	public static final String NM_API_CREATE = "nm.api.create";
+	public static final String NM_API_CLOSE = "nm.api.close";
 	public static final String SNAPSHOTS_DIR = "snapshots";
 
 	private final Properties prop;
@@ -27,8 +28,10 @@ public class Application {
 			throw new RuntimeException(message + NM_URL);
 		if (!instance.prop.containsKey(SNAPSHOTS_DIR))
 			throw new RuntimeException(message + SNAPSHOTS_DIR);
-		if (!instance.prop.containsKey(NM_API))
-			throw new RuntimeException(message + NM_API);
+		if (!instance.prop.containsKey(NM_API_CREATE))
+			throw new RuntimeException(message + NM_API_CREATE);
+		if (!instance.prop.containsKey(NM_API_CLOSE))
+			throw new RuntimeException(message + NM_API_CLOSE);
 	}
 
 	private Application(String propertiesFile) {

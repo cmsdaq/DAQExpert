@@ -20,6 +20,7 @@ import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.reasoning.base.CheckManager;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
+import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
@@ -40,7 +41,8 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	private static ExpertPersistorManager instance;
 	private ObjectMapper objectMapper = new ObjectMapper();
-
+	
+	private SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
 	private static String updatedDir;
 
 	public static ExpertPersistorManager get() {
@@ -49,7 +51,7 @@ public class ExpertPersistorManager extends PersistorManager {
 		return instance;
 	}
 
-	public boolean getUnprocessedSnapshots(Map<String, File> processed, CheckManager checkManager) throws IOException {
+	public boolean getUnprocessedSnapshots(Map<String, File> processed) throws IOException {
 
 		try {
 			List<File> fileList = getFiles(updatedDir);
@@ -73,8 +75,16 @@ public class ExpertPersistorManager extends PersistorManager {
 						}
 						
 						TaskManager.get().rawData.add(new DummyDAQ(daq));
+						
+//						try {
+//							Thread.sleep(600);
+//						} catch (InterruptedException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+						
+						snapshotProcessor.process(daq);
 
-						checkManager.runCheckers(daq);
 						processed.put(path.getName(), path);
 						if (i > max) {
 							breaked = true;
@@ -105,7 +115,8 @@ public class ExpertPersistorManager extends PersistorManager {
 	 * 
 	 * @throws IOException
 	 */
-	public void walkAll() throws IOException {
+	@Deprecated
+	private void walkAll() throws IOException {
 
 		Date earliestSnapshotDate = null, latestSnapshotDate;
 		List<File> fileList = getFiles(persistenceDir);
@@ -129,7 +140,7 @@ public class ExpertPersistorManager extends PersistorManager {
 			if (earliestSnapshotDate == null)
 				earliestSnapshotDate = new Date(daq.getLastUpdate());
 			// test logic modules
-			checkManager.runCheckers(daq);
+			checkManager.runLogicModules(daq);
 			TaskManager.get().rawData.add(new DummyDAQ(daq));
 
 		}

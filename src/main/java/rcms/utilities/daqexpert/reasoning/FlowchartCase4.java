@@ -25,7 +25,7 @@ public class FlowchartCase4 extends ExtendedCondition {
 
 	public FlowchartCase4() {
 		this.name = "FC4";
-		this.description = "FC4: TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
+		this.description = "TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
 				+ "The PI of the subsystem may be suffering from a firmware problem";
 		this.action = Arrays.asList("Stop the run", "red & green recycle the subsystem corresponding to the partition",
 				"Start new run", "Problem fixed: You are done make an e-log entry",

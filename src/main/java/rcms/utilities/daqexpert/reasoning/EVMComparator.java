@@ -43,9 +43,9 @@ public class EVMComparator extends Comparator {
 			return false;
 		}
 
-		if (!currentEVM.getStatus().equals(previousEVM.getStatus())) {
-			logger.debug("EVM state " + currentEVM.getStatus());
-			this.name = "EVM state: " + currentEVM.getStatus();
+		if (!currentEVM.getStateName().equals(previousEVM.getStateName())) {
+			logger.debug("EVM state " + currentEVM.getStateName());
+			this.name = "EVM state: " + currentEVM.getStateName();
 			result = true;
 		}
 		return result;

@@ -27,7 +27,7 @@ public class FlowchartCase6 extends ExtendedCondition {
 
 	public FlowchartCase6() {
 		this.name = "FC6";
-		this.description = "FC6: TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
+		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
 				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
 				+ "A FED stopped sending data.";
 		this.action = Arrays.asList("Try to recover: Stop the run",

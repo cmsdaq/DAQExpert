@@ -25,7 +25,7 @@ public class FlowchartCase2 extends ExtendedCondition {
 
 	public FlowchartCase2() {
 		this.name = "FC2";
-		this.description = "FC2: DAQ and level 0 in error state</br>"
+		this.description = "DAQ and level 0 in error state</br>"
 				+ "A RU {{RU}} is in Failded state. A FED {{FED}} has sent corrupted data to the DAQ. "
 				+ "Problem FED belongs to subsystem {{SUBSYSTEM}}";
 		this.action = Arrays.asList(
@@ -53,7 +53,7 @@ public class FlowchartCase2 extends ExtendedCondition {
 
 			for (FEDBuilder fb : daq.getFedBuilders()) {
 				RU ru = fb.getRu();
-				if (ru.getStatus().equalsIgnoreCase("Failed")) {
+				if (ru.getStateName().equalsIgnoreCase("Failed")) {
 
 					i++;
 					context.register("RU", ru.getHostname());

@@ -26,7 +26,7 @@ public class FlowchartCase5 extends ExtendedCondition {
 
 	public FlowchartCase5() {
 		this.name = "FC5";
-		this.description = "FC5: TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
+		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 		this.action = Arrays.asList("Stop the run",
 				"If the problem is caused by an ECAL FED in Busy proceed to 3rd step. Otherwise red & green recycle the subsystem.",

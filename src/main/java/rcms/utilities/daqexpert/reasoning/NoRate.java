@@ -7,6 +7,9 @@ import rcms.utilities.daqexpert.reasoning.base.Condition;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 
+/**
+ * This logic module identifies no rate condition in DAQ
+ */
 public class NoRate extends Condition {
 
 	public NoRate() {
@@ -16,12 +19,15 @@ public class NoRate extends Condition {
 		this.description = "Rate value is 0";
 	}
 
+	/**
+	 * No rate when sum of FedBuilders rate equals 0 Hz
+	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
-		float rate = daq.getFedBuilderSummary().getRate();
-		if (rate == 0)
+		if (daq.getFedBuilderSummary().getRate() == 0)
 			return true;
-		return false;
+		else
+			return false;
 	}
 
 }

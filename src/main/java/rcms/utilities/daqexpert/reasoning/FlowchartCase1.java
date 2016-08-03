@@ -26,7 +26,7 @@ public class FlowchartCase1 extends ExtendedCondition {
 	public FlowchartCase1() {
 		this.name = "FC1";
 
-		this.description = "FC1: Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss "
+		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss "
 				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";
 
 		this.action = Arrays.asList("Try to recover (try up to 2 times)",
@@ -52,7 +52,7 @@ public class FlowchartCase1 extends ExtendedCondition {
 
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
 			for (RU ru : daq.getRus()) {
-				if ("SyncLoss".equalsIgnoreCase(ru.getStatus())) {
+				if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
 					context.register("RU", ru.getHostname());
 				}
 			}

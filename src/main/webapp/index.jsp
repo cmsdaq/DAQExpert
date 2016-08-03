@@ -193,11 +193,7 @@ body, html {
 				height : '300px',
 				interpolation : false,
 				orientation : 'top',
-				throttleRedraw : 100,
 				dataAxis : {
-					title : {
-						text : "aa"
-					},
 					width : '50px',
 					icons : false
 				},

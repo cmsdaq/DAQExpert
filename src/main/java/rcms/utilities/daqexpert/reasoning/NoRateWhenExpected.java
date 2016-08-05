@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -13,10 +12,10 @@ public class NoRateWhenExpected extends ExtendedCondition {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
-		this.group = EventGroup.Error;
+		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
 		this.priority = EventPriority.critical;
 		this.description = "No rate when expected";
-		this.action = Arrays.asList("Wake up!", "Suggestions should be be delivered shortly.");
+		this.action = null;
 	}
 
 	@Override

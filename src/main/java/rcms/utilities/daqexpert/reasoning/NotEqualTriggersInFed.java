@@ -14,7 +14,7 @@ public class NotEqualTriggersInFed extends Condition {
 
 	public NotEqualTriggersInFed() {
 		this.name = "Not equal triggers in fed";
-		this.group = EventGroup.Error;
+		this.group = EventGroup.OTHER;
 		this.priority = EventPriority.defaultt;
 	}
 

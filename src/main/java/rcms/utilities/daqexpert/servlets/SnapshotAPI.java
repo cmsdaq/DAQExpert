@@ -2,6 +2,8 @@ package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -57,27 +59,36 @@ public class SnapshotAPI extends HttpServlet {
 		logger.info("Requested snapshot date: " + time);
 		Date timeDate = objectMapper.readValue(time, Date.class);
 		logger.info("Parsed requested snapshot date: " + timeDate);
+		String json = "";
+		try {
+			DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
+			// Mixin for adding 'ref_' prefix to fields for details see
+			// http://www.leveluplunch.com/java/tutorials/024-modifying-fields-external-domain-jackson-mixin/
+			objectMapper.addMixIn(BU.class, BUMixIn.class);
+			objectMapper.addMixIn(BUSummary.class, BUSummaryMixIn.class);
+			objectMapper.addMixIn(DAQ.class, DAQMixIn.class);
+			objectMapper.addMixIn(FED.class, FEDMixIn.class);
+			objectMapper.addMixIn(FEDBuilder.class, FEDBuilderMixIn.class);
+			objectMapper.addMixIn(FEDBuilderSummary.class, FEDBuilderSummaryMixIn.class);
+			objectMapper.addMixIn(FMM.class, FMMMixIn.class);
+			objectMapper.addMixIn(FMMApplication.class, FMMApplicationMixIn.class);
+			objectMapper.addMixIn(FRL.class, FRLMixIn.class);
+			objectMapper.addMixIn(FRLPc.class, FRLPcMixIn.class);
+			objectMapper.addMixIn(RU.class, RUMixIn.class);
+			objectMapper.addMixIn(SubFEDBuilder.class, SubFEDBuilderMixIn.class);
+			objectMapper.addMixIn(SubSystem.class, SubSystemMixIn.class);
+			objectMapper.addMixIn(TTCPartition.class, TTCPartitionMixIn.class);
 
-		DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
+			json = objectMapper.writeValueAsString(result);
 
-		// Mixin for adding 'ref_' prefix to fields for details see
-		// http://www.leveluplunch.com/java/tutorials/024-modifying-fields-external-domain-jackson-mixin/
-		objectMapper.addMixIn(BU.class, BUMixIn.class);
-		objectMapper.addMixIn(BUSummary.class, BUSummaryMixIn.class);
-		objectMapper.addMixIn(DAQ.class, DAQMixIn.class);
-		objectMapper.addMixIn(FED.class, FEDMixIn.class);
-		objectMapper.addMixIn(FEDBuilder.class, FEDBuilderMixIn.class);
-		objectMapper.addMixIn(FEDBuilderSummary.class, FEDBuilderSummaryMixIn.class);
-		objectMapper.addMixIn(FMM.class, FMMMixIn.class);
-		objectMapper.addMixIn(FMMApplication.class, FMMApplicationMixIn.class);
-		objectMapper.addMixIn(FRL.class, FRLMixIn.class);
-		objectMapper.addMixIn(FRLPc.class, FRLPcMixIn.class);
-		objectMapper.addMixIn(RU.class, RUMixIn.class);
-		objectMapper.addMixIn(SubFEDBuilder.class, SubFEDBuilderMixIn.class);
-		objectMapper.addMixIn(SubSystem.class, SubSystemMixIn.class);
-		objectMapper.addMixIn(TTCPartition.class, TTCPartitionMixIn.class);
+			logger.info(
+					"Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": " + json.substring(0, 1000));
+		} catch (RuntimeException e) {
+			Map<String,String> result = new HashMap<>();
+			result.put("message", "Could not find snapshot");
+			json = objectMapper.writeValueAsString(result);
+		}
 
-		String json = objectMapper.writeValueAsString(result);
 		// TODO: externalize the Allow-Origin
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Allow-Methods", "GET");
@@ -88,9 +99,6 @@ public class SnapshotAPI extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
-
-		logger.info(
-				"Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": " + json.substring(0, 1000));
 
 	}
 

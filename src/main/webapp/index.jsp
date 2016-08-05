@@ -95,35 +95,12 @@ body, html {
 	background: rgba(244, 244, 244, .4);
 }
 
-/* navbar */
-.navbar-xs {
-	min-height: 22px;
-	border-radius: 0
+/* The max width is dependant on the container (more info below) */
+.popover{
+    max-width: 350px; /* Max Width of the popover (depending on the container!) */
 }
 
-.navbar-xs .navbar-brand {
-	padding: 2px 8px;
-	font-size: 14px;
-	line-height: 14px;
-}
 
-.navbar-xs .navbar-nav>li>a {
-	border-right: 1px solid #ddd;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	line-height: 16px
-}
-
-.navbar-nav>li>a, .navbar-brand {
-	padding-top: 5px !important;
-	padding-bottom: 0 !important;
-	height: 30px;
-}
-
-.navbar {
-	min-height: 30px !important;
-	margin: 0px;
-}
 </style>
 
 
@@ -162,13 +139,38 @@ body, html {
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
-
-	<div id="visualization"></div>
-	<div id="raw"></div>
+	<div class="">
+<div class="btn-group btn-toggle "> 
+        <button class="btn btn-xs btn-primary active">Simple view</button>
+    	<button class="btn btn-xs btn-default">Extended view</button>
+    	</div></div>
+	<div id="visualization" class=""></div>
+	<div id="raw" style="margin-top:15px;"></div>
 	<p></p>
 	<div id="log"></div>
 
 	<script type="text/javascript">
+	
+
+	var filtering = true;
+	
+	var lastData = [];
+	
+	$('.btn-toggle').click(function() {
+		
+	    $(this).find('.btn').toggleClass('active');  
+	    
+	    if ($(this).find('.btn-primary').size()>0) {
+	    	$(this).find('.btn').toggleClass('btn-primary');
+	    }
+	    
+	    $(this).find('.btn').toggleClass('btn-default');
+
+		filtering = !filtering;
+		load(lastData);
+		
+	       
+	});
 		var items = new vis.DataSet([]);
 
 
@@ -208,92 +210,80 @@ body, html {
 			id : 'lhc-beam',
 			content : 'Beam (0)',
 			name : 'Beam',
-			title : 'LHC beam mode'
+			title : 'LHC beam mode',
+			primary : true
 		}, {
 			id : 'lhc-machine',
 			content : 'Machine (0)',
 			name : 'Machine',
-			title : 'LHC machine mode'
+			title : 'LHC machine mode',
+			primary : true
 		}, {
 			id : 'daq-state',
 			content : 'DAQ (0)',
 			name : 'DAQ',
-			title : 'DAQ state'
+			title : 'DAQ state',
+			primary : true
 		}, {
 			id : 'level-zero',
 			content : 'L0 (0)',
 			name : 'L0',
-			title : 'Level zero state'
+			title : 'Level zero state',
+			primary : false
 		}, {
 			id : 'session-no',
 			content : 'Session (0)',
 			name : 'Session',
-			title : 'Session number'
+			title : 'Session number',
+			primary : true
 		}, {
 			id : 'run-no',
 			content : 'Run NO (0)',
 			name : 'Run NO',
-			title : 'Run number'
+			title : 'Run number',
+			primary : true
 		}, {
 			id : 'run-on',
 			content : 'Run on (0)',
 			name : 'Run on',
-			title : 'Run ongoing'
+			title : 'Run ongoing',
+			primary : false
 		},  {
-			id : 'error',
-			content : 'Error (0)',
-			name : 'Error',
-			title : 'Errors'
+			id : 'nrwe',
+			content : 'NRWE (0)',
+			name : 'NRWE',
+			title : 'No rate when expected',
+			primary : true
 		}, {
 			id : 'warning',
 			content : 'Warn (0)',
 			name : 'Warn',
-			title : 'Warnings'
+			title : 'Warnings',
+			primary : false
 		}, {
 			id : 'no-rate',
 			content : 'No rate (0)',
 			name : 'No rate',
-			title : 'No rate condition'
+			title : 'No rate condition',
+			primary : false
 		}, {
 			id : 'rate-oor',
 			content : 'Rate OOR (0)',
 			name : 'Rate OOR',
-			title : 'Rate out of range'
+			title : 'Rate out of range',
+			primary : false
 		}, {
 			id : 'other',
 			content : 'Other (0)',
 			name : 'Other',
-			title : 'Other conditions'
+			title : 'Other conditions',
+			primary : false
 		}, {
-			id : 'fl1',
-			content : 'FC1 (0)',
-			name : 'FC1',
-			title : 'Flowchart events, case 1'
-		}, {
-			id : 'fl2',
-			content : 'FC2 (0)',
-			name : 'FC2',
-			title : 'Flowchart events, case 2'
-		}, {
-			id : 'fl3',
-			content : 'FC3 (0)',
-			name : 'FC3',
-			title : 'Flowchart events, case 3'
-		}, {
-			id : 'fl4',
-			content : 'FC4 (0)',
-			name : 'FC4',
-			title : 'Flowchart events, case 4'
-		}, {
-			id : 'fl5',
-			content : 'FC5 (0)',
-			name : 'FC5',
-			title : 'Flowchart events, case 5'
-		}, {
-			id : 'fl6',
-			content : 'FC6 (0)',
-			name : 'FC6',
-			title : 'Flowchart events, case 6'
+			id : 'flowchart',
+			content : 'FC (0)',
+			name : 'FC',
+			title : 'Flowchart events',
+			primary : true
 		} ];
 
 		var groups = new vis.DataSet(groupsList);
@@ -439,13 +429,25 @@ body, html {
 		});
 
 		function load(data) {
-
+			var visibleData = [];
 			countPerGroup = {};
+			
+			//console.log(data);
 
 			/* Traverse new data to count events per group */
 			$.each(data, function(index, value) {
 				var groupName = value['group'];
 				var currCount = 0;
+				
+
+				var current = groups.get(groupName);
+				if(filtering == false){
+					visibleData.push(value);
+				} else{
+					if(current['primary'] == true)
+						visibleData.push(value);
+				}
+				
 
 				/* Get current count */
 				if (groupName in countPerGroup) {
@@ -473,18 +475,31 @@ body, html {
 
 			//console.log(JSON.stringify(data));
 
+			
+			/* Update groups content */
 			$.each(countPerGroup, function(index, value) {
 				var current = groups.get(index);
 				//console.log("Current: "+JSON.stringify(current));
+				
+				var newContent = "";
+				
+				if(filtering == false){
+					newContent = current['name'] + " (" + value + ")";
+				} else{
+					if(current['primary'] == true)
+						newContent = current['name'] + " (" + value + ")";
+				}
+				
 				groups.update({
 					id : index,
-					content : current['name'] + " (" + value + ")"
+					content : newContent
 				});
 
 			});
-
+			
+			
 			items.clear();
-			items.add(data);
+			items.add(visibleData);
 
 		};
 
@@ -496,6 +511,7 @@ body, html {
 
 			$.getJSON("reasons", parameters, function(data) {
 				load(data);
+				lastData = data;
 			}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
 				console.log("errorThrown " + errorThrown);
@@ -568,7 +584,7 @@ body, html {
 
 			console.log("requested params: " + parsedStart
 					+ ", " + parsedEnd);
-
+			
 			if (Object.prototype.toString.call(parsedStart) === "[object Date]"
 					&& Object.prototype.toString
 							.call(parsedEnd) === "[object Date]") {
@@ -596,6 +612,14 @@ body, html {
 				properties['end'] = parsedEnd;
 			}
 
+			var filterParam = getUrlParameter('filter');
+			//console.log("filter param: " + filterParam);
+			if(filterParam == 'false'){
+				filtering = false;
+			}
+			//console.log("filtering: " + filtering);
+			
+			
 			loadNewData('rangechange', properties);
 			timeline.setWindow(properties['start'],
 					properties['end'], {
@@ -638,22 +662,39 @@ body, html {
 			duration : false,
 			delay : false,
 			steps : [
+			    
 			    {
 			    	title : "Introduction",
 			    	orphan : true,
-			    	content : "The DAQExpert provides interactive visualization tool.</br>It visualizes DAQ data and expert analysis in time.</br>You can freely move and zoom in the timeline by dragging and scrolling in the timelines"
+			    	content : "This is DAQ Expert interactive visualization tool.</br>It visualizes results of analysis in time.</br>You can freely move and zoom in by dragging and scrolling in the timelines"
 			    },
 				{
 					element : "#visualization",
 					title : "Analysis result",
 					placement : 'bottom',
-					content : "Results of the Expert analysis will be displayed here.</br>You can click on each block to get more details."
+					content : "This is main analysis panel. Results and intermediate steps of reasoning are displayed here.</br>You can click on each block to get more details."
 				},
+				{
+			    	title: "Elements",
+					element : "#visualization",
+					placement : 'bottom',
+			    	content: function () {
+			    	    return '<p>Each row is visualizing one Logic Module results. You can find details when you hover the label.</p><img src="external/expert-row.png" />';
+			    	  }
+			    },
+				{
+			    	title: "Element hidding",
+					element : "#visualization",
+					placement : 'bottom',
+			    	content: function () {
+			    	    return '<p>When you zoom out elements will get smaller. For the clarity they will be hidden and replaced by shadow indicating how many elements are underneath.</p><img src="external/expert-filter-explain.png" />';
+			    	  }
+			    },
 				{
 					element : "#raw",
 					title : "Raw data",
 					placement : 'top',
-					content : "Raw data from DAQAggregator will be displayed here. </br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot. "
+					content : "This is raw data panel. Some parameters from snapshots are be displayed here. </br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot."
 				} ]
 			});
 		$('#tour').click(function(e) {

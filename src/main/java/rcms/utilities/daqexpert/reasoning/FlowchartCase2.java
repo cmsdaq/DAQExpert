@@ -32,7 +32,7 @@ public class FlowchartCase2 extends ExtendedCondition {
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem. Start new Run. (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC for the subsystem that sent corrupted data to inform about the problem",
 				"Problem not fixed: Call the DOC for the subsystem that sent corrupted data");
-		this.group = EventGroup.FL2;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

@@ -34,7 +34,7 @@ public class FlowchartCase6 extends ExtendedCondition {
 				"Red & green recycle the subsystem whose FED stopped sending data", "Start new Run (Try 1 time)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem whose FED stopped sending data to inform",
 				"Problem not fixed: Call the OC for the subsystem whose FED stopped sending data");
-		this.group = EventGroup.FL6;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

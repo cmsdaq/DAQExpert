@@ -35,7 +35,7 @@ public class FlowchartCase1 extends ExtendedCondition {
 				"Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC for the subsystem that caused the SyncLoss (attached below) to inform about the problem");
-		this.group = EventGroup.FL1;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

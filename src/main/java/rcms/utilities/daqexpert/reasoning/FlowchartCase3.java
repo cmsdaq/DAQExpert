@@ -32,7 +32,7 @@ public class FlowchartCase3 extends ExtendedCondition {
 				"Problem still not fixed after recover: Call the DOC for the partition in error/OOS",
 				"Problem fixed after recover: Make an e-log entry. Call the DOC for the partition in error/OOS to inform");
 
-		this.group = EventGroup.FL3;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

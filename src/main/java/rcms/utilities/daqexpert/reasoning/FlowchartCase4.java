@@ -30,7 +30,7 @@ public class FlowchartCase4 extends ExtendedCondition {
 		this.action = Arrays.asList("Stop the run", "red & green recycle the subsystem corresponding to the partition",
 				"Start new run", "Problem fixed: You are done make an e-log entry",
 				"Problem not fixed: Call the DOC for the partition in disconnected");
-		this.group = EventGroup.FL4;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

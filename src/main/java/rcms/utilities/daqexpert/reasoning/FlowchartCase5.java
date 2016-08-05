@@ -33,7 +33,7 @@ public class FlowchartCase5 extends ExtendedCondition {
 				"Start new run (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem in Warning/Busy to inform",
 				"Call the DOC for the subsystem in Warning/Busy");
-		this.group = EventGroup.FL5;
+		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
 

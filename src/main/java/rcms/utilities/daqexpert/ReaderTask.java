@@ -2,33 +2,31 @@ package rcms.utilities.daqexpert;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.reasoning.base.CheckManager;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
+import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
+import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
  * 
- * @author Maciej Gladki
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
 public class ReaderTask extends TimerTask {
 
-	private Map<String, File> filesProcessed = new HashMap<>();
 	private static final Logger logger = Logger.getLogger(ReaderTask.class);
-	int last = 0;
-
+	long last = 0;
 
 	private DataResolutionManager dataSegmentator;
-
-	//private long dontSendBefore = 0;
+	private SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
 
 	public ReaderTask(DataResolutionManager dataSegmentator) {
 		this.dataSegmentator = dataSegmentator;
@@ -38,11 +36,34 @@ public class ReaderTask extends TimerTask {
 	public void run() {
 
 		try {
+			StructureSerializer structurePersistor = new StructureSerializer();
 
-			ExpertPersistorManager.get().getUnprocessedSnapshots(filesProcessed);
-			int all = filesProcessed.size();
-			logger.debug("files processed in this round " + (all - last));
-			dataSegmentator.prepareMultipleResolutionData();
+			Entry<Long, List<List<File>>> entry = ExpertPersistorManager.get().explore(last);
+
+			last = entry.getKey();
+
+			for (List<File> chunk : entry.getValue()) {
+				DAQ daq = null;
+				for (File file : chunk) {
+
+					daq = structurePersistor.deserializeFromSmile(file.getAbsolutePath().toString());
+
+					if (daq != null) {
+						TaskManager.get().rawData.add(new DummyDAQ(daq));
+						snapshotProcessor.process(daq);
+					} else {
+						logger.error("Snapshot not deserialized " + file.getAbsolutePath());
+					}
+
+				}
+
+				logger.debug("files processed in this round " + entry.getValue().size());
+				dataSegmentator.prepareMultipleResolutionData();
+
+				if (daq != null)
+					EventProducer.get().finish(new Date(daq.getLastUpdate()));
+
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();

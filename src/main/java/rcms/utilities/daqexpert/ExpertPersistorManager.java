@@ -3,12 +3,13 @@ package rcms.utilities.daqexpert;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -18,10 +19,6 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistorManager;
 import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
-import rcms.utilities.daqexpert.reasoning.base.CheckManager;
-import rcms.utilities.daqexpert.reasoning.base.EventProducer;
-import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
-import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
  * This class reads the persisted DAQ snapshots and
@@ -41,9 +38,6 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	private static ExpertPersistorManager instance;
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	private SnapshotProcessor snapshotProcessor = new SnapshotProcessor();
-	private static String updatedDir;
 
 	public static ExpertPersistorManager get() {
 		if (instance == null)
@@ -51,140 +45,174 @@ public class ExpertPersistorManager extends PersistorManager {
 		return instance;
 	}
 
-	public boolean getUnprocessedSnapshots(Map<String, File> processed) throws IOException {
+	public Entry<Long, List<List<File>>> explore(Long last) throws IOException {
 
-		try {
-			List<File> fileList = getFiles(updatedDir);
-			Collections.sort(fileList, FileComparator);
+		Long tmpLast = last;
+		Long startTime = System.currentTimeMillis();
+		Long snapshotCount = 0L;
 
-			StructureSerializer structurePersistor = new StructureSerializer();
-			DAQ daq = null;
-			logger.debug("Processing files from " + updatedDir + "...");
+		List<List<File>> resultInChunks = new ArrayList<>();
 
-			int max = 5000;
-			int i = 0;
-			boolean breaked = false;
-			for (File path : fileList) {
-				if (!processed.containsKey(path.getName())) {
-					try {
-						i++;
-						daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
-						
-						if(daq == null){
-							logger.error("Snapshot not deserialized " + path.getAbsolutePath());
+		List<File> yearDirs = getDirs(persistenceDir);
+
+		for (File dirYear : yearDirs) {
+			List<File> monthDirs = getDirs(dirYear.getAbsolutePath());
+
+			for (File monthDir : monthDirs) {
+				List<File> dayDirs = getDirs(monthDir.getAbsolutePath());
+
+				for (File dayDir : dayDirs) {
+					List<File> hourDirs = getDirs(dayDir.getAbsolutePath());
+
+					for (File hourDir : hourDirs) {
+						List<File> snapshots = getFiles(hourDir.getAbsolutePath());
+
+						List<File> result = new ArrayList<>();
+
+						for (File snapshot : snapshots) {
+
+							int dotIdx = snapshot.getName().indexOf(".");
+
+							if (dotIdx != -1) {
+								Long timestamp = Long.parseLong(snapshot.getName().substring(0, dotIdx));
+
+								if (last < timestamp) {
+									last = timestamp;
+									result.add(snapshot);
+									snapshotCount++;
+								}
+							}
 						}
-						
-						TaskManager.get().rawData.add(new DummyDAQ(daq));
-						
-//						try {
-//							Thread.sleep(600);
-//						} catch (InterruptedException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-						
-						snapshotProcessor.process(daq);
 
-						processed.put(path.getName(), path);
-						if (i > max) {
-							breaked = true;
-							break;
-						}
-					} catch (RuntimeException e) {
-						logger.error("Problem processing snapshot " + path.getAbsolutePath().toString() , e);
+						if (result.size() > 0)
+							resultInChunks.add(result);
 					}
 				}
 			}
-
-			// temporarly finish
-			if (daq != null)
-				EventProducer.get().finish(new Date(daq.getLastUpdate()));
-
-			return breaked;
-		} catch (NullPointerException e) {
-			logger.error("Problem getting snapthot files from: " + updatedDir);
-			e.printStackTrace();
 		}
-		return false;
 
+		Long endTime = System.currentTimeMillis();
+		logger.debug("Explored " + snapshotCount + " snapshots (" + resultInChunks.size() + " chunks) after " + tmpLast
+				+ ", in " + (endTime - startTime) + "ms");
+		Entry<Long, List<List<File>>> entry = new SimpleEntry<>(last, resultInChunks);
+		return entry;
 	}
+
+	protected List<File> getDirs(String file) throws IOException {
+		List<File> result = new ArrayList<>();
+
+		File folder = new File(file);
+
+		if (folder.exists() && folder.isDirectory()) {
+
+			File[] listOfFiles = folder.listFiles();
+
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+
+					System.out.println("File " + listOfFiles[i].getName());
+				} else if (listOfFiles[i].isDirectory()) {
+					// directory name must be always parsable integer
+					try{
+						Integer.parseInt(listOfFiles[i].getName());
+						result.add(listOfFiles[i]);
+					} catch(NumberFormatException e){
+						// ignore directory
+					}
+				}
+			}
+			Collections.sort(result, DirComparator);
+
+			return result;
+		} else {
+			throw new FileNotFoundException("Folder does not exist " + folder.getAbsolutePath());
+		}
+	}
+
+	protected List<File> getFiles(String file) throws IOException {
+		List<File> result = new ArrayList<>();
+
+		File folder = new File(file);
+
+		if (folder.exists() && folder.isDirectory()) {
+
+			File[] listOfFiles = folder.listFiles();
+
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+
+					result.add(listOfFiles[i]);
+				} else if (listOfFiles[i].isDirectory()) {
+					System.out.println("Directory " + listOfFiles[i].getName());
+				}
+			}
+			Collections.sort(result, FileComparator);
+
+			return result;
+		} else {
+			throw new FileNotFoundException("Folder does not exist " + folder.getAbsolutePath());
+		}
+	}
+
+	public static Comparator<File> DirComparator = new Comparator<File>() {
+		public int compare(File path1, File path2) {
+			Integer filename1 = Integer.parseInt(path1.getName().toString());
+			Integer filename2 = Integer.parseInt(path2.getName().toString());
+			return filename1.compareTo(filename2);
+		}
+	};
+
+	public static Comparator<File> FileComparator = new Comparator<File>() {
+		public int compare(File path1, File path2) {
+			String filename1 = path1.getName().toString();
+			String filename2 = path2.getName().toString();
+			return filename1.compareTo(filename2);
+		}
+	};
 
 	/**
-	 * This method walks through all files but does not keep them in memory. It
-	 * runs analysis modules and saves the results.
+	 * Find snapshot which is the closest to given date
 	 * 
+	 * @param date
+	 *            requested date to find snapshot
+	 * @return DAQ snapshot found for given date
 	 * @throws IOException
 	 */
-	@Deprecated
-	private void walkAll() throws IOException {
+	public DAQ findSnapshot(Date date) throws IOException {
+		List<File> candidates = new ArrayList<>();
+		String candidateDir = null;
 
-		Date earliestSnapshotDate = null, latestSnapshotDate;
-		List<File> fileList = getFiles(persistenceDir);
-		if (fileList.size() == 0) {
-			logger.error("No files to process");
-			return;
+		logger.info("Searching snapshot for date: " + date + ", base dir: " + persistenceDir);
+
+		candidateDir = this.persistor.getTimeDir(persistenceDir, date);
+		
+		logger.info("Candidates will be searched in " + candidateDir);
+
+		try {
+			candidates.addAll(getFiles(candidateDir));
+		} catch (FileNotFoundException e) {
+			candidates = new ArrayList<>();
+			logger.warn("Cannot access persisence dir, ignoring...");
 		}
-		Collections.sort(fileList, FileComparator);
 
-		StructureSerializer structurePersistor = new StructureSerializer();
-		CheckManager checkManager = new CheckManager();
-		DAQ daq = null;
-		logger.info("Processing files from " + persistenceDir + "...");
+		return findSnapshot(date, candidates);
 
-		long start = System.currentTimeMillis();
-		for (File path : fileList) {
-			logger.debug(path.getName().toString());
-
-			daq = structurePersistor.deserializeFromSmile(path.getAbsolutePath().toString());
-
-			if (earliestSnapshotDate == null)
-				earliestSnapshotDate = new Date(daq.getLastUpdate());
-			// test logic modules
-			checkManager.runLogicModules(daq);
-			TaskManager.get().rawData.add(new DummyDAQ(daq));
-
-		}
-		EventProducer.get().finish(new Date(daq.getLastUpdate()));
-		latestSnapshotDate = new Date(daq.getLastUpdate());
-		long diff = latestSnapshotDate.getTime() - earliestSnapshotDate.getTime();
-
-		long end = System.currentTimeMillis();
-		int result = (int) (end - start);
-		long hours = TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
-		if (hours != 0)
-			logger.info("Deserializing and running analysis modules on " + hours + " hours data (" + fileList.size()
-					+ " snapshots) finished in " + result + "ms. (1h of data processed in " + result / hours + "ms)");
-		logger.debug("Current producer state: " + EventProducer.get().toString());
 	}
 
-	public DAQ findSnapshot(Date date) {
+	private DAQ findSnapshot(Date date, List<File> candidates) {
 		StructureSerializer structurePersistor = new StructureSerializer();
 		try {
-			List<File> fileList = new ArrayList<>();
-			try {
-				fileList.addAll(getFiles(persistenceDir));
-			} catch (FileNotFoundException e) {
-				fileList = new ArrayList<>();
-				logger.warn("Cannot access persisence dir, ignoring...");
-			}
 
-			try {
-				fileList.addAll(getFiles(updatedDir));
-			} catch (FileNotFoundException e) {
-				fileList = new ArrayList<>();
-				logger.warn("Cannot access snapshots dir, ignoring...");
-			}
-
-			if (fileList.size() == 0) {
+			if (candidates.size() == 0) {
 				logger.error("No files to process");
 				return null;
 			}
-			Collections.sort(fileList, FileComparator);
+			Collections.sort(candidates, FileComparator);
 
 			long diff = Integer.MAX_VALUE;
 			String bestFile = null;
 			DAQ best = null;
-			for (File path : fileList) {
+			for (File path : candidates) {
 
 				String currentName = path.getAbsolutePath().toString();
 				String dateFromFileName = path.getName();
@@ -219,11 +247,6 @@ public class ExpertPersistorManager extends PersistorManager {
 		}
 
 		return null;
-
-	}
-
-	public static void setUpdatedDir(String updatedDir) {
-		ExpertPersistorManager.updatedDir = updatedDir;
 	}
 
 }

@@ -24,9 +24,17 @@ public class ServletListener implements ServletContextListener {
 		}
 
 		Application.initialize(propertyFilePath);
+		
+		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
-		// TODO: persistence argument is not necessary
-		persistorManager = new ExpertPersistorManager("");
+		if (snapshotsDir != null)
+			logger.info("Loading snapshots from directory: " + snapshotsDir);
+		else {
+			logger.warn("Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
+			return;
+		}
+
+		persistorManager = new ExpertPersistorManager(snapshotsDir);
 		dataSegmentator = new DataResolutionManager();
 		t = new Timer();
 	}
@@ -40,15 +48,7 @@ public class ServletListener implements ServletContextListener {
 
 	public void contextInitialized(ServletContextEvent e) {
 
-		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
-
-		if (snapshotsDir != null)
-			logger.info("Loading snapshots from directory: " + snapshotsDir);
-		else {
-			logger.warn("Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
-			return;
-		}
-		ExpertPersistorManager.setUpdatedDir(snapshotsDir);
+		
 		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator), 0, 3000);
 	}
 

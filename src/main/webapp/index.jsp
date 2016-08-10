@@ -748,7 +748,7 @@
 			    	  }
 			    },
 				{
-			    	title: "Element hidding",
+			    	title: "Element hiding",
 					element : "#visualization",
 					placement : 'bottom',
 			    	content: function () {
@@ -765,7 +765,7 @@
 					element : "#extended-view",
 					title : "View toggle",
 					placement : 'right',
-					content : "You toggle between simple and extended view here."
+					content : "Toggle between simple and extended view here."
 				},
 				{
 					element : "#tour",

@@ -7,10 +7,12 @@ import java.util.Properties;
 
 public class Application {
 
-	public static final String NM_URL = "nm.url";
+	public static final String NM_DASHBOARD = "nm.dashboard";
+	public static final String NM_NOTIFICATIONS = "nm.notifications";
 	public static final String NM_API_CREATE = "nm.api.create";
 	public static final String NM_API_CLOSE = "nm.api.close";
 	public static final String SNAPSHOTS_DIR = "snapshots";
+	public static final String LANDING = "landing";
 
 	private final Properties prop;
 
@@ -24,14 +26,18 @@ public class Application {
 	public static void initialize(String propertiesFile) {
 		String message = "Required property missing ";
 		instance = new Application(propertiesFile);
-		if (!instance.prop.containsKey(NM_URL))
-			throw new RuntimeException(message + NM_URL);
+		if (!instance.prop.containsKey(NM_DASHBOARD))
+			throw new RuntimeException(message + NM_DASHBOARD);
+		if (!instance.prop.containsKey(NM_DASHBOARD))
+			throw new RuntimeException(message + NM_DASHBOARD);
 		if (!instance.prop.containsKey(SNAPSHOTS_DIR))
 			throw new RuntimeException(message + SNAPSHOTS_DIR);
 		if (!instance.prop.containsKey(NM_API_CREATE))
 			throw new RuntimeException(message + NM_API_CREATE);
 		if (!instance.prop.containsKey(NM_API_CLOSE))
 			throw new RuntimeException(message + NM_API_CLOSE);
+		if (!instance.prop.containsKey(LANDING))
+			throw new RuntimeException(message + LANDING);
 	}
 
 	private Application(String propertiesFile) {

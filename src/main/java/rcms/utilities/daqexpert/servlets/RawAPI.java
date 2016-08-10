@@ -75,10 +75,10 @@ public class RawAPI extends HttpServlet {
 				HashMap<String, Long> eventObject = new HashMap<>();
 				
 				// rate in kHz
-				rateObject.put("y", (long) daq.getRate() / 1000);
+				rateObject.put("y", daq.getRate());
 				
 				// milions of events
-				eventObject.put("y", (long) daq.getEvents() /1000000);
+				eventObject.put("y", (long) daq.getEvents());
 				rateObject.put("x", daq.getLastUpdate());
 				eventObject.put("x", daq.getLastUpdate());
 				rateObject.put("group", 0L);

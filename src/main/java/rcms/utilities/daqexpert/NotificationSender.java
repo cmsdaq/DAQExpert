@@ -120,11 +120,11 @@ public class NotificationSender {
 			if (finder instanceof ExtendedCondition) {
 				ContextCollector context = ((ExtendedCondition) finder).getContext();
 				message = context.getMessageWithContext(message);
+				notification.setAction(context.getActionWithContext(finder.getAction()));
 			}
 
 			notification.setMessage(message);
-			notification.setAction(finder.getAction());
-			notification.setType_id(1);
+			notification.setType_id(event.getEventFinder().getGroup().getNmId());
 			notification.setId(event.getId());
 
 			logger.info("To be sent: " + notification);

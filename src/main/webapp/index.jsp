@@ -97,6 +97,22 @@
     max-width: 350px; /* Max Width of the popover (depending on the container!) */
 }
 
+.vis-labelset .vis-inner {
+    width: 8em;
+}
+
+.vis-left .vis-content {
+    width: 8em;
+}
+
+.vis-right .vis-content {
+    width: 8em;
+}
+.vis-panel.vis-background.vis-horizontal .vis-grid {
+    left: 7.5em !important;
+    right: 7.5em !important;
+    width: auto !important;
+}
 
 </style>
 

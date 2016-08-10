@@ -39,7 +39,7 @@ public class EVMComparator extends Comparator {
 				previousEVM = ru;
 		}
 		if (currentEVM == null || previousEVM == null) {
-			logger.error("EVM not found for shapshot " + new Date(current.getLastUpdate()));
+			logger.debug("EVM not found for shapshot " + new Date(current.getLastUpdate()));
 			return false;
 		}
 

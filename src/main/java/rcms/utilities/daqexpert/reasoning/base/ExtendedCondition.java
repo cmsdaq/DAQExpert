@@ -1,8 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
-import java.util.List;
-
-import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.action.Action;
 
 /**
  * Extended condition have additional fields (action and description)
@@ -15,7 +13,7 @@ public abstract class ExtendedCondition extends Condition {
 	/**
 	 * What should be done when condition is meet
 	 */
-	protected List<String> action;
+	protected Action action;
 
 
 	/**
@@ -29,11 +27,11 @@ public abstract class ExtendedCondition extends Condition {
 		this.context = new ContextCollector();
 	}
 
-	public List<String> getAction() {
+	public Action getAction() {
 		return action;
 	}
 
-	public void setAction(List<String> action) {
+	public void setAction(Action action) {
 		this.action = action;
 	}
 	

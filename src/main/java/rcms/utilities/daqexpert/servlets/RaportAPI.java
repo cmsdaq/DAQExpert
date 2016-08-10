@@ -43,6 +43,7 @@ public class RaportAPI extends HttpServlet {
 				if (entry.getId() == id) {
 
 					String description;
+					List<String> actionSteps;
 					EventFinder eventFinder = entry.getEventFinder();
 
 					/* Case of Extended condition */
@@ -51,12 +52,15 @@ public class RaportAPI extends HttpServlet {
 						ContextCollector context = entry.getFinishedContext();
 						if (context != null) {
 							description = context.getMessageWithContext(extendedCondition.getDescription());
+							actionSteps = context.getActionWithContext(extendedCondition.getAction());
+							
 						} else {
 							description = extendedCondition.getDescription();
+							actionSteps = extendedCondition.getAction().getSteps();
 						}
 
 						result.put("description", description);
-						result.put("action", extendedCondition.getAction());
+						result.put("action", actionSteps);
 						result.put("elements", entry.getFinishedContext().getContext());
 					}
 

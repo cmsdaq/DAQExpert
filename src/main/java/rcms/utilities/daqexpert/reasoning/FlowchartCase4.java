@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +11,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
 /**
  * Logic module identifying 4 flowchart case.
@@ -27,9 +27,9 @@ public class FlowchartCase4 extends ExtendedCondition {
 		this.name = "FC4";
 		this.description = "TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
 				+ "The PI of the subsystem may be suffering from a firmware problem";
-		this.action = Arrays.asList("Stop the run", "red & green recycle the subsystem corresponding to the partition",
+		this.action = new SimpleAction("Stop the run", "red & green recycle the subsystem {{SUBSYSTEM}}",
 				"Start new run", "Problem fixed: You are done make an e-log entry",
-				"Problem not fixed: Call the DOC for the partition in disconnected");
+				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem for the partition in disconnected)");
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}

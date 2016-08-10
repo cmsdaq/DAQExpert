@@ -14,6 +14,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
 /**
  * Logic module identifying 6 flowchart case.
@@ -27,15 +28,18 @@ public class FlowchartCase6 extends ExtendedCondition {
 
 	public FlowchartCase6() {
 		this.name = "FC6";
+		this.group = EventGroup.FLOWCHART;
+		this.priority = EventPriority.critical;
+
 		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
 				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
 				+ "A FED stopped sending data.";
-		this.action = Arrays.asList("Try to recover: Stop the run",
-				"Red & green recycle the subsystem whose FED stopped sending data", "Start new Run (Try 1 time)",
-				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem whose FED stopped sending data to inform",
-				"Problem not fixed: Call the OC for the subsystem whose FED stopped sending data");
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+
+		this.action = new SimpleAction("Try to recover: Stop the run",
+				"Red & green recycle the subsystem {{SUBSYSTEM}} (whose FED stopped sending data)",
+				"Start new Run (Try 1 time)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} (whose FED stopped sending data) to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}} (whose FED stopped sending data)");
 	}
 
 	private static final Logger logger = Logger.getLogger(FlowchartCase6.class);

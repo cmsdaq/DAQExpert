@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +11,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 
 /**
  * Logic module identifying 1 flowchart case.
@@ -26,15 +26,23 @@ public class FlowchartCase1 extends ExtendedCondition {
 	public FlowchartCase1() {
 		this.name = "FC1";
 
-		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss "
+		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
 				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";
 
-		this.action = Arrays.asList("Try to recover (try up to 2 times)",
-				"If the subsystem is TRACKER: Stop the run, Start a new run. ",
-				"For any other subsystem: Stop the run. Red & green recycle the subsystem. Start a new Run",
-				"Problem not fixed: Call the DOC for the subsystem that caused the SyncLoss (attached below)",
+		/* Default action */
+		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
+				"Stop the run. Red & green recycle the subsystem. Start a new Run",
+				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
-						+ "Call the DOC for the subsystem that caused the SyncLoss (attached below) to inform about the problem");
+						+ "Call the DOC {{SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+
+		/* SUBSYSTEM=Tracker action */
+		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)", "Stop the run, Start a new run.",
+				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that caused the SyncLoss)",
+				"Problem fixed: Make an e-log entry."
+						+ "Call the DOC {{SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+
+		this.action = action;
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
@@ -72,6 +80,7 @@ public class FlowchartCase1 extends ExtendedCondition {
 					context.register("FED", fed.getSrcIdExpected());
 					context.register("TTCP", ttcpName);
 					context.register("SUBSYSTEM", subsystemName);
+					context.setActionKey(subsystemName);
 
 				}
 

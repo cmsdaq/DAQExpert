@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +11,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
 /**
  * Logic module identifying 3 flowchart case.
@@ -25,12 +25,12 @@ public class FlowchartCase3 extends ExtendedCondition {
 	public FlowchartCase3() {
 		this.name = "FC3";
 		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking trigger.";
-		this.action = Arrays.asList("Issue a TTCHardReset",
+		this.action = new SimpleAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
-				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem. Start a new run. Try up to 2 times",
-				"Problem still not fixed after recover: Call the DOC for the partition in error/OOS",
-				"Problem fixed after recover: Make an e-log entry. Call the DOC for the partition in error/OOS to inform");
+				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem {{SUBSYSTEM}}. Start a new run. Try up to 2 times",
+				"Problem still not fixed after recover: Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}})",
+				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;

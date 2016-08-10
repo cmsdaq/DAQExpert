@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -13,6 +12,7 @@ import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 import rcms.utilities.daqexpert.reasoning.base.TTSState;
+import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 
 /**
  * Logic module identifying 5 flowchart case.
@@ -28,13 +28,23 @@ public class FlowchartCase5 extends ExtendedCondition {
 		this.name = "FC5";
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
-		this.action = Arrays.asList("Stop the run",
-				"If the problem is caused by an ECAL FED in Busy proceed to 3rd step. Otherwise red & green recycle the subsystem.",
-				"Start new run (try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem in Warning/Busy to inform",
-				"Call the DOC for the subsystem in Warning/Busy");
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
+		
+		/* default action*/
+		ConditionalAction action = new ConditionalAction("Stop the run",
+				"Red & green recycle the subsystem {{SUBSYSTEM}}.",
+				"Start new run (try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
+		
+		/* ecal specific case */
+		action.addContextSteps("ECAL", "Stop the run",
+				"Start new run (try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
+		
+		this.action = action;
 	}
 
 	private static final Logger logger = Logger.getLogger(FlowchartCase5.class);
@@ -71,6 +81,7 @@ public class FlowchartCase5 extends ExtendedCondition {
 							context.register("SUBSYSTEM", subSystem.getName());
 							context.register("FED", fed.getSrcIdExpected());
 							context.register("FEDSTATE", currentFedState.name());
+							context.setActionKey(subSystem.getName());
 							result = true;
 						}
 					}

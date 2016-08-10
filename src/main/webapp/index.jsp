@@ -44,9 +44,6 @@
 
 
 <style type="text/css">
-body, html {
-	font-family: sans-serif;
-}
 
 .vis-item {
 	height: 16px;
@@ -112,6 +109,10 @@ body, html {
 	<%@  page import="rcms.utilities.daqexpert.Application"%>
 
 	<nav class="navbar navbar-default navbar-xs" role="navigation">
+	
+	
+	
+	
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -120,34 +121,50 @@ body, html {
 					class="icon-bar"></span> <span class="icon-bar"></span> <span
 					class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#"><b>DAQ</b> Expert</a>
+			<a class="navbar-brand" href="<%out.println(Application.get().getProp().getProperty(Application.LANDING));%>"><b>DAQ</b> Expert</a>
 		</div>
+
+
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse"
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li><a
-					href="<%out.println(Application.get().getProp().getProperty(Application.NM_URL));%>"><i
-						class="glyphicon glyphicon-bell"></i> Notification Manager</a></li>
-				<li><a href="https://github.com/cmsdaq/DAQExpert"><i
-						class="glyphicon glyphicon-tags"></i> Project repo</a></li>
-				<li><a id="tour" href="#"><i
-						class="glyphicon glyphicon-question-sign"></i> Tour</a></li>
-
+			
+				<!-- EXPERT BROWSER -->
+				<li class="active"><a href="#"><i class="glyphicon glyphicon-tasks"></i> Browser</a></li>
+				
+				<!-- NM DASHBOARD -->
+				<li><a href="<%out.println(Application.get().getProp().getProperty(Application.NM_DASHBOARD));%>"><i
+						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
+						
+				<!-- NM NOTIFICATIONS -->
+				<li><a href="<%out.println(Application.get().getProp().getProperty(Application.NM_NOTIFICATIONS));%>"><i
+						class="glyphicon glyphicon-calendar"></i> Notifications</a></li>
+						
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
-	<div class="">
-<div class="btn-group btn-toggle "> 
-        <button class="btn btn-xs btn-primary active">Simple view</button>
-    	<button class="btn btn-xs btn-default">Extended view</button>
-    	</div></div>
-	<div id="visualization" class=""></div>
+	
+	<div class="container">
+	
+	<div class="btn-group btn-toggle" id="extended-view"> 
+        <button class="btn btn-sm btn-primary active">Simple view</button>
+    	<button class="btn btn-sm btn-default">Extended view</button>
+    	</div>
+    	
+	<div class="btn-group pull-right "> 
+    	
+    	<button class="btn btn-sm btn-warning" id="tour" href="#"><i
+						class="glyphicon glyphicon-question-sign"></i> Help</button>
+    	</div>
+    	
+	<div id="visualization"  style="margin-top:15px;"></div>
 	<div id="raw" style="margin-top:15px;"></div>
 	<p></p>
 	<div id="log"></div>
+	</div>
 
 	<script type="text/javascript">
 	
@@ -195,9 +212,28 @@ body, html {
 				height : '300px',
 				interpolation : false,
 				orientation : 'top',
+				
 				dataAxis : {
 					width : '50px',
-					icons : false
+					icons : false,
+					left:{
+						format: function (value) {
+							  return ''+value.toFixed(2);
+						},
+						title: {
+							text: "<span class='glyphicon glyphicon-stop'></span> Avg. RU rate [kHz]",
+							style: "color: #4f81bd;"
+						}
+					},
+					right:{
+						format: function (value) {
+							  return ''+value.toPrecision(2);
+						},
+						title: {
+							text: "<span class='glyphicon glyphicon-stop'></span> Sum events in BU",
+							style: "color: #f79646;"
+						} 
+					}
 				},
 				legend : {
 					left : {
@@ -295,14 +331,14 @@ body, html {
 		var rawgroups = new vis.DataSet();
 		rawgroups.add({
 			id : 0,
-			content : "rate [kHz]",
+			content : "rate",
 			options : {
 				yAxisOrientation : 'left'
 			}
 		})
 		rawgroups.add({
 			id : 1,
-			content : "events (x10^6)",
+			content : "events",
 			options : {
 				yAxisOrientation : 'right',
 				shaded : {
@@ -385,7 +421,7 @@ body, html {
 
 		timeline.on('click', function(properties) {
 			
-			console.log("Properties: "  + properties['what']);
+			//console.log("Properties: "  + properties['what']);
 			
 			if(properties['what'] == 'item'){
 				$('#reasonModal').modal('show');
@@ -410,6 +446,7 @@ body, html {
 					} else {
 						$("#action-section").removeClass("hidden");
 						$("#raport-action").html("<ol id='curr-action'></ol>");
+						//console.log(data['action']);
 						$.each(data['action'], function(key, value) {
 							$("#curr-action").append($("<li>").text(value))
 						});
@@ -550,7 +587,7 @@ body, html {
 
 		/* Raw data click event handling */
 		graph2d.on('click', function(properties) {
-			console.log("Clicked " + JSON.stringify(properties['time']));
+			//console.log("Clicked " + JSON.stringify(properties['time']));
 			var parameters = {};
 			parameters['time'] = JSON.stringify(properties['time']);
 			$.getJSON("snapshot", parameters, function(data) {
@@ -567,6 +604,19 @@ body, html {
 		/* Load raw data to grap chart */
 		function rawload(data) {
 			rawdataset.clear();
+			$.each(data, function(key, value) {
+				
+				// rate entries
+				if(value['group'] == 0){
+					value['y'] = (value['y'] / 1000);
+				}
+				
+				// events entries
+				else if(value['group'] == 1){
+					value['y'] = (value['y']);
+				}
+			});
+			
 			rawdataset.add(data);
 
 		};
@@ -582,8 +632,7 @@ body, html {
 			var parsedStart = new Date(requestedStart);
 			var parsedEnd = new Date(requestedEnd);
 
-			console.log("requested params: " + parsedStart
-					+ ", " + parsedEnd);
+			//console.log("requested params: " + parsedStart + ", " + parsedEnd);
 			
 			if (Object.prototype.toString.call(parsedStart) === "[object Date]"
 					&& Object.prototype.toString
@@ -601,8 +650,7 @@ body, html {
 				useDefault = true;
 			}
 
-			console.log("Initing with using default ranges: "
-					+ useDefault);
+			//console.log("Initing with using default ranges: " + useDefault);
 			properties = {};
 			if (useDefault) {
 				properties['start'] = defaultStart;
@@ -649,6 +697,7 @@ body, html {
 		// Instance the tour
 		var tour = new Tour({
 			container : "body",
+			name : "expert-tour",
 			smartPlacement : true,
 			placement : "left",
 			keyboard : true,
@@ -694,11 +743,23 @@ body, html {
 					element : "#raw",
 					title : "Raw data",
 					placement : 'top',
-					content : "This is raw data panel. Some parameters from snapshots are be displayed here. </br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot."
+					content : "This is raw data panel. Some parameters from snapshots are displayed here (avarage RU rate, sum of events in BU).</br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot."
+				},
+				{
+					element : "#extended-view",
+					title : "View toggle",
+					placement : 'right',
+					content : "You toggle between simple and extended view here."
+				},
+				{
+					element : "#tour",
+					title : "Tour",
+					placement : 'left',
+					content : "You can always start this tour again here."
 				} ]
 			});
 		$('#tour').click(function(e) {
-			console.log("Start tour");
+			//console.log("Start tour");
 
 			tour.restart();
 
@@ -708,7 +769,7 @@ body, html {
 		});
 
 		$(document).ready(function() {
-			console.log("initializing tour");
+			//console.log("initializing tour");
 			// Initialize the tour
 			tour.init();
 

@@ -759,6 +759,14 @@
 			    	  }
 			    },
 			    {
+			    	title: "Element color coding",
+					element : "#visualization",
+					placement : 'bottom',
+			    	content: function () {
+			    	    return '<p>Elements are color coded. Red indicates that event is important and notification was generated. Blue indicates regular events.</p>';
+			    	  }
+			    },
+			    {
 			    	title: "Element details",
 					element : "#visualization",
 					placement : 'bottom',

@@ -608,7 +608,9 @@
 			parameters['time'] = JSON.stringify(properties['time']);
 			$.getJSON("snapshot", parameters, function(data) {
 				var preetified = JSON.stringify(data, null, 2);
-				document.getElementById("json-body").innerHTML = preetified;
+				//console.log(data['lastUpdate']);
+				$("#json-body").html(preetified);
+				$("#snapshot-date").html(moment(data['lastUpdate']).format());
 				$('#myModal').modal('show')
 			}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
@@ -731,13 +733,13 @@
 			    {
 			    	title : "Introduction",
 			    	orphan : true,
-			    	content : "This is DAQ Expert interactive visualization tool.</br>It visualizes results of analysis in time.</br>You can freely move and zoom in by dragging and scrolling in the timelines"
+			    	content : "This is DAQ Expert interactive visualization tool.</br>It visualizes results of analysis in time.</br>You can freely move and zoom in by dragging and scrolling in the timelines."
 			    },
 				{
 					element : "#visualization",
 					title : "Analysis result",
 					placement : 'bottom',
-					content : "This is main analysis panel. Results and intermediate steps of reasoning are displayed here.</br>You can click on each block to get more details."
+					content : "This is main analysis panel. Results and intermediate steps of reasoning are displayed here."
 				},
 				{
 			    	title: "Elements",
@@ -755,11 +757,27 @@
 			    	    return '<p>When you zoom out elements will get smaller. For the clarity they will be hidden and replaced by shadow indicating how many elements are underneath.</p><img src="external/expert-filter-explain.png" />';
 			    	  }
 			    },
+			    {
+			    	title: "Element details",
+					element : "#visualization",
+					placement : 'bottom',
+			    	content: function () {
+			    	    return '<p>Click on element to show details.</p><img src="external/details.png" />';
+			    	  }
+			    },
 				{
 					element : "#raw",
 					title : "Raw data",
 					placement : 'top',
-					content : "This is raw data panel. Some parameters from snapshots are displayed here (avarage RU rate, sum of events in BU).</br>Time range is always synchronized with Analysis result timeline above.</br>You can click at any point in time to get the full snapshot."
+					content : "This is raw data panel. Some parameters from snapshots are displayed here (avarage RU rate, sum of events in BU).</br>Time range is always synchronized with Analysis result timeline above."
+				},
+				{
+					element : "#raw",
+					title : "Raw data",
+					placement : 'top',
+					content : function () {
+			    	    return '<p>Click at any point in time to get the full snapshot in JSON format.</p><img src="external/snapshot.png" />';
+			    	  }
 				},
 				{
 					element : "#extended-view",
@@ -809,7 +827,7 @@
 				</div>
 				<div class="modal-body">
 					<p>
-						Snapshot <span id="snapshotDate">/date/</span> in JSON format:
+						Snapshot <span id="snapshot-date">/date/</span> in JSON format:
 					</p>
 					<pre class="prettyprint lang-json" id="json-body"></pre>
 				</div>

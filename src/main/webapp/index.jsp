@@ -334,6 +334,7 @@
 			id : 'flowchart',
 			content : 'FC (0)',
 			name : 'FC',
+			style : "background-color: white;font-weight:bold;",
 			title : 'Flowchart events',
 			primary : true
 		} ];
@@ -746,7 +747,7 @@
 					element : "#visualization",
 					placement : 'bottom',
 			    	content: function () {
-			    	    return '<p>Each row is visualizing one Logic Module results. You can find details when you hover the label.</p><img src="external/expert-row.png" />';
+			    	    return '<p>Each row is visualizing one Logic Module results (or multiple Logic Modules if group name in bold). The number indicates how many events are visible in current time span. You can find details when you hover the label.</p><img src="external/expert-row.png" />';
 			    	  }
 			    },
 				{

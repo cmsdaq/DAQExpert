@@ -216,6 +216,7 @@
 		
 		var options = {
 			editable : false,
+			orientation : 'top',
 			margin : {
 				item : {
 					horizontal : 0
@@ -227,7 +228,7 @@
 				drawPoints : true,
 				height : '300px',
 				interpolation : false,
-				orientation : 'top',
+				orientation : 'bottom',
 				
 				dataAxis : {
 					width : '50px',

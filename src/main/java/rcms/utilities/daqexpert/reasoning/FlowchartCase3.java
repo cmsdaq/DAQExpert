@@ -54,7 +54,7 @@ public class FlowchartCase3 extends ExtendedCondition {
 				if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
 					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("TTCP", subSystem.getName());
+					context.register("TTCP", ttcp.getName());
 					context.register("STATE", currentState.name());
 					result = true;
 				}

@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,17 @@ public class RawAPI extends HttpServlet {
 
 		Date startDate = objectMapper.readValue(startRange, Date.class);
 		Date endDate = objectMapper.readValue(endRange, Date.class);
+
+		// extend slightly timespan so that few snapshots more on the left and
+		// right are loaded to the chart - avoid cutting the chart lines
+		Calendar c = Calendar.getInstance(); 
+		c.setTime(startDate); 
+		c.add(Calendar.SECOND, -10);
+		startDate = c.getTime();
+		c.setTime(endDate); 
+		c.add(Calendar.SECOND, 10);
+		endDate = c.getTime();
+
 		logger.debug("Parsed range from : " + startDate + " to " + endDate);
 
 		List<HashMap<String, Long>> data = new ArrayList<>();
@@ -73,10 +85,10 @@ public class RawAPI extends HttpServlet {
 			if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {
 				HashMap<String, Long> rateObject = new HashMap<>();
 				HashMap<String, Long> eventObject = new HashMap<>();
-				
+
 				// rate in kHz
 				rateObject.put("y", daq.getRate());
-				
+
 				// milions of events
 				eventObject.put("y", (long) daq.getEvents());
 				rateObject.put("x", daq.getLastUpdate());

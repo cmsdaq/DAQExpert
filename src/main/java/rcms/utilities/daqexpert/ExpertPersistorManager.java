@@ -184,7 +184,7 @@ public class ExpertPersistorManager extends PersistorManager {
 
 		logger.info("Searching snapshot for date: " + date + ", base dir: " + persistenceDir);
 
-		candidateDir = this.persistor.getTimeDir(persistenceDir, date);
+		candidateDir = this.getTimeDir(persistenceDir, date);
 		
 		logger.info("Candidates will be searched in " + candidateDir);
 
@@ -239,7 +239,7 @@ public class ExpertPersistorManager extends PersistorManager {
 			}
 
 			logger.info("Best file found: " + bestFile + " with time diff: " + diff + "ms.");
-			best = structurePersistor.deserializeFromSmile(bestFile);
+			best = structurePersistor.deserialize(bestFile,SnapshotFormat.SMILE);
 			return best;
 
 		} catch (IOException e) {

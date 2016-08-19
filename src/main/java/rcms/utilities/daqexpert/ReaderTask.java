@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
@@ -46,7 +47,7 @@ public class ReaderTask extends TimerTask {
 				DAQ daq = null;
 				for (File file : chunk) {
 
-					daq = structurePersistor.deserializeFromSmile(file.getAbsolutePath().toString());
+					daq = structurePersistor.deserialize(file.getAbsolutePath().toString(),SnapshotFormat.SMILE);
 
 					if (daq != null) {
 						TaskManager.get().rawData.add(new DummyDAQ(daq));

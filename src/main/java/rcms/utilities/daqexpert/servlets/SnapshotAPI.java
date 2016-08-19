@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.servlets;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.SubFEDBuilder;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
+import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.servlets.mixin.BUMixIn;
 import rcms.utilities.daqexpert.servlets.mixin.BUSummaryMixIn;
@@ -62,24 +65,13 @@ public class SnapshotAPI extends HttpServlet {
 		String json = "";
 		try {
 			DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
-			// Mixin for adding 'ref_' prefix to fields for details see
-			// http://www.leveluplunch.com/java/tutorials/024-modifying-fields-external-domain-jackson-mixin/
-			objectMapper.addMixIn(BU.class, BUMixIn.class);
-			objectMapper.addMixIn(BUSummary.class, BUSummaryMixIn.class);
-			objectMapper.addMixIn(DAQ.class, DAQMixIn.class);
-			objectMapper.addMixIn(FED.class, FEDMixIn.class);
-			objectMapper.addMixIn(FEDBuilder.class, FEDBuilderMixIn.class);
-			objectMapper.addMixIn(FEDBuilderSummary.class, FEDBuilderSummaryMixIn.class);
-			objectMapper.addMixIn(FMM.class, FMMMixIn.class);
-			objectMapper.addMixIn(FMMApplication.class, FMMApplicationMixIn.class);
-			objectMapper.addMixIn(FRL.class, FRLMixIn.class);
-			objectMapper.addMixIn(FRLPc.class, FRLPcMixIn.class);
-			objectMapper.addMixIn(RU.class, RUMixIn.class);
-			objectMapper.addMixIn(SubFEDBuilder.class, SubFEDBuilderMixIn.class);
-			objectMapper.addMixIn(SubSystem.class, SubSystemMixIn.class);
-			objectMapper.addMixIn(TTCPartition.class, TTCPartitionMixIn.class);
 
-			json = objectMapper.writeValueAsString(result);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			
+			StructureSerializer ss = new StructureSerializer();
+			ss.serialize(result,baos,SnapshotFormat.JSONREFPREFIXED);
+
+			json = baos.toString( java.nio.charset.StandardCharsets.UTF_8.toString() );
 
 			logger.info(
 					"Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": " + json.substring(0, 1000));

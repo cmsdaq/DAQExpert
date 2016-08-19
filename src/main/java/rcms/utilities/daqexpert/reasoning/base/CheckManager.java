@@ -8,7 +8,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.DAQStateComparator;
+import rcms.utilities.daqexpert.reasoning.Downtime;
 import rcms.utilities.daqexpert.reasoning.EVMComparator;
 import rcms.utilities.daqexpert.reasoning.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.FlowchartCase2;
@@ -54,6 +56,8 @@ public class CheckManager {
 
 		// Level 1 (depends on L0)
 		checkers.add(new NoRateWhenExpected());
+		checkers.add(new Downtime());
+		checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)
 		checkers.add(new FlowchartCase1());
@@ -61,7 +65,7 @@ public class CheckManager {
 		checkers.add(new FlowchartCase3());
 		checkers.add(new FlowchartCase4());
 		checkers.add(new FlowchartCase5());
-		// checkers.add(new FlowchartCase6());
+		//checkers.add(new FlowchartCase6());
 
 		// comparators
 		comparators.add(new SessionComparator());

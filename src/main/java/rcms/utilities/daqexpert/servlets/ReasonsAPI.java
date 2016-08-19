@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 
@@ -44,11 +46,14 @@ public class ReasonsAPI extends HttpServlet {
 		Date startDate = objectMapper.readValue(startRange, Date.class);
 		Date endDate = objectMapper.readValue(endRange, Date.class);
 		logger.debug("Parsed range from : " + startDate + " to " + endDate);
+		Map<String, Object> result = new HashMap<>();
 
-		List<Entry> result = new ArrayList<>();
+		List<Entry> entryList = new ArrayList<>();
 
 		Map<String, Set<Entry>> groupedMap = new HashMap<>();
 		Map<String, Integer> groupedQuantities = new HashMap<>();
+
+		Map<String, Long> durations = new HashMap<>();
 
 		/*
 		 * minimum width for filtering the blocks is calculated based on this.
@@ -64,11 +69,22 @@ public class ReasonsAPI extends HttpServlet {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 		for (Entry entry : EventProducer.get().getResult()) {
+
 			try {
 				if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
 
+					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getContent().equals("STABLE BEAMS"))
+							|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
+							|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
+						long current = 0;
+						if (durations.containsKey(entry.getGroup())) {
+							current = durations.get(entry.getGroup());
+						}
+						durations.put(entry.getGroup(), current + entry.getDuration());
+					}
+
 					if (entry.getDuration() > durationThreshold) {
-						result.add(entry);
+						entryList.add(entry);
 					} else {
 						logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
 								+ " will be filtered");
@@ -91,13 +107,12 @@ public class ReasonsAPI extends HttpServlet {
 						// create base from this if not found
 						if (base == null) {
 							base = new Entry(entry);
-							if(EventPriority.critical.getCode().equals(entry.getClassName())){
+							if (EventPriority.critical.getCode().equals(entry.getClassName())) {
 								base.setClassName(EventPriority.filtered_important.getCode());
-							}
-							else{
+							} else {
 								base.setClassName(EventPriority.filtered.getCode());
 							}
-							//type: 'background',
+							// type: 'background',
 							base.setContent("1");
 						}
 
@@ -110,9 +125,9 @@ public class ReasonsAPI extends HttpServlet {
 							}
 							base.calculateDuration();
 							int filteredElements = Integer.parseInt(base.getContent());
-							base.setContent((filteredElements+1) + "");
+							base.setContent((filteredElements + 1) + "");
 
-							if(EventPriority.critical.getCode().equals(entry.getClassName())){
+							if (EventPriority.critical.getCode().equals(entry.getClassName())) {
 								base.setClassName(EventPriority.filtered_important.getCode());
 							}
 						}
@@ -134,15 +149,15 @@ public class ReasonsAPI extends HttpServlet {
 				if (groupedEntry.getDuration() < durationThreshold) {
 					int append = (int) (durationThreshold - groupedEntry.getDuration());
 
-					Date alteredStart = new Date(groupedEntry.getStart().getTime() - append/2);
-					Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append/2);
+					Date alteredStart = new Date(groupedEntry.getStart().getTime() - append / 2);
+					Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append / 2);
 					groupedEntry.setStart(alteredStart);
 					groupedEntry.setEnd(alteredEnd);
 					groupedEntry.calculateDuration();
 				}
 			}
 
-			result.addAll(groupedEntries);
+			entryList.addAll(groupedEntries);
 
 		}
 
@@ -160,6 +175,8 @@ public class ReasonsAPI extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 
+		result.put("entries", entryList);
+		result.put("durations", durations);
 		/* return the response */
 		String json = objectMapper.writeValueAsString(result);
 		logger.debug("Response JSON: " + json);

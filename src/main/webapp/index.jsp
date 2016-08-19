@@ -10,37 +10,18 @@
 <link href="external/vis.min.css" rel="stylesheet" type="text/css" />
 
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
-	crossorigin="anonymous">
+<link rel="stylesheet" href="external/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 
 <!-- Optional theme -->
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
-	integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
-	crossorigin="anonymous">
+<link rel="stylesheet"href="external/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
 
 <!-- Latest compiled and minified JavaScript -->
-<script
-	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-	integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-	crossorigin="anonymous"></script>
-
-
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-
-
-<script type="text/javascript"
-	src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-
-<link
-	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/css/bootstrap-tour.min.css"
-	rel="stylesheet">
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.10.3/js/bootstrap-tour.min.js"></script>
+<script	src="external/bootstrap-3.3.7-dist/js/bootstrap.min.js"	></script>
+<script	src="external/underscore-min.js"></script>
+<script type="text/javascript" src="external/moment.min.js"></script>
+<link href="external/bootstrap-tour.min.css" rel="stylesheet">
+<script	src="external/bootstrap-tour.min.js"></script>
+<script	src="external/moment-duration-format.min.js"></script>
 
 
 <style type="text/css">
@@ -71,6 +52,13 @@
 	background-color: darkblue;
 	border-color: darkblue;
 	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+.vis-item.warning {
+	background-color: #f79646;
+	border-color: #f79646;
+	border-color: #E38D13;
 	font-family: monospace;
 	box-shadow: 0 0 10px gray;
 }
@@ -177,7 +165,7 @@
     	</div>
     	
 	<div id="visualization"  style="margin-top:15px;"></div>
-	<div id="raw" style="margin-top:15px;"></div>
+	<div id="raw" ></div>
 	<p></p>
 	<div id="log"></div>
 	</div>
@@ -200,7 +188,7 @@
 	    $(this).find('.btn').toggleClass('btn-default');
 
 		filtering = !filtering;
-		load(lastData);
+		load(lastData['entries']);
 		
 	       
 	});
@@ -302,12 +290,6 @@
 			title : 'Run ongoing',
 			primary : false
 		},  {
-			id : 'nrwe',
-			content : 'NRWE (0)',
-			name : 'NRWE',
-			title : 'No rate when expected',
-			primary : true
-		}, {
 			id : 'warning',
 			content : 'Warn (0)',
 			name : 'Warn',
@@ -320,6 +302,12 @@
 			title : 'No rate condition',
 			primary : false
 		}, {
+			id : 'nrwe',
+			content : 'NRWE (0)',
+			name : 'NRWE',
+			title : 'No rate when expected',
+			primary : false
+		},{
 			id : 'rate-oor',
 			content : 'Rate OOR (0)',
 			name : 'Rate OOR',
@@ -331,6 +319,18 @@
 			name : 'Other',
 			title : 'Other conditions',
 			primary : false
+		}, {
+			id : 'dt',
+			content : 'Downtime (0)',
+			name : 'Downtime',
+			title : 'Downtime = no rate during stable beams',
+			primary : true
+		}, {
+			id : 'adt',
+			content : 'Avoid. DT (0)',
+			name : 'Avoid. DT ',
+			title : 'Avoidable downtime',
+			primary : true
 		}, {
 			id : 'flowchart',
 			content : 'FC (0)',
@@ -533,6 +533,7 @@
 			
 			/* Update groups content */
 			$.each(countPerGroup, function(index, value) {
+				//console.log("Current: "+JSON.stringify(index));
 				var current = groups.get(index);
 				//console.log("Current: "+JSON.stringify(current));
 				
@@ -565,7 +566,10 @@
 			parameters['end'] = end + "";
 
 			$.getJSON("reasons", parameters, function(data) {
-				load(data);
+				load(data['entries']);
+				$.each(data['durations'], function(key, value) {
+					console.log(key + ": " +moment.duration(value).format() + ", humanized: " + moment.duration(value).humanize());
+				});
 				lastData = data;
 			}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);

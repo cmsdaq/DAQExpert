@@ -1,7 +1,5 @@
 package rcms.utilities.daqexpert.servlets;
 
-import java.util.Timer;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -10,7 +8,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
-import rcms.utilities.daqexpert.ReaderTask;
+import rcms.utilities.daqexpert.ReadTaskController;
 
 public class ServletListener implements ServletContextListener {
 
@@ -24,7 +22,7 @@ public class ServletListener implements ServletContextListener {
 		}
 
 		Application.initialize(propertyFilePath);
-		
+
 		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
 		if (snapshotsDir != null)
@@ -35,8 +33,6 @@ public class ServletListener implements ServletContextListener {
 		}
 
 		persistorManager = new ExpertPersistorManager(snapshotsDir);
-		dataSegmentator = new DataResolutionManager();
-		t = new Timer();
 	}
 
 	private static final Logger logger = Logger.getLogger(ServletListener.class);
@@ -44,16 +40,15 @@ public class ServletListener implements ServletContextListener {
 	ExpertPersistorManager persistorManager;
 	DataResolutionManager dataSegmentator;
 
-	Timer t;
 
 	public void contextInitialized(ServletContextEvent e) {
-
 		
-		t.scheduleAtFixedRate(new ReaderTask(dataSegmentator), 0, 3000);
+		ReadTaskController readerRaskController = new ReadTaskController();
+		readerRaskController.firePastReaderTask();
+		readerRaskController.fireRealTimeReaderTask();
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {
-		t.cancel();
 	}
 
 }

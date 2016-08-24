@@ -165,7 +165,7 @@
     	</div>
     	
 	<div id="visualization"  style="margin-top:15px;"></div>
-	<div id="raw" ></div>
+	<div id="raw" style="margin-top:5px;"></div>
 	<p></p>
 	<div id="log"></div>
 	</div>

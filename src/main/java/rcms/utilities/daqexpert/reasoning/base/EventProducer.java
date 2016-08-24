@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.DataManager;
+
 /**
  * From checker & comparator boolean results creates events
  * 
@@ -23,11 +25,6 @@ public class EventProducer {
 	/** Logger */
 	private static final Logger logger = Logger.getLogger(EventProducer.class);
 
-	/** Singleton instance */
-	private static EventProducer instance;
-
-	/** All produced reasons are kept in this list */
-	private final List<Entry> result = Collections.synchronizedList(new ArrayList<Entry>());
 
 	/** All events without end date are kept here (unfinished) */
 	private final Map<String, Entry> unfinished = new HashMap<>();
@@ -37,16 +34,6 @@ public class EventProducer {
 
 	private final List<Entry> finishedThisRound = new ArrayList<>();
 
-	/** Singleton constructor */
-	private EventProducer() {
-	}
-
-	/** Get singleton instance */
-	public static EventProducer get() {
-		if (instance == null)
-			instance = new EventProducer();
-		return instance;
-	}
 
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
@@ -138,23 +125,17 @@ public class EventProducer {
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
 
-		result.add(entry);
+		//result.add(entry);
+
+		DataManager.get().getResult().add(entry);
 		unfinished.put(className, entry);
 		return entry;
 	}
 
-	/**
-	 * Get all results produced by event producer
-	 * 
-	 * @return list of events produced
-	 */
-	public List<Entry> getResult() {
-		return result;
-	}
-
+	
 	@Override
 	public String toString() {
-		return "EventProducer [result=" + result + ", states=" + states + ", unfinished=" + unfinished + "]";
+		return "EventProducer [states=" + states + ", unfinished=" + unfinished + "]";
 	}
 
 	public List<Entry> getFinishedThisRound() {
@@ -162,6 +143,12 @@ public class EventProducer {
 	}
 
 	public void clearFinishedThisRound() {
+		finishedThisRound.clear();
+	}
+	
+	public void clearProducer(){
+		states.clear();
+		unfinished.clear();
 		finishedThisRound.clear();
 	}
 

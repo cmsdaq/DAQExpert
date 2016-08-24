@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
-import rcms.utilities.daqexpert.TaskManager;
+import rcms.utilities.daqexpert.DataManager;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.
@@ -71,7 +71,7 @@ public class API extends HttpServlet {
 		
 
 		/* iterate over objects in given range */
-		for (DAQ daq : TaskManager.get().buf) {
+		for (DAQ daq : DataManager.get().buf) {
 			if (daq.getLastUpdate() >= Long.parseLong(startRange) && daq.getLastUpdate() <= Long.parseLong(endRange)) {
 				HashMap<String, Object> object = new HashMap<>();
 				object.put("rate", daq.getFedBuilderSummary().getRate());

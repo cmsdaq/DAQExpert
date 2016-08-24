@@ -39,6 +39,8 @@ public class CheckManager {
 	private final List<Condition> checkers = new ArrayList<>();
 
 	private final List<Comparator> comparators = new ArrayList<>();
+	
+	private final EventProducer eventProducer;
 
 	/**
 	 * Constructor, order of checker matters. Checkers may use results of
@@ -47,7 +49,8 @@ public class CheckManager {
 	 * @param daq
 	 *            daq object to analyze
 	 */
-	public CheckManager() {
+	public CheckManager(EventProducer eventProducer) {
+		this.eventProducer = eventProducer;
 		// Level 0 Independent
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
@@ -113,7 +116,7 @@ public class CheckManager {
 
 			checkerResultMap.put(checker.getClass().getSimpleName(), result);
 			curr = new Date(daq.getLastUpdate());
-			Entry entry = EventProducer.get().produce(checker, result, curr);
+			Entry entry = eventProducer.produce(checker, result, curr);
 
 			/*
 			 * The event finishes (result = false), Context to be cleared for
@@ -129,8 +132,8 @@ public class CheckManager {
 				results.add(entry);
 			}
 		}
-		results.addAll(EventProducer.get().getFinishedThisRound());
-		EventProducer.get().clearFinishedThisRound();
+		results.addAll(eventProducer.getFinishedThisRound());
+		eventProducer.clearFinishedThisRound();
 
 		return results;
 	}
@@ -161,7 +164,7 @@ public class CheckManager {
 			Date current = new Date(comparator.getLast().getLastUpdate());
 
 			// TODO: comparators may also return entry
-			EventProducer.get().produce(comparator, result, last, current);
+			eventProducer.produce(comparator, result, last, current);
 		}
 		return results;
 	}

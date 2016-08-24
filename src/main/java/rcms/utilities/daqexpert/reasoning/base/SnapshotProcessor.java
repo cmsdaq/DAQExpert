@@ -15,24 +15,27 @@ import rcms.utilities.daqexpert.NotificationSender;
  */
 public class SnapshotProcessor {
 
-	CheckManager checkManager = new CheckManager();
+	private CheckManager checkManager;
 
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
 	private final NotificationSender notificationSender;
 
-	public SnapshotProcessor() {
-		notificationSender = new NotificationSender();
+	public SnapshotProcessor(EventProducer eventProducer) {
+		this.notificationSender = new NotificationSender();
+		this.checkManager = new CheckManager(eventProducer);
 	}
 
-	public void process(DAQ daqSnapshot) {
+	public int process(DAQ daqSnapshot, boolean createNotifications) {
 		List<Entry> result = checkManager.runLogicModules(daqSnapshot);
 
 		logger.debug("Results from CheckManager for this snapshot: " + result);
 
-		for (Entry entry : result)
-			if (entry.isShow())
-				notificationSender.rtSend(entry);
+		if (createNotifications)
+			for (Entry entry : result)
+				if (entry.isShow())
+					notificationSender.rtSend(entry);
+		return result.size();
 	}
 
 }

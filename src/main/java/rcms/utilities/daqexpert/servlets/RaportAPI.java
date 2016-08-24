@@ -14,10 +14,10 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventFinder;
-import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
 
 public class RaportAPI extends HttpServlet {
@@ -37,7 +37,7 @@ public class RaportAPI extends HttpServlet {
 			int id = Integer.parseInt(idString);
 
 			Map<String, Object> result = new HashMap<>();
-			List<Entry> entries = EventProducer.get().getResult();
+			List<Entry> entries = DataManager.get().getResult();
 			for (Entry entry : entries) {
 				// FIXME: map should be used
 				if (entry.getId() == id) {

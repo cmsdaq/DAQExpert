@@ -44,14 +44,25 @@ public class ExpertPersistorManager extends PersistorManager {
 			throw new RuntimeException("Persister manager not initialized");
 		return instance;
 	}
+	
 
-	public Entry<Long, List<List<File>>> explore(Long last) throws IOException {
+	public Entry<Long,List<File>> explore(Long startTimestamp) throws IOException {
+		return explore(startTimestamp, Long.MAX_VALUE);
+	}
 
-		Long tmpLast = last;
+	/**
+	 * 
+	 * @param startTimestamp
+	 * @return returns timestamp of last snapshot explored and list of explored snapshots
+	 * @throws IOException
+	 */
+	public Entry<Long,List<File>> explore(Long startTimestamp, Long endTimestamp) throws IOException {
+
+		Long tmpLast = startTimestamp;
 		Long startTime = System.currentTimeMillis();
 		Long snapshotCount = 0L;
-
-		List<List<File>> resultInChunks = new ArrayList<>();
+		
+		List<File> result = new ArrayList<>();
 
 		List<File> yearDirs = getDirs(persistenceDir);
 
@@ -67,8 +78,6 @@ public class ExpertPersistorManager extends PersistorManager {
 					for (File hourDir : hourDirs) {
 						List<File> snapshots = getFiles(hourDir.getAbsolutePath());
 
-						List<File> result = new ArrayList<>();
-
 						for (File snapshot : snapshots) {
 
 							int dotIdx = snapshot.getName().indexOf(".");
@@ -76,25 +85,24 @@ public class ExpertPersistorManager extends PersistorManager {
 							if (dotIdx != -1) {
 								Long timestamp = Long.parseLong(snapshot.getName().substring(0, dotIdx));
 
-								if (last < timestamp) {
-									last = timestamp;
+								// FIXME: this needs to be improved
+								if (startTimestamp < timestamp && timestamp < endTimestamp && snapshotCount < 2000) {
+									startTimestamp = timestamp;
 									result.add(snapshot);
 									snapshotCount++;
 								}
 							}
 						}
 
-						if (result.size() > 0)
-							resultInChunks.add(result);
 					}
 				}
 			}
 		}
 
 		Long endTime = System.currentTimeMillis();
-		logger.debug("Explored " + snapshotCount + " snapshots (" + resultInChunks.size() + " chunks) after " + tmpLast
+		logger.debug("Explored " + snapshotCount + " snapshots (" + result.size() + " snapshots) after " + tmpLast
 				+ ", in " + (endTime - startTime) + "ms");
-		Entry<Long, List<List<File>>> entry = new SimpleEntry<>(last, resultInChunks);
+		Entry<Long, List<File>> entry = new SimpleEntry<>(startTimestamp, result);
 		return entry;
 	}
 

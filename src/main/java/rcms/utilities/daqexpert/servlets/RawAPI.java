@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.TaskManager;
+import rcms.utilities.daqexpert.DataManager;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.
@@ -47,11 +47,11 @@ public class RawAPI extends HttpServlet {
 
 		// extend slightly timespan so that few snapshots more on the left and
 		// right are loaded to the chart - avoid cutting the chart lines
-		Calendar c = Calendar.getInstance(); 
-		c.setTime(startDate); 
+		Calendar c = Calendar.getInstance();
+		c.setTime(startDate);
 		c.add(Calendar.SECOND, -10);
 		startDate = c.getTime();
-		c.setTime(endDate); 
+		c.setTime(endDate);
 		c.add(Calendar.SECOND, 10);
 		endDate = c.getTime();
 
@@ -59,56 +59,57 @@ public class RawAPI extends HttpServlet {
 
 		List<HashMap<String, Long>> data = new ArrayList<>();
 
+		// SortedSet<HashMap<String, Long>> data = new TreeSet<>();
+
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution range = rangeResolver.resolve(startDate, endDate);
 
-		List<DummyDAQ> rawData = null;
+		List<DummyDAQ> targetData = null;
 		switch (range) {
 		case Full:
-			rawData = TaskManager.get().rawData;
+			targetData = DataManager.get().rawData;
 			break;
 		case Minute:
-			rawData = TaskManager.get().rawDataMinute;
+			targetData = DataManager.get().rawDataMinute;
 			break;
 		case Hour:
-			rawData = TaskManager.get().rawDataHour;
+			targetData = DataManager.get().rawDataHour;
 			break;
 		case Day:
-			rawData = TaskManager.get().rawDataDay;
+			targetData = DataManager.get().rawDataDay;
 			break;
 		default:
-			rawData = TaskManager.get().rawDataMonth; // TODO: change to MONTH
+			targetData = DataManager.get().rawDataMonth; // TODO: change to
+															// MONTH
 			break;
 		}
 
-		for (DummyDAQ daq : rawData) {
-			if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {
-				HashMap<String, Long> rateObject = new HashMap<>();
-				HashMap<String, Long> eventObject = new HashMap<>();
+		synchronized (targetData) {
+			for (DummyDAQ daq : targetData) {
+				if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {
+					HashMap<String, Long> rateObject = new HashMap<>();
+					HashMap<String, Long> eventObject = new HashMap<>();
 
-				// rate in kHz
-				rateObject.put("y", daq.getRate());
+					// rate in kHz
+					rateObject.put("y", daq.getRate());
 
-				// milions of events
-				eventObject.put("y", (long) daq.getEvents());
-				rateObject.put("x", daq.getLastUpdate());
-				eventObject.put("x", daq.getLastUpdate());
-				rateObject.put("group", 0L);
-				eventObject.put("group", 1L);
-				data.add(rateObject);
-				data.add(eventObject);
+					// milions of events
+					eventObject.put("y", (long) daq.getEvents());
+					rateObject.put("x", daq.getLastUpdate());
+					eventObject.put("x", daq.getLastUpdate());
+					rateObject.put("group", 0L);
+					eventObject.put("group", 1L);
+					data.add(rateObject);
+					data.add(eventObject);
+				}
 			}
 		}
 
-		logger.debug("Range: " + range + ", elements to process: " + rawData.size());
+		logger.debug("Range: " + range + ", elements to process: " + targetData.size());
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		String json = objectMapper.writeValueAsString(data);
-
-		// String json = new Gson().toJson(result);
-
-		// logger.info("Response JSON: " + json);
 
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Allow-Methods", "GET");

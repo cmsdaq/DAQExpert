@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,10 +18,10 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 
 public class ReasonsAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -68,79 +67,86 @@ public class ReasonsAPI extends HttpServlet {
 		long rangeInMs = endDate.getTime() - startDate.getTime();
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
-		for (Entry entry : EventProducer.get().getResult()) {
 
-			try {
-				if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
+		List<Entry> allElements = DataManager.get().getResult();
+		synchronized (allElements) {
 
-					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getContent().equals("STABLE BEAMS"))
-							|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
-							|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
-						long current = 0;
-						if (durations.containsKey(entry.getGroup())) {
-							current = durations.get(entry.getGroup());
+			for (Entry entry : allElements) {
+				// this needs to be optimized
+				try {
+					if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
+
+						if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode()
+								&& entry.getContent().equals("STABLE BEAMS"))
+								|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
+								|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
+							long current = 0;
+							if (durations.containsKey(entry.getGroup())) {
+								current = durations.get(entry.getGroup());
+							}
+							durations.put(entry.getGroup(), current + entry.getDuration());
 						}
-						durations.put(entry.getGroup(), current + entry.getDuration());
+
+						if (entry.getDuration() > durationThreshold) {
+							entryList.add(entry);
+						} else {
+							logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
+									+ " will be filtered");
+							if (!groupedMap.containsKey(entry.getGroup())) {
+								groupedMap.put(entry.getGroup(), new HashSet<Entry>());
+							}
+
+							// find existing group to merge to
+							Entry base = null;
+							for (Entry potentialBase : groupedMap.get(entry.getGroup())) {
+
+								if (potentialBase.getStart().getTime() - durationThreshold <= entry.getStart().getTime()
+										&& potentialBase.getEnd().getTime() + durationThreshold >= entry.getEnd()
+												.getTime()) {
+									base = potentialBase;
+									break;
+								}
+							}
+
+							// create base from this if not found
+							if (base == null) {
+								base = new Entry(entry);
+								if (EventPriority.critical.getCode().equals(entry.getClassName())) {
+									base.setClassName(EventPriority.filtered_important.getCode());
+								} else {
+									base.setClassName(EventPriority.filtered.getCode());
+								}
+								// type: 'background',
+								base.setContent("1");
+							}
+
+							// merge
+							else {
+								if (base.getStart().after(entry.getStart()))
+									base.setStart(entry.getStart());
+								if (base.getEnd().before(entry.getEnd())) {
+									base.setEnd(entry.getEnd());
+								}
+								base.calculateDuration();
+								int filteredElements = Integer.parseInt(base.getContent());
+								base.setContent((filteredElements + 1) + "");
+
+								if (EventPriority.critical.getCode().equals(entry.getClassName())) {
+									base.setClassName(EventPriority.filtered_important.getCode());
+								}
+							}
+
+							groupedMap.get(entry.getGroup()).add(base);
+						}
 					}
-
-					if (entry.getDuration() > durationThreshold) {
-						entryList.add(entry);
-					} else {
-						logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
-								+ " will be filtered");
-						if (!groupedMap.containsKey(entry.getGroup())) {
-							groupedMap.put(entry.getGroup(), new HashSet<Entry>());
-						}
-
-						// find existing group to merge to
-						Entry base = null;
-						for (Entry potentialBase : groupedMap.get(entry.getGroup())) {
-
-							if (potentialBase.getStart().getTime() - durationThreshold <= entry.getStart().getTime()
-									&& potentialBase.getEnd().getTime() + durationThreshold >= entry.getEnd()
-											.getTime()) {
-								base = potentialBase;
-								break;
-							}
-						}
-
-						// create base from this if not found
-						if (base == null) {
-							base = new Entry(entry);
-							if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-								base.setClassName(EventPriority.filtered_important.getCode());
-							} else {
-								base.setClassName(EventPriority.filtered.getCode());
-							}
-							// type: 'background',
-							base.setContent("1");
-						}
-
-						// merge
-						else {
-							if (base.getStart().after(entry.getStart()))
-								base.setStart(entry.getStart());
-							if (base.getEnd().before(entry.getEnd())) {
-								base.setEnd(entry.getEnd());
-							}
-							base.calculateDuration();
-							int filteredElements = Integer.parseInt(base.getContent());
-							base.setContent((filteredElements + 1) + "");
-
-							if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-								base.setClassName(EventPriority.filtered_important.getCode());
-							}
-						}
-
-						groupedMap.get(entry.getGroup()).add(base);
-					}
+				} catch (NullPointerException e) {
+					// it means that some of reasons are being builed by event
+					// builder, just dont show them yet, they will be ready on
+					// next
+					// request
 				}
-			} catch (NullPointerException e) {
-				// it means that some of reasons are being builed by event
-				// builder, just dont show them yet, they will be ready on next
-				// request
-			}
 
+			}
 		}
 
 		for (Set<Entry> groupedEntries : groupedMap.values()) {

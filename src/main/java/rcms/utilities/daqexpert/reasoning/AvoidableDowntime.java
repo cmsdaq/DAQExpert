@@ -16,7 +16,7 @@ public class AvoidableDowntime extends ExtendedCondition {
 	public AvoidableDowntime() {
 		this.name = "Avoidable Downtime";
 		this.group = EventGroup.AVOIDABLE_DOWNTIME;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.warning;
 		this.description = "No rate and no recovery action is being executed during stable beams";
 		this.action = null;
 	}

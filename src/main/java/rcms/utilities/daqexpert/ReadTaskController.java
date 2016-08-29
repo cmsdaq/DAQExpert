@@ -19,25 +19,26 @@ public class ReadTaskController {
 	private long startTime;
 
 	public ReadTaskController() {
-		startTime = (new Date()).getTime();
+		//bias for generation of events.
+		startTime = (new Date()).getTime() - 1000*60*60*5;
 	}
 
 	private final ScheduledExecutorService pastReaderScheduler = Executors.newScheduledThreadPool(1);
 	private final ScheduledExecutorService realTimeScheduler = Executors.newScheduledThreadPool(1);
 
-	public void firePastReaderTask() {
+	public void firePastReaderTask(String sourceDirectory) {
 		logger.info("Starting past reader task with period of " + PAST_TASK_PERION_IN_SECONDS + " seconds");
 
-		ReaderTask task = new PastReader(new DataResolutionManager(), 1471392000000L, startTime);
+		ReaderTask task = new PastReader(new DataResolutionManager(), sourceDirectory, 1471392000000L, startTime);
 
 		ScheduledFuture<?> future = pastReaderScheduler.scheduleAtFixedRate(task, 15, 15, SECONDS);
 		task.future = future;
 
 	}
 
-	public void fireRealTimeReaderTask() {
+	public void fireRealTimeReaderTask(String sourceDirectory) {
 		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_SECONDS + " seconds");
-		realTimeScheduler.scheduleAtFixedRate(new ForwardReaderTask(new DataResolutionManager(), startTime), 1,
+		realTimeScheduler.scheduleAtFixedRate(new ForwardReaderTask(new DataResolutionManager(),  sourceDirectory,startTime), 1,
 				REAL_TIME_TASK_PERION_IN_SECONDS, SECONDS);
 
 	}

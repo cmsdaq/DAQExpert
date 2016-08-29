@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
+import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
@@ -18,8 +18,8 @@ public class PastReader extends ReaderTask {
 
 	private static final Logger logger = Logger.getLogger(PastReader.class);
 
-	public PastReader(DataResolutionManager dataSegmentator, long startTime, long readTo) {
-		super(dataSegmentator);
+	public PastReader(DataResolutionManager dataSegmentator, String sourceDirectory, long startTime, long readTo) {
+		super(dataSegmentator, sourceDirectory);
 		this.readFrom = startTime;
 		this.readTo = readTo;
 	}
@@ -55,10 +55,10 @@ public class PastReader extends ReaderTask {
 			Entry<Long, List<File>> entry;
 			if (getForwardHourChunk(readFrom) > readTo) {
 
-				entry = ExpertPersistorManager.get().explore(readFrom, readTo);
+				entry = ExpertPersistorManager.get().explore(readFrom, readTo, sourceDirectory);
 			} else {
 				// get chunk of data
-				entry = ExpertPersistorManager.get().explore(readFrom, getForwardHourChunk(readFrom));
+				entry = ExpertPersistorManager.get().explore(readFrom, getForwardHourChunk(readFrom), sourceDirectory);
 			}
 
 			// remember last explored snapshot timestamp
@@ -74,7 +74,7 @@ public class PastReader extends ReaderTask {
 			DAQ daq = null;
 
 			for (File file : entry.getValue()) {
-				daq = structurePersistor.deserialize(file.getAbsolutePath().toString(), SnapshotFormat.SMILE);
+				daq = structurePersistor.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
 
 				if (daq != null) {
 

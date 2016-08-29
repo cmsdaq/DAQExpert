@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
+import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
@@ -18,8 +18,8 @@ public class ForwardReaderTask extends ReaderTask {
 	private static final Logger logger = Logger.getLogger(ForwardReaderTask.class);
 	private Long last;
 
-	public ForwardReaderTask(DataResolutionManager dataSegmentator, long startTime) {
-		super(dataSegmentator);
+	public ForwardReaderTask(DataResolutionManager dataSegmentator, String sourceDirectory, long startTime) {
+		super(dataSegmentator, sourceDirectory);
 		this.last = startTime;
 	}
 
@@ -32,7 +32,7 @@ public class ForwardReaderTask extends ReaderTask {
 			StructureSerializer structurePersistor = new StructureSerializer();
 
 			// get chunk of data
-			Entry<Long, List<File>> entry = ExpertPersistorManager.get().explore(last);
+			Entry<Long, List<File>> entry = ExpertPersistorManager.get().explore(last, sourceDirectory);
 
 			// remember last explored snapshot timestamp
 			last = entry.getKey();
@@ -40,7 +40,7 @@ public class ForwardReaderTask extends ReaderTask {
 			DAQ daq = null;
 			for (File file : entry.getValue()) {
 
-				daq = structurePersistor.deserialize(file.getAbsolutePath().toString(), SnapshotFormat.SMILE);
+				daq = structurePersistor.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
 
 				if (daq != null) {
 					List<DummyDAQ> list = DataManager.get().rawData;

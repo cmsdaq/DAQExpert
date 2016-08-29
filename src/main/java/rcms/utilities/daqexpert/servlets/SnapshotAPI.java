@@ -15,37 +15,10 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqaggregator.data.BU;
-import rcms.utilities.daqaggregator.data.BUSummary;
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.data.FED;
-import rcms.utilities.daqaggregator.data.FEDBuilder;
-import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
-import rcms.utilities.daqaggregator.data.FMM;
-import rcms.utilities.daqaggregator.data.FMMApplication;
-import rcms.utilities.daqaggregator.data.FRL;
-import rcms.utilities.daqaggregator.data.FRLPc;
-import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqaggregator.data.SubFEDBuilder;
-import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqaggregator.persistence.SnapshotFormat;
+import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
-import rcms.utilities.daqexpert.servlets.mixin.BUMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.BUSummaryMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.DAQMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FEDBuilderMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FEDBuilderSummaryMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FEDMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FMMApplicationMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FMMMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FRLMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.FRLPcMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.RUMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.SubFEDBuilderMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.SubSystemMixIn;
-import rcms.utilities.daqexpert.servlets.mixin.TTCPartitionMixIn;
 
 public class SnapshotAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -67,16 +40,16 @@ public class SnapshotAPI extends HttpServlet {
 			DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			
+
 			StructureSerializer ss = new StructureSerializer();
-			ss.serialize(result,baos,SnapshotFormat.JSONREFPREFIXED);
+			ss.serialize(result, baos, PersistenceFormat.JSONREFPREFIXED);
 
-			json = baos.toString( java.nio.charset.StandardCharsets.UTF_8.toString() );
+			json = baos.toString(java.nio.charset.StandardCharsets.UTF_8.toString());
 
-			logger.info(
-					"Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": " + json.substring(0, 1000));
+			logger.info("Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": "
+					+ json.substring(0, 1000));
 		} catch (RuntimeException e) {
-			Map<String,String> result = new HashMap<>();
+			Map<String, String> result = new HashMap<>();
 			result.put("message", "Could not find snapshot");
 			json = objectMapper.writeValueAsString(result);
 		}

@@ -40,12 +40,11 @@ public class ServletListener implements ServletContextListener {
 	ExpertPersistorManager persistorManager;
 	DataResolutionManager dataSegmentator;
 
-
 	public void contextInitialized(ServletContextEvent e) {
-		
+
 		ReadTaskController readerRaskController = new ReadTaskController();
-		readerRaskController.firePastReaderTask();
-		readerRaskController.fireRealTimeReaderTask();
+		readerRaskController.firePastReaderTask(persistorManager.getFlashlistPersistenceDir());
+		readerRaskController.fireRealTimeReaderTask(persistorManager.getFlashlistPersistenceDir());
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

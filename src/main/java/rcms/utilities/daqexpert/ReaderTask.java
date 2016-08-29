@@ -24,13 +24,19 @@ public abstract class ReaderTask implements Runnable {
 	protected DataResolutionManager dataSegmentator;
 	protected SnapshotProcessor snapshotProcessor;
 	protected EventProducer eventProducer;
-
+	protected String sourceDirectory;
+	
+	// TODO: why public?
 	public Future future;
 
-	public ReaderTask(DataResolutionManager dataSegmentator) {
+
+
+
+	public ReaderTask(DataResolutionManager dataSegmentator, String sourceDirectory) {
 		this.dataSegmentator = dataSegmentator;
 		this.eventProducer = new EventProducer();
 		this.snapshotProcessor = new SnapshotProcessor(eventProducer);
+		this.sourceDirectory = sourceDirectory;
 	}
 
 

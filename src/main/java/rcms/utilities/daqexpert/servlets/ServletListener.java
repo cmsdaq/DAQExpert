@@ -43,8 +43,8 @@ public class ServletListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent e) {
 
 		ReadTaskController readerRaskController = new ReadTaskController();
-		readerRaskController.firePastReaderTask(persistorManager.getFlashlistPersistenceDir());
-		readerRaskController.fireRealTimeReaderTask(persistorManager.getFlashlistPersistenceDir());
+		readerRaskController.firePastReaderTask(persistorManager.getSnapshotPersistenceDir());
+		readerRaskController.fireRealTimeReaderTask(persistorManager.getSnapshotPersistenceDir());
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

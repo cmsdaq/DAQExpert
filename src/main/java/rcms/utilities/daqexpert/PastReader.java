@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
@@ -55,17 +56,17 @@ public class PastReader extends ReaderTask {
 			Entry<Long, List<File>> entry;
 			if (getForwardHourChunk(readFrom) > readTo) {
 
-				entry = ExpertPersistorManager.get().explore(readFrom, readTo, sourceDirectory);
+				entry = PersistenceExplorer.get().explore(readFrom, readTo, sourceDirectory);
 			} else {
 				// get chunk of data
-				entry = ExpertPersistorManager.get().explore(readFrom, getForwardHourChunk(readFrom), sourceDirectory);
+				entry = PersistenceExplorer.get().explore(readFrom, getForwardHourChunk(readFrom), sourceDirectory);
 			}
 
 			// remember last explored snapshot timestamp
 			readFrom = entry.getKey();
 
 			if (entry.getValue().size() == 0) {
-				logger.debug("No data in this period, try again");
+				logger.info("No data in this period, try again");
 				readFrom = getForwardHourChunk(readFrom);
 				run();
 				return;

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
@@ -32,7 +33,7 @@ public class ForwardReaderTask extends ReaderTask {
 			StructureSerializer structurePersistor = new StructureSerializer();
 
 			// get chunk of data
-			Entry<Long, List<File>> entry = ExpertPersistorManager.get().explore(last, sourceDirectory);
+			Entry<Long, List<File>> entry = PersistenceExplorer.get().explore(last, sourceDirectory);
 
 			// remember last explored snapshot timestamp
 			last = entry.getKey();

@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
-import rcms.utilities.daqexpert.ReadTaskController;
+import rcms.utilities.daqexpert.processing.JobManager;
 
 public class ServletListener implements ServletContextListener {
 
@@ -33,6 +33,7 @@ public class ServletListener implements ServletContextListener {
 		}
 
 		persistorManager = new ExpertPersistorManager(snapshotsDir);
+
 	}
 
 	private static final Logger logger = Logger.getLogger(ServletListener.class);
@@ -41,10 +42,10 @@ public class ServletListener implements ServletContextListener {
 	DataResolutionManager dataSegmentator;
 
 	public void contextInitialized(ServletContextEvent e) {
+		String sourceDirectory = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
-		ReadTaskController readerRaskController = new ReadTaskController();
-		readerRaskController.firePastReaderTask(persistorManager.getFlashlistPersistenceDir());
-		readerRaskController.fireRealTimeReaderTask(persistorManager.getFlashlistPersistenceDir());
+		JobManager jobManager = new JobManager(sourceDirectory);
+		jobManager.startJobs();
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

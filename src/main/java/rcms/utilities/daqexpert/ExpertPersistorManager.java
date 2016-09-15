@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.PersistorManager;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
@@ -28,8 +29,11 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	private static final Logger logger = Logger.getLogger(ExpertPersistorManager.class);
 
+	private final PersistenceExplorer persistenceExplorer;
+
 	public ExpertPersistorManager(String persistenceDir) {
 		super(persistenceDir, null, PersistenceFormat.SMILE, null);
+		persistenceExplorer = new PersistenceExplorer();
 		instance = this;
 	}
 
@@ -61,7 +65,7 @@ public class ExpertPersistorManager extends PersistorManager {
 		logger.info("Candidates will be searched in " + candidateDir);
 
 		try {
-			candidates.addAll(getFiles(candidateDir));
+			candidates.addAll(persistenceExplorer.getFiles(candidateDir));
 		} catch (FileNotFoundException e) {
 			candidates = new ArrayList<>();
 			logger.warn("Cannot access persisence dir, ignoring...");
@@ -79,7 +83,7 @@ public class ExpertPersistorManager extends PersistorManager {
 				logger.error("No files to process");
 				return null;
 			}
-			Collections.sort(candidates, FileComparator);
+			Collections.sort(candidates, PersistenceExplorer.FileComparator);
 
 			long diff = Integer.MAX_VALUE;
 			String bestFile = null;

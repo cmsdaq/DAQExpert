@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class DataResolutionManager {

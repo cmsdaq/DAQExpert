@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert;
+package rcms.utilities.daqexpert.segmentation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class DataResolutionManager {

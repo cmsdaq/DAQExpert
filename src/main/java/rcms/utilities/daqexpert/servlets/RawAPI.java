@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.segmentation.DataResolution;
+import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.

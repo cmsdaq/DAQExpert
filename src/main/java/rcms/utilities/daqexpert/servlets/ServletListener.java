@@ -6,9 +6,9 @@ import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
 public class ServletListener implements ServletContextListener {
 

@@ -11,9 +11,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.DataResolutionManager;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
+import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**

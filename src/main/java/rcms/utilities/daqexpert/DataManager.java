@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.SortedArrayList;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
@@ -22,11 +23,11 @@ public class DataManager {
 
 	private DataManager() {
 		buf = new CircularFifoQueue<>(5000);
-		rawData = Collections.synchronizedList(new ArrayList<DummyDAQ>());
-		rawDataMinute = Collections.synchronizedList(new ArrayList<DummyDAQ>());
-		rawDataHour = Collections.synchronizedList(new ArrayList<DummyDAQ>());
-		rawDataDay = Collections.synchronizedList(new ArrayList<DummyDAQ>());
-		rawDataMonth = Collections.synchronizedList(new ArrayList<DummyDAQ>());
+		rawData = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
+		rawDataMinute = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
+		rawDataHour = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
+		rawDataDay = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
+		rawDataMonth = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
 		result = Collections.synchronizedList(new ArrayList<Entry>());
 	}
 

@@ -24,6 +24,8 @@ public class DataPrepareJob extends StoppableJob {
 		this.readerJob = readerJob;
 		this.executorService = executorService;
 	}
+	
+	private static int priority = 0;
 
 	@Override
 	public void run() {
@@ -33,8 +35,13 @@ public class DataPrepareJob extends StoppableJob {
 
 			if (!readerJob.finished()) {
 				result = readerJob.read();
+				
+				if(priority == Integer.MAX_VALUE)
+					priority = 0;
+				else
+					priority ++;
 
-				ProcessJob processJob = new ProcessJob(1, result.getRight());
+				ProcessJob processJob = new ProcessJob(priority, result.getRight());
 				executorService.submit(processJob);
 			} else {
 				logger.info("Job " + readerJob.getClass() + " has finished");

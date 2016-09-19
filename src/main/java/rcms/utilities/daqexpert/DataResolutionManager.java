@@ -115,7 +115,8 @@ public class DataResolutionManager {
 
 	}
 
-	public void prepareMultipleResolutionDataForPast(long before) {
+	@Deprecated
+	private void prepareMultipleResolutionDataForPast(long before) {
 		List<DummyDAQ> minuteTargetStream = new ArrayList<>();
 		timestampOfLastMinute = prepareData(timestampOfLastMinute, before, Calendar.MINUTE, minuteTargetStream);
 		List<DummyDAQ> rawDataMinutes = DataManager.get().rawDataMinute;
@@ -154,6 +155,8 @@ public class DataResolutionManager {
 				DataManager.get().rawDataDay);
 		timestampOfLastMonth = prepareData(timestampOfLastMonth, Long.MAX_VALUE, Calendar.MONTH,
 				DataManager.get().rawDataMonth);
+
+		logger.info("Prepared multi resolution data: " + DataManager.get().rawDataMonth);
 	}
 
 }

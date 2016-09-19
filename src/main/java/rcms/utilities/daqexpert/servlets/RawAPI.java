@@ -84,6 +84,8 @@ public class RawAPI extends HttpServlet {
 			break;
 		}
 
+		logger.info(targetData);
+		
 		synchronized (targetData) {
 			for (DummyDAQ daq : targetData) {
 				if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {

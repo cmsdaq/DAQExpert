@@ -32,7 +32,7 @@ public class JobManager {
 	private final DataPrepareJob futureDataPrepareJob;
 
 	public JobManager(String sourceDirectory) {
-		long startTime = (new Date()).getTime() - 1000 * 60 * 60 * 5;
+		long startTime = (new Date()).getTime() - 1000 * 60 * 60 * 60 * 24 * 7;
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {

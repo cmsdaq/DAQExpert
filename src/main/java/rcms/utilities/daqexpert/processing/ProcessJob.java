@@ -45,10 +45,7 @@ public class ProcessJob implements Callable<Long> {
 			daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
 
 			if (daq != null) {
-				List<DummyDAQ> list = DataManager.get().rawData;
-				synchronized (list) {
-					list.add(new DummyDAQ(daq));
-				}
+				DataManager.get().rawData.add(new DummyDAQ(daq));
 				snapshotProcessor.process(daq, true);
 			} else {
 				logger.error("Snapshot not deserialized " + file.getAbsolutePath());
@@ -56,7 +53,7 @@ public class ProcessJob implements Callable<Long> {
 
 		}
 
-		logger.debug("files processed in this round " + entries.size());
+		logger.info("files processed in this round " + entries.size());
 		dataSegmentator.prepareMultipleResolutionData();
 
 		if (daq != null) {

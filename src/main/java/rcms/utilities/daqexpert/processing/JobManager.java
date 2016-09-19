@@ -54,7 +54,7 @@ public class JobManager {
 	public void startJobs() {
 
 		JobScheduler readerRaskController = new JobScheduler(pastDataPrepareJob, futureDataPrepareJob);
-		readerRaskController.firePastReaderTask();
+		//readerRaskController.firePastReaderTask();
 		readerRaskController.fireRealTimeReaderTask();
 	}
 }

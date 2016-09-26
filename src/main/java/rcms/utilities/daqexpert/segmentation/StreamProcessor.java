@@ -23,11 +23,11 @@ public class StreamProcessor {
 	private final HashMap<DataStream, List<Point>> input;
 	private final HashMap<DataStream, List<Point>> output;
 
-	public StreamProcessor(LinearSegmentator linearSegmentator, int threshold) {
+	public StreamProcessor(LinearSegmentator linearSegmentator, SegmentationSettings settings) {
 		this.lastTimestamp = 0L;
 		this.count = 0;
 		this.linearSegmentator = linearSegmentator;
-		this.threshold = threshold;
+		this.threshold = settings.getThreshold();
 
 		this.input = new HashMap<>();
 		this.output = new HashMap<>();

@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.segmentation.Resolution;
+import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 public class DataManagerTest {
 
@@ -45,11 +45,11 @@ public class DataManagerTest {
 			dm.addSnapshot(TestDummyDAQFactory.of(timestamp, value1, value2));
 		}
 
-		Assert.assertEquals(100000, dm.getRawDataByResolution().get(Resolution.Raw).get(DataStream.RATE).size());
-		Assert.assertEquals(3559, dm.getRawDataByResolution().get(Resolution.Minute).get(DataStream.RATE).size());
-		Assert.assertEquals(341, dm.getRawDataByResolution().get(Resolution.Hour).get(DataStream.RATE).size());
-		Assert.assertEquals(36, dm.getRawDataByResolution().get(Resolution.Day).get(DataStream.RATE).size());
-		Assert.assertEquals(0, dm.getRawDataByResolution().get(Resolution.Month).get(DataStream.RATE).size());
+		Assert.assertEquals(100000, dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE).size());
+		Assert.assertEquals(3559, dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE).size());
+		Assert.assertEquals(341, dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE).size());
+		Assert.assertEquals(36, dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE).size());
+		Assert.assertEquals(0, dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE).size());
 
 		// TestDummyDAQFactory.print(dm);
 
@@ -68,11 +68,11 @@ public class DataManagerTest {
 			dm.addSnapshot(TestDummyDAQFactory.of(timestamp, value1, value2));
 		}
 
-		Assert.assertEquals(100000, dm.getRawDataByResolution().get(Resolution.Raw).get(DataStream.RATE).size());
-		Assert.assertEquals(7676, dm.getRawDataByResolution().get(Resolution.Minute).get(DataStream.RATE).size());
-		Assert.assertEquals(792, dm.getRawDataByResolution().get(Resolution.Hour).get(DataStream.RATE).size());
-		Assert.assertEquals(72, dm.getRawDataByResolution().get(Resolution.Day).get(DataStream.RATE).size());
-		Assert.assertEquals(0, dm.getRawDataByResolution().get(Resolution.Month).get(DataStream.RATE).size());
+		Assert.assertEquals(100000, dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE).size());
+		Assert.assertEquals(7676, dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE).size());
+		Assert.assertEquals(792, dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE).size());
+		Assert.assertEquals(72, dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE).size());
+		Assert.assertEquals(0, dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE).size());
 
 		// TestDummyDAQFactory.print(dm);
 

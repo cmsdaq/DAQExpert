@@ -7,34 +7,43 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.processing.SortedArrayList;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DAQConverter;
+import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
-import rcms.utilities.daqexpert.segmentation.Resolution;
+import rcms.utilities.daqexpert.segmentation.LinearSegmentator;
+import rcms.utilities.daqexpert.segmentation.SegmentationSettings;
 import rcms.utilities.daqexpert.segmentation.StreamProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class DataManager {
 
-	private DataResolutionManager dataResolutionManager;
+	private static final Logger logger = Logger.getLogger(DataManager.class);
+
+	private final DataResolutionManager dataResolutionManager;
 
 	public DataManager() {
 		buf = new CircularFifoQueue<>(5000);
-		rawData = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
 
 		rawDataByResolution = new HashMap<>();
 
-		rawDataMinute = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
-		rawDataHour = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
-		rawDataDay = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
-		rawDataMonth = Collections.synchronizedList(new SortedArrayList<DummyDAQ>());
 		result = Collections.synchronizedList(new ArrayList<Entry>());
 
-		this.dataResolutionManager = new DataResolutionManager();
+		StreamProcessor minuteStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Minute),
+				SegmentationSettings.Minute);
+		StreamProcessor hourStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Hour),
+				SegmentationSettings.Hour);
+		StreamProcessor dayStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Day),
+				SegmentationSettings.Day);
+		StreamProcessor monthStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Month),
+				SegmentationSettings.Month);
+
+		this.dataResolutionManager = new DataResolutionManager(minuteStreamProcessor, hourStreamProcessor,
+				dayStreamProcessor, monthStreamProcessor);
 
 		initialize();
 	}
@@ -46,44 +55,50 @@ public class DataManager {
 
 	public void addSnapshot(DummyDAQ dummyDAQ) {
 
-		Map<Resolution, Boolean> a = dataResolutionManager.queue(dummyDAQ);
-		rawDataByResolution.get(Resolution.Raw).get(DataStream.RATE).add(DAQConverter.convertToRatePoint(dummyDAQ));
-		rawDataByResolution.get(Resolution.Raw).get(DataStream.EVENTS).add(DAQConverter.convertToEventPoint(dummyDAQ));
+		logger.debug("New snapshot received");
 
-		if (a.get(Resolution.Minute)) {
-			transferData(Resolution.Minute, dataResolutionManager.getMinuteStreamProcessor());
+		Map<DataResolution, Boolean> a = dataResolutionManager.queue(dummyDAQ);
+		rawDataByResolution.get(DataResolution.Full).get(DataStream.RATE)
+				.add(DAQConverter.convertToRatePoint(dummyDAQ));
+		rawDataByResolution.get(DataResolution.Full).get(DataStream.EVENTS)
+				.add(DAQConverter.convertToEventPoint(dummyDAQ));
+
+		if (a.get(DataResolution.Minute)) {
+			transferData(DataResolution.Minute, dataResolutionManager.getMinuteStreamProcessor());
 		}
-		if (a.get(Resolution.Hour)) {
-			transferData(Resolution.Hour, dataResolutionManager.getHourStreamProcessor());
+		if (a.get(DataResolution.Hour)) {
+			transferData(DataResolution.Hour, dataResolutionManager.getHourStreamProcessor());
 		}
-		if (a.get(Resolution.Day)) {
-			transferData(Resolution.Day, dataResolutionManager.getDayStreamProcessor());
+		if (a.get(DataResolution.Day)) {
+			transferData(DataResolution.Day, dataResolutionManager.getDayStreamProcessor());
 		}
-		if (a.get(Resolution.Month)) {
-			transferData(Resolution.Month, dataResolutionManager.getMonthStreamProcessor());
+		if (a.get(DataResolution.Month)) {
+			transferData(DataResolution.Month, dataResolutionManager.getMonthStreamProcessor());
 		}
 	}
 
 	private void initialize() {
-		rawDataByResolution.put(Resolution.Raw, new HashMap<DataStream, List<Point>>());
-		rawDataByResolution.put(Resolution.Minute, new HashMap<DataStream, List<Point>>());
-		rawDataByResolution.put(Resolution.Hour, new HashMap<DataStream, List<Point>>());
-		rawDataByResolution.put(Resolution.Day, new HashMap<DataStream, List<Point>>());
-		rawDataByResolution.put(Resolution.Month, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Full, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Minute, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Hour, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Day, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Month, new HashMap<DataStream, List<Point>>());
 
-		rawDataByResolution.get(Resolution.Raw).put(DataStream.RATE, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Raw).put(DataStream.EVENTS, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Minute).put(DataStream.RATE, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Minute).put(DataStream.EVENTS, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Hour).put(DataStream.RATE, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Hour).put(DataStream.EVENTS, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Day).put(DataStream.RATE, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Day).put(DataStream.EVENTS, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Month).put(DataStream.RATE, new ArrayList<Point>());
-		rawDataByResolution.get(Resolution.Month).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Full).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Full).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Minute).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Minute).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Hour).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Hour).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Day).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Day).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Month).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Month).put(DataStream.EVENTS, new ArrayList<Point>());
 	}
 
-	private void transferData(Resolution resolution, StreamProcessor streamProcessor) {
+	private void transferData(DataResolution resolution, StreamProcessor streamProcessor) {
+
+		logger.debug("Transfering segmentated data of " + resolution + " resolution");
 		List<Point> rate = streamProcessor.getOutput().get(DataStream.RATE);
 		List<Point> events = streamProcessor.getOutput().get(DataStream.EVENTS);
 
@@ -97,22 +112,7 @@ public class DataManager {
 	/**
 	 * Processed multiresolution data
 	 */
-	private final Map<Resolution, Map<DataStream, List<Point>>> rawDataByResolution;
-
-	@Deprecated
-	public List<DummyDAQ> rawData;
-
-	@Deprecated
-	public List<DummyDAQ> rawDataMinute;
-
-	@Deprecated
-	public List<DummyDAQ> rawDataHour;
-
-	@Deprecated
-	public List<DummyDAQ> rawDataDay;
-
-	@Deprecated
-	public List<DummyDAQ> rawDataMonth;
+	private final Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution;
 
 	/**
 	 * Get all results produced by event producer
@@ -123,8 +123,12 @@ public class DataManager {
 		return result;
 	}
 
-	public Map<Resolution, Map<DataStream, List<Point>>> getRawDataByResolution() {
+	public Map<DataResolution, Map<DataStream, List<Point>>> getRawDataByResolution() {
 		return rawDataByResolution;
+	}
+
+	public DataResolutionManager getDataResolutionManager() {
+		return dataResolutionManager;
 	}
 
 }

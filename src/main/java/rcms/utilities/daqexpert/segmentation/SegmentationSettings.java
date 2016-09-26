@@ -17,26 +17,27 @@ public enum SegmentationSettings {
 	/**
 	 * @see DataResolution#Minute
 	 */
-	Minute(2, 10),
+	Minute(2, 10, 100),
 
 	/**
 	 * @see DataResolution#Hour
 	 */
-	Hour(2, 100),
+	Hour(2, 100, 1000),
 
 	/**
 	 * @see DataResolution#Day
 	 */
-	Day(2, 1000),
+	Day(2, 1000, 10000),
 
 	/**
 	 * @see DataResolution#Month
 	 */
-	Month(2, 10000);
+	Month(2, 10000, 100000);
 
-	private SegmentationSettings(double TI, double creTh) {
+	private SegmentationSettings(double TI, double creTh, int threshold) {
 		this.TI = TI;
 		this.creTh = creTh;
+		this.threshold = threshold;
 	}
 
 	/**
@@ -49,12 +50,18 @@ public enum SegmentationSettings {
 	 */
 	private final double creTh;
 
+	private final int threshold;
+
 	public double getTI() {
 		return TI;
 	}
 
 	public double getCreTh() {
 		return creTh;
+	}
+
+	public int getThreshold() {
+		return threshold;
 	}
 
 }

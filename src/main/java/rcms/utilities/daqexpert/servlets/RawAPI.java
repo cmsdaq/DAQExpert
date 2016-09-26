@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.Point;
+import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
@@ -67,47 +71,40 @@ public class RawAPI extends HttpServlet {
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution range = rangeResolver.resolve(startDate, endDate);
 
-		List<DummyDAQ> targetData = null;
+		Map<DataStream, List<Point>> targetData = null;
 		DataManager dataManager = Application.get().getDataManager();
-		switch (range) {
-		case Full:
-			targetData = dataManager.rawData;
-			break;
-		case Minute:
-			targetData = dataManager.rawDataMinute;
-			break;
-		case Hour:
-			targetData = dataManager.rawDataHour;
-			break;
-		case Day:
-			targetData = dataManager.rawDataDay;
-			break;
-		default:
-			targetData = dataManager.rawDataMonth;
-			break;
-		}
+		targetData = dataManager.getRawDataByResolution().get(range);
 
-		logger.info(targetData);
+		logger.debug(targetData + " of resolution " + range);
 
 		synchronized (targetData) {
-			for (DummyDAQ daq : targetData) {
-				if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {
+			for (Point daq : targetData.get(DataStream.RATE)) {
+				if (daq.x >= startDate.getTime() && daq.x <= endDate.getTime()) {
 					HashMap<String, Long> rateObject = new HashMap<>();
+
+					// rate in kHz
+					rateObject.put("y", (long) daq.y);
+
+					rateObject.put("x", daq.x);
+					rateObject.put("group", 0L);
+					data.add(rateObject);
+				}
+			}
+
+			for (Point daq : targetData.get(DataStream.EVENTS)) {
+				if (daq.x >= startDate.getTime() && daq.x <= endDate.getTime()) {
 					HashMap<String, Long> eventObject = new HashMap<>();
 
 					// rate in kHz
-					rateObject.put("y", daq.getRate());
+					eventObject.put("y", (long) daq.y);
 
-					// milions of events
-					eventObject.put("y", (long) daq.getEvents());
-					rateObject.put("x", daq.getLastUpdate());
-					eventObject.put("x", daq.getLastUpdate());
-					rateObject.put("group", 0L);
+					eventObject.put("x", daq.x);
 					eventObject.put("group", 1L);
-					data.add(rateObject);
 					data.add(eventObject);
 				}
+
 			}
+
 		}
 
 		logger.debug("Range: " + range + ", elements to process: " + targetData.size());

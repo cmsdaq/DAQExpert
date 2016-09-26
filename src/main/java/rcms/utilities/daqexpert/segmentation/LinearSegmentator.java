@@ -3,6 +3,8 @@ package rcms.utilities.daqexpert.segmentation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import rcms.utilities.daqexpert.Point;
 
 /**
@@ -12,13 +14,16 @@ import rcms.utilities.daqexpert.Point;
  *
  */
 public class LinearSegmentator {
+
+	private static final Logger logger = Logger.getLogger(LinearSegmentator.class);
 	private final double TI;
 	private final double cre_th;
+	private final SegmentationSettings settings;
 
 	private List<Point> stream;
 
 	public LinearSegmentator(SegmentationSettings settings) {
-
+		this.settings = settings;
 		this.TI = settings.getTI();
 		this.cre_th = settings.getCreTh();
 	}
@@ -55,6 +60,7 @@ public class LinearSegmentator {
 	}
 
 	public List<Point> segmentate(List<Point> stream) {
+		logger.debug("Segmenting " + stream);
 		this.stream = stream;
 		prepareStream();
 		if (stream == null)
@@ -102,5 +108,9 @@ public class LinearSegmentator {
 
 		return s;
 		// return this.stream;
+	}
+
+	public SegmentationSettings getSettings() {
+		return settings;
 	}
 }

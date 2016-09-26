@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.segmentation.Resolution;
+import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class TestDummyDAQFactory {
@@ -19,18 +19,18 @@ public class TestDummyDAQFactory {
 	}
 
 	public static void print(DataManager dm) {
-		System.out.println("RAW:" + dm.getRawDataByResolution().get(Resolution.Raw).get(DataStream.RATE).size());
-		System.out.println("MIN:" + dm.getRawDataByResolution().get(Resolution.Minute).get(DataStream.RATE).size());
-		System.out.println("HOR:" + dm.getRawDataByResolution().get(Resolution.Hour).get(DataStream.RATE).size());
-		System.out.println("DAY:" + dm.getRawDataByResolution().get(Resolution.Day).get(DataStream.RATE).size());
-		System.out.println("MON:" + dm.getRawDataByResolution().get(Resolution.Month).get(DataStream.RATE).size());
+		System.out.println("RAW:" + dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE).size());
+		System.out.println("MIN:" + dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE).size());
+		System.out.println("HOR:" + dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE).size());
+		System.out.println("DAY:" + dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE).size());
+		System.out.println("MON:" + dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE).size());
 
 		try {
-			print(dm.getRawDataByResolution().get(Resolution.Raw).get(DataStream.RATE), "raw");
-			print(dm.getRawDataByResolution().get(Resolution.Minute).get(DataStream.RATE), "minute");
-			print(dm.getRawDataByResolution().get(Resolution.Hour).get(DataStream.RATE), "hour");
-			print(dm.getRawDataByResolution().get(Resolution.Day).get(DataStream.RATE), "day");
-			print(dm.getRawDataByResolution().get(Resolution.Month).get(DataStream.RATE), "month");
+			print(dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE), "raw");
+			print(dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE), "minute");
+			print(dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE), "hour");
+			print(dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE), "day");
+			print(dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE), "month");
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

@@ -13,7 +13,7 @@ import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
-import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
+import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
@@ -26,7 +26,6 @@ public class ProcessJob implements Callable<Long> {
 	private final static StructureSerializer structureSerializer = new StructureSerializer();
 	private final static EventProducer eventProducer = new EventProducer();
 	private final static SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
-	private final static DataResolutionManager dataSegmentator = new DataResolutionManager();
 	private final static Logger logger = Logger.getLogger(ProcessJob.class);
 
 	private final int priority;
@@ -53,7 +52,9 @@ public class ProcessJob implements Callable<Long> {
 
 		}
 
-		logger.info("files processed in this round " + entries.size());
+		logger.debug("files processed in this round " + entries.size());
+		logger.trace("values in data manager " + Application.get().getDataManager().getRawDataByResolution()
+				.get(DataResolution.Full).get(DataStream.EVENTS));
 
 		if (daq != null) {
 			eventProducer.finish(new Date(daq.getLastUpdate()));

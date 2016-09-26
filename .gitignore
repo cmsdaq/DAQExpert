@@ -1,6 +1,7 @@
 .classpath
 .project
 .settings
+.metadata
 
 *.class
 *.jar
@@ -8,3 +9,5 @@
 *.ear
 
 target
+/doc/
+/logs/

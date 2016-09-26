@@ -1,0 +1,34 @@
+package rcms.utilities.daqexpert.reasoning;
+
+import java.util.Date;
+
+import org.apache.log4j.Logger;
+
+import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Comparator;
+import rcms.utilities.daqexpert.reasoning.base.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.EventPriority;
+
+public class LHCMachineModeComparator extends Comparator {
+
+	public LHCMachineModeComparator() {
+		this.name = "n/a";
+		this.group = EventGroup.LHC_MACHINE;
+		this.priority = EventPriority.defaultt;
+		this.description = "New LHC Machine mode identified";
+	}
+
+	private static Logger logger = Logger.getLogger(LHCMachineModeComparator.class);
+
+	public boolean compare(DAQ previous, DAQ current) {
+		boolean result = false;
+
+		if (!current.getLhcMachineMode().equals(previous.getLhcMachineMode())) {
+			logger.debug("New LHC Machine mode " + new Date(current.getLastUpdate()));
+			this.name = current.getLhcMachineMode();
+			result = true;
+		}
+		return result;
+	}
+
+}

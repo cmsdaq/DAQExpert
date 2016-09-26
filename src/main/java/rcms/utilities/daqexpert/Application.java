@@ -14,6 +14,8 @@ public class Application {
 	public static final String SNAPSHOTS_DIR = "snapshots";
 	public static final String LANDING = "landing";
 
+	private DataManager dataManager;
+
 	private final Properties prop;
 
 	public static Application get() {
@@ -41,7 +43,8 @@ public class Application {
 	}
 
 	private Application(String propertiesFile) {
-		prop = load(propertiesFile);
+		this.prop = load(propertiesFile);
+		this.setDataManager(new DataManager());
 	}
 
 	private static Application instance;
@@ -65,5 +68,13 @@ public class Application {
 
 	public Properties getProp() {
 		return prop;
+	}
+
+	public DataManager getDataManager() {
+		return dataManager;
+	}
+
+	public void setDataManager(DataManager dataManager) {
+		this.dataManager = dataManager;
 	}
 }

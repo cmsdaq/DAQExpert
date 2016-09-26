@@ -72,7 +72,7 @@ public class LinearSegmentatorTest {
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
 		printDataToVisualize(outputStream);
-		Assert.assertEquals(441, outputStream.size());
+		Assert.assertEquals(11, outputStream.size());
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class LinearSegmentatorTest {
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
 		printDataToVisualize(outputStream);
-		Assert.assertEquals(93, outputStream.size());
+		Assert.assertEquals(2, outputStream.size());
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class LinearSegmentatorTest {
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
 		printDataToVisualize(outputStream);
-		Assert.assertEquals(44, outputStream.size());
+		Assert.assertEquals(2, outputStream.size());
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class LinearSegmentatorTest {
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
 		printDataToVisualize(outputStream);
-		Assert.assertEquals(18, outputStream.size());
+		Assert.assertEquals(2, outputStream.size());
 	}
 
 	@Test

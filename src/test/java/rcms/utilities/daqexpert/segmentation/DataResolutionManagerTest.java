@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.segmentation;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqexpert.TestDummyDAQFactory;
@@ -35,7 +36,7 @@ public class DataResolutionManagerTest {
 
 	@Test
 	public void minuteTest() {
-		int threshold = 9;
+		int threshold = 99;
 		drm = new DataResolutionManager();
 		addRandomAndExpect(false, null, null, null);
 		for (int i = 0; i < threshold; i++) {
@@ -51,7 +52,7 @@ public class DataResolutionManagerTest {
 
 	@Test
 	public void hourTest() {
-		int threshold = 99;
+		int threshold = 999;
 		drm = new DataResolutionManager();
 		addRandomAndExpect(null, false, null, null);
 		for (int i = 0; i < threshold; i++) {
@@ -67,7 +68,7 @@ public class DataResolutionManagerTest {
 
 	@Test
 	public void dayTest() {
-		int threshold = 999;
+		int threshold = 9999;
 		drm = new DataResolutionManager();
 		addRandomAndExpect(null, null, false, null);
 		for (int i = 0; i < threshold; i++) {
@@ -82,14 +83,10 @@ public class DataResolutionManagerTest {
 	}
 
 	@Test
+	@Ignore // tests takes too long
 	public void monthTest() {
-		int threshold = 9999;
+		int threshold = 99999;
 		drm = new DataResolutionManager();
-		addRandomAndExpect(null, null, null, false);
-		for (int i = 0; i < threshold; i++) {
-			addRandomAndExpect(null, null, null, false);
-		}
-		addRandomAndExpect(null, null, null, true);
 		addRandomAndExpect(null, null, null, false);
 		for (int i = 0; i < threshold; i++) {
 			addRandomAndExpect(null, null, null, false);

@@ -13,6 +13,7 @@ import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 public class ServletListener implements ServletContextListener {
 
 	public ServletListener() {
+		
 		super();
 		String propertyFilePath = System.getenv("EXPERT_CONF");
 		if (propertyFilePath == null) {

@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -37,7 +38,7 @@ public class RaportAPI extends HttpServlet {
 			int id = Integer.parseInt(idString);
 
 			Map<String, Object> result = new HashMap<>();
-			List<Entry> entries = DataManager.get().getResult();
+			List<Entry> entries = Application.get().getDataManager().getResult();
 			for (Entry entry : entries) {
 				// FIXME: map should be used
 				if (entry.getId() == id) {

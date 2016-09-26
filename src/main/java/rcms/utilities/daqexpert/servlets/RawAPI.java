@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
@@ -67,27 +68,27 @@ public class RawAPI extends HttpServlet {
 		DataResolution range = rangeResolver.resolve(startDate, endDate);
 
 		List<DummyDAQ> targetData = null;
+		DataManager dataManager = Application.get().getDataManager();
 		switch (range) {
 		case Full:
-			targetData = DataManager.get().rawData;
+			targetData = dataManager.rawData;
 			break;
 		case Minute:
-			targetData = DataManager.get().rawDataMinute;
+			targetData = dataManager.rawDataMinute;
 			break;
 		case Hour:
-			targetData = DataManager.get().rawDataHour;
+			targetData = dataManager.rawDataHour;
 			break;
 		case Day:
-			targetData = DataManager.get().rawDataDay;
+			targetData = dataManager.rawDataDay;
 			break;
 		default:
-			targetData = DataManager.get().rawDataMonth; // TODO: change to
-															// MONTH
+			targetData = dataManager.rawDataMonth;
 			break;
 		}
 
 		logger.info(targetData);
-		
+
 		synchronized (targetData) {
 			for (DummyDAQ daq : targetData) {
 				if (daq.getLastUpdate() >= startDate.getTime() && daq.getLastUpdate() <= endDate.getTime()) {

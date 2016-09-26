@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
-import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.EventProducer;
 import rcms.utilities.daqexpert.reasoning.base.SnapshotProcessor;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
@@ -45,7 +45,7 @@ public class ProcessJob implements Callable<Long> {
 			daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
 
 			if (daq != null) {
-				DataManager.get().rawData.add(new DummyDAQ(daq));
+				Application.get().getDataManager().addSnapshot(new DummyDAQ(daq));
 				snapshotProcessor.process(daq, true);
 			} else {
 				logger.error("Snapshot not deserialized " + file.getAbsolutePath());
@@ -54,7 +54,6 @@ public class ProcessJob implements Callable<Long> {
 		}
 
 		logger.info("files processed in this round " + entries.size());
-		dataSegmentator.prepareMultipleResolutionData();
 
 		if (daq != null) {
 			eventProducer.finish(new Date(daq.getLastUpdate()));

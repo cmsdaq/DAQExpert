@@ -67,7 +67,7 @@ public class LinearSegmentatorTest {
 	private static List<Point> realDataExample;
 
 	@Test
-	public void minuteResolutionSegmentationTest() {
+	public void realDataMinuteResolutionSegmentationTest() {
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Minute);
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
@@ -76,7 +76,7 @@ public class LinearSegmentatorTest {
 	}
 
 	@Test
-	public void hourResolutionSegmentationTest() {
+	public void realDataHourResolutionSegmentationTest() {
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Hour);
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
@@ -85,7 +85,7 @@ public class LinearSegmentatorTest {
 	}
 
 	@Test
-	public void dayResolutionSegmentationTest() {
+	public void realDataDayResolutionSegmentationTest() {
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Day);
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
@@ -94,12 +94,32 @@ public class LinearSegmentatorTest {
 	}
 
 	@Test
-	public void monthResolutionSegmentationTest() {
+	public void realDataMonthResolutionSegmentationTest() {
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Month);
 		List<Point> outputStream = ls.segmentate(realDataExample);
 		printDataToVisualize(realDataExample);
 		printDataToVisualize(outputStream);
 		Assert.assertEquals(18, outputStream.size());
+	}
+
+	@Test
+	public void sequeceResolutionSegmentationTest() {
+		LinearSegmentator ls1 = new LinearSegmentator(SegmentationSettings.Minute);
+		LinearSegmentator ls2 = new LinearSegmentator(SegmentationSettings.Hour);
+		LinearSegmentator ls3 = new LinearSegmentator(SegmentationSettings.Day);
+		LinearSegmentator ls4 = new LinearSegmentator(SegmentationSettings.Month);
+		printDataToVisualize(realDataExample);
+
+		List<Point> output1 = ls1.segmentate(realDataExample);
+		List<Point> output2 = ls2.segmentate(output1);
+		List<Point> output3 = ls3.segmentate(output2);
+		List<Point> output4 = ls4.segmentate(output3);
+
+		printDataToVisualize(output1);
+		printDataToVisualize(output2);
+		printDataToVisualize(output3);
+		printDataToVisualize(output4);
+
 	}
 
 	private void printDataToVisualize(List<Point> stream) {

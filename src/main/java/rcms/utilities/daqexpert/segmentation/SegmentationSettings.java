@@ -17,22 +17,22 @@ public enum SegmentationSettings {
 	/**
 	 * @see DataResolution#Minute
 	 */
-	Minute(15, 0.5),
+	Minute(2, 10),
 
 	/**
 	 * @see DataResolution#Hour
 	 */
-	Hour(5, 2),
+	Hour(2, 100),
 
 	/**
 	 * @see DataResolution#Day
 	 */
-	Day(2, 2),
+	Day(2, 1000),
 
 	/**
 	 * @see DataResolution#Month
 	 */
-	Month(1, 3);
+	Month(2, 10000);
 
 	private SegmentationSettings(double TI, double creTh) {
 		this.TI = TI;

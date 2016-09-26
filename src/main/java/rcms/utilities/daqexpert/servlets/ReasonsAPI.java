@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
@@ -68,7 +69,7 @@ public class ReasonsAPI extends HttpServlet {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 
-		List<Entry> allElements = DataManager.get().getResult();
+		List<Entry> allElements = Application.get().getDataManager().getResult();
 		synchronized (allElements) {
 
 			for (Entry entry : allElements) {

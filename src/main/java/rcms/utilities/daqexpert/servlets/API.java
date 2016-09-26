@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 
 /**
@@ -71,7 +72,7 @@ public class API extends HttpServlet {
 		
 
 		/* iterate over objects in given range */
-		for (DAQ daq : DataManager.get().buf) {
+		for (DAQ daq : Application.get().getDataManager().buf) {
 			if (daq.getLastUpdate() >= Long.parseLong(startRange) && daq.getLastUpdate() <= Long.parseLong(endRange)) {
 				HashMap<String, Object> object = new HashMap<>();
 				object.put("rate", daq.getFedBuilderSummary().getRate());

@@ -4,6 +4,7 @@
 	<groupId>ch.cern</groupId>
 	<artifactId>DAQExpert</artifactId>
 	<version>1.3.4</version>
+
 	<name>DAQExpert</name>
 
 
@@ -16,7 +17,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -24,11 +25,10 @@
 			<version>1.2.17</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>ch.cern</groupId>
 			<artifactId>DAQAggregator</artifactId>
-			<version>1.4.2</version>
+			<version>1.4.2.20160926</version>
 		</dependency>
 
 		<!-- JSP -->
@@ -74,12 +74,41 @@
 			<version>2.7.4</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.jmock/jmock-junit4 -->
+		<dependency>
+			<groupId>org.jmock</groupId>
+			<artifactId>jmock-junit4</artifactId>
+			<version>2.8.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+
+
+
 		<!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
 		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>1.6</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+		</dependency>
+
 
 	</dependencies>
 

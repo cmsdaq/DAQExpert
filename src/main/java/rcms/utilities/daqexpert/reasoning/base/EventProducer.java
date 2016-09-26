@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 
 /**
@@ -127,7 +128,7 @@ public class EventProducer {
 
 		//result.add(entry);
 
-		DataManager.get().getResult().add(entry);
+		Application.get().getDataManager().getResult().add(entry);
 		unfinished.put(className, entry);
 		return entry;
 	}

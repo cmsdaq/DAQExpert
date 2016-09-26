@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.servlets;
+package rcms.utilities.daqexpert.segmentation;
 
 /**
  * Enumeration of data resolution

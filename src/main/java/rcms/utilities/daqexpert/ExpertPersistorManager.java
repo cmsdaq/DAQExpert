@@ -29,8 +29,11 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	private static final Logger logger = Logger.getLogger(ExpertPersistorManager.class);
 
+	private final PersistenceExplorer persistenceExplorer;
+
 	public ExpertPersistorManager(String persistenceDir) {
-		super(persistenceDir, null, PersistenceFormat.JSON, null);
+		super(persistenceDir, null, PersistenceFormat.SMILE, null);
+		persistenceExplorer = new PersistenceExplorer();
 		instance = this;
 	}
 
@@ -62,7 +65,7 @@ public class ExpertPersistorManager extends PersistorManager {
 		logger.info("Candidates will be searched in " + candidateDir);
 
 		try {
-			candidates.addAll(PersistenceExplorer.get().getFiles(candidateDir));
+			candidates.addAll(persistenceExplorer.getFiles(candidateDir));
 		} catch (FileNotFoundException e) {
 			candidates = new ArrayList<>();
 			logger.warn("Cannot access persisence dir, ignoring...");

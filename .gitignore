@@ -1,6 +1,7 @@
 .classpath
 .project
 .settings
+.metadata
 
 *.class
 *.jar
@@ -9,3 +10,4 @@
 
 target
 /doc/
+/logs/

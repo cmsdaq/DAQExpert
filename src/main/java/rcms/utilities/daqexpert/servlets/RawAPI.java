@@ -75,7 +75,7 @@ public class RawAPI extends HttpServlet {
 		DataManager dataManager = Application.get().getDataManager();
 		targetData = dataManager.getRawDataByResolution().get(range);
 
-		logger.info("resolution of data to RAW API " + range);
+		logger.debug("resolution of data to RAW API " + range);
 
 		synchronized (targetData) {
 			for (Point daq : targetData.get(DataStream.RATE)) {

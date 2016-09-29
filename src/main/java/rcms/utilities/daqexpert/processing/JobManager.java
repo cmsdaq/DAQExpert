@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -13,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
+import rcms.utilities.daqexpert.Application;
 
 /**
  * Manages the jobs of retrieving and processing the data (snapshots)
@@ -41,7 +41,7 @@ public class JobManager {
 	public JobManager(String sourceDirectory) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		int offset = 1000 * 60 * 60;// * 24 * 2;
+		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
 		long startTime = utcCalendar.getTimeInMillis() - offset;
 		logger.info("Data will be processed from: " + utcCalendar.getTime() + " minus offset of " + offset + "ms");
 

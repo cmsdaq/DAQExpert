@@ -34,7 +34,8 @@ public class RunOngoing extends Condition {
 						|| tcdsStatus.equalsIgnoreCase("TTCResyncingFromRunning")) {
 					String l0 = daq.getLevelZeroState();
 					if (!l0.equalsIgnoreCase("stopping") && !l0.equalsIgnoreCase("halting")
-							&& !l0.equalsIgnoreCase("forcestopping") && !l0.equalsIgnoreCase("forcehalting"))
+							&& !l0.equalsIgnoreCase("forcestopping") && !l0.equalsIgnoreCase("forcehalting")
+							&& !l0.equalsIgnoreCase("undefined"))
 						return true;
 				}
 			}

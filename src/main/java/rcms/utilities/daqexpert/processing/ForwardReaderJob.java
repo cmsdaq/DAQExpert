@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqaggregator.DAQExceptionCode;
@@ -18,6 +19,8 @@ import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
  *
  */
 public class ForwardReaderJob implements ReaderJob {
+
+	private final static Logger logger = Logger.getLogger(ForwardReaderJob.class);
 
 	private final PersistenceExplorer persistenceExplorer;
 	private Long last;
@@ -35,9 +38,11 @@ public class ForwardReaderJob implements ReaderJob {
 		// get chunk of data
 		Pair<Long, List<File>> entry;
 		try {
+			logger.debug("Exploring with " + last);
 			entry = persistenceExplorer.explore(last, sourceDirectory);
 			// remember last explored snapshot timestamp
-			if (entry != null && entry.getLeft() != null) {
+			if (entry != null && entry.getLeft() != null && entry.getLeft() != 0) {
+
 				last = entry.getLeft();
 				return entry;
 			} else {

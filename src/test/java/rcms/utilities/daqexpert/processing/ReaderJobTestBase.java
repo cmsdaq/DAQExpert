@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
 public class ReaderJobTestBase {
@@ -20,6 +21,10 @@ public class ReaderJobTestBase {
 	protected List<Long> testSet = new ArrayList<>();
 
 	public class PersistenceExplorerStub extends PersistenceExplorer {
+
+		public PersistenceExplorerStub(FileSystemConnector fileSystemConnector) {
+			super(fileSystemConnector);
+		}
 
 		@Override
 		public Pair<Long, List<File>> explore(Long startTimestamp, Long endTimestamp, String dir, int chunkSize)

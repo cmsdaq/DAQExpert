@@ -1,12 +1,17 @@
 package rcms.utilities.daqexpert.processing;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
+import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
 /**
@@ -16,6 +21,8 @@ import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
  *
  */
 public class JobManager {
+
+	private static final Logger logger = Logger.getLogger(JobManager.class);
 	/**
 	 * Number of main threads - should be 1 so that there is not concurrent
 	 * access to analysis stream
@@ -32,7 +39,11 @@ public class JobManager {
 	private final DataPrepareJob futureDataPrepareJob;
 
 	public JobManager(String sourceDirectory) {
-		long startTime = (new Date()).getTime() - 1000 * 60 * 60 * 60 * 24 * 7;
+
+		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		int offset = 1000 * 60 * 60;// * 24 * 2;
+		long startTime = utcCalendar.getTimeInMillis() - offset;
+		logger.info("Data will be processed from: " + utcCalendar.getTime() + " minus offset of " + offset + "ms");
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {
@@ -43,7 +54,7 @@ public class JobManager {
 			}
 		};
 
-		PersistenceExplorer persistenceExplorer = new PersistenceExplorer();
+		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
 		PastReaderJob prj = new PastReaderJob(persistenceExplorer, sourceDirectory, 1471392000000L, startTime);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
@@ -54,7 +65,7 @@ public class JobManager {
 	public void startJobs() {
 
 		JobScheduler readerRaskController = new JobScheduler(pastDataPrepareJob, futureDataPrepareJob);
-		//readerRaskController.firePastReaderTask();
+		// readerRaskController.firePastReaderTask();
 		readerRaskController.fireRealTimeReaderTask();
 	}
 }

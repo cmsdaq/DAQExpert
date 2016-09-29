@@ -7,13 +7,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
+import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
 public class PastReaderJobTest extends ReaderJobTestBase {
 
 	@Test
 	public void simpleTest() throws Exception {
-		PersistenceExplorer explorer = new PersistenceExplorerStub();
+		PersistenceExplorer explorer = new PersistenceExplorerStub(new FileSystemConnector());
 		PastReaderJob pastReaderJob = new PastReaderJob(explorer, null, 1473858460000L, 1473858466000L);
 		Pair<Long, List<File>> result = pastReaderJob.read();
 		Assert.assertEquals(1473858466000L, (long) result.getLeft());

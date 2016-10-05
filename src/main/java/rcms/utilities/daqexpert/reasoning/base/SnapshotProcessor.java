@@ -5,7 +5,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.NotificationSender;
+import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.NotificationSignalConnector;
+import rcms.utilities.daqexpert.NotificationSignalSender;
 
 /**
  * Processes snapshot in analysis
@@ -19,10 +21,15 @@ public class SnapshotProcessor {
 
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
-	private final NotificationSender notificationSender;
+	private final NotificationSignalSender notificationSender;
 
 	public SnapshotProcessor(EventProducer eventProducer) {
-		this.notificationSender = new NotificationSender();
+
+		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
+
+		this.notificationSender = new NotificationSignalSender(notificationConnector,
+				Application.get().getProp().getProperty(Application.NM_API_CREATE),
+				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis());
 		this.checkManager = new CheckManager(eventProducer);
 	}
 
@@ -34,7 +41,7 @@ public class SnapshotProcessor {
 		if (createNotifications)
 			for (Entry entry : result)
 				if (entry.isShow())
-					notificationSender.rtSend(entry);
+					notificationSender.send(entry);
 		return result.size();
 	}
 

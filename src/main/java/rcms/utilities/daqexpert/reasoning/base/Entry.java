@@ -15,7 +15,7 @@ public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore
 	private long duration;
-	
+
 	@JsonIgnore
 	private static long globalId = 1;
 
@@ -27,12 +27,11 @@ public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore
 	private EventFinder eventFinder;
-	
+
 	@JsonIgnore
 	private ContextCollector finishedContext;
 
 	private long id;
-	
 
 	/**
 	 * Short description of event. Displayed in main expert view
@@ -41,14 +40,15 @@ public class Entry implements Comparable<Entry> {
 
 	private Date start;
 	private Date end;
-	
+
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
 	private String group;
-	
+
 	/**
-	 * Class name of the event, indicates if event is important and should be highlighted or not
+	 * Class name of the event, indicates if event is important and should be
+	 * highlighted or not TODO: enum this
 	 */
 	private String className;
 
@@ -127,7 +127,6 @@ public class Entry implements Comparable<Entry> {
 
 	@Override
 	public int compareTo(Entry arg0) {
-		// TODO Auto-generated method stub
 		return (int) (this.duration - arg0.duration);
 	}
 

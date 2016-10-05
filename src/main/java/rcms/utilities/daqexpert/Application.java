@@ -13,6 +13,7 @@ public class Application {
 	public static final String NM_API_CLOSE = "nm.api.close";
 	public static final String SNAPSHOTS_DIR = "snapshots";
 	public static final String LANDING = "landing";
+	public static final String OFFSET = "offset";
 
 	private DataManager dataManager;
 
@@ -40,6 +41,8 @@ public class Application {
 			throw new RuntimeException(message + NM_API_CLOSE);
 		if (!instance.prop.containsKey(LANDING))
 			throw new RuntimeException(message + LANDING);
+		if (!instance.prop.containsKey(OFFSET))
+			throw new RuntimeException(message + OFFSET);
 	}
 
 	private Application(String propertiesFile) {

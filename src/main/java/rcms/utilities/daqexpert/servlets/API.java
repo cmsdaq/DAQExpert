@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.DataManager;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.

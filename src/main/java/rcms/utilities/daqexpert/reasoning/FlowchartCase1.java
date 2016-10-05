@@ -2,8 +2,6 @@ package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
@@ -47,7 +45,6 @@ public class FlowchartCase1 extends ExtendedCondition {
 		this.priority = EventPriority.critical;
 	}
 
-	private static final Logger logger = Logger.getLogger(FlowchartCase1.class);
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
 
 	@Override

@@ -16,6 +16,7 @@ import rcms.utilities.daqexpert.segmentation.DAQConverter;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 import rcms.utilities.daqexpert.segmentation.LinearSegmentator;
+import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.SegmentationSettings;
 import rcms.utilities.daqexpert.segmentation.StreamProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;

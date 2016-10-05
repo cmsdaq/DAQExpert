@@ -2,8 +2,6 @@ package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
@@ -30,24 +28,21 @@ public class FlowchartCase5 extends ExtendedCondition {
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
-		
-		/* default action*/
+
+		/* default action */
 		ConditionalAction action = new ConditionalAction("Stop the run",
-				"Red & green recycle the subsystem {{SUBSYSTEM}}.",
-				"Start new run (try up to 2 times)",
+				"Red & green recycle the subsystem {{SUBSYSTEM}}.", "Start new run (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
-		
+
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Stop the run",
-				"Start new run (try up to 2 times)",
+		action.addContextSteps("ECAL", "Stop the run", "Start new run (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
-		
+
 		this.action = action;
 	}
 
-	private static final Logger logger = Logger.getLogger(FlowchartCase5.class);
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
 
 	@Override
@@ -57,10 +52,10 @@ public class FlowchartCase5 extends ExtendedCondition {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		
+
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
-		
+
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate))
 			return false;
 

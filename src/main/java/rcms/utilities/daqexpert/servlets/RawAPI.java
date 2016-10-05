@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,9 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
+import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
 /**

@@ -6,7 +6,6 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
-import rcms.utilities.daqexpert.reasoning.states.LHCBeamMode;
 
 /**
  * This logic module identifies no rate condition in DAQ

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.Point;
-
 public class LinearSegmentatorTest {
 
 	private static Logger logger = Logger.getLogger(LinearSegmentatorTest.class);

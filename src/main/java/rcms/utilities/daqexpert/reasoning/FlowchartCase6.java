@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 

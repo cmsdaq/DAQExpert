@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert;
+package rcms.utilities.daqexpert.notifications;
 
 import java.util.Date;
 import java.util.List;

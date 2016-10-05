@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.NotificationSignalConnector;
-import rcms.utilities.daqexpert.NotificationSignalSender;
+import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
+import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
 
 /**
  * Processes snapshot in analysis

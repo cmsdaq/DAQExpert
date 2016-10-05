@@ -2,8 +2,6 @@ package rcms.utilities.daqexpert.reasoning;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
@@ -33,8 +31,6 @@ public class FlowchartCase4 extends ExtendedCondition {
 		this.group = EventGroup.FLOWCHART;
 		this.priority = EventPriority.critical;
 	}
-
-	private static final Logger logger = Logger.getLogger(FlowchartCase4.class);
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {

@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert;
+package rcms.utilities.daqexpert.notifications;
 
 import java.util.HashSet;
 import java.util.Set;

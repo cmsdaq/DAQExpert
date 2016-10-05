@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +8,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.DataManager;
 
 /**
  * From checker & comparator boolean results creates events

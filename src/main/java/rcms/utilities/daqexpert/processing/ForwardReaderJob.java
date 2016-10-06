@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,12 @@ public class ForwardReaderJob implements ReaderJob {
 				List<File> emptyList = new ArrayList<>();
 				return Pair.of(last, emptyList);
 			}
+		} catch (FileNotFoundException e) {
+			// e.printStackTrace();
+			logger.fatal(e.getMessage());
+			throw new DAQException(DAQExceptionCode.ProblemExploringFiles, e.getMessage());
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new DAQException(DAQExceptionCode.ProblemExploringFiles, "Problem exploring files");
 		}
 

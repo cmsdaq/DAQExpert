@@ -3,9 +3,14 @@ package rcms.utilities.daqexpert;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class Application {
+
+	private static final Logger logger = Logger.getLogger(Application.class);
 
 	public static final String NM_DASHBOARD = "nm.dashboard";
 	public static final String NM_NOTIFICATIONS = "nm.notifications";
@@ -13,7 +18,7 @@ public class Application {
 	public static final String NM_API_CLOSE = "nm.api.close";
 	public static final String SNAPSHOTS_DIR = "snapshots";
 	public static final String LANDING = "landing";
-	public static final String OFFSET = "offset";
+	public static final String OFFSET = "nm.offset";
 
 	private DataManager dataManager;
 
@@ -55,11 +60,26 @@ public class Application {
 	private Properties load(String propertiesFile) {
 
 		try {
-			FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
-			Properties properties = new Properties();
-			properties.load(propertiesInputStream);
 
-			return properties;
+			if (propertiesFile == null) {
+				logger.info("Loading properties from default location");
+				String resourceName = "config.properties"; // could also be a
+															// constant
+				ClassLoader loader = Thread.currentThread().getContextClassLoader();
+				Properties props = new Properties();
+				try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
+					props.load(resourceStream);
+				}
+				return props;
+
+			} else {
+				logger.info("Loading properties from environment variable location");
+				FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
+				Properties properties = new Properties();
+				properties.load(propertiesInputStream);
+				return properties;
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot run application without configuration file");

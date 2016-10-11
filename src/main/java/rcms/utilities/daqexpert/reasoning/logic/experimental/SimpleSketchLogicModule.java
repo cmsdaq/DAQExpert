@@ -12,10 +12,10 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  */
-public class SimpleSketch extends SimpleLogicModule {
+public class SimpleSketchLogicModule extends SimpleLogicModule {
 
 	/** TODO: 1. Set up basic information about this Logic Module here */
-	public SimpleSketch() {
+	public SimpleSketchLogicModule() {
 		this.name = "Sketch LM"; // TODO: 1a. set descriptive name
 		this.description = "Easy start sketch LM"; // TODO 1b. provide more info
 
@@ -39,7 +39,10 @@ public class SimpleSketch extends SimpleLogicModule {
 		/*
 		 * TODO: 2a. implement your condition here
 		 * 
-		 * TODO: 2b. register your module at
+		 * TODO: 2b. reuse other LMs results by accessing
+		 * results.get(NoRate.class.getSimpleName())
+		 * 
+		 * TODO: 2c. register your module at
 		 * rcms.utilities.daqexpert.reasoning.processing.CheckManager:77
 		 */
 		return false;

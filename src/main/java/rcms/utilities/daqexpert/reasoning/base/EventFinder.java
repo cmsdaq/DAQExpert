@@ -1,5 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+
 public abstract class EventFinder {
 	/**
 	 * Name of the event found

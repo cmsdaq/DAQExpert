@@ -13,9 +13,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EntryState;
-import rcms.utilities.daqexpert.reasoning.base.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 
 /**
  * Tests if notification signals are generated correctly

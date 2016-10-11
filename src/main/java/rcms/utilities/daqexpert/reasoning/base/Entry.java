@@ -4,6 +4,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+
 /**
  * 
  * Base object of analysis result.

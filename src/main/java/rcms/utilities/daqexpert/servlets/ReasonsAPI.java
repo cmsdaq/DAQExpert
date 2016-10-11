@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 public class ReasonsAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;

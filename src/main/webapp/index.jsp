@@ -338,7 +338,14 @@
 			style : "background-color: white;font-weight:bold;",
 			title : 'Flowchart events',
 			primary : true
-		} ];
+		}, {
+			id : 'experimental',
+			content : 'Exp. (0)',
+			name : 'Exp. ',
+			style : "background-color: white;font-weight:bold;",
+			title : 'Experimental logic modules',
+			primary : false
+		}  ];
 
 		var groups = new vis.DataSet(groupsList);
 		

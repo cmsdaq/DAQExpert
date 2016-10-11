@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
@@ -109,9 +109,9 @@ public class NotificationSignalSender {
 	 */
 	private int sendStartSignal(Entry event) {
 
-		if (event.getEventFinder() instanceof ExtendedCondition) {
+		if (event.getEventFinder() instanceof ActionLogicModule) {
 
-			ExtendedCondition finder = (ExtendedCondition) event.getEventFinder();
+			ActionLogicModule finder = (ActionLogicModule) event.getEventFinder();
 			Notification notification = new Notification();
 			notification.setDate(event.getStart());
 
@@ -120,8 +120,8 @@ public class NotificationSignalSender {
 			logger.info("Now working on: " + message);
 			logger.info("Now working on: " + event);
 
-			if (finder instanceof ExtendedCondition) {
-				ContextCollector context = ((ExtendedCondition) finder).getContext();
+			if (finder instanceof ActionLogicModule) {
+				Context context = ((ActionLogicModule) finder).getContext();
 				message = context.getMessageWithContext(message);
 				notification.setAction(context.getActionWithContext(finder.getAction()));
 			}

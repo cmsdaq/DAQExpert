@@ -5,11 +5,11 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Comparator;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class LHCBeamModeComparator extends Comparator {
+public class LHCBeamModeComparator extends ComparatorLogicModule {
 
 	public LHCBeamModeComparator() {
 		this.name = "n/a";

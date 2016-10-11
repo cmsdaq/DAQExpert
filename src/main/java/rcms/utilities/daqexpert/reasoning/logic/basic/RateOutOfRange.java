@@ -3,11 +3,11 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class RateOutOfRange extends Condition {
+public class RateOutOfRange extends SimpleLogicModule {
 
 	public RateOutOfRange() {
 		this.name = "Rate out of range";

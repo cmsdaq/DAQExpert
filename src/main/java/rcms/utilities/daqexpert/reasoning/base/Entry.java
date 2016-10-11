@@ -28,10 +28,10 @@ public class Entry implements Comparable<Entry> {
 	private EntryState state;
 
 	@JsonIgnore
-	private EventFinder eventFinder;
+	private LogicModule eventFinder;
 
 	@JsonIgnore
-	private ContextCollector finishedContext;
+	private Context finishedContext;
 
 	private long id;
 
@@ -159,19 +159,19 @@ public class Entry implements Comparable<Entry> {
 				+ ", end=" + end + ", group=" + group + ", className=" + className + "]";
 	}
 
-	public EventFinder getEventFinder() {
+	public LogicModule getEventFinder() {
 		return eventFinder;
 	}
 
-	public void setEventFinder(EventFinder eventFinder) {
+	public void setEventFinder(LogicModule eventFinder) {
 		this.eventFinder = eventFinder;
 	}
 
-	public ContextCollector getFinishedContext() {
+	public Context getFinishedContext() {
 		return finishedContext;
 	}
 
-	public void setFinishedContext(ContextCollector finishedContext) {
+	public void setFinishedContext(Context finishedContext) {
 		this.finishedContext = finishedContext;
 	}
 }

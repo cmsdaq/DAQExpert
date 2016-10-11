@@ -4,11 +4,11 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class RunOngoing extends Condition {
+public class RunOngoing extends SimpleLogicModule {
 
 	public RunOngoing() {
 		this.name = "Run ongoing";

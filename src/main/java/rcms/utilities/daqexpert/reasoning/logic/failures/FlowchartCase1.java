@@ -6,7 +6,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -20,7 +20,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase1 extends ExtendedCondition {
+public class FlowchartCase1 extends ActionLogicModule {
 
 	public FlowchartCase1() {
 		this.name = "FC1";

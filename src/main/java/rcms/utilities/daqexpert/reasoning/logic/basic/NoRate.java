@@ -3,14 +3,14 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
  * This logic module identifies no rate condition in DAQ
  */
-public class NoRate extends ExtendedCondition {
+public class NoRate extends ActionLogicModule {
 
 	public NoRate() {
 		this.name = "No rate";

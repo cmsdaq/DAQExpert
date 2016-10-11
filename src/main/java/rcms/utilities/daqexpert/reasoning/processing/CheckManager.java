@@ -8,10 +8,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
@@ -40,9 +40,9 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 public class CheckManager {
 
 	private final static Logger logger = Logger.getLogger(CheckManager.class);
-	private final List<Condition> checkers = new ArrayList<>();
+	private final List<SimpleLogicModule> checkers = new ArrayList<>();
 
-	private final List<Comparator> comparators = new ArrayList<>();
+	private final List<ComparatorLogicModule> comparators = new ArrayList<>();
 	
 	private final EventProducer eventProducer;
 
@@ -115,7 +115,7 @@ public class CheckManager {
 		Date curr = null;
 		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
 
-		for (Condition checker : checkers) {
+		for (SimpleLogicModule checker : checkers) {
 			boolean result = checker.satisfied(daq, checkerResultMap);
 
 			checkerResultMap.put(checker.getClass().getSimpleName(), result);
@@ -128,8 +128,8 @@ public class CheckManager {
 			 * EventProducer.produce so that context can be used to close the
 			 * event
 			 */
-			if (!result && checker instanceof ExtendedCondition) {
-				((ExtendedCondition) checker).getContext().clearContext();
+			if (!result && checker instanceof ActionLogicModule) {
+				((ActionLogicModule) checker).getContext().clearContext();
 			}
 
 			if (entry != null) {
@@ -151,7 +151,7 @@ public class CheckManager {
 	 */
 	private List<Entry> runComparators(DAQ daq) {
 		List<Entry> results = new ArrayList<>();
-		for (Comparator comparator : comparators) {
+		for (ComparatorLogicModule comparator : comparators) {
 			Date last = null;
 			if (comparator.getLast() != null)
 				last = new Date(comparator.getLast().getLastUpdate());

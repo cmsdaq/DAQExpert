@@ -9,12 +9,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.reasoning.base.Comparator;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
-import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventFinder;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -58,7 +58,7 @@ public class EventProducer {
 	 * Produces events for value 111000111000 will produce 2 events
 	 * corresponding to 1 start and end time
 	 */
-	public Entry produce(Condition checker, boolean value, Date date) {
+	public Entry produce(SimpleLogicModule checker, boolean value, Date date) {
 		return produce(checker, value, date, checker.getGroup());
 	}
 
@@ -66,7 +66,7 @@ public class EventProducer {
 	 * 00000100000100000100 will produce 3 events corresponding to 1 start and
 	 * ending on next 1 start
 	 */
-	public void produce(Comparator comparator, boolean value, Date last, Date current) {
+	public void produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
@@ -75,16 +75,16 @@ public class EventProducer {
 		}
 	}
 
-	private Entry produce(EventFinder classificable, boolean value, Date date, EventGroup level) {
+	private Entry produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
 		// get current state
 		String className = classificable.getClass().getSimpleName();
 		String content = classificable.getName();
 		EventPriority eventClass = classificable.getPriority();
 
-		ContextCollector context = null;
+		Context context = null;
 
-		if (classificable instanceof ExtendedCondition) {
-			context = ((ExtendedCondition) classificable).getContext();
+		if (classificable instanceof ActionLogicModule) {
+			context = ((ActionLogicModule) classificable).getContext();
 		}
 
 		Entry result = null;
@@ -109,7 +109,7 @@ public class EventProducer {
 	}
 
 	private Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
-			EventPriority eventClass, ContextCollector context) {
+			EventPriority eventClass, Context context) {
 
 		/* finish old entry */
 		if (unfinished.containsKey(className)) {
@@ -117,7 +117,7 @@ public class EventProducer {
 			toFinish.setState(EntryState.FINISHED);
 			toFinish.setEnd(date);
 			toFinish.calculateDuration();
-			ContextCollector clone = (ContextCollector) org.apache.commons.lang.SerializationUtils.clone(context);
+			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
 			finishedThisRound.add(toFinish);
 		}

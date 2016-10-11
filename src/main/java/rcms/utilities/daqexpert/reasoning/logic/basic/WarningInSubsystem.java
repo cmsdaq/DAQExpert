@@ -5,12 +5,12 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class WarningInSubsystem extends ExtendedCondition {
+public class WarningInSubsystem extends ActionLogicModule {
 
 	public WarningInSubsystem() {
 		this.name = "Exists TTCP with warning > 0%";

@@ -2,7 +2,13 @@ package rcms.utilities.daqexpert.reasoning.base;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 
-public abstract class Comparator extends EventFinder {
+/**
+ * Type of Logic Module which identifies state transitions.
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
+public abstract class ComparatorLogicModule extends LogicModule {
 
 	private DAQ last;
 
@@ -13,7 +19,7 @@ public abstract class Comparator extends EventFinder {
 			try {
 				result = compare(last, daq);
 			} catch (NullPointerException e) {
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 

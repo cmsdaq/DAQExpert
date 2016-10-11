@@ -7,11 +7,11 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Comparator;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class EVMComparator extends Comparator {
+public class EVMComparator extends ComparatorLogicModule {
 
 	public EVMComparator() {
 		this.name = "n/a";

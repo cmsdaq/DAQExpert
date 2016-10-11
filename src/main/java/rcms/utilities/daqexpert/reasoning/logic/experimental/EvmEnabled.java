@@ -6,11 +6,11 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqexpert.reasoning.base.Condition;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class EvmEnabled extends Condition {
+public class EvmEnabled extends SimpleLogicModule {
 
 	public EvmEnabled() {
 		this.name = "Enabled EVM";

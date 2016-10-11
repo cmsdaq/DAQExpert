@@ -3,28 +3,28 @@ package rcms.utilities.daqexpert.reasoning.base;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 
 /**
- * Extended condition have additional fields (action and description)
+ * The Action Logic Module has additional field - <code>action</code>. It is to be
+ * used when identified conditions require an action to take.
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public abstract class ExtendedCondition extends Condition {
+public abstract class ActionLogicModule extends SimpleLogicModule {
 
 	/**
-	 * What should be done when condition is meet
+	 * What should be done when LM's condition is satisfied
 	 */
 	protected Action action;
-
 
 	/**
 	 * Context is used to parameterize action and description fields with
 	 * specific context information. Variables will be replaced with values from
 	 * this context
 	 */
-	protected final ContextCollector context;
+	protected final Context context;
 
-	public ExtendedCondition() {
-		this.context = new ContextCollector();
+	public ActionLogicModule() {
+		this.context = new Context();
 	}
 
 	public Action getAction() {
@@ -34,8 +34,8 @@ public abstract class ExtendedCondition extends Condition {
 	public void setAction(Action action) {
 		this.action = action;
 	}
-	
-	public ContextCollector getContext() {
+
+	public Context getContext() {
 		return context;
 	}
 

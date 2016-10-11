@@ -3,12 +3,12 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
-public class NoRateWhenExpected extends ExtendedCondition {
+public class NoRateWhenExpected extends ActionLogicModule {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";

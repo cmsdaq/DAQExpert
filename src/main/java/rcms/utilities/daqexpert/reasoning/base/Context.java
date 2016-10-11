@@ -17,15 +17,16 @@ import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
-public class ContextCollector implements Serializable {
+@SuppressWarnings("serial")
+public class Context implements Serializable {
 
-	private static final Logger logger = Logger.getLogger(ContextCollector.class);
+	private static final Logger logger = Logger.getLogger(Context.class);
 
 	private Map<String, Set<Object>> context;
 
 	private Set<String> actionKey;
 
-	public ContextCollector() {
+	public Context() {
 		this.context = new HashMap<>();
 	}
 

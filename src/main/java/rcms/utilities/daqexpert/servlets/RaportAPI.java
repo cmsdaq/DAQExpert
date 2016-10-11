@@ -15,10 +15,10 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.reasoning.base.ContextCollector;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
-import rcms.utilities.daqexpert.reasoning.base.EventFinder;
-import rcms.utilities.daqexpert.reasoning.base.ExtendedCondition;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -44,12 +44,12 @@ public class RaportAPI extends HttpServlet {
 
 					String description;
 					List<String> actionSteps;
-					EventFinder eventFinder = entry.getEventFinder();
+					LogicModule eventFinder = entry.getEventFinder();
 
 					/* Case of Extended condition */
-					if (eventFinder instanceof ExtendedCondition) {
-						ExtendedCondition extendedCondition = (ExtendedCondition) eventFinder;
-						ContextCollector context = entry.getFinishedContext();
+					if (eventFinder instanceof ActionLogicModule) {
+						ActionLogicModule extendedCondition = (ActionLogicModule) eventFinder;
+						Context context = entry.getFinishedContext();
 						if (context != null) {
 							description = context.getMessageWithContext(extendedCondition.getDescription());
 							actionSteps = context.getActionWithContext(extendedCondition.getAction());

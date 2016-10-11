@@ -43,7 +43,7 @@ public class CheckManager {
 	private final List<SimpleLogicModule> checkers = new ArrayList<>();
 
 	private final List<ComparatorLogicModule> comparators = new ArrayList<>();
-	
+
 	private final EventProducer eventProducer;
 
 	/**
@@ -72,7 +72,11 @@ public class CheckManager {
 		checkers.add(new FlowchartCase3());
 		checkers.add(new FlowchartCase4());
 		checkers.add(new FlowchartCase5());
-		//checkers.add(new FlowchartCase6());
+		// checkers.add(new FlowchartCase6());
+
+		/* START EXPERIMENTAL LMs */
+		// checkers.add(new YourNewLM());
+		/* END EXPERIMENTAL LMs */
 
 		// comparators
 		comparators.add(new SessionComparator());

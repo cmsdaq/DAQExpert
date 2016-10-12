@@ -48,7 +48,6 @@ public class FlowchartCase4 extends ActionLogicModule {
 
 					context.register("SUBSYSTEM", subSystem.getName());
 					context.register("TTCP", ttcp.getName());
-					context.register("STATE", currentState.name());
 					result = true;
 				}
 			}

@@ -4,18 +4,18 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
-public class NoRateWhenExpected extends ActionLogicModule {
+public class NoRateWhenExpected extends SimpleLogicModule {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
 		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
 		this.priority = EventPriority.critical;
 		this.description = "No rate when expected";
-		this.action = null;
 	}
 
 	@Override
@@ -23,8 +23,8 @@ public class NoRateWhenExpected extends ActionLogicModule {
 		boolean stableBeams = false;
 		boolean runOngoing = false;
 		boolean noRate = false;
-		if (LHCBeamMode.STABLE_BEAMS == LHCBeamMode.getModeByCode(daq.getLhcBeamMode()))
-			stableBeams = true;
+
+		stableBeams = results.get(StableBeams.class.getSimpleName());
 		runOngoing = results.get(RunOngoing.class.getSimpleName());
 		noRate = results.get(NoRate.class.getSimpleName());
 

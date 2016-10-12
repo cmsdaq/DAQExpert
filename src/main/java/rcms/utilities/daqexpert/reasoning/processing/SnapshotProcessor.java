@@ -18,7 +18,7 @@ import rcms.utilities.daqexpert.reasoning.base.Entry;
  */
 public class SnapshotProcessor {
 
-	private CheckManager checkManager;
+	private LogicModuleManager checkManager;
 
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
@@ -31,7 +31,7 @@ public class SnapshotProcessor {
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
 				Application.get().getProp().getProperty(Application.NM_API_CREATE),
 				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis());
-		this.checkManager = new CheckManager(eventProducer);
+		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 
 	public int process(DAQ daqSnapshot, boolean createNotifications) {

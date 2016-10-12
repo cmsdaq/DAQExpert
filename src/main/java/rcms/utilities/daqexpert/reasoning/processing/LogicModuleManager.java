@@ -1,23 +1,30 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.EVMComparator;
@@ -37,9 +44,9 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  */
-public class CheckManager {
+public class LogicModuleManager {
 
-	private final static Logger logger = Logger.getLogger(CheckManager.class);
+	private final static Logger logger = Logger.getLogger(LogicModuleManager.class);
 	private final List<SimpleLogicModule> checkers = new ArrayList<>();
 
 	private final List<ComparatorLogicModule> comparators = new ArrayList<>();
@@ -53,13 +60,14 @@ public class CheckManager {
 	 * @param daq
 	 *            daq object to analyze
 	 */
-	public CheckManager(EventProducer eventProducer) {
+	public LogicModuleManager(EventProducer eventProducer) {
 		this.eventProducer = eventProducer;
 		// Level 0 Independent
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
 		checkers.add(new RunOngoing());
 		checkers.add(new WarningInSubsystem());
+		checkers.add(new StableBeams());
 
 		// Level 1 (depends on L0)
 		checkers.add(new NoRateWhenExpected());

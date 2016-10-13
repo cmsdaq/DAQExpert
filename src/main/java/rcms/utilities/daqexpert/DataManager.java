@@ -10,7 +10,12 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
+import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
+import rcms.utilities.daqexpert.processing.DataPrepareJob;
 import rcms.utilities.daqexpert.processing.DataStream;
+import rcms.utilities.daqexpert.processing.ForwardReaderJob;
+import rcms.utilities.daqexpert.processing.OnDemandReaderJob;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DAQConverter;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
@@ -29,6 +34,7 @@ public class DataManager {
 
 	public DataManager() {
 		buf = new CircularFifoQueue<>(5000);
+		experimentalLMBuffer = new CircularFifoQueue<>(5000);
 
 		rawDataByResolution = new HashMap<>();
 
@@ -53,6 +59,9 @@ public class DataManager {
 	private final List<Entry> result;
 
 	public CircularFifoQueue<DAQ> buf;
+	
+
+	public CircularFifoQueue<DAQ> experimentalLMBuffer;
 
 	public void addSnapshot(DummyDAQ dummyDAQ) {
 
@@ -131,5 +140,6 @@ public class DataManager {
 	public DataResolutionManager getDataResolutionManager() {
 		return dataResolutionManager;
 	}
-
+	
+	
 }

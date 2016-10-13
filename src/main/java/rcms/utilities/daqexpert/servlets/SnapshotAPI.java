@@ -20,6 +20,12 @@ import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 
+/**
+ * Request snapshots API
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class SnapshotAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

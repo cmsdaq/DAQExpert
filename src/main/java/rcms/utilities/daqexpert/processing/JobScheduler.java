@@ -21,15 +21,10 @@ public class JobScheduler {
 	 */
 	private static final int REAL_TIME_TASK_PERION_IN_SECONDS = 2;
 
-	/**
-	 * Period in which past data will be accessed
-	 */
-	private static final int PAST_TASK_PERION_IN_SECONDS = 15;
+	/** Scheduled executor of on demand reader task */
+	private final ScheduledExecutorService onDemandScheduler;
 
-	/** Scheduled executor of past reader task */
-	private final ScheduledExecutorService pastReaderScheduler;
-
-	private final StoppableJob pastReaderTask;
+	private final StoppableJob onDemandReaderTask;
 
 	private StoppableJob realTimeTask;
 
@@ -42,23 +37,24 @@ public class JobScheduler {
 		this(pastReaderTask, realTimeTask, Executors.newScheduledThreadPool(1), Executors.newScheduledThreadPool(1));
 	}
 
-	public JobScheduler(StoppableJob pastReaderTask, StoppableJob realTimeTask, ScheduledExecutorService realTimeScheduler,
-			ScheduledExecutorService pastReaderScheduler) {
+	public JobScheduler(StoppableJob onDemantTask, StoppableJob realTimeTask,
+			ScheduledExecutorService realTimeScheduler, ScheduledExecutorService onDemandScheduler) {
 
-		this.pastReaderScheduler = pastReaderScheduler;
+		this.onDemandScheduler = onDemandScheduler;
 		this.realTimeScheduler = realTimeScheduler;
 
-		this.pastReaderTask = pastReaderTask;
+		this.onDemandReaderTask = onDemantTask;
 
 		this.realTimeTask = realTimeTask;
 
 	}
 
-	public void firePastReaderTask() {
-		logger.info("Starting past reader task with period of " + PAST_TASK_PERION_IN_SECONDS + " seconds");
+	public void onDemandReaderTask() {
 
-		ScheduledFuture<?> future = pastReaderScheduler.scheduleAtFixedRate(pastReaderTask, 15, 15, SECONDS);
-		pastReaderTask.setFuture(future);
+		logger.info("Starting on-demand reader job");
+
+		ScheduledFuture<?> future = onDemandScheduler.schedule(onDemandReaderTask, 0, SECONDS);
+		onDemandReaderTask.setFuture(future);
 
 	}
 

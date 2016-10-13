@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.processing.JobManager;
+
 public class Application {
 
 	private static final Logger logger = Logger.getLogger(Application.class);
@@ -22,6 +24,8 @@ public class Application {
 	public static final String EXPERIMENTAL_DIR = "experimental";
 
 	private DataManager dataManager;
+
+	private JobManager jobManager;
 
 	private final Properties prop;
 
@@ -102,5 +106,13 @@ public class Application {
 
 	public void setDataManager(DataManager dataManager) {
 		this.dataManager = dataManager;
+	}
+
+	public JobManager getJobManager() {
+		return jobManager;
+	}
+
+	public void setJobManager(JobManager jobManager) {
+		this.jobManager = jobManager;
 	}
 }

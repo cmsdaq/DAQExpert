@@ -10,15 +10,20 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
-public class PastReaderJobTest extends ReaderJobTestBase {
+public class OnDemandReaderJobTest extends ReaderJobTestBase {
 
 	@Test
 	public void simpleTest() throws Exception {
 		PersistenceExplorer explorer = new PersistenceExplorerStub(new FileSystemConnector());
-		PastReaderJob pastReaderJob = new PastReaderJob(explorer, null, 1473858460000L, 1473858466000L);
-		Pair<Long, List<File>> result = pastReaderJob.read();
+		OnDemandReaderJob onDemandReaderJob = new OnDemandReaderJob(explorer, null);
+		onDemandReaderJob.setTimeSpan(1473858460000L, 1473858466000L);
+		Pair<Long, List<File>> result = onDemandReaderJob.read();
 		Assert.assertEquals(1473858466000L, (long) result.getLeft());
 		Assert.assertEquals(6, (long) result.getRight().size());
 	}
 
+	@Test
+	public void rerunLogicModulesOnDemandTest() {
+
+	}
 }

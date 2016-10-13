@@ -34,9 +34,13 @@ public class JobManager {
 
 	private final ThreadPoolExecutor mainExecutor;
 
-	private final DataPrepareJob pastDataPrepareJob;
+	private final DataPrepareJob onDemandDataJob;
+
+	private final OnDemandReaderJob onDemandReader;
 
 	private final DataPrepareJob futureDataPrepareJob;
+
+	private final JobScheduler readerRaskController;
 
 	public JobManager(String sourceDirectory) {
 
@@ -55,17 +59,21 @@ public class JobManager {
 		};
 
 		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
-		PastReaderJob prj = new PastReaderJob(persistenceExplorer, sourceDirectory, 1471392000000L, startTime);
+		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
-		pastDataPrepareJob = new DataPrepareJob(prj, mainExecutor);
+		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor);
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor);
+
+		readerRaskController = new JobScheduler(onDemandDataJob, futureDataPrepareJob);
 	}
 
 	public void startJobs() {
-
-		JobScheduler readerRaskController = new JobScheduler(pastDataPrepareJob, futureDataPrepareJob);
-		// readerRaskController.firePastReaderTask();
 		readerRaskController.fireRealTimeReaderTask();
+	}
+
+	public void fireOnDemandJob(long startTime, long endTime) {
+		onDemandReader.setTimeSpan(startTime, endTime);
+		readerRaskController.onDemandReaderTask();
 	}
 }

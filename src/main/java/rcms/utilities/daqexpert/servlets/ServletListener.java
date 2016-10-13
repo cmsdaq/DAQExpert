@@ -45,6 +45,8 @@ public class ServletListener implements ServletContextListener {
 
 		JobManager jobManager = new JobManager(sourceDirectory);
 		jobManager.startJobs();
+
+		Application.get().setJobManager(jobManager);
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
 /**
- * Job for retrieving past data (snapshots)
+ * Job for retrieving data on demand (snapshots)
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class PastReaderJob implements ReaderJob {
+public class OnDemandReaderJob implements ReaderJob {
 	/**
 	 * Indicator of last snapshot processed timestamp
 	 */
@@ -25,18 +25,21 @@ public class PastReaderJob implements ReaderJob {
 
 	private final PersistenceExplorer explorer;
 
-	private final long readTo;
+	private long readTo;
 
 	private final String sourceDirectory;
 
 	private volatile boolean finished = false;
 
-	private static final Logger logger = Logger.getLogger(PastReaderJob.class);
+	private static final Logger logger = Logger.getLogger(OnDemandReaderJob.class);
 
-	public PastReaderJob(PersistenceExplorer explorer, String sourceDirectory, long readFrom, long readTo) {
+	public OnDemandReaderJob(PersistenceExplorer explorer, String sourceDirectory) {
 		super();
 		this.explorer = explorer;
 		this.sourceDirectory = sourceDirectory;
+	}
+
+	public void setTimeSpan(long readFrom, long readTo) {
 		this.readFrom = readFrom;
 		this.readTo = readTo;
 	}
@@ -44,20 +47,29 @@ public class PastReaderJob implements ReaderJob {
 	@Override
 	public Pair<Long, List<File>> read() {
 
+		finished = false;
+
+		logger.info("Requested snapshots in timespan " + new Date(readFrom) + "-" + new Date(readTo)
+				+ " elements on demand");
 		try {
 
 			Pair<Long, List<File>> entry;
 
 			do {
 				Pair<Date, Date> currentStep = step();
-				logger.info("Getting chunk " + currentStep.getLeft() + " - " + currentStep.getRight());
+				logger.debug("Getting chunk " + currentStep.getLeft() + " - " + currentStep.getRight());
 				entry = explorer.explore(currentStep.getLeft().getTime(), currentStep.getRight().getTime(),
 						sourceDirectory);
+				if (entry.getRight().size() > 0)
+					logger.info("In this chunk " + entry.getRight().size() + " elements");
 				readFrom = currentStep.getRight().getTime();
 			} while (entry.getRight().size() == 0 && !finished);
 
 			// remember last explored snapshot timestamp
 			readFrom = entry.getKey();
+
+			logger.info("Found " + entry.getRight().size() + " elements on demand");
+
 			return entry;
 
 		} catch (IOException e) {
@@ -92,7 +104,7 @@ public class PastReaderJob implements ReaderJob {
 
 	@Override
 	public boolean finished() {
-		return finished;
+		return false;
 	}
 
 }

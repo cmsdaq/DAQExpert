@@ -159,9 +159,12 @@
     	</div>
     	
 	<div class="btn-group pull-right "> 
-    	
+    	<button class="btn btn-sm btn-info" id="experiment" href="#"><i
+						class="glyphicon glyphicon-question-sign"></i> Playground</button>
     	<button class="btn btn-sm btn-warning" id="tour" href="#"><i
 						class="glyphicon glyphicon-question-sign"></i> Help</button>
+						
+		
     	</div>
     	
 	<div id="visualization"  style="margin-top:15px;"></div>
@@ -821,6 +824,25 @@
 			// it's also good practice to preventDefault on the click event
 			// to avoid the click triggering whatever is within href:
 			e.preventDefault();
+		});
+		
+		$('#experiment').click(function(e) {
+			
+			
+			parameters = {};
+			parameters['start'] = timeline.getWindow()['start'].toISOString();
+			parameters['end'] = timeline.getWindow()['end'].toISOString();
+			
+
+			console.log("Experiment requested with parameters " + parameters);
+
+			$.getJSON("experiment", parameters, function(data) {
+				console.log("Successfull call");
+			}).error(function(jqXHR, textStatus, errorThrown) {
+				console.log("error " + textStatus);
+				console.log("errorThrown " + errorThrown);
+				console.log("incoming Text " + jqXHR.responseText);
+			});
 		});
 
 		$(document).ready(function() {

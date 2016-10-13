@@ -102,6 +102,14 @@
 			<version>3.4</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.4.7</version>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
 		<dependency>
 			<groupId>org.mockito</groupId>

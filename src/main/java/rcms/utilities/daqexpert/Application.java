@@ -19,6 +19,7 @@ public class Application {
 	public static final String SNAPSHOTS_DIR = "snapshots";
 	public static final String LANDING = "landing";
 	public static final String OFFSET = "nm.offset";
+	public static final String EXPERIMENTAL_DIR = "experimental";
 
 	private DataManager dataManager;
 
@@ -48,6 +49,8 @@ public class Application {
 			throw new RuntimeException(message + LANDING);
 		if (!instance.prop.containsKey(OFFSET))
 			throw new RuntimeException(message + OFFSET);
+		if (!instance.prop.containsKey(EXPERIMENTAL_DIR))
+			throw new RuntimeException(message + EXPERIMENTAL_DIR);
 	}
 
 	private Application(String propertiesFile) {

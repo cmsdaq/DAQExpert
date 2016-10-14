@@ -10,28 +10,32 @@
 <link href="external/vis.min.css" rel="stylesheet" type="text/css" />
 
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="external/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="external/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 
 <!-- Optional theme -->
-<link rel="stylesheet"href="external/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
+<link rel="stylesheet"
+	href="external/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
 
 <!-- Latest compiled and minified JavaScript -->
-<script	src="external/bootstrap-3.3.7-dist/js/bootstrap.min.js"	></script>
-<script	src="external/underscore-min.js"></script>
+<script src="external/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script src="external/underscore-min.js"></script>
 <script type="text/javascript" src="external/moment.min.js"></script>
 <link href="external/bootstrap-tour.min.css" rel="stylesheet">
-<script	src="external/bootstrap-tour.min.js"></script>
-<script	src="external/moment-duration-format.min.js"></script>
+<script src="external/bootstrap-tour.min.js"></script>
+<script src="external/moment-duration-format.min.js"></script>
 
 
 <style type="text/css">
-
 .vis-item {
 	height: 16px;
 	font-size: 8pt;
 }
 
-/* create a custom sized dot at the bottom of the red item */
+.vis-timeline {
+	border: 2px solid #bfbfbf;
+}
+
 .vis-item.critical {
 	background-color: red;
 	border-color: darkred;
@@ -55,6 +59,7 @@
 	font-family: monospace;
 	box-shadow: 0 0 10px gray;
 }
+
 .vis-item.warning {
 	background-color: #f79646;
 	border-color: #f79646;
@@ -81,31 +86,52 @@
 }
 
 /* The max width is dependant on the container (more info below) */
-.popover{
-    max-width: 350px; /* Max Width of the popover (depending on the container!) */
+.popover {
+	max-width: 350px;
+	/* Max Width of the popover (depending on the container!) */
 }
 
 .vis-labelset .vis-inner {
-    width: 8em;
+	width: 8em;
 }
 
 .vis-left .vis-content {
-    width: 8em;
+	width: 8em;
 }
 
 .vis-right .vis-content {
-    width: 8em;
-}
-.vis-panel.vis-background.vis-horizontal .vis-grid {
-    left: 7.5em !important;
-    right: 7.5em !important;
-    width: auto !important;
+	width: 8em;
 }
 
+.vis-panel.vis-background.vis-horizontal .vis-grid {
+	left: 7.5em !important;
+	right: 7.5em !important;
+	width: auto !important;
+}
 </style>
 
 
+<style type="text/css">
+.loader {
+	border: 16px solid #f3f3f3;
+	border-radius: 50%;
+	border-top: 16px solid #3498db;
+	width: 120px;
+	height: 120px;
+	-webkit-animation: spin 0.5s linear infinite;
+	animation: spin 0.5s linear infinite;
+}
 
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 
 </head>
 
@@ -113,10 +139,10 @@
 	<%@  page import="rcms.utilities.daqexpert.Application"%>
 
 	<nav class="navbar navbar-default navbar-xs" role="navigation">
-	
-	
-	
-	
+
+
+
+
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -125,7 +151,9 @@
 					class="icon-bar"></span> <span class="icon-bar"></span> <span
 					class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="<%out.println(Application.get().getProp().getProperty(Application.LANDING));%>"><b>DAQ</b> Expert</a>
+			<a class="navbar-brand"
+				href="<%out.println(Application.get().getProp().getProperty(Application.LANDING));%>"><b>DAQ</b>
+				Expert</a>
 		</div>
 
 
@@ -134,77 +162,113 @@
 		<div class="collapse navbar-collapse"
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-			
+
 				<!-- EXPERT BROWSER -->
-				<li class="active"><a href="#"><i class="glyphicon glyphicon-tasks"></i> Browser</a></li>
-				
+				<li class="active"><a href="#"><i
+						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
+
 				<!-- NM DASHBOARD -->
-				<li><a href="<%out.println(Application.get().getProp().getProperty(Application.NM_DASHBOARD));%>"><i
+				<li><a
+					href="<%out.println(Application.get().getProp().getProperty(Application.NM_DASHBOARD));%>"><i
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
-						
+
 				<!-- NM NOTIFICATIONS -->
-				<li><a href="<%out.println(Application.get().getProp().getProperty(Application.NM_NOTIFICATIONS));%>"><i
+				<li><a
+					href="<%out.println(Application.get().getProp().getProperty(Application.NM_NOTIFICATIONS));%>"><i
 						class="glyphicon glyphicon-calendar"></i> Notifications</a></li>
-						
+
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
-	
+
 	<div class="container">
-	
-	<div class="btn-group btn-toggle" id="extended-view"> 
-        <button class="btn btn-sm btn-primary active">Simple view</button>
-    	<button class="btn btn-sm btn-default">Extended view</button>
-    	</div>
-    	
-	<div class="btn-group pull-right "> 
-    	<button class="btn btn-sm btn-info" id="experiment" href="#"><i
-						class="glyphicon glyphicon-question-sign"></i> Playground</button>
-    	<button class="btn btn-sm btn-warning" id="tour" href="#"><i
-						class="glyphicon glyphicon-question-sign"></i> Help</button>
-						
-		
-    	</div>
-    	
-	<div id="visualization"  style="margin-top:15px;"></div>
-	<div id="raw" style="margin-top:5px;"></div>
-	<p></p>
-	<div id="log"></div>
+
+		<div class="btn-group btn-toggle" id="extended-view">
+			<button id="mode1" type="button"
+				class="mode-btn btn btn-sm btn-default btn-primary">Simple</button>
+			<button id="mode2" type="button"
+				class="mode-btn btn btn-sm btn-default">Extended</button>
+			<button id="mode3" type="button"
+				class="mode-btn btn btn-sm btn-default">Experiment</button>
+		</div>
+
+
+		<div class="btn-group pull-right ">
+			<button style="display: none;" class="btn btn-sm btn-info"
+				id="run-experimental-lm-button" href="#">
+				<i class="glyphicon glyphicon-question-sign"></i> Run experimental
+				LMs
+			</button>
+			<button class="btn btn-sm btn-warning" id="tour" href="#">
+				<i class="glyphicon glyphicon-question-sign"></i> Help
+			</button>
+
+
+		</div>
+
+		<div id="visualization" style="margin-top: 15px;"></div>
+		<div id="raw" style="margin-top: 5px;"></div>
+		<p></p>
+		<div id="log"></div>
 	</div>
 
 	<script type="text/javascript">
-	
+		var filtering = true;
+		var mode = "standard";
+		var lastTimeSpan = {};
 
-	var filtering = true;
-	
-	var lastData = [];
-	
-	$('.btn-toggle').click(function() {
-		
-	    $(this).find('.btn').toggleClass('active');  
-	    
-	    if ($(this).find('.btn-primary').size()>0) {
-	    	$(this).find('.btn').toggleClass('btn-primary');
-	    }
-	    
-	    $(this).find('.btn').toggleClass('btn-default');
+		var lastData = [];
 
-		filtering = !filtering;
-		load(lastData['entries']);
-		
-	       
-	});
+		$('.mode-btn').click(function() {
+			$('.mode-btn').removeClass('btn-primary');
+			$(this).addClass('btn-primary')
+
+		});
+
+		$('#mode1').click(function() {
+			filtering = true;
+			mode = "standard";
+			refreshBackgroundColor("2px solid #bfbfbf");
+			params = getWindowInformationForAPI();
+			params['mode'] = mode;
+			getDatap(params);
+			$('#run-experimental-lm-button').hide();
+		});
+		$('#mode2').click(function() {
+			filtering = false;
+			mode = "standard";
+			refreshBackgroundColor("2px solid #bfbfbf");
+			params = getWindowInformationForAPI();
+			params['mode'] = mode;
+			getDatap(params);
+			$('#run-experimental-lm-button').hide();
+		});
+		$('#mode3').click(function() {
+			filtering = false;
+			mode = "test";
+			refreshBackgroundColor("2px solid #aa6708");
+			params = getWindowInformationForAPI();
+			params['mode'] = mode;
+			getDatap(params);
+			$('#run-experimental-lm-button').show();
+		});
+
+		var refreshBackgroundColor = (function(color) {
+			$.each($('.vis-timeline'), function(key, value) {
+				console.log(value);
+				value.style.border = color;
+			});
+		});
+
 		var items = new vis.DataSet([]);
-
 
 		/* containers */
 		var container = document.getElementById('visualization');
 		var rawcontainer = document.getElementById('raw');
-		
+
 		var rawitems = [];
-		
-		
+
 		var options = {
 			editable : false,
 			orientation : 'top',
@@ -214,41 +278,41 @@
 				}
 			}
 		};
-		
+
 		var rawoptions = {
-				drawPoints : true,
-				height : '300px',
-				interpolation : false,
-				orientation : 'bottom',
-				
-				dataAxis : {
-					width : '50px',
-					icons : false,
-					left:{
-						format: function (value) {
-							  return ''+value.toFixed(2);
-						},
-						title: {
-							text: "<span class='glyphicon glyphicon-stop'></span> Avg. RU rate [kHz]",
-							style: "color: #4f81bd;"
-						}
+			drawPoints : true,
+			height : '300px',
+			interpolation : false,
+			orientation : 'bottom',
+
+			dataAxis : {
+				width : '50px',
+				icons : false,
+				left : {
+					format : function(value) {
+						return '' + value.toFixed(2);
 					},
-					right:{
-						format: function (value) {
-							  return ''+value.toPrecision(2);
-						},
-						title: {
-							text: "<span class='glyphicon glyphicon-stop'></span> Sum events in BU",
-							style: "color: #f79646;"
-						} 
+					title : {
+						text : "<span class='glyphicon glyphicon-stop'></span> Avg. RU rate [kHz]",
+						style : "color: #4f81bd;"
 					}
 				},
-				legend : {
-					left : {
-						position : "bottom-left"
+				right : {
+					format : function(value) {
+						return '' + value.toPrecision(2);
+					},
+					title : {
+						text : "<span class='glyphicon glyphicon-stop'></span> Sum events in BU",
+						style : "color: #f79646;"
 					}
 				}
-			};
+			},
+			legend : {
+				left : {
+					position : "bottom-left"
+				}
+			}
+		};
 
 		var groupsList = [ {
 			id : 'lhc-beam',
@@ -292,7 +356,7 @@
 			name : 'Run on',
 			title : 'Run ongoing',
 			primary : false
-		},  {
+		}, {
 			id : 'warning',
 			content : 'Warn (0)',
 			name : 'Warn',
@@ -310,7 +374,7 @@
 			name : 'NRWE',
 			title : 'No rate when expected',
 			primary : false
-		},{
+		}, {
 			id : 'rate-oor',
 			content : 'Rate OOR (0)',
 			name : 'Rate OOR',
@@ -348,11 +412,9 @@
 			style : "background-color: white;font-weight:bold;",
 			title : 'Experimental logic modules',
 			primary : false
-		}  ];
+		} ];
 
 		var groups = new vis.DataSet(groupsList);
-		
-
 
 		var rawdataset = new vis.DataSet(rawitems);
 
@@ -374,15 +436,11 @@
 				}
 			}
 		})
-		
-		
-		
+
 		var timeline = new vis.Timeline(container, items, groups, options);
-		
+
 		var graph2d = new vis.Graph2d(rawcontainer, rawdataset, rawgroups,
 				rawoptions);
-		
-		
 
 		/** Refresh data on timeline event */
 		var runDataUpdateFromTimeline = function(properties) {
@@ -391,7 +449,7 @@
 				loadNewData('rangechange', properties);
 			}
 		};
-		
+
 		/** Refresh data on graph event */
 		var runDataUpdateFromGraph = function(properties) {
 			var byUser = properties["byUser"];
@@ -433,10 +491,10 @@
 		/** Load new data on event */
 		function loadNewData(event, properties) {
 
-			getData(JSON.stringify(properties["start"]), JSON
-					.stringify(properties["end"]));
-			getRawData(JSON.stringify(properties["start"]), JSON
-					.stringify(properties["end"]));
+			getData(properties["start"].toISOString(), properties["end"]
+					.toISOString(), mode);
+			getRawData(properties["start"].toISOString(), properties["end"]
+					.toISOString());
 		};
 
 		/** Register event listener and throttle firing */
@@ -448,46 +506,52 @@
 		}));
 
 		timeline.on('click', function(properties) {
-			
+
 			//console.log("Properties: "  + properties['what']);
-			
-			if(properties['what'] == 'item'){
+
+			if (properties['what'] == 'item') {
 				$('#reasonModal').modal('show');
 				var parameters = {};
 				parameters['id'] = properties['item'];
-				
-				$.getJSON("raport", parameters, function(data) {
-	
-					$("#raport-name").html(data['name']);
-					$("#raport-description").html(data['description']);
-	
-					if (data['elements'] == null) {
-						$("#context-section").addClass("hidden");
-					} else {
-						$("#context-section").removeClass("hidden");
-						var preetified = JSON.stringify(data['elements'], null, 2);
-						$("#raport-body").html(preetified);
-					}
-	
-					if (data['action'] == null) {
-						$("#action-section").addClass("hidden");
-					} else {
-						$("#action-section").removeClass("hidden");
-						$("#raport-action").html("<ol id='curr-action'></ol>");
-						//console.log(data['action']);
-						$.each(data['action'], function(key, value) {
-							$("#curr-action").append($("<li>").text(value))
-						});
-					}
-	
-				}).error(function(jqXHR, textStatus, errorThrown) {
+
+				$.getJSON(
+						"raport",
+						parameters,
+						function(data) {
+
+							$("#raport-name").html(data['name']);
+							$("#raport-description").html(data['description']);
+
+							if (data['elements'] == null) {
+								$("#context-section").addClass("hidden");
+							} else {
+								$("#context-section").removeClass("hidden");
+								var preetified = JSON.stringify(
+										data['elements'], null, 2);
+								$("#raport-body").html(preetified);
+							}
+
+							if (data['action'] == null) {
+								$("#action-section").addClass("hidden");
+							} else {
+								$("#action-section").removeClass("hidden");
+								$("#raport-action").html(
+										"<ol id='curr-action'></ol>");
+								//console.log(data['action']);
+								$.each(data['action'], function(key, value) {
+									$("#curr-action").append(
+											$("<li>").text(value))
+								});
+							}
+
+						}).error(function(jqXHR, textStatus, errorThrown) {
 					console.log("error " + textStatus);
 					console.log("errorThrown " + errorThrown);
 					console.log("incoming Text " + jqXHR.responseText);
 				});
 
-			} else{
-				console.log("No event selected...");	
+			} else {
+				console.log("No event selected...");
 				return;
 			}
 
@@ -496,23 +560,21 @@
 		function load(data) {
 			var visibleData = [];
 			countPerGroup = {};
-			
+
 			//console.log(data);
 
 			/* Traverse new data to count events per group */
 			$.each(data, function(index, value) {
 				var groupName = value['group'];
 				var currCount = 0;
-				
 
 				var current = groups.get(groupName);
-				if(filtering == false){
+				if (filtering == false) {
 					visibleData.push(value);
-				} else{
-					if(current['primary'] == true)
+				} else {
+					if (current['primary'] == true)
 						visibleData.push(value);
 				}
-				
 
 				/* Get current count */
 				if (groupName in countPerGroup) {
@@ -540,52 +602,62 @@
 
 			//console.log(JSON.stringify(data));
 
-			
 			/* Update groups content */
 			$.each(countPerGroup, function(index, value) {
 				//console.log("Current: "+JSON.stringify(index));
 				var current = groups.get(index);
 				//console.log("Current: "+JSON.stringify(current));
-				
+
 				var newContent = "";
-				
-				if(filtering == false){
+
+				if (filtering == false) {
 					newContent = current['name'] + " (" + value + ")";
-				} else{
-					if(current['primary'] == true)
+				} else {
+					if (current['primary'] == true)
 						newContent = current['name'] + " (" + value + ")";
 				}
-				
+
 				groups.update({
 					id : index,
 					content : newContent
 				});
 
 			});
-			
-			
+
 			items.clear();
 			items.add(visibleData);
 
 		};
 
-		function getData(start, end) {
-
-			parameters = {};
-			parameters['start'] = start + "";
-			parameters['end'] = end + "";
-
-			$.getJSON("reasons", parameters, function(data) {
-				load(data['entries']);
-				$.each(data['durations'], function(key, value) {
-					console.log(key + ": " +moment.duration(value).format() + ", humanized: " + moment.duration(value).humanize());
-				});
-				lastData = data;
-			}).error(function(jqXHR, textStatus, errorThrown) {
+		function getDatap(parameters) {
+			$.getJSON(
+					"reasons",
+					parameters,
+					function(data) {
+						load(data['entries']);
+						$.each(data['durations'], function(key, value) {
+							console.log(key + ": "
+									+ moment.duration(value).format()
+									+ ", humanized: "
+									+ moment.duration(value).humanize());
+						});
+						lastData = data;
+					}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
 				console.log("errorThrown " + errorThrown);
 				console.log("incoming Text " + jqXHR.responseText);
 			});
+		}
+
+		function getData(start, end, mode) {
+
+			parameters = {};
+			parameters['start'] = start + "";
+			parameters['end'] = end + "";
+			parameters['mode'] = mode + "";
+
+			getDatap(parameters);
+
 		};
 	</script>
 
@@ -606,13 +678,10 @@
 			});
 		};
 
-		
-
 		graph2d.on('rangechange', _.throttle(runDataUpdateFromGraph, 500, {
 			leading : false
 		}));
-		
-		
+
 		graph2d.on('rangechange', _.throttle(runSyncFromGraph, 50, {
 			leading : false
 		}));
@@ -627,7 +696,7 @@
 				//console.log(data['lastUpdate']);
 				$("#json-body").html(preetified);
 				$("#snapshot-date").html(moment(data['lastUpdate']).format());
-				$('#myModal').modal('show')
+				$('#snapshot-popup').modal('show')
 			}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
 				console.log("incoming Text " + jqXHR.responseText);
@@ -639,80 +708,81 @@
 		function rawload(data) {
 			rawdataset.clear();
 			$.each(data, function(key, value) {
-				
+
 				// rate entries
-				if(value['group'] == 0){
+				if (value['group'] == 0) {
 					value['y'] = (value['y'] / 1000);
 				}
-				
+
 				// events entries
-				else if(value['group'] == 1){
+				else if (value['group'] == 1) {
 					value['y'] = (value['y']);
 				}
 			});
-			
+
 			rawdataset.add(data);
 
 		};
 
 		/* Initialize */
-		$(document).ready(function() {
-			var defaultEnd = moment().add(1, 'hours');
-			var defaultStart = moment().subtract(2, 'days');
-			var useDefault = true;
+		$(document)
+				.ready(
+						function() {
+							var defaultEnd = moment().add(1, 'hours');
+							var defaultStart = moment().subtract(2, 'days');
+							var useDefault = true;
 
-			var requestedStart = getUrlParameter('start');
-			var requestedEnd = getUrlParameter('end');
-			var parsedStart = new Date(requestedStart);
-			var parsedEnd = new Date(requestedEnd);
+							var requestedStart = getUrlParameter('start');
+							var requestedEnd = getUrlParameter('end');
+							var parsedStart = new Date(requestedStart);
+							var parsedEnd = new Date(requestedEnd);
 
-			//console.log("requested params: " + parsedStart + ", " + parsedEnd);
-			
-			if (Object.prototype.toString.call(parsedStart) === "[object Date]"
-					&& Object.prototype.toString
-							.call(parsedEnd) === "[object Date]") {
-				// it is a date
-				if (isNaN(parsedStart.getTime())
-						|| isNaN(parsedEnd.getTime())) {
-					// date is not valid
-					useDefault = true;
-				} else {
-					useDefault = false;
-				}
-			} else {
-				// not a date
-				useDefault = true;
-			}
+							//console.log("requested params: " + parsedStart + ", " + parsedEnd);
 
-			//console.log("Initing with using default ranges: " + useDefault);
-			properties = {};
-			if (useDefault) {
-				properties['start'] = defaultStart;
-				properties['end'] = defaultEnd;
-			} else {
-				properties['start'] = parsedStart;
-				properties['end'] = parsedEnd;
-			}
+							if (Object.prototype.toString.call(parsedStart) === "[object Date]"
+									&& Object.prototype.toString
+											.call(parsedEnd) === "[object Date]") {
+								// it is a date
+								if (isNaN(parsedStart.getTime())
+										|| isNaN(parsedEnd.getTime())) {
+									// date is not valid
+									useDefault = true;
+								} else {
+									useDefault = false;
+								}
+							} else {
+								// not a date
+								useDefault = true;
+							}
 
-			var filterParam = getUrlParameter('filter');
-			//console.log("filter param: " + filterParam);
-			if(filterParam == 'false'){
-				filtering = false;
-			}
-			//console.log("filtering: " + filtering);
-			
-			
-			loadNewData('rangechange', properties);
-			timeline.setWindow(properties['start'],
-					properties['end'], {
-						animation : false
-					});
-			graph2d.setWindow(properties['start'],
-					properties['end'], {
-						animation : false
-					});
+							//console.log("Initing with using default ranges: " + useDefault);
+							properties = {};
+							if (useDefault) {
+								properties['start'] = defaultStart;
+								properties['end'] = defaultEnd;
+							} else {
+								properties['start'] = parsedStart;
+								properties['end'] = parsedEnd;
+							}
 
-		});
+							var filterParam = getUrlParameter('filter');
+							//console.log("filter param: " + filterParam);
+							if (filterParam == 'false') {
+								filtering = false;
+							}
+							//console.log("filtering: " + filtering);
+
+							loadNewData('rangechange', properties);
+							timeline.setWindow(properties['start'],
+									properties['end'], {
+										animation : false
+									});
+							graph2d.setWindow(properties['start'],
+									properties['end'], {
+										animation : false
+									});
+
+						});
 
 		var getUrlParameter = function getUrlParameter(sParam) {
 			var sPageURL = decodeURIComponent(window.location.search
@@ -729,93 +799,94 @@
 		};
 
 		// Instance the tour
-		var tour = new Tour({
-			container : "body",
-			name : "expert-tour",
-			smartPlacement : true,
-			placement : "left",
-			keyboard : true,
-			storage : window.localStorage,
-			debug : false,
-			backdrop : true,
-			backdropContainer : 'body',
-			backdropPadding : 0,
-			redirect : true,
-			orphan : false,
-			duration : false,
-			delay : false,
-			steps : [
-			    
-			    {
-			    	title : "Introduction",
-			    	orphan : true,
-			    	content : "This is DAQ Expert interactive visualization tool.</br>It visualizes results of analysis in time.</br>You can freely move and zoom in by dragging and scrolling in the timelines."
-			    },
+		var tour = new Tour(
 				{
-					element : "#visualization",
-					title : "Analysis result",
-					placement : 'bottom',
-					content : "This is main analysis panel. Results and intermediate steps of reasoning are displayed here."
-				},
-				{
-			    	title: "Elements",
-					element : "#visualization",
-					placement : 'bottom',
-			    	content: function () {
-			    	    return '<p>Each row is visualizing one Logic Module results (or multiple Logic Modules if group name in bold). The number indicates how many events are visible in current time span. You can find details when you hover the label.</p><img src="external/expert-row.png" />';
-			    	  }
-			    },
-				{
-			    	title: "Element hiding",
-					element : "#visualization",
-					placement : 'bottom',
-			    	content: function () {
-			    	    return '<p>When you zoom out elements will get smaller. For the clarity they will be hidden and replaced by shadow indicating how many elements are underneath.</p><img src="external/expert-filter-explain.png" />';
-			    	  }
-			    },
-			    {
-			    	title: "Element color coding",
-					element : "#visualization",
-					placement : 'bottom',
-			    	content: function () {
-			    	    return '<p>Elements are color coded. Red indicates that event is important and notification was generated. Blue indicates regular events.</p>';
-			    	  }
-			    },
-			    {
-			    	title: "Element details",
-					element : "#visualization",
-					placement : 'bottom',
-			    	content: function () {
-			    	    return '<p>Click on element to show details.</p><img src="external/details.png" />';
-			    	  }
-			    },
-				{
-					element : "#raw",
-					title : "Raw data",
-					placement : 'top',
-					content : "This is raw data panel. Some parameters from snapshots are displayed here (avarage RU rate, sum of events in BU).</br>Time range is always synchronized with Analysis result timeline above."
-				},
-				{
-					element : "#raw",
-					title : "Raw data",
-					placement : 'top',
-					content : function () {
-			    	    return '<p>Click at any point in time to get the full snapshot in JSON format.</p><img src="external/snapshot.png" />';
-			    	  }
-				},
-				{
-					element : "#extended-view",
-					title : "View toggle",
-					placement : 'right',
-					content : "Toggle between simple and extended view here."
-				},
-				{
-					element : "#tour",
-					title : "Tour",
-					placement : 'left',
-					content : "You can always start this tour again here."
-				} ]
-			});
+					container : "body",
+					name : "expert-tour",
+					smartPlacement : true,
+					placement : "left",
+					keyboard : true,
+					storage : window.localStorage,
+					debug : false,
+					backdrop : true,
+					backdropContainer : 'body',
+					backdropPadding : 0,
+					redirect : true,
+					orphan : false,
+					duration : false,
+					delay : false,
+					steps : [
+
+							{
+								title : "Introduction",
+								orphan : true,
+								content : "This is DAQ Expert interactive visualization tool.</br>It visualizes results of analysis in time.</br>You can freely move and zoom in by dragging and scrolling in the timelines."
+							},
+							{
+								element : "#visualization",
+								title : "Analysis result",
+								placement : 'bottom',
+								content : "This is main analysis panel. Results and intermediate steps of reasoning are displayed here."
+							},
+							{
+								title : "Elements",
+								element : "#visualization",
+								placement : 'bottom',
+								content : function() {
+									return '<p>Each row is visualizing one Logic Module results (or multiple Logic Modules if group name in bold). The number indicates how many events are visible in current time span. You can find details when you hover the label.</p><img src="external/expert-row.png" />';
+								}
+							},
+							{
+								title : "Element hiding",
+								element : "#visualization",
+								placement : 'bottom',
+								content : function() {
+									return '<p>When you zoom out elements will get smaller. For the clarity they will be hidden and replaced by shadow indicating how many elements are underneath.</p><img src="external/expert-filter-explain.png" />';
+								}
+							},
+							{
+								title : "Element color coding",
+								element : "#visualization",
+								placement : 'bottom',
+								content : function() {
+									return '<p>Elements are color coded. Red indicates that event is important and notification was generated. Blue indicates regular events.</p>';
+								}
+							},
+							{
+								title : "Element details",
+								element : "#visualization",
+								placement : 'bottom',
+								content : function() {
+									return '<p>Click on element to show details.</p><img src="external/details.png" />';
+								}
+							},
+							{
+								element : "#raw",
+								title : "Raw data",
+								placement : 'top',
+								content : "This is raw data panel. Some parameters from snapshots are displayed here (avarage RU rate, sum of events in BU).</br>Time range is always synchronized with Analysis result timeline above."
+							},
+							{
+								element : "#raw",
+								title : "Raw data",
+								placement : 'top',
+								content : function() {
+									return '<p>Click at any point in time to get the full snapshot in JSON format.</p><img src="external/snapshot.png" />';
+								}
+							},
+							{
+								element : "#extended-view",
+								title : "View toggle",
+								placement : 'right',
+								content : "Toggle between simple and extended view here."
+							},
+							{
+								element : "#tour",
+								title : "Tour",
+								placement : 'left',
+								content : "You can always start this tour again here."
+							} ]
+				});
 		$('#tour').click(function(e) {
 			//console.log("Start tour");
 
@@ -824,25 +895,6 @@
 			// it's also good practice to preventDefault on the click event
 			// to avoid the click triggering whatever is within href:
 			e.preventDefault();
-		});
-		
-		$('#experiment').click(function(e) {
-			
-			
-			parameters = {};
-			parameters['start'] = timeline.getWindow()['start'].toISOString();
-			parameters['end'] = timeline.getWindow()['end'].toISOString();
-			
-
-			console.log("Experiment requested with parameters " + parameters);
-
-			$.getJSON("experiment", parameters, function(data) {
-				console.log("Successfull call");
-			}).error(function(jqXHR, textStatus, errorThrown) {
-				console.log("error " + textStatus);
-				console.log("errorThrown " + errorThrown);
-				console.log("incoming Text " + jqXHR.responseText);
-			});
 		});
 
 		$(document).ready(function() {
@@ -858,7 +910,7 @@
 
 
 
-	<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+	<div id="snapshot-popup" class="modal fade" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -875,6 +927,45 @@
 					<pre class="prettyprint lang-json" id="json-body"></pre>
 				</div>
 				<div class="modal-footer"></div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+	<div id="experimental-run-popup" class="modal fade" tabindex="-1"
+		role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Experimental Logic Module run</h4>
+				</div>
+				<div class="modal-body">
+
+					<p>
+						Timespan requested:</br> <span class="badge"
+							id="experimental-time-span-start">{}</span> - <span class="badge"
+							id="experimental-time-span-end">{}</span>
+					</p>
+					<p>
+						Duration requested:</br> <span class="badge" id="duration-humanized">{}</span>,
+						<span class="badge" id="duration-formatted">{}</span>
+					</p>
+
+					<div id="loader-animation" style="display: none;"
+						class="loader text-centered"></div>
+
+				</div>
+
+				<div class="modal-footer">
+					<button id="experimental-run-process-button" type="button"
+						class="btn btn-info">Run</button>
+				</div>
 			</div>
 			<!-- /.modal-content -->
 		</div>
@@ -903,24 +994,72 @@
 						<p id="raport-action">/action/</p>
 					</div>
 
-						<div id="context-section" >
-						
-							<button type="button" class="btn btn-info" data-toggle="collapse"
-								data-target="#context-collapse">Show raw context</button>
-							<div id="context-collapse" class="collapse">
-								<h4>Context</h4>
-								<pre id="raport-body"></pre>
-							</div>
-						</div>
+					<div id="context-section">
 
+						<button type="button" class="btn btn-info" data-toggle="collapse"
+							data-target="#context-collapse">Show raw context</button>
+						<div id="context-collapse" class="collapse">
+							<h4>Context</h4>
+							<pre id="raport-body"></pre>
+						</div>
 					</div>
-					<div class="modal-footer"></div>
+
 				</div>
-				<!-- /.modal-content -->
+				<div class="modal-footer"></div>
 			</div>
-			<!-- /.modal-dialog -->
+			<!-- /.modal-content -->
 		</div>
-		<!-- /.modal -->
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+	<script>
+		$('#run-experimental-lm-button').click(
+				function(e) {
+					params = getWindowInformationForAPI();
+					console.log("Experiment requested with parameters "
+							+ JSON.stringify(params));
+					$('#experimental-time-span-start').html(
+							moment(params['start']).format());
+					$('#experimental-time-span-end').html(
+							moment(params['end']).format());
+
+					$('#experimental-run-popup').modal('show')
+
+				});
+
+		var getWindowInformationForAPI = function() {
+
+			parameters = {};
+			parameters['start'] = timeline.getWindow()['start'].toISOString();
+			parameters['end'] = timeline.getWindow()['end'].toISOString();
+			return parameters;
+		}
+
+		var requestRunExperimentalLM = function() {
+			params = getWindowInformationForAPI();
+			$('#loader-animation').show();
+			$.getJSON("experiment", params, function(data) {
+				console.log("Successfull call " + data);
+				$('#loader-animation').hide();
+				$('#experimental-run-popup').modal('hide')
+				getData(params['start'], params['end'], mode);
+
+			}).error(function(jqXHR, textStatus, errorThrown) {
+				console.log("error " + textStatus);
+				console.log("errorThrown " + errorThrown);
+				console.log("incoming Text " + jqXHR.responseText);
+			});
+		};
+
+		$('#experimental-run-process-button').click(function(e) {
+			console.log("Run experimental logic modules!");
+
+			requestRunExperimentalLM();
+
+			//$('#experimental-run-popup').modal('hide')
+		});
+	</script>
 </body>
 
 </html>

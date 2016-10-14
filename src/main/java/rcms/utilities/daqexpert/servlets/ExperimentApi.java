@@ -2,6 +2,10 @@ package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 
 /**
  * Api to request rerun of experimental logic modules on chosen time span
@@ -30,6 +35,14 @@ public class ExperimentApi extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String experimentalLm = request.getParameter("experimental-lm");
+		experimentalLm = "test";
+		
+		logger.info("Experimental run of LM: " + experimentalLm);
+
+		Set<Entry> destination = new LinkedHashSet<Entry>();
+		Application.get().getDataManager().experimental.put(experimentalLm, destination);
+
 		String startRange = request.getParameter("start");
 		String endRange = request.getParameter("end");
 
@@ -38,9 +51,24 @@ public class ExperimentApi extends HttpServlet {
 
 		logger.info("Experimenting on from : " + startDate + " to " + endDate);
 
-		Application.get().getJobManager().fireOnDemandJob(startDate.getTime(), endDate.getTime());
+		Future future = Application.get().getJobManager().fireOnDemandJob(startDate.getTime(), endDate.getTime(),
+				destination);
 
-		Object result = "s";
+
+		String result = null;
+		
+		try {
+			future.get();
+			result = "successful";
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			result = e.getMessage();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			result = e.getMessage();
+		}
+		
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		String json = objectMapper.writeValueAsString(result);
 		response.setContentType("application/json");

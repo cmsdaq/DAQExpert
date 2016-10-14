@@ -29,16 +29,22 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class EventProducer {
 
+	public EventProducer() {
+		unfinished = new HashMap<>();
+		states = new HashMap<>();
+		finishedThisRound = new ArrayList<>();
+	}
+
 	/** Logger */
 	private static final Logger logger = Logger.getLogger(EventProducer.class);
 
 	/** All events without end date are kept here (unfinished) */
-	private final Map<String, Entry> unfinished = new HashMap<>();
+	private final Map<String, Entry> unfinished;
 
 	/** Current states are kept here */
-	private final Map<String, Boolean> states = new HashMap<>();
+	private final Map<String, Boolean> states;
 
-	private final List<Entry> finishedThisRound = new ArrayList<>();
+	private final List<Entry> finishedThisRound;
 
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
@@ -173,6 +179,9 @@ public class EventProducer {
 	}
 
 	public void clearProducer() {
+		for (java.util.Map.Entry<String, Boolean> state : states.entrySet()) {
+			state.setValue(false);
+		}
 		states.clear();
 		unfinished.clear();
 		finishedThisRound.clear();

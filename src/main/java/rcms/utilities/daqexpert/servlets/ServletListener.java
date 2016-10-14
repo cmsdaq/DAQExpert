@@ -8,6 +8,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -47,8 +48,9 @@ public class ServletListener implements ServletContextListener {
 		String sourceDirectory = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
 		Set<Entry> destination = Application.get().getDataManager().getResult();
+		DataManager dataManager = Application.get().getDataManager();
 
-		JobManager jobManager = new JobManager(sourceDirectory, destination, destination);
+		JobManager jobManager = new JobManager(sourceDirectory, destination, dataManager);
 		jobManager.startJobs();
 
 		Application.get().setJobManager(jobManager);

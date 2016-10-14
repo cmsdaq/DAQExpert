@@ -21,8 +21,8 @@ public class StableBeams extends SimpleLogicModule {
 		this.description = "Stable beams identified"; // TODO 1b. provide more
 														// info
 
-		this.group = EventGroup.EXPERIMENTAL; // leave it like this
-		this.priority = EventPriority.important; // leave it like this
+		this.group = EventGroup.OTHER; // leave it like this
+		this.priority = EventPriority.defaultt; // leave it like this
 	}
 
 	/**

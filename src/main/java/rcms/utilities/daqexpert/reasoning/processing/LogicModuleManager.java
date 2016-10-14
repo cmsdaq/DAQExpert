@@ -113,13 +113,21 @@ public class LogicModuleManager {
 	 *            current snapshot
 	 * @return results of logic modules analysis
 	 */
-	public List<Entry> runLogicModules(DAQ daq) {
+	public List<Entry> runLogicModules(DAQ daq, boolean includeExperimental) {
+
+		if (includeExperimental) {
+			try {
+				experimentalProcessor.loadScriptInstances();
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 
 		List<Entry> results = new ArrayList<>();
 
 		logger.debug("Running analysis modules for run " + daq.getSessionId());
 
-		results.addAll(runCheckers(daq));
+		results.addAll(runCheckers(daq,includeExperimental));
 		results.addAll(runComparators(daq));
 
 		return results;
@@ -130,9 +138,10 @@ public class LogicModuleManager {
 	 * 
 	 * @param daq
 	 *            current snapshot
+	 * @param includeExperimental
 	 * @return results of checkers analysis
 	 */
-	private List<Entry> runCheckers(DAQ daq) {
+	private List<Entry> runCheckers(DAQ daq, boolean includeExperimental) {
 		List<Entry> results = new ArrayList<>();
 		Date curr = null;
 		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
@@ -159,12 +168,14 @@ public class LogicModuleManager {
 			}
 		}
 
-		try {
-			experimentalProcessor.runLogicModules(daq, checkerResultMap);
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		}
+		if (includeExperimental) {
+			try {
+				experimentalProcessor.runLogicModules(daq, checkerResultMap);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
 
+		}
 		results.addAll(eventProducer.getFinishedThisRound());
 		eventProducer.clearFinishedThisRound();
 

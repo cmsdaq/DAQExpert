@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,7 +15,10 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
+import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
  * Manages the jobs of retrieving and processing the data (snapshots)
@@ -44,7 +48,7 @@ public class JobManager {
 
 	private final JobScheduler readerRaskController;
 
-	public JobManager(String sourceDirectory, Set<Entry> destination, Set<Entry> experimentalDestination) {
+	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
@@ -64,8 +68,13 @@ public class JobManager {
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
-		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, experimentalDestination);
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination);
+		EventProducer eventProducer = new EventProducer();
+		EventProducer eventProducer2 = new EventProducer();
+		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
+		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer2);
+
+		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null, snapshotProcessor2);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination, dataManager, snapshotProcessor);
 
 		readerRaskController = new JobScheduler(onDemandDataJob, futureDataPrepareJob);
 	}
@@ -74,8 +83,10 @@ public class JobManager {
 		readerRaskController.fireRealTimeReaderTask();
 	}
 
-	public void fireOnDemandJob(long startTime, long endTime) {
+	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination) {
 		onDemandReader.setTimeSpan(startTime, endTime);
-		readerRaskController.onDemandReaderTask();
+		onDemandDataJob.setDestination(destination);
+		onDemandDataJob.getSnapshotProcessor().clearProducer();
+		return readerRaskController.scheduleOnDemandReaderTask();
 	}
 }

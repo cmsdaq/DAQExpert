@@ -25,9 +25,12 @@ public class SnapshotProcessor {
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
 	private final NotificationSignalSender notificationSender;
+	
+	private EventProducer eventProducer;
 
 	public SnapshotProcessor(EventProducer eventProducer) {
 
+		this.eventProducer = eventProducer;
 		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
@@ -36,9 +39,9 @@ public class SnapshotProcessor {
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 
-	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications) {
+	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications, boolean includeExperimental) {
 		logger.trace("Process snapshot");
-		List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot);
+		List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
 
 		Set<Entry> result = new LinkedHashSet<>();
 		for (Entry lmResult : lmResults) {
@@ -54,6 +57,14 @@ public class SnapshotProcessor {
 				if (entry.isShow())
 					notificationSender.send(entry);
 		return result;
+	}
+
+	public EventProducer getEventProducer() {
+		return eventProducer;
+	}
+	
+	public void clearProducer(){
+		eventProducer = new EventProducer();
 	}
 
 }

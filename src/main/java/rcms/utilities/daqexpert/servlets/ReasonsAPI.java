@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
 
@@ -30,12 +31,13 @@ public class ReasonsAPI extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(ReasonsAPI.class);
 
 	int maxDuration = 1000000;
-
 	ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		String experimentalKey = request.getParameter("mode");
 
 		/* requested range dates */
 		String startRange = request.getParameter("start");
@@ -43,8 +45,9 @@ public class ReasonsAPI extends HttpServlet {
 		logger.debug("Getting reasons from : " + startRange + " to " + endRange);
 
 		/* parsed range dates */
-		Date startDate = objectMapper.readValue(startRange, Date.class);
-		Date endDate = objectMapper.readValue(endRange, Date.class);
+
+		Date startDate = DatatypeConverter.parseDateTime(startRange).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endRange).getTime();
 		logger.trace("Parsed range from : " + startDate + " to " + endDate);
 		Map<String, Object> result = new HashMap<>();
 
@@ -67,7 +70,14 @@ public class ReasonsAPI extends HttpServlet {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 
-		Collection<Entry> allElements = Application.get().getDataManager().getResult();
+		Collection<Entry> allElements = null;
+		if (experimentalKey == null || experimentalKey.equals("standard")) {
+			logger.info("API runs in standard mode");
+			allElements = Application.get().getDataManager().getResult();
+		} else {
+			logger.info("API runs in experimental mode: " + experimentalKey);
+			allElements = Application.get().getDataManager().experimental.get(experimentalKey);
+		}
 
 		logger.debug("There are " + allElements.size() + " in DataManager");
 		synchronized (allElements) {

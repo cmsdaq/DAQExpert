@@ -49,12 +49,13 @@ public class JobScheduler {
 
 	}
 
-	public void onDemandReaderTask() {
+	public ScheduledFuture scheduleOnDemandReaderTask() {
 
 		logger.info("Starting on-demand reader job");
 
 		ScheduledFuture<?> future = onDemandScheduler.schedule(onDemandReaderTask, 0, SECONDS);
 		onDemandReaderTask.setFuture(future);
+		return future;
 
 	}
 

@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
 
@@ -48,8 +49,8 @@ public class RawAPI extends HttpServlet {
 		String endRange = request.getParameter("end");
 		logger.debug("Getting reasons from : " + startRange + " to " + endRange);
 
-		Date startDate = objectMapper.readValue(startRange, Date.class);
-		Date endDate = objectMapper.readValue(endRange, Date.class);
+		Date startDate = DatatypeConverter.parseDateTime(startRange).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endRange).getTime();
 
 		// extend slightly timespan so that few snapshots more on the left and
 		// right are loaded to the chart - avoid cutting the chart lines

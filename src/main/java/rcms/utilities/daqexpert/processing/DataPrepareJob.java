@@ -10,7 +10,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
+import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
  * This job manages reading and processing the snapshots
@@ -23,13 +26,19 @@ public class DataPrepareJob extends StoppableJob {
 	private final ReaderJob readerJob;
 	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(DataPrepareJob.class);
-	private final Set<Entry> destination;
+	private Set<Entry> destination;
+	private DataManager dataManager;
 
-	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, Set<Entry> destination) {
+	private final SnapshotProcessor snapshotProcessor;
+
+	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, Set<Entry> destination,
+			DataManager dataManager, SnapshotProcessor snapshotProcessor) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
 		this.destination = destination;
+		this.dataManager = dataManager;
+		this.snapshotProcessor = snapshotProcessor;
 	}
 
 	private static int priority = 0;
@@ -48,11 +57,15 @@ public class DataPrepareJob extends StoppableJob {
 				else
 					priority++;
 
-				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight());
+				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager, snapshotProcessor);
 				Future<Set<Entry>> future = executorService.submit(processJob);
 
-				Set<Entry> result = future.get(3, TimeUnit.SECONDS);
-				destination.addAll(result);
+				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
+				if (destination != null) {
+					destination.addAll(result);
+				} else {
+					logger.warn("No desitnation for processing job - results will be forgotten");
+				}
 
 			} else {
 				logger.info("Job " + readerJob.getClass() + " has finished");
@@ -68,6 +81,18 @@ public class DataPrepareJob extends StoppableJob {
 			e.printStackTrace();
 		}
 
+	}
+
+	protected Set<Entry> getDestination() {
+		return destination;
+	}
+
+	protected void setDestination(Set<Entry> destination) {
+		this.destination = destination;
+	}
+
+	protected SnapshotProcessor getSnapshotProcessor() {
+		return snapshotProcessor;
 	}
 
 }

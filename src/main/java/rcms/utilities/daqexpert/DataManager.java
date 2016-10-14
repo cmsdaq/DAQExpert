@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,22 @@ public class DataManager {
 
 	private static final Logger logger = Logger.getLogger(DataManager.class);
 
+	/** All produced reasons are kept in this list */
+	private final Set<Entry> result;
+
+	/**
+	 * TODO: check if this field is really necessary
+	 */
+	public CircularFifoQueue<DAQ> buf;
+
+	public Map<String, Set<Entry>> experimental;
+
 	private final DataResolutionManager dataResolutionManager;
 
 	public DataManager() {
 		buf = new CircularFifoQueue<>(5000);
-		experimentalLMBuffer = new CircularFifoQueue<>(10);
+		experimental = new HashMap<>();
+		experimental.put("test", new HashSet<Entry>());
 
 		rawDataByResolution = new HashMap<>();
 
@@ -51,16 +63,6 @@ public class DataManager {
 
 		initialize();
 	}
-
-	/** All produced reasons are kept in this list */
-	private final Set<Entry> result;
-
-	/**
-	 * TODO: check if this field is really necessary
-	 */
-	public CircularFifoQueue<DAQ> buf;
-
-	public CircularFifoQueue<Map<String, Entry>> experimentalLMBuffer;
 
 	public void addSnapshot(DummyDAQ dummyDAQ) {
 

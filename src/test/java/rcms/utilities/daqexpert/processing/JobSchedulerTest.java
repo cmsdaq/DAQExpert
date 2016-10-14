@@ -66,7 +66,7 @@ public class JobSchedulerTest {
 		DeterministicScheduler s1 = new DeterministicScheduler();
 		JobScheduler dpc = new JobScheduler(simplePastTask, simpleRTTask, null, s1);
 
-		dpc.onDemandReaderTask();
+		dpc.scheduleOnDemandReaderTask();
 
 		s1.tick(5, TimeUnit.SECONDS);
 		Assert.assertEquals(0, counter);

@@ -3,18 +3,20 @@ package rcms.utilities.daqexpert.reasoning.processing;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -30,7 +32,6 @@ public class EventProducer {
 	/** Logger */
 	private static final Logger logger = Logger.getLogger(EventProducer.class);
 
-
 	/** All events without end date are kept here (unfinished) */
 	private final Map<String, Entry> unfinished = new HashMap<>();
 
@@ -39,26 +40,36 @@ public class EventProducer {
 
 	private final List<Entry> finishedThisRound = new ArrayList<>();
 
-
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
 	 * 
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	public void finish(Date date) {
+	public Set<Entry> finish(Date date) {
+
+		logger.trace("Unfinished: " + unfinished);
+		logger.trace("finishedTR: " + finishedThisRound);
+
+		Set<Entry> result = new HashSet<>();
+
 		for (Entry entry : unfinished.values()) {
 			entry.setEnd(date);
 			entry.calculateDuration();
-			// entry.setEnd(null);
+
+			if (entry.isShow()) {
+				result.add(entry);
+			}
+
 		}
+		return result;
 	}
 
 	/**
 	 * Produces events for value 111000111000 will produce 2 events
 	 * corresponding to 1 start and end time
 	 */
-	public Entry produce(SimpleLogicModule checker, boolean value, Date date) {
+	public Pair<Boolean, Entry> produce(SimpleLogicModule checker, boolean value, Date date) {
 		return produce(checker, value, date, checker.getGroup());
 	}
 
@@ -66,16 +77,23 @@ public class EventProducer {
 	 * 00000100000100000100 will produce 3 events corresponding to 1 start and
 	 * ending on next 1 start
 	 */
-	public void produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
+	public Pair<Boolean, Entry> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
 			produce(comparator, !value, current, comparator.getGroup());
-			produce(comparator, value, current, comparator.getGroup());
+			Pair<Boolean, Entry> b = produce(comparator, value, current, comparator.getGroup());
+			b.getRight().setShow(true);
+
+			logger.trace("Result for comparator LM: " + b.getLeft());
+			return b;
 		}
+
+		return Pair.of(false, null);
+
 	}
 
-	private Entry produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
+	private Pair<Boolean, Entry> produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
 		// get current state
 		String className = classificable.getClass().getSimpleName();
 		String content = classificable.getName();
@@ -87,12 +105,14 @@ public class EventProducer {
 			context = ((ActionLogicModule) classificable).getContext();
 		}
 
+		Boolean leftResult = false;
 		Entry result = null;
 		if (states.containsKey(className)) {
 			boolean currentState = states.get(className);
 
 			if (currentState != value) {
 				result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+				leftResult = true;
 				states.put(className, value);
 			} else {
 				result = unfinished.get(className);
@@ -103,12 +123,13 @@ public class EventProducer {
 		else {
 			states.put(className, value);
 			result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+			leftResult = true;
 		}
 		result.setEventFinder(classificable);
-		return result;
+		return Pair.of(leftResult, result);
 	}
 
-	private Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
+	protected Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
 			EventPriority eventClass, Context context) {
 
 		/* finish old entry */
@@ -119,7 +140,8 @@ public class EventProducer {
 			toFinish.calculateDuration();
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
-			finishedThisRound.add(toFinish);
+			if (!toFinish.getStart().equals(toFinish.getEnd()))
+				finishedThisRound.add(toFinish);
 		}
 
 		/* add new entry */
@@ -130,14 +152,13 @@ public class EventProducer {
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
 
-		//result.add(entry);
+		// result.add(entry);
 
-		Application.get().getDataManager().getResult().add(entry);
+		// Application.get().getDataManager().getResult().add(entry);
 		unfinished.put(className, entry);
 		return entry;
 	}
 
-	
 	@Override
 	public String toString() {
 		return "EventProducer [states=" + states + ", unfinished=" + unfinished + "]";
@@ -150,11 +171,15 @@ public class EventProducer {
 	public void clearFinishedThisRound() {
 		finishedThisRound.clear();
 	}
-	
-	public void clearProducer(){
+
+	public void clearProducer() {
 		states.clear();
 		unfinished.clear();
 		finishedThisRound.clear();
+	}
+
+	protected Map<String, Entry> getUnfinished() {
+		return unfinished;
 	}
 
 }

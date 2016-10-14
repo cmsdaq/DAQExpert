@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,10 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -37,7 +38,7 @@ public class RaportAPI extends HttpServlet {
 			int id = Integer.parseInt(idString);
 
 			Map<String, Object> result = new HashMap<>();
-			List<Entry> entries = Application.get().getDataManager().getResult();
+			Collection<Entry> entries = Application.get().getDataManager().getResult();
 			for (Entry entry : entries) {
 				// FIXME: map should be used
 				if (entry.getId() == id) {

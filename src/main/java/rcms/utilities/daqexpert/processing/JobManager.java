@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.util.Calendar;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -13,6 +14,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 
 /**
  * Manages the jobs of retrieving and processing the data (snapshots)
@@ -42,7 +44,7 @@ public class JobManager {
 
 	private final JobScheduler readerRaskController;
 
-	public JobManager(String sourceDirectory) {
+	public JobManager(String sourceDirectory, Set<Entry> destination, Set<Entry> experimentalDestination) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
@@ -62,8 +64,8 @@ public class JobManager {
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
-		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor);
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor);
+		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, experimentalDestination);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination);
 
 		readerRaskController = new JobScheduler(onDemandDataJob, futureDataPrepareJob);
 	}

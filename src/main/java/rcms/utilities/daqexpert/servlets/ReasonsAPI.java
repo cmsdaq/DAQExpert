@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,13 +45,12 @@ public class ReasonsAPI extends HttpServlet {
 		/* parsed range dates */
 		Date startDate = objectMapper.readValue(startRange, Date.class);
 		Date endDate = objectMapper.readValue(endRange, Date.class);
-		logger.debug("Parsed range from : " + startDate + " to " + endDate);
+		logger.trace("Parsed range from : " + startDate + " to " + endDate);
 		Map<String, Object> result = new HashMap<>();
 
 		List<Entry> entryList = new ArrayList<>();
 
 		Map<String, Set<Entry>> groupedMap = new HashMap<>();
-		Map<String, Integer> groupedQuantities = new HashMap<>();
 
 		Map<String, Long> durations = new HashMap<>();
 
@@ -59,7 +59,6 @@ public class ReasonsAPI extends HttpServlet {
 		 * This amount of sequential blocks of the same width is the threshold
 		 */
 		int elementsInRow = 100;
-		int filtered = 0;
 
 		/*
 		 * Filter entries based on the duration and requested range
@@ -68,7 +67,9 @@ public class ReasonsAPI extends HttpServlet {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 
-		List<Entry> allElements = Application.get().getDataManager().getResult();
+		Collection<Entry> allElements = Application.get().getDataManager().getResult();
+
+		logger.debug("There are " + allElements.size() + " in DataManager");
 		synchronized (allElements) {
 
 			for (Entry entry : allElements) {
@@ -111,6 +112,7 @@ public class ReasonsAPI extends HttpServlet {
 							// create base from this if not found
 							if (base == null) {
 								base = new Entry(entry);
+								base.setId(-base.getId());
 								if (EventPriority.critical.getCode().equals(entry.getClassName())) {
 									base.setClassName(EventPriority.filtered_important.getCode());
 								} else {

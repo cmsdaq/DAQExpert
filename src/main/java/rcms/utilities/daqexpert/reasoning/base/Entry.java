@@ -71,22 +71,25 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public Entry() {
-		this.id = globalId;
-		globalId++;
-		show = false;
+		this.id = ++globalId;
+		show = true;
 		this.state = EntryState.NEW;
 	}
 
 	public Entry(Entry entry) {
-		this.id = globalId;
+		this.id = -entry.id;
 		this.start = entry.start;
 		this.end = entry.end;
 		this.group = entry.group;
 		this.duration = entry.duration;
 		this.state = entry.state;
-		globalId++;
 	}
 
+	/**
+	 * Get duration in ms
+	 * 
+	 * @return duration in ms
+	 */
 	public long getDuration() {
 		return duration;
 	}
@@ -173,5 +176,27 @@ public class Entry implements Comparable<Entry> {
 
 	public void setFinishedContext(Context finishedContext) {
 		this.finishedContext = finishedContext;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Entry other = (Entry) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

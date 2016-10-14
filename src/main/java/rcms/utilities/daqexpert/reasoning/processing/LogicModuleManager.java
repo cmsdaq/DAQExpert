@@ -1,19 +1,18 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -52,6 +51,8 @@ public class LogicModuleManager {
 	private final List<ComparatorLogicModule> comparators = new ArrayList<>();
 
 	private final EventProducer eventProducer;
+
+	private ExperimentalProcessor experimentalProcessor;
 
 	/**
 	 * Constructor, order of checker matters. Checkers may use results of
@@ -94,6 +95,15 @@ public class LogicModuleManager {
 		comparators.add(new LevelZeroStateComparator());
 		comparators.add(new DAQStateComparator());
 		comparators.add(new EVMComparator());
+
+		try {
+			experimentalProcessor = new ExperimentalProcessor(
+					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
+			experimentalProcessor.loadExperimentalLogicModules();
+		} catch (IOException | ResourceException | ScriptException e) {
+			experimentalProcessor = null;
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -132,7 +142,7 @@ public class LogicModuleManager {
 
 			checkerResultMap.put(checker.getClass().getSimpleName(), result);
 			curr = new Date(daq.getLastUpdate());
-			Entry entry = eventProducer.produce(checker, result, curr);
+			Pair<Boolean, Entry> produceResult = eventProducer.produce(checker, result, curr);
 
 			/*
 			 * The event finishes (result = false), Context to be cleared for
@@ -144,10 +154,17 @@ public class LogicModuleManager {
 				((ActionLogicModule) checker).getContext().clearContext();
 			}
 
-			if (entry != null) {
-				results.add(entry);
+			if (produceResult.getLeft()) {
+				results.add(produceResult.getRight());
 			}
 		}
+
+		try {
+			experimentalProcessor.runLogicModules(daq, checkerResultMap);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		}
+
 		results.addAll(eventProducer.getFinishedThisRound());
 		eventProducer.clearFinishedThisRound();
 
@@ -181,6 +198,7 @@ public class LogicModuleManager {
 
 			// TODO: comparators may also return entry
 			eventProducer.produce(comparator, result, last, current);
+
 		}
 		return results;
 	}

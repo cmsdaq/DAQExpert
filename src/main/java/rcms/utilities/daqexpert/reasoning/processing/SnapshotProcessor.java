@@ -1,6 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -34,16 +36,24 @@ public class SnapshotProcessor {
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 
-	public int process(DAQ daqSnapshot, boolean createNotifications) {
-		List<Entry> result = checkManager.runLogicModules(daqSnapshot);
+	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications) {
+		logger.trace("Process snapshot");
+		List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot);
 
-		logger.debug("Results from CheckManager for this snapshot: " + result);
+		Set<Entry> result = new LinkedHashSet<>();
+		for (Entry lmResult : lmResults) {
+			result.add(lmResult);
+		}
+
+		// Application.get().getDataManager().getResult().addAll(result);
+
+		logger.debug("Results from CheckManager for this snapshot: " + lmResults);
 
 		if (createNotifications)
 			for (Entry entry : result)
 				if (entry.isShow())
 					notificationSender.send(entry);
-		return result.size();
+		return result;
 	}
 
 }

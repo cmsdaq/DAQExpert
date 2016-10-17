@@ -53,6 +53,7 @@ public class LogicModuleManager {
 	private final EventProducer eventProducer;
 
 	private ExperimentalProcessor experimentalProcessor;
+	private boolean artificialForced;
 
 	/**
 	 * Constructor, order of checker matters. Checkers may use results of
@@ -104,6 +105,8 @@ public class LogicModuleManager {
 			experimentalProcessor = null;
 			e.printStackTrace();
 		}
+		
+		artificialForced = true;
 	}
 
 	/**
@@ -115,19 +118,11 @@ public class LogicModuleManager {
 	 */
 	public List<Entry> runLogicModules(DAQ daq, boolean includeExperimental) {
 
-		if (includeExperimental) {
-			try {
-				experimentalProcessor.loadScriptInstances();
-			} catch (InstantiationException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-
 		List<Entry> results = new ArrayList<>();
 
 		logger.debug("Running analysis modules for run " + daq.getSessionId());
 
-		results.addAll(runCheckers(daq,includeExperimental));
+		results.addAll(runCheckers(daq, includeExperimental));
 		results.addAll(runComparators(daq));
 
 		return results;
@@ -193,16 +188,15 @@ public class LogicModuleManager {
 		List<Entry> results = new ArrayList<>();
 		for (ComparatorLogicModule comparator : comparators) {
 			Date last = null;
-			if (comparator.getLast() != null)
-				last = new Date(comparator.getLast().getLastUpdate());
 
 			/* add artificial event starting point */
-			if (last == null) {
+			if (artificialForced || comparator.getLast() == null) {
 				DAQ fake = new DAQ();
 				last = new Date(daq.getLastUpdate());
 				fake.setLastUpdate(daq.getLastUpdate());
 				comparator.setLast(fake);
-			}
+			} else
+				last = new Date(comparator.getLast().getLastUpdate());
 
 			boolean result = comparator.compare(daq);
 			Date current = new Date(comparator.getLast().getLastUpdate());
@@ -211,6 +205,15 @@ public class LogicModuleManager {
 			eventProducer.produce(comparator, result, last, current);
 
 		}
+		artificialForced = false;
 		return results;
+	}
+
+	public ExperimentalProcessor getExperimentalProcessor() {
+		return experimentalProcessor;
+	}
+
+	public void setArtificialForced(boolean artificialForced) {
+		this.artificialForced = artificialForced;
 	}
 }

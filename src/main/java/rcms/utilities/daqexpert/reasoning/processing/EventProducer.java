@@ -54,7 +54,7 @@ public class EventProducer {
 	 */
 	public Set<Entry> finish(Date date) {
 
-		logger.trace("Unfinished: " + unfinished);
+		logger.info("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finishedTR: " + finishedThisRound);
 
 		Set<Entry> result = new HashSet<>();
@@ -179,6 +179,7 @@ public class EventProducer {
 	}
 
 	public void clearProducer() {
+		logger.info("Clearing producer");
 		for (java.util.Map.Entry<String, Boolean> state : states.entrySet()) {
 			state.setValue(false);
 		}

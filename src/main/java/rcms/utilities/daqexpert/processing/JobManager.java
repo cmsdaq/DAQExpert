@@ -86,6 +86,7 @@ public class JobManager {
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination) {
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.setDestination(destination);
+		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
 		return readerRaskController.scheduleOnDemandReaderTask();
 	}

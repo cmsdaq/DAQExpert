@@ -53,6 +53,11 @@ public class ProcessJob implements Callable<Set<Entry>> {
 		Set<Entry> result = new LinkedHashSet<>();
 
 		DAQ daq = null;
+
+		if (includeExperimental) {
+			snapshotProcessor.getCheckManager().getExperimentalProcessor().loadExperimentalLogicModules();
+		}
+
 		for (File file : entries) {
 
 			daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
@@ -79,7 +84,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 			logger.info("Temporarly finishing events");
 			Set<Entry> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
 			// Application.get().getDataManager().getResult().addAll(finished);
-			logger.debug("Finishing the round.");
+			logger.info("Force finishing returned with results: " + finished);
 			result.addAll(finished);
 		}
 

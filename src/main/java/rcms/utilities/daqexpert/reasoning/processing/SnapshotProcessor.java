@@ -20,7 +20,7 @@ import rcms.utilities.daqexpert.reasoning.base.Entry;
  */
 public class SnapshotProcessor {
 
-	private LogicModuleManager checkManager;
+	private final LogicModuleManager checkManager;
 
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
@@ -64,7 +64,11 @@ public class SnapshotProcessor {
 	}
 	
 	public void clearProducer(){
-		eventProducer = new EventProducer();
+		eventProducer.clearProducer();// = new EventProducer();
+	}
+
+	public LogicModuleManager getCheckManager() {
+		return checkManager;
 	}
 
 }

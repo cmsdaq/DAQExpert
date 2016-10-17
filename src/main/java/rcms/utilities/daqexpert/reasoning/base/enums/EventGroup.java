@@ -16,7 +16,8 @@ public enum EventGroup {
 	LEVEL_ZERO("level-zero",0),
 	DAQ_STATE("daq-state",0),
 	EXPERIMENTAL("experimental",0),
-	OTHER("other",0);
+	OTHER("other",0),
+	HIDDEN("hidden",0);
 
 	private final String code;
 	

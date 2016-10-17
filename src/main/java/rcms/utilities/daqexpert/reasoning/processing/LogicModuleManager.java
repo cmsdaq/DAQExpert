@@ -100,7 +100,7 @@ public class LogicModuleManager {
 		try {
 			experimentalProcessor = new ExperimentalProcessor(
 					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
-			experimentalProcessor.loadExperimentalLogicModules();
+			//experimentalProcessor.loadExperimentalLogicModules();
 		} catch (IOException | ResourceException | ScriptException e) {
 			experimentalProcessor = null;
 			e.printStackTrace();

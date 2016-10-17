@@ -50,6 +50,8 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 	public Set<Entry> call() throws Exception {
 
+		Long start = System.currentTimeMillis();
+
 		Set<Entry> result = new LinkedHashSet<>();
 
 		DAQ daq = null;
@@ -76,15 +78,19 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 		}
 
-		logger.debug("files processed in this round " + entries.size());
+		Long end = System.currentTimeMillis();
+		int time = (int) (end - start);
+
+		if (entries.size() > 0)
+			logger.info(entries.size() + " files processed this round in " + time + "ms");
 		logger.trace("values in data manager " + Application.get().getDataManager().getRawDataByResolution()
 				.get(DataResolution.Full).get(DataStream.EVENTS));
 
 		if (daq != null) {
-			logger.info("Temporarly finishing events");
+			logger.debug("Temporarly finishing events");
 			Set<Entry> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
 			// Application.get().getDataManager().getResult().addAll(finished);
-			logger.info("Force finishing returned with results: " + finished);
+			logger.debug("Force finishing returned with results: " + finished);
 			result.addAll(finished);
 		}
 

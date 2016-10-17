@@ -54,7 +54,7 @@ public class EventProducer {
 	 */
 	public Set<Entry> finish(Date date) {
 
-		logger.info("Artificial finishing with unfinished events: " + unfinished);
+		logger.debug("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finishedTR: " + finishedThisRound);
 
 		Set<Entry> result = new HashSet<>();

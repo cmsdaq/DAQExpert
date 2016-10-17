@@ -72,10 +72,10 @@ public class ReasonsAPI extends HttpServlet {
 
 		Collection<Entry> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
-			logger.info("API runs in standard mode");
+			logger.debug("API runs in standard mode");
 			allElements = Application.get().getDataManager().getResult();
 		} else {
-			logger.info("API runs in experimental mode: " + experimentalKey);
+			logger.debug("API runs in experimental mode: " + experimentalKey);
 			allElements = Application.get().getDataManager().experimental.get(experimentalKey);
 		}
 

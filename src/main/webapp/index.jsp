@@ -122,14 +122,18 @@
 	animation: spin 0.5s linear infinite;
 }
 
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+@-webkit-keyframes spin { 0% {
+	-webkit-transform: rotate(0deg);
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+100%{-webkit-transform:rotate(360deg);
+}
+}
+@keyframes spin { 0% {
+	transform: rotate(0deg);
+}
+100%{transform:rotate(360deg);
+}
 }
 </style>
 
@@ -957,14 +961,24 @@
 						<span class="badge" id="duration-formatted">{}</span>
 					</p>
 
+
+					<label for="elm-select">Select Logic Module from <code id='experimental-dir' class="inlinecode">/current/dir/to/lms/</code></label>
+					<select
+						class="form-control" id="elm-select">
+						<option>sketch-file-name.java</option>
+					</select>
+
 					<div id="loader-animation" style="display: none;"
 						class="loader text-centered"></div>
 
 				</div>
 
 				<div class="modal-footer">
+					<button id="experimental-load-button" type="button"
+						class="btn btn-default">Load</button>
 					<button id="experimental-run-process-button" type="button"
 						class="btn btn-info">Run</button>
+					
 				</div>
 			</div>
 			<!-- /.modal-content -->
@@ -1014,11 +1028,14 @@
 	<!-- /.modal -->
 
 	<script>
+	
+		/* Show modal experimental */
 		$('#run-experimental-lm-button').click(
 				function(e) {
+					requestListOfExperimentalLM();
 					params = getWindowInformationForAPI();
-					console.log("Experiment requested with parameters "
-							+ JSON.stringify(params));
+					/*console.log("Experiment requested with parameters "
+							+ JSON.stringify(params));*/
 					$('#experimental-time-span-start').html(
 							moment(params['start']).format());
 					$('#experimental-time-span-end').html(
@@ -1029,7 +1046,6 @@
 				});
 
 		var getWindowInformationForAPI = function() {
-
 			parameters = {};
 			parameters['start'] = timeline.getWindow()['start'].toISOString();
 			parameters['end'] = timeline.getWindow()['end'].toISOString();
@@ -1038,9 +1054,13 @@
 
 		var requestRunExperimentalLM = function() {
 			params = getWindowInformationForAPI();
+			var selected = $('#elm-select').find(":selected").text();
+			//console.log("selected " + selected);
+			params['experimental-lm'] = selected;
+			mode = selected;
 			$('#loader-animation').show();
 			$.getJSON("experiment", params, function(data) {
-				console.log("Successfull call " + data);
+				//console.log("Successfull call " + data);
 				$('#loader-animation').hide();
 				$('#experimental-run-popup').modal('hide')
 				getData(params['start'], params['end'], mode);
@@ -1051,13 +1071,42 @@
 				console.log("incoming Text " + jqXHR.responseText);
 			});
 		};
+		
+		
+		var requestListOfExperimentalLM = function() {
+			$.getJSON("scripts", params, function(data) {
+				//console.log("Successfull call " + data);
+				
+				$('#experimental-dir').text(data['directory']);
+				$("#elm-select").empty();
+				$.each(data['names'], function(index, lm) {
+	  				//console.log("base: "+ lm);
+	  				$("<option>").appendTo($('#elm-select')).text(lm)
+				});
+
+			}).error(function(jqXHR, textStatus, errorThrown) {
+				console.log("error " + textStatus);
+				console.log("errorThrown " + errorThrown);
+				console.log("incoming Text " + jqXHR.responseText);
+			});
+		};
 
 		$('#experimental-run-process-button').click(function(e) {
-			console.log("Run experimental logic modules!");
-
+			//console.log("Run experimental logic modules!");
 			requestRunExperimentalLM();
 
 			//$('#experimental-run-popup').modal('hide')
+		});
+		
+		$('#experimental-load-button').click(function(e) {
+			//console.log("Load experimental logic modules!");
+			var selected = $('#elm-select').find(":selected").text();
+			//console.log("selected now " + selected);
+			mode = selected;
+			params = getWindowInformationForAPI();
+			getData(params['start'], params['end'], mode);
+			$('#experimental-run-popup').modal('hide')
+
 		});
 	</script>
 </body>

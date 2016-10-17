@@ -29,8 +29,8 @@ public class ExperimentalProcessor {
 
 	private final GroovyScriptEngine groovyScriptEngine;
 
-	FileSystemConnector connector;
-	String experimentalDirectory;
+	private final FileSystemConnector connector;
+	private final String experimentalDirectory;
 
 	private static final Logger logger = Logger.getLogger(ExperimentalProcessor.class);
 
@@ -97,6 +97,11 @@ public class ExperimentalProcessor {
 		return result;
 	}
 
+	/**
+	 * Gets a list of scripts available in experimental dir
+	 * 
+	 * @return
+	 */
 	protected List<Class<LogicModule>> getScripts() {
 
 		try {
@@ -125,6 +130,10 @@ public class ExperimentalProcessor {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public List<File> getScriptFiles() throws IOException {
+		return connector.getFiles(experimentalDirectory);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -156,4 +165,9 @@ public class ExperimentalProcessor {
 			e.printStackTrace();
 		}
 	}
+
+	public String getExperimentalDirectory() {
+		return experimentalDirectory;
+	}
+
 }

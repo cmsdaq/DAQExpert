@@ -79,111 +79,116 @@ public class ReasonsAPI extends HttpServlet {
 			allElements = Application.get().getDataManager().experimental.get(experimentalKey);
 		}
 
-		logger.debug("There are " + allElements.size() + " in DataManager");
-		synchronized (allElements) {
+		if (allElements != null) {
 
-			for (Entry entry : allElements) {
+			logger.debug("There are " + allElements.size() + " in DataManager");
+			synchronized (allElements) {
 
-				if (entry.getEventFinder().getGroup() != EventGroup.HIDDEN) {
+				for (Entry entry : allElements) {
 
-					// this needs to be optimized
-					try {
-						if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
+					if (entry.getEventFinder().getGroup() != EventGroup.HIDDEN) {
 
-							if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode()
-									&& entry.getContent().equals("STABLE BEAMS"))
-									|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
-									|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
-								long current = 0;
-								if (durations.containsKey(entry.getGroup())) {
-									current = durations.get(entry.getGroup());
+						// this needs to be optimized
+						try {
+							if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
+
+								if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode()
+										&& entry.getContent().equals("STABLE BEAMS"))
+										|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
+										|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
+									long current = 0;
+									if (durations.containsKey(entry.getGroup())) {
+										current = durations.get(entry.getGroup());
+									}
+									durations.put(entry.getGroup(), current + entry.getDuration());
 								}
-								durations.put(entry.getGroup(), current + entry.getDuration());
+
+								if (entry.getDuration() > durationThreshold) {
+									entryList.add(entry);
+								} else {
+									logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
+											+ " will be filtered");
+									if (!groupedMap.containsKey(entry.getGroup())) {
+										groupedMap.put(entry.getGroup(), new HashSet<Entry>());
+									}
+
+									// find existing group to merge to
+									Entry base = null;
+									for (Entry potentialBase : groupedMap.get(entry.getGroup())) {
+
+										if (potentialBase.getStart().getTime() - durationThreshold <= entry.getStart()
+												.getTime()
+												&& potentialBase.getEnd().getTime() + durationThreshold >= entry
+														.getEnd().getTime()) {
+											base = potentialBase;
+											break;
+										}
+									}
+
+									// create base from this if not found
+									if (base == null) {
+										base = new Entry(entry);
+										base.setId(-base.getId());
+										if (EventPriority.critical.getCode().equals(entry.getClassName())) {
+											base.setClassName(EventPriority.filtered_important.getCode());
+										} else {
+											base.setClassName(EventPriority.filtered.getCode());
+										}
+										// type: 'background',
+										base.setContent("1");
+									}
+
+									// merge
+									else {
+										if (base.getStart().after(entry.getStart()))
+											base.setStart(entry.getStart());
+										if (base.getEnd().before(entry.getEnd())) {
+											base.setEnd(entry.getEnd());
+										}
+										base.calculateDuration();
+										int filteredElements = Integer.parseInt(base.getContent());
+										base.setContent((filteredElements + 1) + "");
+
+										if (EventPriority.critical.getCode().equals(entry.getClassName())) {
+											base.setClassName(EventPriority.filtered_important.getCode());
+										}
+									}
+
+									groupedMap.get(entry.getGroup()).add(base);
+								}
 							}
-
-							if (entry.getDuration() > durationThreshold) {
-								entryList.add(entry);
-							} else {
-								logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
-										+ " will be filtered");
-								if (!groupedMap.containsKey(entry.getGroup())) {
-									groupedMap.put(entry.getGroup(), new HashSet<Entry>());
-								}
-
-								// find existing group to merge to
-								Entry base = null;
-								for (Entry potentialBase : groupedMap.get(entry.getGroup())) {
-
-									if (potentialBase.getStart().getTime() - durationThreshold <= entry.getStart()
-											.getTime()
-											&& potentialBase.getEnd().getTime() + durationThreshold >= entry.getEnd()
-													.getTime()) {
-										base = potentialBase;
-										break;
-									}
-								}
-
-								// create base from this if not found
-								if (base == null) {
-									base = new Entry(entry);
-									base.setId(-base.getId());
-									if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-										base.setClassName(EventPriority.filtered_important.getCode());
-									} else {
-										base.setClassName(EventPriority.filtered.getCode());
-									}
-									// type: 'background',
-									base.setContent("1");
-								}
-
-								// merge
-								else {
-									if (base.getStart().after(entry.getStart()))
-										base.setStart(entry.getStart());
-									if (base.getEnd().before(entry.getEnd())) {
-										base.setEnd(entry.getEnd());
-									}
-									base.calculateDuration();
-									int filteredElements = Integer.parseInt(base.getContent());
-									base.setContent((filteredElements + 1) + "");
-
-									if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-										base.setClassName(EventPriority.filtered_important.getCode());
-									}
-								}
-
-								groupedMap.get(entry.getGroup()).add(base);
-							}
+						} catch (NullPointerException e) {
+							// it means that some of reasons are being builed by
+							// event
+							// builder, just dont show them yet, they will be
+							// ready
+							// on
+							// next
+							// request
 						}
-					} catch (NullPointerException e) {
-						// it means that some of reasons are being builed by
-						// event
-						// builder, just dont show them yet, they will be ready
-						// on
-						// next
-						// request
+					}
+
+				}
+			}
+			for (Set<Entry> groupedEntries : groupedMap.values()) {
+
+				for (Entry groupedEntry : groupedEntries) {
+					if (groupedEntry.getDuration() < durationThreshold) {
+						int append = (int) (durationThreshold - groupedEntry.getDuration());
+
+						Date alteredStart = new Date(groupedEntry.getStart().getTime() - append / 2);
+						Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append / 2);
+						groupedEntry.setStart(alteredStart);
+						groupedEntry.setEnd(alteredEnd);
+						groupedEntry.calculateDuration();
 					}
 				}
 
+				entryList.addAll(groupedEntries);
+
 			}
-		}
-
-		for (Set<Entry> groupedEntries : groupedMap.values()) {
-
-			for (Entry groupedEntry : groupedEntries) {
-				if (groupedEntry.getDuration() < durationThreshold) {
-					int append = (int) (durationThreshold - groupedEntry.getDuration());
-
-					Date alteredStart = new Date(groupedEntry.getStart().getTime() - append / 2);
-					Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append / 2);
-					groupedEntry.setStart(alteredStart);
-					groupedEntry.setEnd(alteredEnd);
-					groupedEntry.calculateDuration();
-				}
-			}
-
-			entryList.addAll(groupedEntries);
-
+		}else {
+			logger.warn("There is no data for reasons API. It will return nothing.");
 		}
 
 		/*

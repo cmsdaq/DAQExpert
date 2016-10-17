@@ -36,7 +36,7 @@ public class ExperimentApi extends HttpServlet {
 			throws ServletException, IOException {
 
 		String experimentalLm = request.getParameter("experimental-lm");
-		experimentalLm = "test";
+		//experimentalLm = "test";
 		
 		logger.info("Experimental run of LM: " + experimentalLm);
 

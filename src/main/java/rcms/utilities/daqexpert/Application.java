@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -38,23 +40,27 @@ public class Application {
 
 	public static void initialize(String propertiesFile) {
 		String message = "Required property missing ";
+		List<String> missing = new ArrayList<>();
 		instance = new Application(propertiesFile);
 		if (!instance.prop.containsKey(NM_DASHBOARD))
-			throw new RuntimeException(message + NM_DASHBOARD);
-		if (!instance.prop.containsKey(NM_DASHBOARD))
-			throw new RuntimeException(message + NM_DASHBOARD);
+			missing.add(NM_DASHBOARD);
 		if (!instance.prop.containsKey(SNAPSHOTS_DIR))
-			throw new RuntimeException(message + SNAPSHOTS_DIR);
+			missing.add(SNAPSHOTS_DIR);
 		if (!instance.prop.containsKey(NM_API_CREATE))
-			throw new RuntimeException(message + NM_API_CREATE);
+			missing.add(NM_API_CREATE);
 		if (!instance.prop.containsKey(NM_API_CLOSE))
-			throw new RuntimeException(message + NM_API_CLOSE);
+			missing.add(NM_API_CLOSE);
 		if (!instance.prop.containsKey(LANDING))
-			throw new RuntimeException(message + LANDING);
+			missing.add(LANDING);
 		if (!instance.prop.containsKey(OFFSET))
-			throw new RuntimeException(message + OFFSET);
+			missing.add(OFFSET);
 		if (!instance.prop.containsKey(EXPERIMENTAL_DIR))
-			throw new RuntimeException(message + EXPERIMENTAL_DIR);
+			missing.add(EXPERIMENTAL_DIR);
+
+		if (missing.size() > 0) {
+			logger.fatal(message + missing);
+			throw new RuntimeException(message + missing);
+		}
 	}
 
 	private Application(String propertiesFile) {

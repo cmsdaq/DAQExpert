@@ -947,20 +947,22 @@
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Experimental Logic Module run</h4>
+					<h4 class="modal-title">Summary of experimental run</h4>
 				</div>
 				<div class="modal-body">
 
-					<p>
-						Timespan requested:</br> <span class="badge"
+					<label for="timespan-summary">Timespan</label>
+					<p id="timespan-summary"> <span class="badge"
 							id="experimental-time-span-start">{}</span> - <span class="badge"
 							id="experimental-time-span-end">{}</span>
 					</p>
-					<p>
-						Duration requested:</br> <span class="badge" id="duration-humanized">{}</span>,
-						<span class="badge" id="duration-formatted">{}</span>
+					
+					<label for="duration-summary">Duration</label>
+					<p id="duration-summary"><span class="badge" id="duration-humanized">{}</span></p>
+					<p id="processing-warning0-message" class ="bg-danger">You are trying to process <span class='duration-in-message'></span> of snapshots. Processing will take too long. Please zoom in to interesting period of few minutes.
 					</p>
-
+					<p id="processing-warning1-message" class ="bg-warning">You are about to process <span class='duration-in-message'></span> of snapshots. Processing may take few seconds. Be patient or zoom-in to interesting period.
+					</p>
 
 					<label for="elm-select">Select Logic Module from <code id='experimental-dir' class="inlinecode">/current/dir/to/lms/</code></label>
 					<select
@@ -1036,10 +1038,28 @@
 					params = getWindowInformationForAPI();
 					/*console.log("Experiment requested with parameters "
 							+ JSON.stringify(params));*/
-					$('#experimental-time-span-start').html(
-							moment(params['start']).format());
-					$('#experimental-time-span-end').html(
-							moment(params['end']).format());
+							
+					var start = moment(params['start']);
+					var end = moment(params['end']);
+					$('#experimental-time-span-start').html(start.format());
+					$('#experimental-time-span-end').html(end.format());
+					
+					var diff = end.diff(start);
+					$('#processing-warning0-message').hide();
+					$('#processing-warning1-message').hide();
+					$('#experimental-run-process-button').attr("disabled", false);
+					if(diff > 1 * 60 * 60 * 1000){
+						$('#processing-warning0-message').show();
+						$('#experimental-run-process-button').attr("disabled", true);
+					} else if(diff > 30 * 60 * 1000){
+						$('#processing-warning1-message').show();
+					} 
+						
+					var duration = moment.duration(diff);
+					
+					console.log("Duration " + duration);
+					$('.duration-in-message').html(duration.humanize());
+					$('#duration-humanized').html(duration.humanize());
 
 					$('#experimental-run-popup').modal('show')
 

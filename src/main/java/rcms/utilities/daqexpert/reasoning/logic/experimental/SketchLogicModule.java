@@ -18,7 +18,6 @@ public class SketchLogicModule extends SimpleLogicModule {
 	public SketchLogicModule() {
 		this.name = "experimental"; // TODO: 1a. set descriptive name
 		this.description = "Easy start sketch LM"; // TODO 1b. provide more info
-
 		this.group = EventGroup.EXPERIMENTAL;
 		this.priority = EventPriority.EXPERIMENTAL;
 	}
@@ -38,9 +37,7 @@ public class SketchLogicModule extends SimpleLogicModule {
 	@Override
 	public boolean satisfied(DAQ snapshot, Map<String, Boolean> results) {
 
-		/*
-		 * TODO: 2a. implement your condition here
-		 */
+		/* TODO: 2a. implement your condition here */
 		return false;
 	}
 

@@ -14,7 +14,7 @@ public class SessionComparator extends ComparatorLogicModule {
 	public SessionComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.SESSION_NUMBER;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "DAQ session";
 	}
 

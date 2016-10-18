@@ -8,12 +8,13 @@ package rcms.utilities.daqexpert.reasoning.base.enums;
  */
 public enum EventPriority {
 
-	defaultt("default"),
-	important("important"),
-	warning("warning"),
-	critical("critical"),
-	filtered("filtered"),
-	filtered_important("filtered-important");
+	DEFAULTT("default"),
+	IMPORTANT("important"),
+	WARNING("warning"),
+	CRITICAL("critical"),
+	FILTERED("filtered"),
+	EXPERIMENTAL("experimental"),
+	FILTERED_IMPORTANT("filtered-important");
 
 	private EventPriority(String code) {
 		this.code = code;

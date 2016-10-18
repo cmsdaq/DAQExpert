@@ -34,7 +34,7 @@ public class FlowchartCase2 extends ActionLogicModule {
 				"Problem fixed: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data)");
 		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 	}
 
 	private static Logger logger = Logger.getLogger(FlowchartCase2.class);

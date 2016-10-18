@@ -40,8 +40,6 @@ public class JobManager {
 
 	private final ThreadPoolExecutor mainExecutor;
 
-	private final DataPrepareJob onDemandDataJob;
-
 	private final OnDemandReaderJob onDemandReader;
 
 	private final DataPrepareJob futureDataPrepareJob;
@@ -69,25 +67,27 @@ public class JobManager {
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
 		EventProducer eventProducer = new EventProducer();
-		EventProducer eventProducer2 = new EventProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
-		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer2);
 
-		onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null, snapshotProcessor2);
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination, dataManager, snapshotProcessor);
 
-		readerRaskController = new JobScheduler(onDemandDataJob, futureDataPrepareJob);
+		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
 
 	public void startJobs() {
 		readerRaskController.fireRealTimeReaderTask();
 	}
 
-	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination) {
+	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination, String scriptName) {
+
+		EventProducer eventProducer = new EventProducer();
+		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
+		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null, snapshotProcessor2);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.setDestination(destination);
+		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor().setRequestedScript(scriptName);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
-		return readerRaskController.scheduleOnDemandReaderTask();
+		return readerRaskController.scheduleOnDemandReaderTask(onDemandDataJob);
 	}
 }

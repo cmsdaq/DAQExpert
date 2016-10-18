@@ -68,6 +68,14 @@
 	box-shadow: 0 0 10px gray;
 }
 
+.vis-item.experimental {
+	color: white;
+	background-color: #5bc0de;
+	border-color: #2aabd2;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
 /* gray background in weekends, white text color */
 .vis-time-axis .vis-grid.vis-saturday, .vis-time-axis .vis-grid.vis-sunday
 	{
@@ -201,7 +209,7 @@
 		<div class="btn-group pull-right ">
 			<button style="display: none;" class="btn btn-sm btn-info"
 				id="run-experimental-lm-button" href="#">
-				<i class="glyphicon glyphicon-question-sign"></i> Run experimental
+				<i class="glyphicon glyphicon-play"></i> Run experimental
 				LMs
 			</button>
 			<button class="btn btn-sm btn-warning" id="tour" href="#">
@@ -972,14 +980,18 @@
 
 					<div id="loader-animation" style="display: none;"
 						class="loader text-centered"></div>
+						
+						<p id="processing-error-message" class ="bg-danger">Error occurred while processing your Logic Module.
+					</p>
+					<pre id="processing-error-stacktrace"></pre>
 
 				</div>
 
 				<div class="modal-footer">
 					<button id="experimental-load-button" type="button"
-						class="btn btn-default">Load</button>
+						class="btn btn-default"><i class="glyphicon glyphicon-repeat"></i> Load</button>
 					<button id="experimental-run-process-button" type="button"
-						class="btn btn-info">Run</button>
+						class="btn btn-info"><i class="glyphicon glyphicon-play"></i> Run</button>
 					
 				</div>
 			</div>
@@ -1047,6 +1059,8 @@
 					var diff = end.diff(start);
 					$('#processing-warning0-message').hide();
 					$('#processing-warning1-message').hide();
+					$('#processing-error-message').hide();
+					$('#processing-error-stacktrace').hide();
 					$('#experimental-run-process-button').attr("disabled", false);
 					if(diff > 1 * 60 * 60 * 1000){
 						$('#processing-warning0-message').show();
@@ -1080,10 +1094,19 @@
 			mode = selected;
 			$('#loader-animation').show();
 			$.getJSON("experiment", params, function(data) {
-				//console.log("Successfull call " + data);
+				console.log("Successfull call " + data);
 				$('#loader-animation').hide();
-				$('#experimental-run-popup').modal('hide')
-				getData(params['start'], params['end'], mode);
+				if(data['status'] == "success"){
+					//console.log("Run without errors");
+					$('#experimental-run-popup').modal('hide')
+					getData(params['start'], params['end'], mode);
+				} else{
+					//console.log("Run with errors");
+					//console.log("Error message: " + data['message']);
+					$('#processing-error-stacktrace').html(data['message']);
+					$('#processing-error-message').show();
+					$('#processing-error-stacktrace').show();
+				}
 
 			}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
@@ -100,12 +102,12 @@ public class LogicModuleManager {
 		try {
 			experimentalProcessor = new ExperimentalProcessor(
 					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
-			//experimentalProcessor.loadExperimentalLogicModules();
+			// experimentalProcessor.loadExperimentalLogicModules();
 		} catch (IOException | ResourceException | ScriptException e) {
 			experimentalProcessor = null;
 			e.printStackTrace();
 		}
-		
+
 		artificialForced = true;
 	}
 
@@ -138,15 +140,41 @@ public class LogicModuleManager {
 	 */
 	private List<Entry> runCheckers(DAQ daq, boolean includeExperimental) {
 		List<Entry> results = new ArrayList<>();
-		Date curr = null;
 		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
 
 		for (SimpleLogicModule checker : checkers) {
 			boolean result = checker.satisfied(daq, checkerResultMap);
+			postprocess(checkerResultMap, checker, result, daq, results);
+		}
 
-			checkerResultMap.put(checker.getClass().getSimpleName(), result);
-			curr = new Date(daq.getLastUpdate());
-			Pair<Boolean, Entry> produceResult = eventProducer.produce(checker, result, curr);
+		if (includeExperimental) {
+			try {
+				List<Pair<LogicModule, Boolean>> a = experimentalProcessor.runLogicModules(daq, checkerResultMap);
+
+				logger.debug("Experimental logic modules returned: " + a);
+				for (Pair<LogicModule, Boolean> b : a) {
+					postprocess(checkerResultMap, b.getLeft(), b.getRight(), daq, results);
+				}
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+
+		}
+		results.addAll(eventProducer.getFinishedThisRound());
+		eventProducer.clearFinishedThisRound();
+
+		return results;
+	}
+
+	private void postprocess(Map<String, Boolean> checkerResultMap, LogicModule checker, boolean result, DAQ daq,
+			List<Entry> results) {
+		Date curr = null;
+		checkerResultMap.put(checker.getClass().getSimpleName(), result);
+		curr = new Date(daq.getLastUpdate());
+
+		if (checker instanceof SimpleLogicModule) {
+			SimpleLogicModule simpleChecker = (SimpleLogicModule) checker;
+			Pair<Boolean, Entry> produceResult = eventProducer.produce(simpleChecker, result, curr);
 
 			/*
 			 * The event finishes (result = false), Context to be cleared for
@@ -161,20 +189,9 @@ public class LogicModuleManager {
 			if (produceResult.getLeft()) {
 				results.add(produceResult.getRight());
 			}
+		} else {
+			logger.warn("Problem postrprocessing LM results, not an instance of simple logic module");
 		}
-
-		if (includeExperimental) {
-			try {
-				experimentalProcessor.runLogicModules(daq, checkerResultMap);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-			}
-
-		}
-		results.addAll(eventProducer.getFinishedThisRound());
-		eventProducer.clearFinishedThisRound();
-
-		return results;
 	}
 
 	/**

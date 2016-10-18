@@ -28,7 +28,7 @@ public class FlowchartCase5 extends ActionLogicModule {
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction("Stop the run",

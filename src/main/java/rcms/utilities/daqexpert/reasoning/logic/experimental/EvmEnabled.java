@@ -15,7 +15,7 @@ public class EvmEnabled extends SimpleLogicModule {
 	public EvmEnabled() {
 		this.name = "Enabled EVM";
 		this.group = EventGroup.Warning;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "EVM is enabled";
 	}
 

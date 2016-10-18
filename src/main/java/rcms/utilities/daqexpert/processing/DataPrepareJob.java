@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqaggregator.DAQException;
+import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -20,7 +22,7 @@ import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class DataPrepareJob extends StoppableJob {
+public class DataPrepareJob implements Runnable {
 
 	private final ReaderJob readerJob;
 	private final ExecutorService executorService;
@@ -66,18 +68,10 @@ public class DataPrepareJob extends StoppableJob {
 					logger.warn("No desitnation for processing job - results will be forgotten");
 				}
 
-			} else {
-				logger.info("Job " + readerJob.getClass() + " has finished");
-				if (getFuture() != null) {
-					logger.info("Trying to stop the job");
-					getFuture().cancel(false);
-				} else {
-					logger.info("Job cannot be stopped - no future object registered");
-				}
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
 		}
 
 	}

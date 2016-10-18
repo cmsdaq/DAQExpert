@@ -17,7 +17,7 @@ public class WarningInSubsystem extends ActionLogicModule {
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is in warning {{WARNING}}, it may affect rate.";
 		this.action = new SimpleAction("No action");
 		this.group = EventGroup.Warning;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 	}
 
 	@Override

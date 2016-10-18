@@ -30,7 +30,7 @@ public class FlowchartCase4 extends ActionLogicModule {
 				"Start new run", "Problem fixed: You are done make an e-log entry",
 				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem for the partition in disconnected)");
 		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 	}
 
 	@Override

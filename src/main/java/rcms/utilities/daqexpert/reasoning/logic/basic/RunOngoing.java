@@ -13,7 +13,7 @@ public class RunOngoing extends SimpleLogicModule {
 	public RunOngoing() {
 		this.name = "Run ongoing";
 		this.group = EventGroup.RUN_ONGOING;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "Run is ongoing according to TCDS state";
 	}
 

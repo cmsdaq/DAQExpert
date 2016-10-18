@@ -12,7 +12,7 @@ public class RunComparator extends ComparatorLogicModule {
 	public RunComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.RUN_NUMBER;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New run has been identified";
 	}
 

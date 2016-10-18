@@ -20,7 +20,7 @@ public class StableBeams extends SimpleLogicModule {
 		this.description = "Stable beams identified";
 
 		this.group = EventGroup.HIDDEN;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 	}
 
 	@Override

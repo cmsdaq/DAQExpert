@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.logic.experimental;
 
+import java.util.Date;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -20,11 +21,12 @@ public class SimpleSketchLogicModule extends SimpleLogicModule {
 		this.description = "Easy start sketch LM"; // TODO 1b. provide more info
 
 		this.group = EventGroup.EXPERIMENTAL; // leave it like this
-		this.priority = EventPriority.defaultt; // leave it like this
+		this.priority = EventPriority.DEFAULTT; // leave it like this
 	}
 
 	/**
-	 * TODO: 2. Implement condition of this LM in this method
+	 * TODO: 2. Implement condition of this LM in this method. Return true when
+	 * your condition is satisfied, otherwise return false.
 	 * 
 	 * @param snapshot
 	 *            access any parameter of DAQ system using this object
@@ -39,12 +41,16 @@ public class SimpleSketchLogicModule extends SimpleLogicModule {
 		/*
 		 * TODO: 2a. implement your condition here
 		 * 
-		 * TODO: 2b. reuse other LMs results by accessing
+		 * TODO: 2b. you can reuse other LMs results by accessing
 		 * results.get(NoRate.class.getSimpleName())
 		 * 
 		 * TODO: 2c. register your module at
 		 * rcms.utilities.daqexpert.reasoning.processing.CheckManager:77
 		 */
+		Date snapshotDate = new Date(snapshot.getLastUpdate());
+		if(snapshotDate.getMinutes() %2 == 0){
+			return true;
+		}
 		return false;
 	}
 

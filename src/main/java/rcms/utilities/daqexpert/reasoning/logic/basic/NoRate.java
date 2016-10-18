@@ -15,7 +15,7 @@ public class NoRate extends ActionLogicModule {
 	public NoRate() {
 		this.name = "No rate";
 		this.group = EventGroup.NO_RATE;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "Rate value is 0";
 		this.action = null;
 	}

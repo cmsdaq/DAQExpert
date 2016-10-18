@@ -15,7 +15,7 @@ public class NotEqualTriggersInFed extends SimpleLogicModule {
 	public NotEqualTriggersInFed() {
 		this.name = "Not equal triggers in fed";
 		this.group = EventGroup.OTHER;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 	}
 
 	@Override

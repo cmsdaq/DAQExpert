@@ -14,7 +14,7 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
 		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 		this.description = "No rate when expected";
 	}
 

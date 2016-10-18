@@ -16,7 +16,7 @@ public class EVMComparator extends ComparatorLogicModule {
 	public EVMComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.OTHER;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New EVM state identified";
 	}
 

@@ -28,12 +28,12 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.EVMComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
+import rcms.utilities.daqexpert.reasoning.logic.experimental.EVMComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
@@ -97,7 +97,7 @@ public class LogicModuleManager {
 		comparators.add(new RunComparator());
 		comparators.add(new LevelZeroStateComparator());
 		comparators.add(new DAQStateComparator());
-		comparators.add(new EVMComparator());
+		//comparators.add(new EVMComparator());
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(

@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.comparators;
+package rcms.utilities.daqexpert.reasoning.logic.experimental;
 
 import java.util.Date;
 

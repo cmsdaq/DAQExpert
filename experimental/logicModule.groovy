@@ -22,7 +22,7 @@ public class NonStableBeams extends SimpleLogicModule {
 														// info
 
 		this.group = EventGroup.EXPERIMENTAL; // leave it like this
-		this.priority = EventPriority.important; // leave it like this
+		this.priority = EventPriority.EXPERIMENTAL; // leave it like this
 	}
 
 	/**

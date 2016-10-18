@@ -228,6 +228,7 @@
 	<script type="text/javascript">
 		var filtering = true;
 		var mode = "standard";
+		var lastExperimentalMode = "test";
 		var lastTimeSpan = {};
 
 		var lastData = [];
@@ -258,7 +259,7 @@
 		});
 		$('#mode3').click(function() {
 			filtering = false;
-			mode = "test";
+			mode = lastExperimentalMode;
 			refreshBackgroundColor("2px solid #aa6708");
 			params = getWindowInformationForAPI();
 			params['mode'] = mode;
@@ -1092,6 +1093,7 @@
 			//console.log("selected " + selected);
 			params['experimental-lm'] = selected;
 			mode = selected;
+			lastExperimentalMode = selected;
 			$('#loader-animation').show();
 			$.getJSON("experiment", params, function(data) {
 				console.log("Successfull call " + data);
@@ -1146,6 +1148,7 @@
 			var selected = $('#elm-select').find(":selected").text();
 			//console.log("selected now " + selected);
 			mode = selected;
+			lastExperimentalMode = selected;
 			params = getWindowInformationForAPI();
 			getData(params['start'], params['end'], mode);
 			$('#experimental-run-popup').modal('hide')

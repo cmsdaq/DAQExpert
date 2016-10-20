@@ -24,6 +24,7 @@
 <link href="external/bootstrap-tour.min.css" rel="stylesheet">
 <script src="external/bootstrap-tour.min.js"></script>
 <script src="external/moment-duration-format.min.js"></script>
+<script src="static/js/run-info-link.js"></script>
 
 
 <style type="text/css">
@@ -130,17 +131,29 @@
 	animation: spin 0.5s linear infinite;
 }
 
-@-webkit-keyframes spin { 0% {
+@
+-webkit-keyframes spin { 0% {
 	-webkit-transform: rotate(0deg);
 }
 
-100%{-webkit-transform:rotate(360deg);
+100%{
+-webkit-transform
+:rotate(360deg)
+;
+
+
 }
 }
-@keyframes spin { 0% {
+@
+keyframes spin { 0% {
 	transform: rotate(0deg);
 }
-100%{transform:rotate(360deg);
+100%{
+transform
+:rotate(360deg)
+;
+
+
 }
 }
 </style>
@@ -209,14 +222,15 @@
 		<div class="btn-group pull-right ">
 			<button style="display: none;" class="btn btn-sm btn-info"
 				id="run-experimental-lm-button" href="#">
-				<i class="glyphicon glyphicon-play"></i> Run experimental
-				LMs
+				Run experimental LMs <i class="glyphicon glyphicon-play"></i>
+			</button>
+			<button class="btn btn-sm btn-default" id="run-info-button"
+				target="_blank">
+				RunInfo <span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 			<button class="btn btn-sm btn-warning" id="tour" href="#">
-				<i class="glyphicon glyphicon-question-sign"></i> Help
+				Help <i class="glyphicon glyphicon-question-sign"></i>
 			</button>
-
-
 		</div>
 
 		<div id="visualization" style="margin-top: 15px;"></div>
@@ -226,6 +240,7 @@
 	</div>
 
 	<script type="text/javascript">
+
 		var filtering = true;
 		var mode = "standard";
 		var lastExperimentalMode = "test";
@@ -961,39 +976,51 @@
 				<div class="modal-body">
 
 					<label for="timespan-summary">Timespan</label>
-					<p id="timespan-summary"> <span class="badge"
-							id="experimental-time-span-start">{}</span> - <span class="badge"
-							id="experimental-time-span-end">{}</span>
-					</p>
-					
-					<label for="duration-summary">Duration</label>
-					<p id="duration-summary"><span class="badge" id="duration-humanized">{}</span></p>
-					<p id="processing-warning0-message" class ="bg-danger">You are trying to process <span class='duration-in-message'></span> of snapshots. Processing will take too long. Please zoom in to interesting period of few minutes.
-					</p>
-					<p id="processing-warning1-message" class ="bg-warning">You are about to process <span class='duration-in-message'></span> of snapshots. Processing may take few seconds. Be patient or zoom-in to interesting period.
+					<p id="timespan-summary">
+						<span class="badge" id="experimental-time-span-start">{}</span> -
+						<span class="badge" id="experimental-time-span-end">{}</span>
 					</p>
 
-					<label for="elm-select">Select Logic Module from <code id='experimental-dir' class="inlinecode">/current/dir/to/lms/</code></label>
-					<select
-						class="form-control" id="elm-select">
+					<label for="duration-summary">Duration</label>
+					<p id="duration-summary">
+						<span class="badge" id="duration-humanized">{}</span>
+					</p>
+					<p id="processing-warning0-message" class="bg-danger">
+						You are trying to process <span class='duration-in-message'></span>
+						of snapshots. Processing will take too long. Please zoom in to
+						interesting period of few minutes.
+					</p>
+					<p id="processing-warning1-message" class="bg-warning">
+						You are about to process <span class='duration-in-message'></span>
+						of snapshots. Processing may take few seconds. Be patient or
+						zoom-in to interesting period.
+					</p>
+
+					<label for="elm-select">Select Logic Module from <code
+							id='experimental-dir' class="inlinecode">/current/dir/to/lms/</code></label>
+					<select class="form-control" id="elm-select">
 						<option>sketch-file-name.java</option>
 					</select>
 
 					<div id="loader-animation" style="display: none;"
 						class="loader text-centered"></div>
-						
-						<p id="processing-error-message" class ="bg-danger">Error occurred while processing your Logic Module.
-					</p>
+
+					<p id="processing-error-message" class="bg-danger">Error
+						occurred while processing your Logic Module.</p>
 					<pre id="processing-error-stacktrace"></pre>
 
 				</div>
 
 				<div class="modal-footer">
 					<button id="experimental-load-button" type="button"
-						class="btn btn-default"><i class="glyphicon glyphicon-repeat"></i> Load</button>
+						class="btn btn-default">
+						<i class="glyphicon glyphicon-repeat"></i> Load
+					</button>
 					<button id="experimental-run-process-button" type="button"
-						class="btn btn-info"><i class="glyphicon glyphicon-play"></i> Run</button>
-					
+						class="btn btn-info">
+						<i class="glyphicon glyphicon-play"></i> Run
+					</button>
+
 				</div>
 			</div>
 			<!-- /.modal-content -->
@@ -1043,42 +1070,40 @@
 	<!-- /.modal -->
 
 	<script>
-	
 		/* Show modal experimental */
-		$('#run-experimental-lm-button').click(
-				function(e) {
-					requestListOfExperimentalLM();
-					params = getWindowInformationForAPI();
-					/*console.log("Experiment requested with parameters "
-							+ JSON.stringify(params));*/
-							
-					var start = moment(params['start']);
-					var end = moment(params['end']);
-					$('#experimental-time-span-start').html(start.format());
-					$('#experimental-time-span-end').html(end.format());
-					
-					var diff = end.diff(start);
-					$('#processing-warning0-message').hide();
-					$('#processing-warning1-message').hide();
-					$('#processing-error-message').hide();
-					$('#processing-error-stacktrace').hide();
-					$('#experimental-run-process-button').attr("disabled", false);
-					if(diff > 1 * 60 * 60 * 1000){
-						$('#processing-warning0-message').show();
-						$('#experimental-run-process-button').attr("disabled", true);
-					} else if(diff > 30 * 60 * 1000){
-						$('#processing-warning1-message').show();
-					} 
-						
-					var duration = moment.duration(diff);
-					
-					console.log("Duration " + duration);
-					$('.duration-in-message').html(duration.humanize());
-					$('#duration-humanized').html(duration.humanize());
+		$('#run-experimental-lm-button').click(function(e) {
+			requestListOfExperimentalLM();
+			params = getWindowInformationForAPI();
+			/*console.log("Experiment requested with parameters "
+					+ JSON.stringify(params));*/
 
-					$('#experimental-run-popup').modal('show')
+			var start = moment(params['start']);
+			var end = moment(params['end']);
+			$('#experimental-time-span-start').html(start.format());
+			$('#experimental-time-span-end').html(end.format());
 
-				});
+			var diff = end.diff(start);
+			$('#processing-warning0-message').hide();
+			$('#processing-warning1-message').hide();
+			$('#processing-error-message').hide();
+			$('#processing-error-stacktrace').hide();
+			$('#experimental-run-process-button').attr("disabled", false);
+			if (diff > 1 * 60 * 60 * 1000) {
+				$('#processing-warning0-message').show();
+				$('#experimental-run-process-button').attr("disabled", true);
+			} else if (diff > 30 * 60 * 1000) {
+				$('#processing-warning1-message').show();
+			}
+
+			var duration = moment.duration(diff);
+
+			console.log("Duration " + duration);
+			$('.duration-in-message').html(duration.humanize());
+			$('#duration-humanized').html(duration.humanize());
+
+			$('#experimental-run-popup').modal('show')
+
+		});
 
 		var getWindowInformationForAPI = function() {
 			parameters = {};
@@ -1098,11 +1123,11 @@
 			$.getJSON("experiment", params, function(data) {
 				console.log("Successfull call " + data);
 				$('#loader-animation').hide();
-				if(data['status'] == "success"){
+				if (data['status'] == "success") {
 					//console.log("Run without errors");
 					$('#experimental-run-popup').modal('hide')
 					getData(params['start'], params['end'], mode);
-				} else{
+				} else {
 					//console.log("Run with errors");
 					//console.log("Error message: " + data['message']);
 					$('#processing-error-stacktrace').html(data['message']);
@@ -1116,17 +1141,16 @@
 				console.log("incoming Text " + jqXHR.responseText);
 			});
 		};
-		
-		
+
 		var requestListOfExperimentalLM = function() {
 			$.getJSON("scripts", params, function(data) {
 				//console.log("Successfull call " + data);
-				
+
 				$('#experimental-dir').text(data['directory']);
 				$("#elm-select").empty();
 				$.each(data['names'], function(index, lm) {
-	  				//console.log("base: "+ lm);
-	  				$("<option>").appendTo($('#elm-select')).text(lm)
+					//console.log("base: "+ lm);
+					$("<option>").appendTo($('#elm-select')).text(lm)
 				});
 
 			}).error(function(jqXHR, textStatus, errorThrown) {
@@ -1142,7 +1166,7 @@
 
 			//$('#experimental-run-popup').modal('hide')
 		});
-		
+
 		$('#experimental-load-button').click(function(e) {
 			//console.log("Load experimental logic modules!");
 			var selected = $('#elm-select').find(":selected").text();

@@ -46,6 +46,7 @@ $(document).ready(function() {
 			console.log("Got to " + link);
 			window.open(link);
 		} else{
+			$('#runinfo-popup').modal('show');
 			console.log("Could not found session id");
 		}
 	});
@@ -53,16 +54,22 @@ $(document).ready(function() {
 
 	var findSessionId = function() {
 		
-		var result = false;
+		var found = 0;
 		
 		$.each(lastData['entries'], function(key, value) {
 			if(value['group'] == 'session-no' && value['className'] != 'filtered'){
 				sessionIdValue = value['content'];
 				console.log("Found session id: " + sessionIdValue);
-				result = true;
+				found += 1;
 			}
 		});
-		return result;
+		
+		console.log("Visible sessions: " + found);
+		if(found == 1){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 });

@@ -91,7 +91,9 @@
 			<button id="mode2" type="button"
 				class="mode-btn btn btn-sm btn-default">Extended</button>
 			<button id="mode3" type="button"
-				class="mode-btn btn btn-sm btn-default">Experiment</button>
+				class="mode-btn btn btn-sm btn-default">
+				Experimental <span><sup><b>beta</b></sup></span>
+			</button>
 		</div>
 
 
@@ -257,8 +259,8 @@
 					<h4 class="modal-title">Go to run info</h4>
 				</div>
 				<div class="modal-body">
-					<p>Session id ambiguous. Please set the time span so that there is
-						exactly on session id.</p>
+					<p>Session id ambiguous. Please set the time span so that there
+						is exactly on session id.</p>
 				</div>
 				<div class="modal-footer"></div>
 			</div>

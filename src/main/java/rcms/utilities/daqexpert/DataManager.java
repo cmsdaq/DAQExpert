@@ -3,8 +3,11 @@ package rcms.utilities.daqexpert;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.log4j.Logger;
@@ -16,6 +19,7 @@ import rcms.utilities.daqexpert.segmentation.DAQConverter;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 import rcms.utilities.daqexpert.segmentation.LinearSegmentator;
+import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.SegmentationSettings;
 import rcms.utilities.daqexpert.segmentation.StreamProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
@@ -24,14 +28,26 @@ public class DataManager {
 
 	private static final Logger logger = Logger.getLogger(DataManager.class);
 
+	/** All produced reasons are kept in this list */
+	private final Set<Entry> result;
+
+	/**
+	 * TODO: check if this field is really necessary
+	 */
+	public CircularFifoQueue<DAQ> buf;
+
+	public Map<String, Set<Entry>> experimental;
+
 	private final DataResolutionManager dataResolutionManager;
 
 	public DataManager() {
 		buf = new CircularFifoQueue<>(5000);
+		experimental = new HashMap<>();
+		experimental.put("test", new HashSet<Entry>());
 
 		rawDataByResolution = new HashMap<>();
 
-		result = Collections.synchronizedList(new ArrayList<Entry>());
+		result = Collections.synchronizedSet(new LinkedHashSet<Entry>());
 
 		StreamProcessor minuteStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Minute),
 				SegmentationSettings.Minute);
@@ -47,11 +63,6 @@ public class DataManager {
 
 		initialize();
 	}
-
-	/** All produced reasons are kept in this list */
-	private final List<Entry> result;
-
-	public CircularFifoQueue<DAQ> buf;
 
 	public void addSnapshot(DummyDAQ dummyDAQ) {
 
@@ -119,7 +130,7 @@ public class DataManager {
 	 * 
 	 * @return list of events produced
 	 */
-	public List<Entry> getResult() {
+	public Set<Entry> getResult() {
 		return result;
 	}
 

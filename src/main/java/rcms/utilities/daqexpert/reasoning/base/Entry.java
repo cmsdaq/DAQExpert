@@ -4,6 +4,8 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+
 /**
  * 
  * Base object of analysis result.
@@ -15,7 +17,7 @@ public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore
 	private long duration;
-	
+
 	@JsonIgnore
 	private static long globalId = 1;
 
@@ -26,13 +28,12 @@ public class Entry implements Comparable<Entry> {
 	private EntryState state;
 
 	@JsonIgnore
-	private EventFinder eventFinder;
-	
+	private LogicModule eventFinder;
+
 	@JsonIgnore
-	private ContextCollector finishedContext;
+	private Context finishedContext;
 
 	private long id;
-	
 
 	/**
 	 * Short description of event. Displayed in main expert view
@@ -41,14 +42,15 @@ public class Entry implements Comparable<Entry> {
 
 	private Date start;
 	private Date end;
-	
+
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
 	private String group;
-	
+
 	/**
-	 * Class name of the event, indicates if event is important and should be highlighted or not
+	 * Class name of the event, indicates if event is important and should be
+	 * highlighted or not TODO: enum this
 	 */
 	private String className;
 
@@ -69,22 +71,25 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public Entry() {
-		this.id = globalId;
-		globalId++;
-		show = false;
+		this.id = ++globalId;
+		show = true;
 		this.state = EntryState.NEW;
 	}
 
 	public Entry(Entry entry) {
-		this.id = globalId;
+		this.id = -entry.id;
 		this.start = entry.start;
 		this.end = entry.end;
 		this.group = entry.group;
 		this.duration = entry.duration;
 		this.state = entry.state;
-		globalId++;
 	}
 
+	/**
+	 * Get duration in ms
+	 * 
+	 * @return duration in ms
+	 */
 	public long getDuration() {
 		return duration;
 	}
@@ -127,7 +132,6 @@ public class Entry implements Comparable<Entry> {
 
 	@Override
 	public int compareTo(Entry arg0) {
-		// TODO Auto-generated method stub
 		return (int) (this.duration - arg0.duration);
 	}
 
@@ -158,19 +162,41 @@ public class Entry implements Comparable<Entry> {
 				+ ", end=" + end + ", group=" + group + ", className=" + className + "]";
 	}
 
-	public EventFinder getEventFinder() {
+	public LogicModule getEventFinder() {
 		return eventFinder;
 	}
 
-	public void setEventFinder(EventFinder eventFinder) {
+	public void setEventFinder(LogicModule eventFinder) {
 		this.eventFinder = eventFinder;
 	}
 
-	public ContextCollector getFinishedContext() {
+	public Context getFinishedContext() {
 		return finishedContext;
 	}
 
-	public void setFinishedContext(ContextCollector finishedContext) {
+	public void setFinishedContext(Context finishedContext) {
 		this.finishedContext = finishedContext;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Entry other = (Entry) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

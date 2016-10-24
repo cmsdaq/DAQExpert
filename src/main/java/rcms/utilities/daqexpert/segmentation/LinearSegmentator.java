@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.Point;
-
 /**
  * Linear segmentator
  * 

@@ -7,12 +7,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
 
@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
+import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
 /**
@@ -49,8 +49,8 @@ public class RawAPI extends HttpServlet {
 		String endRange = request.getParameter("end");
 		logger.debug("Getting reasons from : " + startRange + " to " + endRange);
 
-		Date startDate = objectMapper.readValue(startRange, Date.class);
-		Date endDate = objectMapper.readValue(endRange, Date.class);
+		Date startDate = DatatypeConverter.parseDateTime(startRange).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endRange).getTime();
 
 		// extend slightly timespan so that few snapshots more on the left and
 		// right are loaded to the chart - avoid cutting the chart lines

@@ -56,7 +56,7 @@
 		<servlet-name>SnapshotAPI</servlet-name>
 		<url-pattern>/snapshot</url-pattern>
 	</servlet-mapping>
-		<servlet>
+	<servlet>
 		<servlet-name>RaportAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.RaportAPI</servlet-class>
 	</servlet>
@@ -64,7 +64,21 @@
 		<servlet-name>RaportAPI</servlet-name>
 		<url-pattern>/raport</url-pattern>
 	</servlet-mapping>
-
-
+	<servlet>
+		<servlet-name>ExperimentApi</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.ExperimentApi</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ExperimentApi</servlet-name>
+		<url-pattern>/experiment</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ScriptsExperimentalAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.ScriptsExperimentalAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ScriptsExperimentalAPI</servlet-name>
+		<url-pattern>/scripts</url-pattern>
+	</servlet-mapping>
 
 </web-app>

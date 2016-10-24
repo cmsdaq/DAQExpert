@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
+import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class TestDummyDAQFactory {

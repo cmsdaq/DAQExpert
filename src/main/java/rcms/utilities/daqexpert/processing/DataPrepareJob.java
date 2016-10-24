@@ -2,10 +2,19 @@ package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+
+import rcms.utilities.daqaggregator.DAQException;
+import rcms.utilities.daqaggregator.DAQExceptionCode;
+import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
  * This job manages reading and processing the snapshots
@@ -13,50 +22,70 @@ import org.apache.log4j.Logger;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class DataPrepareJob extends StoppableJob {
+public class DataPrepareJob implements Runnable {
 
 	private final ReaderJob readerJob;
 	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(DataPrepareJob.class);
+	private Set<Entry> destination;
+	private DataManager dataManager;
 
-	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService) {
+	private final SnapshotProcessor snapshotProcessor;
+
+	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, Set<Entry> destination,
+			DataManager dataManager, SnapshotProcessor snapshotProcessor) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
+		this.destination = destination;
+		this.dataManager = dataManager;
+		this.snapshotProcessor = snapshotProcessor;
 	}
-	
+
 	private static int priority = 0;
 
 	@Override
 	public void run() {
 
 		try {
-			Pair<Long, List<File>> result;
+			Pair<Long, List<File>> snapshots;
 
 			if (!readerJob.finished()) {
-				result = readerJob.read();
-				
-				if(priority == Integer.MAX_VALUE)
+				snapshots = readerJob.read();
+
+				if (priority == Integer.MAX_VALUE)
 					priority = 0;
 				else
-					priority ++;
+					priority++;
 
-				ProcessJob processJob = new ProcessJob(priority, result.getRight());
-				executorService.submit(processJob);
-			} else {
-				logger.info("Job " + readerJob.getClass() + " has finished");
-				if (getFuture() != null) {
-					logger.info("Trying to stop the job");
-					getFuture().cancel(false);
+				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager, snapshotProcessor);
+				Future<Set<Entry>> future = executorService.submit(processJob);
+
+				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
+				if (destination != null) {
+					destination.addAll(result);
 				} else {
-					logger.info("Job cannot be stopped - no future object registered");
+					logger.warn("No desitnation for processing job - results will be forgotten");
 				}
+
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
 		}
 
+	}
+
+	protected Set<Entry> getDestination() {
+		return destination;
+	}
+
+	protected void setDestination(Set<Entry> destination) {
+		this.destination = destination;
+	}
+
+	protected SnapshotProcessor getSnapshotProcessor() {
+		return snapshotProcessor;
 	}
 
 }

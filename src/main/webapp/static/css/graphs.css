@@ -1,0 +1,91 @@
+@CHARSET "UTF-8";
+
+.vis-item {
+	height: 16px;
+	font-size: 8pt;
+}
+
+.vis-timeline {
+	border: 2px solid #bfbfbf;
+}
+
+.vis-item.critical {
+	background-color: red;
+	border-color: darkred;
+	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+.vis-item.vis-background.filtered {
+	background-color: rgba(0, 136, 204, 0.1);
+}
+
+.vis-item.vis-background.filtered-important {
+	background-color: rgba(189, 54, 47, 0.1);
+}
+
+.vis-item.important {
+	background-color: darkblue;
+	border-color: darkblue;
+	color: white;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+.vis-item.warning {
+	background-color: #f79646;
+	border-color: #f79646;
+	border-color: #E38D13;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+.vis-item.experimental {
+	color: white;
+	background-color: #5bc0de;
+	border-color: #2aabd2;
+	font-family: monospace;
+	box-shadow: 0 0 10px gray;
+}
+
+/* gray background in weekends, white text color */
+.vis-time-axis .vis-grid.vis-saturday, .vis-time-axis .vis-grid.vis-sunday
+	{
+	background: rgba(244, 244, 244, .4);
+}
+
+.vis-time-axis .vis-grid.vis-h0-h4, .vis-time-axis .vis-grid.vis-h4-h8 {
+	background: rgba(244, 244, 244, .4);
+}
+
+.vis-time-axis .vis-grid.vis-h0, .vis-time-axis .vis-grid.vis-h1,
+	.vis-time-axis .vis-grid.vis-h2, .vis-time-axis .vis-grid.vis-h3,
+	.vis-time-axis .vis-grid.vis-h4, .vis-time-axis .vis-grid.vis-h5,
+	.vis-time-axis .vis-grid.vis-h6, .vis-time-axis .vis-grid.vis-h7 {
+	background: rgba(244, 244, 244, .4);
+}
+
+/* The max width is dependant on the container (more info below) */
+.popover {
+	max-width: 350px;
+	/* Max Width of the popover (depending on the container!) */
+}
+
+.vis-labelset .vis-inner {
+	width: 8em;
+}
+
+.vis-left .vis-content {
+	width: 8em;
+}
+
+.vis-right .vis-content {
+	width: 8em;
+}
+
+.vis-panel.vis-background.vis-horizontal .vis-grid {
+	left: 7.5em !important;
+	right: 7.5em !important;
+	width: auto !important;
+}

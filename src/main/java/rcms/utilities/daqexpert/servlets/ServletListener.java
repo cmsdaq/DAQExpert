@@ -1,25 +1,27 @@
 package rcms.utilities.daqexpert.servlets;
 
+import java.util.Set;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
 public class ServletListener implements ServletContextListener {
 
 	public ServletListener() {
-		
+
 		super();
 		String propertyFilePath = System.getenv("EXPERT_CONF");
 		if (propertyFilePath == null) {
-			logger.fatal(
-					"No configuration file supplied. Set the path to configuration file in environment variable EXPERT_CONF");
-			throw new RuntimeException("EXPERT_CONF variable is empty");
+			logger.info("No configuration file supplied with environment variable EXPERT_CONF");
 		}
 
 		Application.initialize(propertyFilePath);
@@ -45,8 +47,13 @@ public class ServletListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent e) {
 		String sourceDirectory = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
 
-		JobManager jobManager = new JobManager(sourceDirectory);
+		Set<Entry> destination = Application.get().getDataManager().getResult();
+		DataManager dataManager = Application.get().getDataManager();
+
+		JobManager jobManager = new JobManager(sourceDirectory, destination, dataManager);
 		jobManager.startJobs();
+
+		Application.get().setJobManager(jobManager);
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

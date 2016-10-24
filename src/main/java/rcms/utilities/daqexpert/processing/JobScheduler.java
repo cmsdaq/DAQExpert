@@ -2,9 +2,10 @@ package rcms.utilities.daqexpert.processing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 import org.apache.log4j.Logger;
 
@@ -21,44 +22,36 @@ public class JobScheduler {
 	 */
 	private static final int REAL_TIME_TASK_PERION_IN_SECONDS = 2;
 
-	/**
-	 * Period in which past data will be accessed
-	 */
-	private static final int PAST_TASK_PERION_IN_SECONDS = 15;
+	/** Executor of on demand reader task */
+	private final ExecutorService onDemandScheduler;
 
-	/** Scheduled executor of past reader task */
-	private final ScheduledExecutorService pastReaderScheduler;
-
-	private final StoppableJob pastReaderTask;
-
-	private StoppableJob realTimeTask;
+	private Runnable realTimeTask;
 
 	/** Scheduled executor of real time reader task */
 	private final ScheduledExecutorService realTimeScheduler;
 
 	private static final Logger logger = Logger.getLogger(JobScheduler.class);
 
-	public JobScheduler(StoppableJob pastReaderTask, StoppableJob realTimeTask) {
-		this(pastReaderTask, realTimeTask, Executors.newScheduledThreadPool(1), Executors.newScheduledThreadPool(1));
+	public JobScheduler(Runnable realTimeTask) {
+		this(realTimeTask, Executors.newScheduledThreadPool(1), Executors.newFixedThreadPool(1));
 	}
 
-	public JobScheduler(StoppableJob pastReaderTask, StoppableJob realTimeTask, ScheduledExecutorService realTimeScheduler,
-			ScheduledExecutorService pastReaderScheduler) {
+	public JobScheduler(Runnable realTimeTask, ScheduledExecutorService realTimeScheduler,
+			ExecutorService onDemandScheduler) {
 
-		this.pastReaderScheduler = pastReaderScheduler;
+		this.onDemandScheduler = onDemandScheduler;
 		this.realTimeScheduler = realTimeScheduler;
-
-		this.pastReaderTask = pastReaderTask;
 
 		this.realTimeTask = realTimeTask;
 
 	}
 
-	public void firePastReaderTask() {
-		logger.info("Starting past reader task with period of " + PAST_TASK_PERION_IN_SECONDS + " seconds");
+	public Future scheduleOnDemandReaderTask(Runnable onDemandReaderTask) {
 
-		ScheduledFuture<?> future = pastReaderScheduler.scheduleAtFixedRate(pastReaderTask, 15, 15, SECONDS);
-		pastReaderTask.setFuture(future);
+		logger.info("Starting on-demand reader job");
+
+		Future<?> future = onDemandScheduler.submit(onDemandReaderTask);
+		return future;
 
 	}
 

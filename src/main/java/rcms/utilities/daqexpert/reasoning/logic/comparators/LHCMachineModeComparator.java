@@ -14,7 +14,7 @@ public class LHCMachineModeComparator extends ComparatorLogicModule {
 	public LHCMachineModeComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.LHC_MACHINE;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New LHC Machine mode identified";
 	}
 

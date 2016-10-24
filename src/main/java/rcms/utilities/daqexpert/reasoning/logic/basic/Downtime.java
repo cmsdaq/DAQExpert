@@ -16,7 +16,7 @@ public class Downtime extends ActionLogicModule {
 	public Downtime() {
 		this.name = "Downtime";
 		this.group = EventGroup.DOWNTIME;
-		this.priority = EventPriority.warning;
+		this.priority = EventPriority.WARNING;
 		this.description = "No rate during stable beams";
 		this.action = null;
 	}

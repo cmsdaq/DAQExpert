@@ -12,7 +12,7 @@ public class DAQStateComparator extends ComparatorLogicModule {
 	public DAQStateComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.DAQ_STATE;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New DAQ state identified";
 	}
 

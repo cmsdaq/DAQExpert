@@ -12,7 +12,7 @@ public class LevelZeroStateComparator extends ComparatorLogicModule {
 	public LevelZeroStateComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.LEVEL_ZERO;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New Level zero state identified";
 	}
 

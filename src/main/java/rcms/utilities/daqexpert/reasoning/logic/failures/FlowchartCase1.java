@@ -43,7 +43,7 @@ public class FlowchartCase1 extends ActionLogicModule {
 
 		this.action = action;
 		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 	}
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";

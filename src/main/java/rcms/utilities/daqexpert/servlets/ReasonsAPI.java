@@ -129,10 +129,10 @@ public class ReasonsAPI extends HttpServlet {
 									if (base == null) {
 										base = new Entry(entry);
 										base.setId(-base.getId());
-										if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-											base.setClassName(EventPriority.filtered_important.getCode());
+										if (EventPriority.CRITICAL.getCode().equals(entry.getClassName())) {
+											base.setClassName(EventPriority.FILTERED_IMPORTANT.getCode());
 										} else {
-											base.setClassName(EventPriority.filtered.getCode());
+											base.setClassName(EventPriority.FILTERED.getCode());
 										}
 										// type: 'background',
 										base.setContent("1");
@@ -149,8 +149,8 @@ public class ReasonsAPI extends HttpServlet {
 										int filteredElements = Integer.parseInt(base.getContent());
 										base.setContent((filteredElements + 1) + "");
 
-										if (EventPriority.critical.getCode().equals(entry.getClassName())) {
-											base.setClassName(EventPriority.filtered_important.getCode());
+										if (EventPriority.CRITICAL.getCode().equals(entry.getClassName())) {
+											base.setClassName(EventPriority.FILTERED_IMPORTANT.getCode());
 										}
 									}
 

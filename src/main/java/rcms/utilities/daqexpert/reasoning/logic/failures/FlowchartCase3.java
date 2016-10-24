@@ -32,7 +32,7 @@ public class FlowchartCase3 extends ActionLogicModule {
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.critical;
+		this.priority = EventPriority.CRITICAL;
 	}
 
 	@Override

@@ -12,7 +12,7 @@ public class RateOutOfRange extends SimpleLogicModule {
 	public RateOutOfRange() {
 		this.name = "Rate out of range";
 		this.group = EventGroup.RATE_OUT_OF_RANGE;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "Rate is considered out of range when less than 50kHz";
 	}
 

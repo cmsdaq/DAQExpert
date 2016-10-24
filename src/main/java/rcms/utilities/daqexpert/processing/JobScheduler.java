@@ -2,9 +2,10 @@ package rcms.utilities.daqexpert.processing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
 import org.apache.log4j.Logger;
 
@@ -21,40 +22,35 @@ public class JobScheduler {
 	 */
 	private static final int REAL_TIME_TASK_PERION_IN_SECONDS = 2;
 
-	/** Scheduled executor of on demand reader task */
-	private final ScheduledExecutorService onDemandScheduler;
+	/** Executor of on demand reader task */
+	private final ExecutorService onDemandScheduler;
 
-	private final StoppableJob onDemandReaderTask;
-
-	private StoppableJob realTimeTask;
+	private Runnable realTimeTask;
 
 	/** Scheduled executor of real time reader task */
 	private final ScheduledExecutorService realTimeScheduler;
 
 	private static final Logger logger = Logger.getLogger(JobScheduler.class);
 
-	public JobScheduler(StoppableJob pastReaderTask, StoppableJob realTimeTask) {
-		this(pastReaderTask, realTimeTask, Executors.newScheduledThreadPool(1), Executors.newScheduledThreadPool(1));
+	public JobScheduler(Runnable realTimeTask) {
+		this(realTimeTask, Executors.newScheduledThreadPool(1), Executors.newFixedThreadPool(1));
 	}
 
-	public JobScheduler(StoppableJob onDemantTask, StoppableJob realTimeTask,
-			ScheduledExecutorService realTimeScheduler, ScheduledExecutorService onDemandScheduler) {
+	public JobScheduler(Runnable realTimeTask, ScheduledExecutorService realTimeScheduler,
+			ExecutorService onDemandScheduler) {
 
 		this.onDemandScheduler = onDemandScheduler;
 		this.realTimeScheduler = realTimeScheduler;
-
-		this.onDemandReaderTask = onDemantTask;
 
 		this.realTimeTask = realTimeTask;
 
 	}
 
-	public ScheduledFuture scheduleOnDemandReaderTask() {
+	public Future scheduleOnDemandReaderTask(Runnable onDemandReaderTask) {
 
 		logger.info("Starting on-demand reader job");
 
-		ScheduledFuture<?> future = onDemandScheduler.schedule(onDemandReaderTask, 0, SECONDS);
-		onDemandReaderTask.setFuture(future);
+		Future<?> future = onDemandScheduler.submit(onDemandReaderTask);
 		return future;
 
 	}

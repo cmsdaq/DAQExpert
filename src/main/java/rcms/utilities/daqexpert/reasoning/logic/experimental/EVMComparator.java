@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.comparators;
+package rcms.utilities.daqexpert.reasoning.logic.experimental;
 
 import java.util.Date;
 
@@ -16,7 +16,7 @@ public class EVMComparator extends ComparatorLogicModule {
 	public EVMComparator() {
 		this.name = "n/a";
 		this.group = EventGroup.OTHER;
-		this.priority = EventPriority.defaultt;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "New EVM state identified";
 	}
 

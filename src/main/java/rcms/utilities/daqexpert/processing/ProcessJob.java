@@ -57,6 +57,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 		DAQ daq = null;
 
 		if (includeExperimental) {
+			logger.info("Experimental logic modules job");
 			snapshotProcessor.getCheckManager().getExperimentalProcessor().loadExperimentalLogicModules();
 		}
 

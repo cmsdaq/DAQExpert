@@ -1,11 +1,16 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 
@@ -36,8 +42,8 @@ public class ExperimentApi extends HttpServlet {
 			throws ServletException, IOException {
 
 		String experimentalLm = request.getParameter("experimental-lm");
-		//experimentalLm = "test";
-		
+		// experimentalLm = "test";
+
 		logger.info("Experimental run of LM: " + experimentalLm);
 
 		Set<Entry> destination = new LinkedHashSet<Entry>();
@@ -51,24 +57,39 @@ public class ExperimentApi extends HttpServlet {
 
 		logger.info("Experimenting on from : " + startDate + " to " + endDate);
 
-		Future future = Application.get().getJobManager().fireOnDemandJob(startDate.getTime(), endDate.getTime(),
-				destination);
+		Future<?> future = Application.get().getJobManager().fireOnDemandJob(startDate.getTime(), endDate.getTime(),
+				destination, experimentalLm);
 
+		HashMap<String, Object> result = new HashMap<>();
+		String message = null;
+		String status = "fail";
 
-		String result = null;
-		
 		try {
-			future.get();
-			result = "successful";
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			result = e.getMessage();
+			future.get(30, TimeUnit.SECONDS);
+			status = "success";
 		} catch (ExecutionException e) {
-			e.printStackTrace();
-			result = e.getMessage();
+
+
+			logger.fatal("Execution exception catched: " + e.getMessage());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			message = sw.toString();
+			
+		} catch (InterruptedException e) {
+			message = e.getMessage();
+			logger.fatal("Interrupted exception catched");
+		} catch (DAQException e) {
+			message = e.getMessage();
+			logger.fatal("DAQException exception catched");
+		} catch (TimeoutException e) {
+			message = e.getMessage();
+			logger.fatal("TimeoutException exception catched");
 		}
 		
-		
+		result.put("message", message);
+		result.put("status", status);
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		String json = objectMapper.writeValueAsString(result);
 		response.setContentType("application/json");

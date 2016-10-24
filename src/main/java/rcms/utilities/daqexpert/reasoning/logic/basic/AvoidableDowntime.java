@@ -15,7 +15,7 @@ public class AvoidableDowntime extends ActionLogicModule {
 	public AvoidableDowntime() {
 		this.name = "Avoidable Downtime";
 		this.group = EventGroup.AVOIDABLE_DOWNTIME;
-		this.priority = EventPriority.warning;
+		this.priority = EventPriority.WARNING;
 		this.description = "No rate and no recovery action is being executed during stable beams";
 		this.action = null;
 	}

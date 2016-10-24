@@ -9,7 +9,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
- * Identifies event minutes
+ * Demo Logic Module: Identifies even minutes
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  */

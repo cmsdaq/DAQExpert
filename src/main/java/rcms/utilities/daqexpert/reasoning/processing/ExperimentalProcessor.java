@@ -18,6 +18,8 @@ import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 /**
@@ -58,9 +60,9 @@ public class ExperimentalProcessor {
 
 		} catch (InstantiationException e) {
 			// TODO: change this code
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (IllegalAccessException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		}
 	}
 
@@ -105,7 +107,7 @@ public class ExperimentalProcessor {
 				LogicModule scriptInstance = scriptClass.newInstance();
 				result.add(Pair.of(scriptClass, scriptInstance));
 			} catch (MissingPropertyException e) {
-				throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+				throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 			}
 		}
 
@@ -131,9 +133,9 @@ public class ExperimentalProcessor {
 						Class<LogicModule> scriptClass = loadFromFile(b);
 						scripts.add(scriptClass);
 					} catch (ResourceException e) {
-						throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+						throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 					} catch (ScriptException e) {
-						throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+						throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 					}
 				}
 			}
@@ -174,15 +176,15 @@ public class ExperimentalProcessor {
 				logger.info("Groovy returned non-boolean value: " + gresult + ", cannot add to results");
 			}
 		} catch (IllegalAccessException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (IllegalArgumentException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (InvocationTargetException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (NoSuchMethodException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (SecurityException e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		}
 		return null;
 	}

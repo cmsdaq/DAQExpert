@@ -27,6 +27,7 @@
 <script src="static/js/tour.js"></script>
 <script src="static/js/experimental.js"></script>
 <script src="static/js/run-info-link.js"></script>
+<script src="static/js/wbm-link.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -104,19 +105,34 @@
 			</button>
 		</div>
 
-
 		<div class="btn-group pull-right ">
-			<button style="display: none;" class="btn btn-sm btn-info"
-				id="run-experimental-lm-button" href="#">
-				Run experimental LMs <i class="glyphicon glyphicon-play"></i>
-			</button>
-			<button class="btn btn-sm btn-default" id="run-info-button"
-				target="_blank">
-				RunInfo <span class="glyphicon glyphicon-chevron-right"></span>
-			</button>
-			<button class="btn btn-sm btn-warning" id="tour" href="#">
-				Help <i class="glyphicon glyphicon-question-sign"></i>
-			</button>
+
+			<div class="btn-group" role="group" aria-label="...">
+				<div class="btn-group" role="group">
+					<button type="button"
+						class="btn btn-default btn-sm dropdown-toggle"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						External Tools <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a id="run-info-button" target="_blank"> RunInfo <span
+								class="glyphicon glyphicon-chevron-right"></span>
+						</a></li>
+						<li><a id="wbm-button" target="_blank"> WBM run summary <span
+								class="glyphicon glyphicon-chevron-right"></span>
+						</a></li>
+					</ul>
+				</div>
+				<button type="button" class="btn btn-sm btn-info"
+					id="run-experimental-lm-button" href="#" style="display: none;">
+					Run experimental LMs <i class="glyphicon glyphicon-play"></i>
+				</button>
+
+				<button type="button" class="btn btn-sm btn-warning" id="tour"
+					href="#">
+					Help <i class="glyphicon glyphicon-question-sign"></i>
+				</button>
+			</div>
 		</div>
 
 		<div id="visualization" style="margin-top: 15px;"></div>
@@ -269,6 +285,28 @@
 				<div class="modal-body">
 					<p>Session id ambiguous. Please set the time span so that there
 						is exactly on session id.</p>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+	<div id="wbm-popup" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Go to WBM</h4>
+				</div>
+				<div class="modal-body">
+					<p>Run number ambiguous. Please set the time span so that there
+						is exactly on run number.</p>
 				</div>
 				<div class="modal-footer"></div>
 			</div>

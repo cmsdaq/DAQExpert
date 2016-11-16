@@ -94,6 +94,12 @@ var groupsList = [ {
 	title : 'Flowchart events',
 	primary : true
 }, {
+	id : 'deadtime',
+	content : 'Dead. (0)',
+	name : 'Dead. ',
+	title : 'Total deadtime',
+	primary : false
+}, {
 	id : 'experimental',
 	content : 'Exp. (0)',
 	name : 'Exp. ',

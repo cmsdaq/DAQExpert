@@ -5,6 +5,7 @@ public enum EventGroup {
 	LHC_MACHINE("lhc-machine",0),
 	NO_RATE("no-rate",0),
 	DOWNTIME("dt",0),
+	DEADTIME("deadtime",0),
 	AVOIDABLE_DOWNTIME("adt",0),
 	RATE_OUT_OF_RANGE("rate-oor",0),
 	Warning("warning",0),

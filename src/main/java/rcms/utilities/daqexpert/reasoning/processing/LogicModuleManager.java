@@ -20,6 +20,7 @@ import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -33,7 +34,6 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
-import rcms.utilities.daqexpert.reasoning.logic.experimental.EVMComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
@@ -76,6 +76,7 @@ public class LogicModuleManager {
 		// Level 1 (depends on L0)
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
+		checkers.add(new Deadtime());
 		checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)

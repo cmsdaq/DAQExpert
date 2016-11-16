@@ -284,7 +284,7 @@
 				</div>
 				<div class="modal-body">
 					<p>Session id ambiguous. Please set the time span so that there
-						is exactly on session id.</p>
+						is exactly one session id.</p>
 				</div>
 				<div class="modal-footer"></div>
 			</div>
@@ -306,7 +306,7 @@
 				</div>
 				<div class="modal-body">
 					<p>Run number ambiguous. Please set the time span so that there
-						is exactly on run number.</p>
+						is exactly one run number.</p>
 				</div>
 				<div class="modal-footer"></div>
 			</div>

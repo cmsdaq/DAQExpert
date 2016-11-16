@@ -26,6 +26,12 @@ var groupsList = [ {
 	name : 'L0',
 	title : 'Level zero state',
 	primary : false
+},{
+	id : 'tcds',
+	content : 'TCDS (0)',
+	name : 'TCDS',
+	title : 'TCDS state',
+	primary : false
 }, {
 	id : 'session-no',
 	content : 'Session (0)',

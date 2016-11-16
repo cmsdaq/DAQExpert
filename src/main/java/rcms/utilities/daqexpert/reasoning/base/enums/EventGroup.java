@@ -16,6 +16,7 @@ public enum EventGroup {
 	SESSION_NUMBER("session-no",0),
 	FLOWCHART("flowchart",1),
 	LEVEL_ZERO("level-zero",0),
+	TCDS_STATE("tcds",0),
 	DAQ_STATE("daq-state",0),
 	EXPERIMENTAL("experimental",0),
 	OTHER("other",0),

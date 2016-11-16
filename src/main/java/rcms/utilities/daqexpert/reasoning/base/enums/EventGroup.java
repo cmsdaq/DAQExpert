@@ -12,6 +12,7 @@ public enum EventGroup {
 	NO_RATE_WHEN_EXPECTED("nrwe",2),
 	RUN_NUMBER("run-no",0),
 	RUN_ONGOING("run-on",0),
+	TRANSITION("transition",0),
 	SESSION_NUMBER("session-no",0),
 	FLOWCHART("flowchart",1),
 	LEVEL_ZERO("level-zero",0),

@@ -27,6 +27,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
@@ -70,6 +71,7 @@ public class LogicModuleManager {
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
 		checkers.add(new RunOngoing());
+		checkers.add(new Transition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new StableBeams());
 

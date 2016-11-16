@@ -8,4 +8,4 @@ Develpment version of DAQExpert can be accessed at http://daq-expert-dev.cern.ch
 
 # Contributing
 
-Step by step contributing guide: http://daq-expert.cern.ch/contributing.html
+Step by step contributing guide: http://daq-expert.cern.ch/logic-contributing.html

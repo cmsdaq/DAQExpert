@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
@@ -71,7 +73,7 @@ public class DataPrepareJob implements Runnable {
 			}
 
 		} catch (Exception e) {
-			throw new DAQException(DAQExceptionCode.SessionCannotBeRetrieved, e.getMessage());
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem, e.getMessage());
 		}
 
 	}

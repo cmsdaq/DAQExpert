@@ -40,7 +40,7 @@ public class SnapshotAPI extends HttpServlet {
 		String time = request.getParameter("time");
 		logger.info("Requested snapshot date: " + time);
 		Date timeDate = objectMapper.readValue(time, Date.class);
-		logger.info("Parsed requested snapshot date: " + timeDate);
+		logger.debug("Parsed requested snapshot date: " + timeDate);
 		String json = "";
 		try {
 			DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
@@ -52,8 +52,8 @@ public class SnapshotAPI extends HttpServlet {
 
 			json = baos.toString(java.nio.charset.StandardCharsets.UTF_8.toString());
 
-			logger.info("Found snapshot with timestamp: " + new Date(result.getLastUpdate()) + ": "
-					+ json.substring(0, 1000));
+			logger.info("Found snapshot with timestamp: " + new Date(result.getLastUpdate()));
+			logger.debug("Snapshot fragment: " + json.substring(0, 1000));
 		} catch (RuntimeException e) {
 			Map<String, String> result = new HashMap<>();
 			result.put("message", "Could not find snapshot");

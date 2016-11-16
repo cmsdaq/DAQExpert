@@ -45,6 +45,12 @@ var groupsList = [ {
 	title : 'Run ongoing',
 	primary : false
 }, {
+	id : 'transition',
+	content : 'Trans. (0)',
+	name : 'Trans.',
+	title : 'Transition period',
+	primary : false
+}, {
 	id : 'warning',
 	content : 'Warn (0)',
 	name : 'Warn',

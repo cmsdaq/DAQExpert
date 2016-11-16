@@ -23,16 +23,18 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		boolean stableBeams = false;
 		boolean runOngoing = false;
 		boolean noRate = false;
+		boolean transition = false;
 
 		stableBeams = results.get(StableBeams.class.getSimpleName());
 		runOngoing = results.get(RunOngoing.class.getSimpleName());
 		noRate = results.get(NoRate.class.getSimpleName());
+		transition = results.get(Transition.class.getSimpleName());
 
 		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
 		boolean dcsPauseResume = daq.getLevelZeroState().equalsIgnoreCase("PerformingDCSPauseResume") ? true : false;
 		// TODO: ! tcds paused + pausing + resuming
 
-		if (stableBeams && runOngoing && noRate && !fixingSoftError && !dcsPauseResume)
+		if (stableBeams && runOngoing && noRate && !fixingSoftError && !dcsPauseResume && !transition)
 			return true;
 		return false;
 	}

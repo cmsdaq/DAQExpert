@@ -52,6 +52,10 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 		Long start = System.currentTimeMillis();
 
+		int deserializingTime = 0;
+		int processingTime = 0;
+		int segmentingTime = 0;
+
 		Set<Entry> result = new LinkedHashSet<>();
 
 		DAQ daq = null;
@@ -63,15 +67,26 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 		for (File file : entries) {
 
+			Long startDeserializing = System.currentTimeMillis();
 			daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+			Long endDeserializing = System.currentTimeMillis();
+			deserializingTime += (endDeserializing - startDeserializing);
 
 			if (daq != null) {
 
+				Long startSegmenting = System.currentTimeMillis();
 				if (dataManager != null) {
 					// this is not done in on-demand requests
 					dataManager.addSnapshot(new DummyDAQ(daq));
 				}
+				Long endSegmenting = System.currentTimeMillis();
+				segmentingTime += (endSegmenting - startSegmenting);
+
+				Long startProcessing = System.currentTimeMillis();
 				Set<Entry> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
+				Long endProcessing = System.currentTimeMillis();
+				processingTime += (endProcessing - startProcessing);
+
 				result.addAll(logicResults);
 			} else {
 				logger.error("Snapshot not deserialized " + file.getAbsolutePath());
@@ -83,7 +98,9 @@ public class ProcessJob implements Callable<Set<Entry>> {
 		int time = (int) (end - start);
 
 		if (entries.size() > 0)
-			logger.info(entries.size() + " files processed this round in " + time + "ms");
+			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
+					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
+					+ processingTime);
 		logger.trace("values in data manager " + Application.get().getDataManager().getRawDataByResolution()
 				.get(DataResolution.Full).get(DataStream.EVENTS));
 

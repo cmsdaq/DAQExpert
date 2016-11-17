@@ -27,13 +27,15 @@ public class TCDSStateComparator extends ComparatorLogicModule {
 	}
 
 	private String getTCDSState(DAQ daq) {
-		for (SubSystem curr : daq.getSubSystems()) {
-			/* check tcds subsystem state */
-			if (curr.getName().equals("TCDS")) {
-				return curr.getStatus();
+		if (daq.getSubFEDBuilders() != null) {
+			for (SubSystem curr : daq.getSubSystems()) {
+				/* check tcds subsystem state */
+				if (curr.getName().equals("TCDS")) {
+					return curr.getStatus();
+				}
 			}
 		}
-		return null;
+		return "undefined";
 	}
 
 }

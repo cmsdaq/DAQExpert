@@ -1,5 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import org.apache.log4j.Logger;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 
 /**
@@ -11,6 +13,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 public abstract class ComparatorLogicModule extends LogicModule {
 
 	private DAQ last;
+	
+	private static Logger logger = Logger.getLogger(ComparatorLogicModule.class);
 
 	public boolean compare(DAQ daq) {
 		boolean result = false;
@@ -18,8 +22,8 @@ public abstract class ComparatorLogicModule extends LogicModule {
 		if (last != null) {
 			try {
 				result = compare(last, daq);
-			} catch (NullPointerException e) {
-				// e.printStackTrace();
+			} catch (RuntimeException e) {
+				logger.error("Error comparing snapshots", e);
 			}
 		}
 

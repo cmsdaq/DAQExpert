@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -51,7 +52,9 @@ public class JobManager {
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
 		long startTime = utcCalendar.getTimeInMillis() - offset;
-		logger.info("Data will be processed from: " + utcCalendar.getTime() + " minus offset of " + offset + "ms");
+		utcCalendar.setTimeInMillis(startTime);
+		Date startDate = utcCalendar.getTime();
+		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offset + "ms)");
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {
@@ -82,10 +85,12 @@ public class JobManager {
 
 		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
-		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null, snapshotProcessor2);
+		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null,
+				snapshotProcessor2);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.setDestination(destination);
-		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor().setRequestedScript(scriptName);
+		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
+				.setRequestedScript(scriptName);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
 		return readerRaskController.scheduleOnDemandReaderTask(onDemandDataJob);

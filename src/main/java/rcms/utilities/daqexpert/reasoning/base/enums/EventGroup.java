@@ -11,6 +11,7 @@ public enum EventGroup {
 	Warning("warning",0),
 	NO_RATE_WHEN_EXPECTED("nrwe",2),
 	RUN_NUMBER("run-no",0),
+	EXPECTED_RATE("expected",0),
 	RUN_ONGOING("run-on",0),
 	TRANSITION("transition",0),
 	SESSION_NUMBER("session-no",0),

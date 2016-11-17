@@ -29,7 +29,7 @@ public class Transition extends ActionLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
 
 		// first check
 		if (started == 0) {
@@ -38,7 +38,7 @@ public class Transition extends ActionLogicModule {
 			duration = (int) (daq.getLastUpdate() - started);
 		}
 
-		if (runOngoing) {
+		if (expectedRate) {
 			if (duration < 5000)
 				// transition time
 				return true;

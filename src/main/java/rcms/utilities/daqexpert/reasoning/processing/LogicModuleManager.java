@@ -35,6 +35,7 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
+import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
@@ -99,8 +100,9 @@ public class LogicModuleManager {
 		comparators.add(new LHCMachineModeComparator());
 		comparators.add(new RunComparator());
 		comparators.add(new LevelZeroStateComparator());
+		comparators.add(new TCDSStateComparator());
 		comparators.add(new DAQStateComparator());
-		//comparators.add(new EVMComparator());
+		// comparators.add(new EVMComparator());
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(

@@ -67,29 +67,35 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 		for (File file : entries) {
 
-			Long startDeserializing = System.currentTimeMillis();
-			daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
-			Long endDeserializing = System.currentTimeMillis();
-			deserializingTime += (endDeserializing - startDeserializing);
+			try {
 
-			if (daq != null) {
+				Long startDeserializing = System.currentTimeMillis();
+				daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+				Long endDeserializing = System.currentTimeMillis();
+				deserializingTime += (endDeserializing - startDeserializing);
 
-				Long startSegmenting = System.currentTimeMillis();
-				if (dataManager != null) {
-					// this is not done in on-demand requests
-					dataManager.addSnapshot(new DummyDAQ(daq));
+				if (daq != null) {
+
+					Long startSegmenting = System.currentTimeMillis();
+					if (dataManager != null) {
+						// this is not done in on-demand requests
+						dataManager.addSnapshot(new DummyDAQ(daq));
+					}
+					Long endSegmenting = System.currentTimeMillis();
+					segmentingTime += (endSegmenting - startSegmenting);
+
+					Long startProcessing = System.currentTimeMillis();
+					Set<Entry> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
+					Long endProcessing = System.currentTimeMillis();
+					processingTime += (endProcessing - startProcessing);
+
+					result.addAll(logicResults);
+				} else {
+					logger.error("Snapshot not deserialized " + file.getAbsolutePath());
 				}
-				Long endSegmenting = System.currentTimeMillis();
-				segmentingTime += (endSegmenting - startSegmenting);
 
-				Long startProcessing = System.currentTimeMillis();
-				Set<Entry> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
-				Long endProcessing = System.currentTimeMillis();
-				processingTime += (endProcessing - startProcessing);
-
-				result.addAll(logicResults);
-			} else {
-				logger.error("Snapshot not deserialized " + file.getAbsolutePath());
+			} catch (RuntimeException e) {
+				logger.error("Error processing files " + file);
 			}
 
 		}

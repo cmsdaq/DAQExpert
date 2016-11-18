@@ -159,6 +159,8 @@ var initAnalysisGraph = function() {
 
 				$("#raport-name").html(data['name']);
 				$("#raport-description").html(data['description']);
+				$("#raport-duration").html(moment.duration(data['duration']).format());
+				$("#raport-duration-humanized").html(moment.duration(data['duration']).humanize());
 
 				if (data['elements'] == null) {
 					$("#context-section").addClass("hidden");

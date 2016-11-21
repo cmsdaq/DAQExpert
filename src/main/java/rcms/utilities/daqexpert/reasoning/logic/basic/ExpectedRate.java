@@ -28,9 +28,12 @@ public class ExpectedRate extends SimpleLogicModule {
 		boolean resuming = daq.getLevelZeroState().equalsIgnoreCase("Resuming") ? true : false;
 		boolean ttcHardResettingFromRunning = daq.getLevelZeroState().equalsIgnoreCase("TTCHardResettingFromRunning")
 				? true : false;
+		boolean ttcResyncingFromRunning = daq.getLevelZeroState().equalsIgnoreCase("TTCResyncingFromRunning")
+				? true : false;
+		
 
 		if (runOngoing && !fixingSoftError && !dcsPauseResume && !pausing && !paused && !resuming
-				&& !ttcHardResettingFromRunning)
+				&& !ttcHardResettingFromRunning && !ttcResyncingFromRunning)
 			return true;
 		return false;
 	}

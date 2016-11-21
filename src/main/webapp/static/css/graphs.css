@@ -3,6 +3,9 @@
 .vis-item {
 	height: 16px;
 	font-size: 8pt;
+	
+	border-color: #ccc;
+	background-image: linear-gradient(to bottom,#f2f2f2 0,#e0e0e0 100%);
 }
 
 .vis-timeline {
@@ -10,35 +13,34 @@
 }
 
 .vis-item.critical {
-	background-color: red;
-	border-color: darkred;
+	background-image: linear-gradient(to bottom,#d9534f 0,#c12e2a 100%);
+	border-color: #b92c28;
 	color: white;
 	font-family: monospace;
-	box-shadow: 0 0 10px gray;
 }
 
 .vis-item.vis-background.filtered {
-	background-color: rgba(0, 136, 204, 0.1);
+	background-color: rgba(94, 142, 156, 0.1);
+	background-image: unset;
 }
 
 .vis-item.vis-background.filtered-important {
-	background-color: rgba(189, 54, 47, 0.1);
+	background-color: rgba(42, 171, 210, 0.5);
+	background-image: unset;
 }
 
 .vis-item.important {
-	background-color: darkblue;
-	border-color: darkblue;
+	
+	border-color: #3277b3;
+	background-image: linear-gradient(to bottom,#3884c7 0,#337ab7 100%);
 	color: white;
 	font-family: monospace;
-	box-shadow: 0 0 10px gray;
 }
 
 .vis-item.warning {
-	background-color: #f79646;
-	border-color: #f79646;
-	border-color: #E38D13;
+	background-image: linear-gradient(to bottom,#f0ad4e 0,#eb9316 100%);
+	border-color: #e38d13;
 	font-family: monospace;
-	box-shadow: 0 0 10px gray;
 }
 
 .vis-item.experimental {

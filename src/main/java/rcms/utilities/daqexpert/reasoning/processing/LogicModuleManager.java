@@ -211,6 +211,7 @@ public class LogicModuleManager {
 	private List<Entry> runComparators(DAQ daq) {
 		List<Entry> results = new ArrayList<>();
 		for (ComparatorLogicModule comparator : comparators) {
+			logger.trace("Running comparator " + comparator.getClass().getSimpleName());
 			Date last = null;
 
 			/* add artificial event starting point */

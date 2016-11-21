@@ -246,6 +246,7 @@
 				<div class="modal-body">
 					<h4 id="raport-name">/Name/</h4>
 					<p id="raport-description">/description/</p>
+					<p>Duration: <span id="raport-duration" class= "badge">/duration/</span> <small class="text-muted" id="raport-duration-humanized">aa</small></p>
 
 
 					<div id="action-section">

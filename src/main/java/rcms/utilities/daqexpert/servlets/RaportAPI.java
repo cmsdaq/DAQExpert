@@ -72,6 +72,7 @@ public class RaportAPI extends HttpServlet {
 
 					result.put("description", description);
 					result.put("name", entry.getContent());
+					result.put("duration", entry.getDuration());
 				}
 
 			}

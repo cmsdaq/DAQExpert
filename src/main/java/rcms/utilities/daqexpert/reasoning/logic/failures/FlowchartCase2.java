@@ -14,6 +14,7 @@ import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 1st flowchart case.
@@ -42,13 +43,16 @@ public class FlowchartCase2 extends ActionLogicModule {
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+		
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+			return false;
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
+		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
+		
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 		boolean result = false;
 		int i = 0;
-
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
-			return false;
 
 		if (ERROR_STATE.equalsIgnoreCase(l0state) && ERROR_STATE.equalsIgnoreCase(daqstate)) {
 

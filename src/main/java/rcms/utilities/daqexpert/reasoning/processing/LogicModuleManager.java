@@ -82,7 +82,7 @@ public class LogicModuleManager {
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
 		checkers.add(new Deadtime());
-		checkers.add(new AvoidableDowntime());
+		//checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)
 		checkers.add(new FlowchartCase1());

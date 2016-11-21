@@ -85,14 +85,14 @@
 
 	<div class="container">
 
-		<div id="guide-available-message" class="alert alert-success"
+		<!-- <div id="guide-available-message" class="alert alert-success"
 			role="alert">
 			<button type="button" class="close" data-dismiss="alert">×</button>
 			<strong>Experimental mode now available!</strong> Learn more about
 			experimental mode in this <a
 				href="http://daq-expert.cern.ch/logic-contributing.html">step by
 				step guide</a>.
-		</div>
+		</div> -->
 
 		<div class="btn-group btn-toggle" id="extended-view">
 			<button id="mode1" type="button"

@@ -6,7 +6,6 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
 /**
  * This logic module identifies avoidable downtime condition in DAQ
@@ -27,11 +26,9 @@ public class Downtime extends ActionLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean stableBeams = false;
-		boolean noRate = false;
-		if (LHCBeamMode.STABLE_BEAMS == LHCBeamMode.getModeByCode(daq.getLhcBeamMode()))
-			stableBeams = true;
-		noRate = results.get(NoRate.class.getSimpleName());
+		boolean noRate = results.get(NoRate.class.getSimpleName());
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
+		this.priority = stableBeams ? EventPriority.WARNING : EventPriority.DEFAULTT;
 
 		if (stableBeams && noRate)
 			return true;

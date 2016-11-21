@@ -15,6 +15,18 @@ var groupsList = [ {
 	title : 'LHC machine mode',
 	primary : true
 }, {
+	id : 'session-no',
+	content : 'Session (0)',
+	name : 'Session',
+	title : 'Session number',
+	primary : true
+}, {
+	id : 'run-no',
+	content : 'Run NO (0)',
+	name : 'Run NO',
+	title : 'Run number',
+	primary : true
+}, {
 	id : 'daq-state',
 	content : 'DAQ (0)',
 	name : 'DAQ',
@@ -80,13 +92,13 @@ var groupsList = [ {
 	name : 'Downtime',
 	title : 'Downtime = no rate during stable beams',
 	primary : true
-}, {
+},/* {
 	id : 'adt',
 	content : 'Avoid. DT (0)',
 	name : 'Avoid. DT ',
 	title : 'Avoidable downtime',
 	primary : true
-}, {
+}, */{
 	id : 'flowchart',
 	content : 'FC (0)',
 	name : 'FC',
@@ -99,25 +111,6 @@ var groupsList = [ {
 	name : 'Dead. ',
 	title : 'Total deadtime',
 	primary : false
-}, {
-	id : 'experimental',
-	content : 'Exp. (0)',
-	name : 'Exp. ',
-	style : "background-color: white;font-weight:bold;",
-	title : 'Experimental logic modules',
-	primary : false
-}, {
-	id : 'session-no',
-	content : 'Session (0)',
-	name : 'Session',
-	title : 'Session number',
-	primary : true
-}, {
-	id : 'run-no',
-	content : 'Run NO (0)',
-	name : 'Run NO',
-	title : 'Run number',
-	primary : true
 }, {
 	id : 'warning',
 	content : 'Warn (0)',

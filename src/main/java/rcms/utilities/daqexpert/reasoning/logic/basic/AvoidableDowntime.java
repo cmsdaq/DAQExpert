@@ -15,7 +15,7 @@ public class AvoidableDowntime extends ActionLogicModule {
 	public AvoidableDowntime() {
 		this.name = "Avoidable Downtime";
 		this.group = EventGroup.AVOIDABLE_DOWNTIME;
-		this.priority = EventPriority.WARNING;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "No rate and no recovery action is being executed during stable beams";
 		this.action = null;
 	}
@@ -25,6 +25,10 @@ public class AvoidableDowntime extends ActionLogicModule {
 	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
+		this.priority = stableBeams ? EventPriority.WARNING : EventPriority.DEFAULTT;
+		
 
 		return results.get(NoRateWhenExpected.class.getSimpleName());
 

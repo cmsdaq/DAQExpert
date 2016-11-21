@@ -20,8 +20,12 @@ public class Transition extends ActionLogicModule {
 		this.action = null;
 	}
 
-	int duration;
-	long started;
+	/**
+	 * Transition time in ms
+	 */
+	private final int transitionTime = 10000;
+	private int duration;
+	private long started;
 
 	/**
 	 * No rate when sum of FedBuilders rate equals 0 Hz
@@ -39,7 +43,7 @@ public class Transition extends ActionLogicModule {
 		}
 
 		if (expectedRate) {
-			if (duration < 5000)
+			if (duration < transitionTime)
 				// transition time
 				return true;
 			else {

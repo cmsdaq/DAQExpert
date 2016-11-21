@@ -72,8 +72,8 @@ public class LogicModuleManager {
 		// Level 0 Independent
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
-		checkers.add(new ExpectedRate());
 		checkers.add(new RunOngoing());
+		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new StableBeams());

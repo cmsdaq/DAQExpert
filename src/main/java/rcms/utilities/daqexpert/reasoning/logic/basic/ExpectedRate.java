@@ -3,7 +3,6 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -20,32 +19,15 @@ public class ExpectedRate extends SimpleLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean tcdsRunning = false;
-		boolean daqRunning = false;
-		boolean l0Running = false;
+		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
 
-		if (daq.getDaqState().equals("Running")) {
-			daqRunning = true;
-		} else {
-			return false;
-		}
+		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
+		boolean dcsPauseResume = daq.getLevelZeroState().equalsIgnoreCase("PerformingDCSPauseResume") ? true : false;
+		boolean pausing = daq.getLevelZeroState().equalsIgnoreCase("Pausing") ? true : false;
+		boolean paused = daq.getLevelZeroState().equalsIgnoreCase("Paused") ? true : false;
+		boolean resuming = daq.getLevelZeroState().equalsIgnoreCase("Resuming") ? true : false;
 
-		if (daq.getLevelZeroState().equals("Running")) {
-			l0Running = true;
-		} else {
-			return false;
-		}
-
-		for (SubSystem curr : daq.getSubSystems()) {
-			if (curr.getName().equals("TCDS")) {
-				if (curr.getStatus().equalsIgnoreCase("Running")) {
-					tcdsRunning = true;
-					break;
-				}
-			}
-		}
-
-		if (tcdsRunning && daqRunning && l0Running)
+		if (runOngoing && !fixingSoftError && !dcsPauseResume && !pausing && !paused && !resuming)
 			return true;
 		return false;
 	}

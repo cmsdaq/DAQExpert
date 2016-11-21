@@ -22,6 +22,7 @@ import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
+import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
@@ -72,6 +73,7 @@ public class LogicModuleManager {
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
 		checkers.add(new RunOngoing());
+		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new StableBeams());

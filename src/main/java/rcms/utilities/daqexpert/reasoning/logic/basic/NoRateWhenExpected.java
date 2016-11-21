@@ -3,41 +3,37 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
-import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
 public class NoRateWhenExpected extends SimpleLogicModule {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
 		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
-		this.priority = EventPriority.CRITICAL;
+		this.priority = EventPriority.DEFAULTT;
 		this.description = "No rate when expected";
 	}
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		boolean stableBeams = false;
-		boolean runOngoing = false;
+		boolean expectedRate = false;
 		boolean noRate = false;
 		boolean transition = false;
 
 		stableBeams = results.get(StableBeams.class.getSimpleName());
-		runOngoing = results.get(RunOngoing.class.getSimpleName());
+		expectedRate = results.get(ExpectedRate.class.getSimpleName());
 		noRate = results.get(NoRate.class.getSimpleName());
 		transition = results.get(Transition.class.getSimpleName());
 
-		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
-		boolean dcsPauseResume = daq.getLevelZeroState().equalsIgnoreCase("PerformingDCSPauseResume") ? true : false;
-		boolean pausing = daq.getLevelZeroState().equalsIgnoreCase("Pausing") ? true : false;
-		boolean paused = daq.getLevelZeroState().equalsIgnoreCase("Paused") ? true : false;
-		boolean resuming = daq.getLevelZeroState().equalsIgnoreCase("Resuming") ? true : false;
+		if (stableBeams)
+			this.priority = EventPriority.CRITICAL;
+		else
+			this.priority = EventPriority.DEFAULTT;
 
-		if (stableBeams && runOngoing && noRate && !fixingSoftError && !dcsPauseResume && !transition && !pausing
-				&& !paused && !resuming)
+		if (expectedRate && noRate && !transition)
 			return true;
 		return false;
 	}

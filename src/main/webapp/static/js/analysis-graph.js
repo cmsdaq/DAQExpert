@@ -32,18 +32,12 @@ var groupsList = [ {
 	name : 'TCDS',
 	title : 'TCDS state',
 	primary : false
-}, {
-	id : 'session-no',
-	content : 'Session (0)',
-	name : 'Session',
-	title : 'Session number',
-	primary : true
-}, {
-	id : 'run-no',
-	content : 'Run NO (0)',
-	name : 'Run NO',
-	title : 'Run number',
-	primary : true
+}/**/, {
+	id : 'expected',
+	content : 'ER (0)',
+	name : 'ER',
+	title : 'Expected run',
+	primary : false
 }, {
 	id : 'run-on',
 	content : 'Run on (0)',
@@ -55,12 +49,6 @@ var groupsList = [ {
 	content : 'Trans. (0)',
 	name : 'Trans.',
 	title : 'Transition period',
-	primary : false
-}, {
-	id : 'warning',
-	content : 'Warn (0)',
-	name : 'Warn',
-	title : 'Warnings',
 	primary : false
 }, {
 	id : 'no-rate',
@@ -117,6 +105,24 @@ var groupsList = [ {
 	name : 'Exp. ',
 	style : "background-color: white;font-weight:bold;",
 	title : 'Experimental logic modules',
+	primary : false
+}, {
+	id : 'session-no',
+	content : 'Session (0)',
+	name : 'Session',
+	title : 'Session number',
+	primary : true
+}, {
+	id : 'run-no',
+	content : 'Run NO (0)',
+	name : 'Run NO',
+	title : 'Run number',
+	primary : true
+}, {
+	id : 'warning',
+	content : 'Warn (0)',
+	name : 'Warn',
+	title : 'Warnings',
 	primary : false
 } ];
 

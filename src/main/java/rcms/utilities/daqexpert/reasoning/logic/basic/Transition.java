@@ -20,8 +20,12 @@ public class Transition extends ActionLogicModule {
 		this.action = null;
 	}
 
-	int duration;
-	long started;
+	/**
+	 * Transition time in ms
+	 */
+	private final int transitionTime = 10000;
+	private int duration;
+	private long started;
 
 	/**
 	 * No rate when sum of FedBuilders rate equals 0 Hz
@@ -29,7 +33,7 @@ public class Transition extends ActionLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
 
 		// first check
 		if (started == 0) {
@@ -38,8 +42,8 @@ public class Transition extends ActionLogicModule {
 			duration = (int) (daq.getLastUpdate() - started);
 		}
 
-		if (runOngoing) {
-			if (duration < 5000)
+		if (expectedRate) {
+			if (duration < transitionTime)
 				// transition time
 				return true;
 			else {

@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class SnapshotProcessor {
 	private static final Logger logger = Logger.getLogger(SnapshotProcessor.class);
 
 	private final NotificationSignalSender notificationSender;
-	
+
 	private EventProducer eventProducer;
 
 	public SnapshotProcessor(EventProducer eventProducer) {
@@ -40,30 +41,34 @@ public class SnapshotProcessor {
 	}
 
 	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications, boolean includeExperimental) {
-		logger.trace("Process snapshot");
-		List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
-
+		logger.trace("Process snapshot " + new Date(daqSnapshot.getLastUpdate()) );
 		Set<Entry> result = new LinkedHashSet<>();
-		for (Entry lmResult : lmResults) {
-			result.add(lmResult);
+		try {
+			List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
+
+			for (Entry lmResult : lmResults) {
+				result.add(lmResult);
+			}
+
+			// Application.get().getDataManager().getResult().addAll(result);
+
+			logger.debug("Results from CheckManager for this snapshot: " + lmResults);
+
+			if (createNotifications)
+				for (Entry entry : result)
+					if (entry.isShow())
+						notificationSender.send(entry);
+		} catch (RuntimeException e) {
+			logger.error("Exception processing snapshot", e);
 		}
-
-		// Application.get().getDataManager().getResult().addAll(result);
-
-		logger.debug("Results from CheckManager for this snapshot: " + lmResults);
-
-		if (createNotifications)
-			for (Entry entry : result)
-				if (entry.isShow())
-					notificationSender.send(entry);
 		return result;
 	}
 
 	public EventProducer getEventProducer() {
 		return eventProducer;
 	}
-	
-	public void clearProducer(){
+
+	public void clearProducer() {
 		eventProducer.clearProducer();// = new EventProducer();
 	}
 

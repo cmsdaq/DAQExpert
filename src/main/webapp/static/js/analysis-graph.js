@@ -26,18 +26,18 @@ var groupsList = [ {
 	name : 'L0',
 	title : 'Level zero state',
 	primary : false
-}, {
-	id : 'session-no',
-	content : 'Session (0)',
-	name : 'Session',
-	title : 'Session number',
-	primary : true
-}, {
-	id : 'run-no',
-	content : 'Run NO (0)',
-	name : 'Run NO',
-	title : 'Run number',
-	primary : true
+},{
+	id : 'tcds',
+	content : 'TCDS (0)',
+	name : 'TCDS',
+	title : 'TCDS state',
+	primary : false
+}/**/, {
+	id : 'expected',
+	content : 'ER (0)',
+	name : 'ER',
+	title : 'Expected run',
+	primary : false
 }, {
 	id : 'run-on',
 	content : 'Run on (0)',
@@ -49,12 +49,6 @@ var groupsList = [ {
 	content : 'Trans. (0)',
 	name : 'Trans.',
 	title : 'Transition period',
-	primary : false
-}, {
-	id : 'warning',
-	content : 'Warn (0)',
-	name : 'Warn',
-	title : 'Warnings',
 	primary : false
 }, {
 	id : 'no-rate',
@@ -112,6 +106,24 @@ var groupsList = [ {
 	style : "background-color: white;font-weight:bold;",
 	title : 'Experimental logic modules',
 	primary : false
+}, {
+	id : 'session-no',
+	content : 'Session (0)',
+	name : 'Session',
+	title : 'Session number',
+	primary : true
+}, {
+	id : 'run-no',
+	content : 'Run NO (0)',
+	name : 'Run NO',
+	title : 'Run number',
+	primary : true
+}, {
+	id : 'warning',
+	content : 'Warn (0)',
+	name : 'Warn',
+	title : 'Warnings',
+	primary : false
 } ];
 
 var options = {
@@ -153,6 +165,8 @@ var initAnalysisGraph = function() {
 
 				$("#raport-name").html(data['name']);
 				$("#raport-description").html(data['description']);
+				$("#raport-duration").html(moment.duration(data['duration']).format());
+				$("#raport-duration-humanized").html(moment.duration(data['duration']).humanize());
 
 				if (data['elements'] == null) {
 					$("#context-section").addClass("hidden");

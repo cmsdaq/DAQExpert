@@ -22,6 +22,7 @@ import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
+import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
@@ -35,6 +36,7 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
+import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
@@ -71,6 +73,7 @@ public class LogicModuleManager {
 		checkers.add(new RateOutOfRange());
 		checkers.add(new NoRate());
 		checkers.add(new RunOngoing());
+		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new StableBeams());
@@ -99,8 +102,9 @@ public class LogicModuleManager {
 		comparators.add(new LHCMachineModeComparator());
 		comparators.add(new RunComparator());
 		comparators.add(new LevelZeroStateComparator());
+		comparators.add(new TCDSStateComparator());
 		comparators.add(new DAQStateComparator());
-		//comparators.add(new EVMComparator());
+		// comparators.add(new EVMComparator());
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(
@@ -207,6 +211,7 @@ public class LogicModuleManager {
 	private List<Entry> runComparators(DAQ daq) {
 		List<Entry> results = new ArrayList<>();
 		for (ComparatorLogicModule comparator : comparators) {
+			logger.trace("Running comparator " + comparator.getClass().getSimpleName());
 			Date last = null;
 
 			/* add artificial event starting point */

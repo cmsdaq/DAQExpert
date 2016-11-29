@@ -5,9 +5,7 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -20,7 +18,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase3 extends ActionLogicModule {
+public class FlowchartCase3 extends KnownFailure {
 
 	public FlowchartCase3() {
 		this.name = "FC3";
@@ -32,13 +30,11 @@ public class FlowchartCase3 extends ActionLogicModule {
 				"Problem still not fixed after recover: Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}})",
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
 	}
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
-		
+
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());

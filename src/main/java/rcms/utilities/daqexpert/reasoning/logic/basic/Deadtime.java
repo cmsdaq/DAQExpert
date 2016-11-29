@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -17,6 +18,8 @@ public class Deadtime extends SimpleLogicModule {
 		this.group = EventGroup.DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime is greater than 5%";
+		this.setNotificationPlay(true);// TODO: make it true
+		this.setSoundToPlay(Sound.DEADTIME);
 	}
 
 	/**
@@ -24,6 +27,16 @@ public class Deadtime extends SimpleLogicModule {
 	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+
+		boolean transition = false;
+		boolean expectedRate = false;
+		expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		if (!expectedRate)
+			return false;
+		transition = results.get(LongTransition.class.getSimpleName());
+		if (transition)
+			return false;
+
 		if (daq.getTcdsGlobalInfo().getDeadTimes().get("total") > 5)
 			return true;
 		else

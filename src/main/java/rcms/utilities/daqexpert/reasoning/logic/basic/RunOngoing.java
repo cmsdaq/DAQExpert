@@ -4,6 +4,7 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -15,6 +16,9 @@ public class RunOngoing extends SimpleLogicModule {
 		this.group = EventGroup.RUN_ONGOING;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Run is ongoing according to TCDS state";
+		this.setNotificationPlay(true);
+		this.setSoundToPlay(Sound.NEW_RUN);
+		this.setSkipText(true);
 	}
 
 	@Override

@@ -9,9 +9,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -23,7 +21,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase2 extends ActionLogicModule {
+public class FlowchartCase2 extends KnownFailure {
 
 	public FlowchartCase2() {
 		this.name = "FC2";
@@ -34,8 +32,6 @@ public class FlowchartCase2 extends ActionLogicModule {
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data)");
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
 	}
 
 	private static Logger logger = Logger.getLogger(FlowchartCase2.class);
@@ -43,12 +39,12 @@ public class FlowchartCase2 extends ActionLogicModule {
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
-		
+
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
 		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
-		
+
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 		boolean result = false;

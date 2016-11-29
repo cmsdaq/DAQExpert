@@ -49,8 +49,8 @@ public class NotificationSignalSender {
 	 *            notifications based on older snapshots than this timestamp
 	 *            will not generate notifications
 	 */
-	public NotificationSignalSender(NotificationSignalConnector notificationConnector, String createAPIAddress, String finishAPIAddress,
-			long appStartTime) {
+	public NotificationSignalSender(NotificationSignalConnector notificationConnector, String createAPIAddress,
+			String finishAPIAddress, long appStartTime) {
 		this.notificationConnector = notificationConnector;
 		this.appStartTime = appStartTime;
 		this.createAPIAddress = createAPIAddress;
@@ -66,38 +66,42 @@ public class NotificationSignalSender {
 	 */
 	public void send(Entry entry) {
 
-		if ("critical".equals(entry.getClassName()) && !isPastSnapshot(entry.getStart().getTime())) {
-			EntryState state = entry.getState();
-			switch (state) {
-			case NEW:
-				// Immediately in 2nd snapshot becomes mature
-				// may check date here
-				entry.setState(EntryState.MATURE);
-				break;
-			case MATURE:
-				entry.setState(EntryState.STARTED);
-				// send started notification
-				logger.info("Send entry notification, id: " + entry.getId());
-				sendStartSignal(entry);
-				sentIds.add(entry.getId());
-				break;
-			case STARTED:
-				// TODO: send update when there is new information about event
-				if (entry.hasChanged())
-					logger.info("Send entry update, id: " + entry.getId());
-				break;
-			case FINISHED:
-				// send finished
-				if (sentIds.contains(entry.getId())) {
-					logger.info("Send entry finish, id: " + entry);
-					sendEndSignal(entry);
-					sentIds.remove(entry.getId());
+		if (!isPastSnapshot(entry.getStart().getTime())) {
+			if (entry.getEventFinder().isNotificationDisplay() || entry.getEventFinder().isNotificationPlay()) {
+				EntryState state = entry.getState();
+				switch (state) {
+				case NEW:
+				case MATURE:
+					entry.setState(EntryState.STARTED);
+					// send started notification
+					logger.info("Send entry notification, id: " + entry.getId());
+					sendStartSignal(entry);
+					sentIds.add(entry.getId());
+					break;
+				case STARTED:
+					// TODO: send update when there is new information about
+					// event
+					if (entry.hasChanged())
+						logger.info("Send entry update, id: " + entry.getId());
+					break;
+				case FINISHED:
+					// send finished
+					if (sentIds.contains(entry.getId())) {
+						logger.info("Send entry finish, id: " + entry);
+						sendEndSignal(entry);
+						sentIds.remove(entry.getId());
+					}
+					break;
+				default:
+					logger.warn("Problem sending signal to NotificationManager: Entry has no state " + entry);
+					break;
 				}
-				break;
-			default:
-				logger.warn("Problem sending signal to NotificationManager: Entry has no state " + entry);
-				break;
+			} else {
+
+				logger.debug("Event not to show nor to display in NM: " + entry);
 			}
+		} else {
+			logger.debug("Past event, notification cancelled for: " + entry);
 		}
 	}
 
@@ -109,36 +113,49 @@ public class NotificationSignalSender {
 	 */
 	private int sendStartSignal(Entry event) {
 
+		logger.debug("Sending start signal");
+
+		Notification notification = new Notification();
+		notification.setDisplay(true);
+		notification.setPlay(true);
+		notification.setDate(event.getStart());
+
+		String message = event.getEventFinder().getName();
+		if (event.getEventFinder().getPrefixToPlay() != null) {
+			message = event.getEventFinder().getPrefixToPlay() + message;
+		}
+		if (event.getEventFinder().getSuffixToPlay() != null) {
+			message = message + event.getEventFinder().getSuffixToPlay();
+		}
+		if (event.getEventFinder().getSoundToPlay() != null) {
+			notification.setSoundId(event.getEventFinder().getSoundToPlay().ordinal());
+		}
+		if(event.getEventFinder().isSkipText()){
+			message = "";
+		}
+		logger.debug("Now working on: " + message);
+		logger.debug("Now working on: " + event);
+
 		if (event.getEventFinder() instanceof ActionLogicModule) {
 
 			ActionLogicModule finder = (ActionLogicModule) event.getEventFinder();
-			Notification notification = new Notification();
-			notification.setDate(event.getStart());
+			Context context = ((ActionLogicModule) finder).getContext();
+			message = context.getMessageWithContext(message);
+			notification.setAction(context.getActionWithContext(finder.getAction()));
+		}
 
-			String message = finder.getDescription();
+		notification.setMessage(message);
+		notification.setType_id(event.getEventFinder().getGroup().getNmId());
+		notification.setId(event.getId());
 
-			logger.info("Now working on: " + message);
-			logger.info("Now working on: " + event);
+		logger.info("To be sent: " + notification.getMessage());
 
-			if (finder instanceof ActionLogicModule) {
-				Context context = ((ActionLogicModule) finder).getContext();
-				message = context.getMessageWithContext(message);
-				notification.setAction(context.getActionWithContext(finder.getAction()));
-			}
-
-			notification.setMessage(message);
-			notification.setType_id(event.getEventFinder().getGroup().getNmId());
-			notification.setId(event.getId());
-
-			logger.info("To be sent: " + notification);
-
-			String notificationString;
-			try {
-				notificationString = objectMapper.writeValueAsString(notification);
-				return notificationConnector.sendSignal(createAPIAddress, notificationString);
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
+		String notificationString;
+		try {
+			notificationString = objectMapper.writeValueAsString(notification);
+			return notificationConnector.sendSignal(createAPIAddress, notificationString);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
 		return 0;
 
@@ -148,6 +165,8 @@ public class NotificationSignalSender {
 		FinishNotification finishNotification = new FinishNotification();
 		finishNotification.setId(entry.getId());
 		finishNotification.setDate(entry.getEnd());
+		finishNotification.setDisplay(true);
+		finishNotification.setPlay(entry.getEventFinder().isNotificationEndPlay());
 		try {
 			String notificationAsString = objectMapper.writeValueAsString(finishNotification);
 			notificationConnector.sendSignal(finishAPIAddress, notificationAsString);

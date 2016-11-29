@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import oracle.net.aso.e;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
@@ -33,15 +34,22 @@ public class SnapshotProcessor {
 
 		this.eventProducer = eventProducer;
 		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
+		
+		int offset = 0;
+		try{
+			offset = Integer.parseInt(Application.get().getProp().getProperty(Application.OFFSET));
+		}catch(NumberFormatException e){
+			logger.error("Problem parsing offset");
+		}
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
 				Application.get().getProp().getProperty(Application.NM_API_CREATE),
-				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis());
+				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis()-offset);
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 
 	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications, boolean includeExperimental) {
-		logger.trace("Process snapshot " + new Date(daqSnapshot.getLastUpdate()) );
+		logger.trace("Process snapshot " + new Date(daqSnapshot.getLastUpdate()));
 		Set<Entry> result = new LinkedHashSet<>();
 		try {
 			List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
@@ -54,10 +62,21 @@ public class SnapshotProcessor {
 
 			logger.debug("Results from CheckManager for this snapshot: " + lmResults);
 
-			if (createNotifications)
-				for (Entry entry : result)
-					if (entry.isShow())
-						notificationSender.send(entry);
+			if (createNotifications) {
+				if (result.size() != 0) {
+					logger.debug("Creating notifications for " + result);
+					for (Entry entry : result)
+						if (entry.isShow()) {
+							logger.debug("Send notification for " + entry);
+							notificationSender.send(entry);
+						} else {
+							logger.debug("No notification (show=false) for result " + entry);
+						}
+				}
+			} else {
+				logger.debug("Global notification flag set to false for this results, notification will not be send: "
+						+ result);
+			}
 		} catch (RuntimeException e) {
 			logger.error("Exception processing snapshot", e);
 		}

@@ -17,6 +17,7 @@ public class DAQStateComparator extends ComparatorLogicModule {
 		this.description = "New DAQ state identified";
 		this.setNotificationPlay(true);
 		this.setPrefixToPlay("DAQ " );
+		this.setNotificationDisplay(false);
 		this.setSoundToPlay(Sound.STATE_CHANGE_DAQ);
 		
 	}

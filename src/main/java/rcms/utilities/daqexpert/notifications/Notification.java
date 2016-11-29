@@ -18,6 +18,7 @@ public class Notification {
 	private boolean display;
 	private boolean play;
 	private int soundId;
+	private boolean closeable;
 	
 	public int getType_id() {
 		return type_id;
@@ -87,6 +88,14 @@ public class Notification {
 
 	public void setSoundId(int soundId) {
 		this.soundId = soundId;
+	}
+
+	public boolean isCloseable() {
+		return closeable;
+	}
+
+	public void setCloseable(boolean closeable) {
+		this.closeable = closeable;
 	}
 
 }

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
@@ -116,8 +117,8 @@ public class NotificationSignalSender {
 		logger.debug("Sending start signal");
 
 		Notification notification = new Notification();
-		notification.setDisplay(true);
-		notification.setPlay(true);
+		notification.setDisplay(event.getEventFinder().isNotificationDisplay());
+		notification.setPlay(event.getEventFinder().isNotificationPlay());
 		notification.setDate(event.getStart());
 
 		String message = event.getEventFinder().getName();
@@ -130,8 +131,13 @@ public class NotificationSignalSender {
 		if (event.getEventFinder().getSoundToPlay() != null) {
 			notification.setSoundId(event.getEventFinder().getSoundToPlay().ordinal());
 		}
-		if(event.getEventFinder().isSkipText()){
+		if (event.getEventFinder().isSkipText()) {
 			message = "";
+		}
+		if (event.getEventFinder() instanceof ComparatorLogicModule) {
+			notification.setCloseable(false);
+		} else {
+			notification.setCloseable(true);
 		}
 		logger.debug("Now working on: " + message);
 		logger.debug("Now working on: " + event);

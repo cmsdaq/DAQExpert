@@ -59,7 +59,7 @@ public abstract class LogicModule {
 	private boolean notificationPlay;
 	private boolean notificationEndPlay = false;
 
-	private boolean notificationDisplay;
+	private boolean notificationDisplay = false;
 
 	private String prefixToPlay;
 	private String suffixToPlay;

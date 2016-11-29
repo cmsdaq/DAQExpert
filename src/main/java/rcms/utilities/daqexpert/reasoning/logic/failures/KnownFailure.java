@@ -9,6 +9,7 @@ public abstract class KnownFailure extends ActionLogicModule {
 
 	public KnownFailure() {
 		this.setNotificationPlay(true);
+		this.setNotificationDisplay(true);
 		this.setPrefixToPlay("Known failure: ");
 		this.setSuffixToPlay(". Steps ready");
 		this.group = EventGroup.FLOWCHART;

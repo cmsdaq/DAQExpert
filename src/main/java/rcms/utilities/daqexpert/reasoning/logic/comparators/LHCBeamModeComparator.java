@@ -18,6 +18,7 @@ public class LHCBeamModeComparator extends ComparatorLogicModule {
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "New LHC beam mode identified";
 		this.setNotificationPlay(true);
+		this.setNotificationDisplay(false);
 		this.setPrefixToPlay("Beam: ");
 		this.setSoundToPlay(Sound.STATE_CHANGE_LHC_BEAM_MODE);
 	}

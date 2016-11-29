@@ -18,6 +18,7 @@ public class LHCMachineModeComparator extends ComparatorLogicModule {
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "New LHC Machine mode identified";
 		this.setNotificationPlay(true);
+		this.setNotificationDisplay(false);
 		this.setPrefixToPlay("Machine: ");
 		this.setSoundToPlay(Sound.STATE_CHANGE_LHC_MACHINE_MODE);
 	}

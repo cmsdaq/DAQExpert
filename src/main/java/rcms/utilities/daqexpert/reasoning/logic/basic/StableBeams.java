@@ -21,6 +21,8 @@ public class StableBeams extends SimpleLogicModule {
 
 		this.group = EventGroup.HIDDEN;
 		this.priority = EventPriority.DEFAULTT;
+		
+		this.setNotificationPlay(false);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -16,6 +17,10 @@ public class LHCBeamModeComparator extends ComparatorLogicModule {
 		this.group = EventGroup.LHC_BEAM;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "New LHC beam mode identified";
+		this.setNotificationPlay(true);
+		this.setNotificationDisplay(false);
+		this.setPrefixToPlay("Beam: ");
+		this.setSoundToPlay(Sound.STATE_CHANGE_LHC_BEAM_MODE);
 	}
 
 	private static Logger logger = Logger.getLogger(LHCBeamModeComparator.class);

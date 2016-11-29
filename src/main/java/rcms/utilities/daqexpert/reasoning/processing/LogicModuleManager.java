@@ -19,10 +19,10 @@ import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.logic.basic.AvoidableDowntime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
+import rcms.utilities.daqexpert.reasoning.logic.basic.LongTransition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
@@ -75,6 +75,7 @@ public class LogicModuleManager {
 		checkers.add(new RunOngoing());
 		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
+		checkers.add(new LongTransition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new StableBeams());
 
@@ -82,7 +83,7 @@ public class LogicModuleManager {
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
 		checkers.add(new Deadtime());
-		//checkers.add(new AvoidableDowntime());
+		// checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)
 		checkers.add(new FlowchartCase1());
@@ -226,8 +227,11 @@ public class LogicModuleManager {
 			boolean result = comparator.compare(daq);
 			Date current = new Date(comparator.getLast().getLastUpdate());
 
-			// TODO: comparators may also return entry
-			eventProducer.produce(comparator, result, last, current);
+			Pair<Boolean, Entry> produced = eventProducer.produce(comparator, result, last, current);
+			if (produced.getLeft()) {
+				logger.trace(produced.getRight());
+				results.add(produced.getRight());
+			}
 
 		}
 		artificialForced = false;

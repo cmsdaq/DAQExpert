@@ -14,6 +14,9 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "No rate when expected";
+		this.setNotificationDisplay(true);
+		this.setNotificationPlay(true);
+		this.setNotificationEndPlay(true);
 	}
 
 	@Override

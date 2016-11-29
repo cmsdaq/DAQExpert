@@ -9,9 +9,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -25,12 +23,10 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase6 extends ActionLogicModule {
+public class FlowchartCase6 extends KnownFailure {
 
 	public FlowchartCase6() {
 		this.name = "FC6";
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
 
 		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
 				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
@@ -41,6 +37,7 @@ public class FlowchartCase6 extends ActionLogicModule {
 				"Start new Run (Try 1 time)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} (whose FED stopped sending data) to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}} (whose FED stopped sending data)");
+
 	}
 
 	private static final Logger logger = Logger.getLogger(FlowchartCase6.class);

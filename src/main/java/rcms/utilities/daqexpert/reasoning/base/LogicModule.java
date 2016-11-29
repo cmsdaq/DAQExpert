@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
@@ -54,6 +55,16 @@ public abstract class LogicModule {
 	 * Condition description
 	 */
 	protected String description;
+
+	private boolean notificationPlay;
+	private boolean notificationEndPlay = false;
+
+	private boolean notificationDisplay = false;
+
+	private String prefixToPlay;
+	private String suffixToPlay;
+	private Sound soundToPlay;
+	private boolean skipText;
 
 	/**
 	 * Get name of the condition
@@ -118,6 +129,62 @@ public abstract class LogicModule {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isNotificationPlay() {
+		return notificationPlay;
+	}
+
+	public void setNotificationPlay(boolean notificationPlay) {
+		this.notificationPlay = notificationPlay;
+	}
+
+	public boolean isNotificationDisplay() {
+		return notificationDisplay;
+	}
+
+	public void setNotificationDisplay(boolean notificationDisplay) {
+		this.notificationDisplay = notificationDisplay;
+	}
+
+	public String getPrefixToPlay() {
+		return prefixToPlay;
+	}
+
+	public void setPrefixToPlay(String prefixToPlay) {
+		this.prefixToPlay = prefixToPlay;
+	}
+
+	public String getSuffixToPlay() {
+		return suffixToPlay;
+	}
+
+	public void setSuffixToPlay(String suffixToPlay) {
+		this.suffixToPlay = suffixToPlay;
+	}
+
+	public Sound getSoundToPlay() {
+		return soundToPlay;
+	}
+
+	public void setSoundToPlay(Sound soundToPlay) {
+		this.soundToPlay = soundToPlay;
+	}
+
+	public boolean isSkipText() {
+		return skipText;
+	}
+
+	public void setSkipText(boolean skipText) {
+		this.skipText = skipText;
+	}
+
+	public boolean isNotificationEndPlay() {
+		return notificationEndPlay;
+	}
+
+	public void setNotificationEndPlay(boolean notificationEndPlay) {
+		this.notificationEndPlay = notificationEndPlay;
 	}
 
 }

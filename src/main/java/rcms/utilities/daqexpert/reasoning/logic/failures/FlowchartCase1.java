@@ -6,9 +6,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -21,7 +19,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase1 extends ActionLogicModule {
+public class FlowchartCase1 extends KnownFailure {
 
 	public FlowchartCase1() {
 		this.name = "FC1";
@@ -43,8 +41,6 @@ public class FlowchartCase1 extends ActionLogicModule {
 						+ "Call the DOC {{SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		this.action = action;
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
 	}
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";

@@ -5,9 +5,7 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -21,7 +19,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase4 extends ActionLogicModule {
+public class FlowchartCase4 extends KnownFailure {
 
 	public FlowchartCase4() {
 		this.name = "FC4";
@@ -30,8 +28,6 @@ public class FlowchartCase4 extends ActionLogicModule {
 		this.action = new SimpleAction("Stop the run", "red & green recycle the subsystem {{SUBSYSTEM}}",
 				"Start new run", "Problem fixed: You are done make an e-log entry",
 				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem for the partition in disconnected)");
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
 	}
 
 	@Override

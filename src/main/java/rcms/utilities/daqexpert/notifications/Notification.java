@@ -15,6 +15,11 @@ public class Notification {
 	private List<String> action;
 	private Long id;
 
+	private boolean display;
+	private boolean play;
+	private int soundId;
+	private boolean closeable;
+	
 	public int getType_id() {
 		return type_id;
 	}
@@ -59,6 +64,38 @@ public class Notification {
 	public String toString() {
 		return "Notification [type_id=" + type_id + ", date=" + date + ", message=" + message + ", action=" + action
 				+ ", id=" + id + "]";
+	}
+
+	public boolean isDisplay() {
+		return display;
+	}
+
+	public void setDisplay(boolean display) {
+		this.display = display;
+	}
+
+	public boolean isPlay() {
+		return play;
+	}
+
+	public void setPlay(boolean play) {
+		this.play = play;
+	}
+
+	public int getSoundId() {
+		return soundId;
+	}
+
+	public void setSoundId(int soundId) {
+		this.soundId = soundId;
+	}
+
+	public boolean isCloseable() {
+		return closeable;
+	}
+
+	public void setCloseable(boolean closeable) {
+		this.closeable = closeable;
 	}
 
 }

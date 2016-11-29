@@ -74,7 +74,7 @@ public class NotificationSignalSender {
 				case MATURE:
 					entry.setState(EntryState.STARTED);
 					// send started notification
-					logger.info("Send entry notification, id: " + entry.getId());
+					logger.debug("Send entry notification, id: " + entry.getId());
 					sendStartSignal(entry);
 					sentIds.add(entry.getId());
 					break;
@@ -87,7 +87,7 @@ public class NotificationSignalSender {
 				case FINISHED:
 					// send finished
 					if (sentIds.contains(entry.getId())) {
-						logger.info("Send entry finish, id: " + entry);
+						logger.debug("Send entry finish, id: " + entry);
 						sendEndSignal(entry);
 						sentIds.remove(entry.getId());
 					}

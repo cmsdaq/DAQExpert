@@ -229,7 +229,7 @@ public class LogicModuleManager {
 
 			Pair<Boolean, Entry> produced = eventProducer.produce(comparator, result, last, current);
 			if (produced.getLeft()) {
-				logger.info(produced.getRight());
+				logger.trace(produced.getRight());
 				results.add(produced.getRight());
 			}
 

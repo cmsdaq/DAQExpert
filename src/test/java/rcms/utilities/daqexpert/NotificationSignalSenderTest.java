@@ -6,14 +6,15 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 
@@ -23,6 +24,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
+@Ignore
 public class NotificationSignalSenderTest {
 
 	@Test

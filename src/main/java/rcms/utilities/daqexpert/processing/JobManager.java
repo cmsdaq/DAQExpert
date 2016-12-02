@@ -50,7 +50,7 @@ public class JobManager {
 	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
+		long offset = Long.parseLong(Application.get().getProp().get(Application.EXPERT_OFFSET).toString());
 		long startTime = utcCalendar.getTimeInMillis() - offset;
 		utcCalendar.setTimeInMillis(startTime);
 		Date startDate = utcCalendar.getTime();

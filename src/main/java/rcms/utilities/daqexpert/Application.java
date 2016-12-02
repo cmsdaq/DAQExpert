@@ -22,7 +22,8 @@ public class Application {
 	public static final String NM_API_CLOSE = "nm.api.close";
 	public static final String SNAPSHOTS_DIR = "snapshots";
 	public static final String LANDING = "landing";
-	public static final String OFFSET = "nm.offset";
+	public static final String EXPERT_OFFSET = "expert.offset";
+	public static final String NM_OFFSET = "nm.offset";
 	public static final String EXPERIMENTAL_DIR = "experimental";
 
 	private DataManager dataManager;
@@ -52,8 +53,8 @@ public class Application {
 			missing.add(NM_API_CLOSE);
 		if (!instance.prop.containsKey(LANDING))
 			missing.add(LANDING);
-		if (!instance.prop.containsKey(OFFSET))
-			missing.add(OFFSET);
+		if (!instance.prop.containsKey(EXPERT_OFFSET))
+			missing.add(EXPERT_OFFSET);
 		if (!instance.prop.containsKey(EXPERIMENTAL_DIR))
 			missing.add(EXPERIMENTAL_DIR);
 

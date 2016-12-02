@@ -34,17 +34,17 @@ public class SnapshotProcessor {
 
 		this.eventProducer = eventProducer;
 		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
-		
-		int offset = 0;
-		try{
-			offset = Integer.parseInt(Application.get().getProp().getProperty(Application.OFFSET));
-		}catch(NumberFormatException e){
+
+		long offset = 0;
+		try {
+			offset = Long.parseLong(Application.get().getProp().getProperty(Application.NM_OFFSET));
+		} catch (NumberFormatException e) {
 			logger.error("Problem parsing offset");
 		}
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
 				Application.get().getProp().getProperty(Application.NM_API_CREATE),
-				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis()-offset);
+				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis() - offset);
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 

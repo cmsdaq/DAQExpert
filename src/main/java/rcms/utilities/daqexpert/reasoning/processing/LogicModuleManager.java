@@ -28,7 +28,9 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemError;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
@@ -79,6 +81,8 @@ public class LogicModuleManager {
 		checkers.add(new LongTransition());
 		checkers.add(new WarningInSubsystem());
 		checkers.add(new SubsystemRunningDegraded());
+		checkers.add(new SubsystemError());
+		checkers.add(new SubsystemSoftError());
 		checkers.add(new StableBeams());
 
 		// Level 1 (depends on L0)

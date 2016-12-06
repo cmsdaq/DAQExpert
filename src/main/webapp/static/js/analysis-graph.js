@@ -112,6 +112,37 @@ var groupsList = [ {
 	title : 'Total deadtime',
 	primary : false
 }, {
+	id : 'feddead',
+	content : 'FEDD. (0)',
+	name : 'FEDD. ',
+	title : 'Individual FED deadtime',
+	primary : false
+},  {
+	id : 'partition-dead',
+	content : 'PDead. (0)',
+	name : 'PDead. ',
+	title : 'Partition deadtime',
+	primary : false
+},{
+	id : 'ssdegraded',
+	content : 'SSDegr. (0)',
+	name : 'SSDegr. ',
+	title : 'Subsystem running degraded',
+	primary : false
+},{
+	id : 'ss-soft-err',
+	content : 'SSSErr. (0)',
+	name : 'SSSErr. ',
+	title : 'Subsystem soft error',
+	primary : false
+},
+{
+	id : 'ss-err',
+	content : 'SSErr. (0)',
+	name : 'SSErr. ',
+	title : 'Subsystem error',
+	primary : false
+},{
 	id : 'warning',
 	content : 'Warn (0)',
 	name : 'Warn',

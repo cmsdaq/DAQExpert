@@ -22,9 +22,11 @@ import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
+import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.LongTransition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.PartitionDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
@@ -83,6 +85,8 @@ public class LogicModuleManager {
 		checkers.add(new SubsystemRunningDegraded());
 		checkers.add(new SubsystemError());
 		checkers.add(new SubsystemSoftError());
+		checkers.add(new FEDDeadtime());
+		checkers.add(new PartitionDeadtime());
 		checkers.add(new StableBeams());
 
 		// Level 1 (depends on L0)

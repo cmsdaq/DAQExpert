@@ -15,7 +15,7 @@ public class SubsystemSoftError extends ActionLogicModule {
 		this.name = "Subsystem soft error detected";
 		this.description = "{{SUBSYSTEM}} subsystem is in soft error detected";
 		this.action = new SimpleAction("");
-		this.group = EventGroup.Warning;
+		this.group = EventGroup.SUBSYS_SOFT_ERR;
 		this.priority = EventPriority.DEFAULTT;
 		this.setNotificationPlay(true);
 		this.setNotificationDisplay(true);
@@ -27,6 +27,10 @@ public class SubsystemSoftError extends ActionLogicModule {
 		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
 
 		if (!runOngoing)
+			return false;
+		
+		boolean transition = results.get(LongTransition.class.getSimpleName());
+		if (transition)
 			return false;
 
 		boolean result = false;

@@ -25,8 +25,11 @@ public class SubsystemError extends ActionLogicModule {
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
-
 		if (!runOngoing)
+			return false;
+		
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		if (!expectedRate)
 			return false;
 		
 		boolean transition = results.get(LongTransition.class.getSimpleName());

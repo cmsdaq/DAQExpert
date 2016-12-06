@@ -29,6 +29,10 @@ public class SubsystemSoftError extends ActionLogicModule {
 		if (!runOngoing)
 			return false;
 		
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		if (!expectedRate)
+			return false;
+		
 		boolean transition = results.get(LongTransition.class.getSimpleName());
 		if (transition)
 			return false;

@@ -1,10 +1,13 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
 import oracle.net.aso.e;
@@ -41,6 +44,12 @@ public class SnapshotProcessor {
 		} catch (NumberFormatException e) {
 			logger.error("Problem parsing offset");
 		}
+		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		long startTime = utcCalendar.getTimeInMillis() - offset;
+		utcCalendar.setTimeInMillis(startTime);
+		Date startDate = utcCalendar.getTime();
+		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+		logger.info("Notifications will generated from: " + startDate + " (now minus offset of " + offsetString + ")");
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
 				Application.get().getProp().getProperty(Application.NM_API_CREATE),

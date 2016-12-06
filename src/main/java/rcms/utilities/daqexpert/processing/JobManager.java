@@ -11,6 +11,7 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
@@ -54,7 +55,9 @@ public class JobManager {
 		long startTime = utcCalendar.getTimeInMillis() - offset;
 		utcCalendar.setTimeInMillis(startTime);
 		Date startDate = utcCalendar.getTime();
-		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offset + "ms)");
+		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+
+		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offsetString + ")");
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {

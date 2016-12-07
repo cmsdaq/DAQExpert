@@ -9,11 +9,16 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 public class RateOutOfRange extends SimpleLogicModule {
 
-	public RateOutOfRange() {
+	private final float min;
+	private final float max;
+
+	public RateOutOfRange(float min, float max) {
 		this.name = "Rate out of range";
 		this.group = EventGroup.RATE_OUT_OF_RANGE;
 		this.priority = EventPriority.DEFAULTT;
-		this.description = "Rate is considered out of range when less than 50kHz";
+		this.description = "L1 rate out of expected range [" + min + "; " + max + "]";
+		this.min = min;
+		this.max = max;
 	}
 
 	@Override
@@ -21,7 +26,7 @@ public class RateOutOfRange extends SimpleLogicModule {
 		float a = daq.getFedBuilderSummary().getRate();
 
 		boolean result = false;
-		if (50000 > a)
+		if (min > a || max < a)
 			result = true;
 
 		return result;

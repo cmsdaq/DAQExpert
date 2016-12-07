@@ -10,9 +10,9 @@ import java.util.TimeZone;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
-import oracle.net.aso.e;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -40,7 +40,7 @@ public class SnapshotProcessor {
 
 		long offset = 0;
 		try {
-			offset = Long.parseLong(Application.get().getProp().getProperty(Application.NM_OFFSET));
+			offset = Long.parseLong(Application.get().getProp(Setting.NM_OFFSET));
 		} catch (NumberFormatException e) {
 			logger.error("Problem parsing offset");
 		}
@@ -52,8 +52,8 @@ public class SnapshotProcessor {
 		logger.info("Notifications will generated from: " + startDate + " (now minus offset of " + offsetString + ")");
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
-				Application.get().getProp().getProperty(Application.NM_API_CREATE),
-				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis() - offset);
+				Application.get().getProp(Setting.NM_API_CREATE),
+				Application.get().getProp(Setting.NM_API_CLOSE), System.currentTimeMillis() - offset);
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 

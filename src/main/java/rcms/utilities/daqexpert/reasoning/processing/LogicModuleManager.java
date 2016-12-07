@@ -14,6 +14,7 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -29,10 +30,10 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.PartitionDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemError;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
@@ -73,9 +74,14 @@ public class LogicModuleManager {
 	 *            daq object to analyze
 	 */
 	public LogicModuleManager(EventProducer eventProducer) {
+		
+
+		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
+		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
+		
 		this.eventProducer = eventProducer;
 		// Level 0 Independent
-		checkers.add(new RateOutOfRange());
+		checkers.add(new RateOutOfRange(level0RateMin, level0RateMax));
 		checkers.add(new NoRate());
 		checkers.add(new RunOngoing());
 		checkers.add(new ExpectedRate());
@@ -118,8 +124,7 @@ public class LogicModuleManager {
 		// comparators.add(new EVMComparator());
 
 		try {
-			experimentalProcessor = new ExperimentalProcessor(
-					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
+			experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));
 			// experimentalProcessor.loadExperimentalLogicModules();
 		} catch (IOException | ResourceException | ScriptException e) {
 			experimentalProcessor = null;

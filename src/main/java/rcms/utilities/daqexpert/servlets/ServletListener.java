@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
@@ -26,7 +27,7 @@ public class ServletListener implements ServletContextListener {
 
 		Application.initialize(propertyFilePath);
 
-		String snapshotsDir = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
+		String snapshotsDir = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 
 		if (snapshotsDir != null)
 			logger.info("Loading snapshots from directory: " + snapshotsDir);
@@ -45,7 +46,7 @@ public class ServletListener implements ServletContextListener {
 	DataResolutionManager dataSegmentator;
 
 	public void contextInitialized(ServletContextEvent e) {
-		String sourceDirectory = Application.get().getProp().getProperty(Application.SNAPSHOTS_DIR);
+		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 
 		Set<Entry> destination = Application.get().getDataManager().getResult();
 		DataManager dataManager = Application.get().getDataManager();

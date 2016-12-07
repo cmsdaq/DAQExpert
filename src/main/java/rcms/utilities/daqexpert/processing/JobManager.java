@@ -18,6 +18,7 @@ import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -51,7 +52,7 @@ public class JobManager {
 	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		long offset = Long.parseLong(Application.get().getProp().get(Application.EXPERT_OFFSET).toString());
+		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
 		long startTime = utcCalendar.getTimeInMillis() - offset;
 		utcCalendar.setTimeInMillis(startTime);
 		Date startDate = utcCalendar.getTime();

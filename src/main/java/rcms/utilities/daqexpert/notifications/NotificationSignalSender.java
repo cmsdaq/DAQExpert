@@ -162,6 +162,8 @@ public class NotificationSignalSender {
 			return notificationConnector.sendSignal(createAPIAddress, notificationString);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+		} catch (RuntimeException e) {
+			logger.error("Could not send", e);
 		}
 		return 0;
 

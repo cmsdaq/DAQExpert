@@ -4,20 +4,21 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class WarningInSubsystem extends ActionLogicModule {
+public class SubsystemError extends ActionLogicModule {
 
-	public WarningInSubsystem() {
-		this.name = "Warning in partition";
-		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is in warning {{WARNING}}, it may affect rate.";
-		this.action = new SimpleAction("No action");
-		this.group = EventGroup.Warning;
+	public SubsystemError() {
+		this.name = "Subsystem in error";
+		this.description = "{{SUBSYSTEM}} subsystem is in error";
+		this.action = new SimpleAction("");
+		this.group = EventGroup.SUBSYS_ERROR;
 		this.priority = EventPriority.DEFAULTT;
+		this.setNotificationPlay(true);
+		this.setNotificationDisplay(true);
 	}
 
 	@Override
@@ -38,15 +39,9 @@ public class WarningInSubsystem extends ActionLogicModule {
 		boolean result = false;
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
-
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
-
-				if (ttcp.getPercentWarning() > 50F) {
-					context.register("TTCP", ttcp.getName());
-					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("WARNING", ttcp.getPercentWarning());
-					result = true;
-				}
+			if ("Error".equalsIgnoreCase(subSystem.getStatus())) {
+				context.register("SUBSYSTEM", subSystem.getName());
+				result = true;
 			}
 		}
 

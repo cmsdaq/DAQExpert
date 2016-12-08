@@ -79,6 +79,10 @@ public class LogicModuleManager {
 
 		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
 		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
+		int thresholdFED = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED));
+		int thresholdPartition = Integer
+				.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION));
+		int thresholdTotal = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL));
 
 		this.eventProducer = eventProducer;
 		// Level 0 Independent
@@ -93,14 +97,14 @@ public class LogicModuleManager {
 		checkers.add(new SubsystemRunningDegraded());
 		checkers.add(new SubsystemError());
 		checkers.add(new SubsystemSoftError());
-		checkers.add(new FEDDeadtime());
-		checkers.add(new PartitionDeadtime());
+		checkers.add(new FEDDeadtime(thresholdFED));
+		checkers.add(new PartitionDeadtime(thresholdPartition));
 		checkers.add(new StableBeams());
 
 		// Level 1 (depends on L0)
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
-		checkers.add(new Deadtime());
+		checkers.add(new Deadtime(thresholdTotal));
 		checkers.add(new CriticalDeadtime());
 		// checkers.add(new AvoidableDowntime());
 

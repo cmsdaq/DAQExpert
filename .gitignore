@@ -2,6 +2,7 @@
 .project
 .settings
 .metadata
+.idea
 
 *.class
 *.jar

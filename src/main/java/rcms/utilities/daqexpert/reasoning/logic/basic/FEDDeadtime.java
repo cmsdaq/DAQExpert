@@ -14,12 +14,15 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class FEDDeadtime extends ActionLogicModule {
 
-	public FEDDeadtime() {
+	private final float threshold;
+
+	public FEDDeadtime(final float threshold) {
 		this.name = "FED deadtime";
 		this.group = EventGroup.FED_DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime of fed(s) {{FED}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
 		this.setNotificationPlay(true);
+		this.threshold = threshold;
 	}
 
 	/**
@@ -49,7 +52,7 @@ public class FEDDeadtime extends ActionLogicModule {
 				deadPercentage += fed.getPercentBusy();
 				deadPercentage += fed.getPercentWarning();
 
-				if (deadPercentage > 1f) {
+				if (deadPercentage > threshold) {
 					result = true;
 					context.register("FED", fed.getSrcIdExpected());
 					context.register("SUBSYSTEM", fed.getTtcp().getSubsystem().getName());

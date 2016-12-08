@@ -3,7 +3,6 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -13,12 +12,15 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class Deadtime extends SimpleLogicModule {
 
-	public Deadtime() {
+	private final float threshold;
+
+	public Deadtime(float threshold) {
 		this.name = "Deadtime";
 		this.group = EventGroup.DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime is greater than 5%";
 		this.setNotificationPlay(false);
+		this.threshold = threshold;
 	}
 
 	/**
@@ -37,7 +39,7 @@ public class Deadtime extends SimpleLogicModule {
 		} catch (NullPointerException e) {
 		}
 
-		if (deadtime > 5)
+		if (deadtime > threshold)
 			return true;
 		else
 			return false;

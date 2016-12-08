@@ -14,12 +14,15 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class PartitionDeadtime extends ActionLogicModule {
 
-	public PartitionDeadtime() {
+	private final float threshold;
+
+	public PartitionDeadtime(final float threshold) {
 		this.name = "Partition deadtime";
 		this.group = EventGroup.PARTITION_DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
 		this.setNotificationPlay(true);
+		this.threshold = threshold;
 	}
 
 	/**
@@ -48,7 +51,7 @@ public class PartitionDeadtime extends ActionLogicModule {
 				deadPercentage += partition.getPercentBusy();
 				deadPercentage += partition.getPercentWarning();
 
-				if (deadPercentage > 1f) {
+				if (deadPercentage > threshold) {
 					result = true;
 					context.register("TTCP", partition.getName());
 					context.register("SUBSYSTEM", partition.getSubsystem().getName());

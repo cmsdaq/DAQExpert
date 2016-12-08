@@ -15,6 +15,12 @@ var groupsList = [ {
 	title : 'LHC machine mode',
 	primary : true
 }, {
+	id : 'beam-active',
+	content : 'BActive (0)',
+	name : 'BActive',
+	title : 'Beam active',
+	primary : true
+}, {
 	id : 'session-no',
 	content : 'Session (0)',
 	name : 'Session',
@@ -38,7 +44,7 @@ var groupsList = [ {
 	name : 'L0',
 	title : 'Level zero state',
 	primary : false
-},{
+}, {
 	id : 'tcds',
 	content : 'TCDS (0)',
 	name : 'TCDS',
@@ -92,13 +98,10 @@ var groupsList = [ {
 	name : 'Downtime',
 	title : 'Downtime = no rate during stable beams',
 	primary : true
-},/* {
-	id : 'adt',
-	content : 'Avoid. DT (0)',
-	name : 'Avoid. DT ',
-	title : 'Avoidable downtime',
-	primary : true
-}, */{
+},/*
+	 * { id : 'adt', content : 'Avoid. DT (0)', name : 'Avoid. DT ', title :
+	 * 'Avoidable downtime', primary : true },
+	 */{
 	id : 'flowchart',
 	content : 'FC (0)',
 	name : 'FC',
@@ -111,38 +114,43 @@ var groupsList = [ {
 	name : 'Dead. ',
 	title : 'Total deadtime',
 	primary : false
+},{
+	id : 'critical-deadtime',
+	content : 'CDead. (0)',
+	name : 'CDead. ',
+	title : 'Total critical deadtime',
+	primary : false
 }, {
 	id : 'feddead',
 	content : 'FEDD. (0)',
 	name : 'FEDD. ',
 	title : 'Individual FED deadtime',
 	primary : false
-},  {
+}, {
 	id : 'partition-dead',
 	content : 'PDead. (0)',
 	name : 'PDead. ',
 	title : 'Partition deadtime',
 	primary : false
-},{
+}, {
 	id : 'ssdegraded',
 	content : 'SSDegr. (0)',
 	name : 'SSDegr. ',
 	title : 'Subsystem running degraded',
 	primary : false
-},{
+}, {
 	id : 'ss-soft-err',
 	content : 'SSSErr. (0)',
 	name : 'SSSErr. ',
 	title : 'Subsystem soft error',
 	primary : false
-},
-{
+}, {
 	id : 'ss-err',
 	content : 'SSErr. (0)',
 	name : 'SSErr. ',
 	title : 'Subsystem error',
 	primary : false
-},{
+}, {
 	id : 'warning',
 	content : 'Warn (0)',
 	name : 'Warn',
@@ -185,33 +193,40 @@ var initAnalysisGraph = function() {
 			var parameters = {};
 			parameters['id'] = properties['item'];
 
-			$.getJSON("raport", parameters, function(data) {
+			$.getJSON(
+					"raport",
+					parameters,
+					function(data) {
 
-				$("#raport-name").html(data['name']);
-				$("#raport-description").html(data['description']);
-				$("#raport-duration").html(moment.duration(data['duration']).format());
-				$("#raport-duration-humanized").html(moment.duration(data['duration']).humanize());
+						$("#raport-name").html(data['name']);
+						$("#raport-description").html(data['description']);
+						$("#raport-duration").html(
+								moment.duration(data['duration']).format());
+						$("#raport-duration-humanized").html(
+								moment.duration(data['duration']).humanize());
 
-				if (data['elements'] == null) {
-					$("#context-section").addClass("hidden");
-				} else {
-					$("#context-section").removeClass("hidden");
-					var preetified = JSON.stringify(data['elements'], null, 2);
-					$("#raport-body").html(preetified);
-				}
+						if (data['elements'] == null) {
+							$("#context-section").addClass("hidden");
+						} else {
+							$("#context-section").removeClass("hidden");
+							var preetified = JSON.stringify(data['elements'],
+									null, 2);
+							$("#raport-body").html(preetified);
+						}
 
-				if (data['action'] == null) {
-					$("#action-section").addClass("hidden");
-				} else {
-					$("#action-section").removeClass("hidden");
-					$("#raport-action").html("<ol id='curr-action'></ol>");
-					// console.log(data['action']);
-					$.each(data['action'], function(key, value) {
-						$("#curr-action").append($("<li>").text(value))
-					});
-				}
+						if (data['action'] == null) {
+							$("#action-section").addClass("hidden");
+						} else {
+							$("#action-section").removeClass("hidden");
+							$("#raport-action").html(
+									"<ol id='curr-action'></ol>");
+							// console.log(data['action']);
+							$.each(data['action'], function(key, value) {
+								$("#curr-action").append($("<li>").text(value))
+							});
+						}
 
-			}).error(function(jqXHR, textStatus, errorThrown) {
+					}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
 				console.log("errorThrown " + errorThrown);
 				console.log("incoming Text " + jqXHR.responseText);
@@ -267,7 +282,7 @@ function loadNewData(event, properties) {
 function load(data) {
 	var visibleData = [];
 	countPerGroup = {};
-	
+
 	var groups = timeline['groupsData'];
 	var items = timeline['itemsData'];
 
@@ -277,11 +292,10 @@ function load(data) {
 	$.each(data, function(index, value) {
 		var groupName = value['group'];
 		var currCount = 0;
-		
 
-//		for (prop in timeline) {
-//			console.log("groups: " + prop);
-//		}
+		// for (prop in timeline) {
+		// console.log("groups: " + prop);
+		// }
 
 		var current = groups.get(groupName);
 		if (filtering == false) {

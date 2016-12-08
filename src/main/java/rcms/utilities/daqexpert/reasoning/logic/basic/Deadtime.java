@@ -18,8 +18,7 @@ public class Deadtime extends SimpleLogicModule {
 		this.group = EventGroup.DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime is greater than 5%";
-		this.setNotificationPlay(true);// TODO: make it true
-		this.setSoundToPlay(Sound.DEADTIME);
+		this.setNotificationPlay(false);
 	}
 
 	/**
@@ -28,16 +27,17 @@ public class Deadtime extends SimpleLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean transition = false;
-		boolean expectedRate = false;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName());
-		if (!expectedRate)
-			return false;
-		transition = results.get(LongTransition.class.getSimpleName());
-		if (transition)
-			return false;
+		double deadtime = 0;
+		try {
+			if (results.get(BeamActive.class.getSimpleName())) {
+				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("beamactive_total");
+			} else {
+				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("total");
+			}
+		} catch (NullPointerException e) {
+		}
 
-		if (daq.getTcdsGlobalInfo().getDeadTimes().get("total") > 5)
+		if (deadtime > 5)
 			return true;
 		else
 			return false;

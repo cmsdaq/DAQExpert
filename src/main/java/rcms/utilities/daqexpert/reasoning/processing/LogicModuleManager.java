@@ -20,6 +20,8 @@ import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
+import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
@@ -74,15 +76,15 @@ public class LogicModuleManager {
 	 *            daq object to analyze
 	 */
 	public LogicModuleManager(EventProducer eventProducer) {
-		
 
 		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
 		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
-		
+
 		this.eventProducer = eventProducer;
 		// Level 0 Independent
 		checkers.add(new RateOutOfRange(level0RateMin, level0RateMax));
 		checkers.add(new NoRate());
+		checkers.add(new BeamActive());
 		checkers.add(new RunOngoing());
 		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
@@ -99,6 +101,7 @@ public class LogicModuleManager {
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
 		checkers.add(new Deadtime());
+		checkers.add(new CriticalDeadtime());
 		// checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)

@@ -3,9 +3,11 @@ package rcms.utilities.daqexpert.reasoning.base.enums;
 public enum EventGroup {
 	LHC_BEAM("lhc-beam",0),
 	LHC_MACHINE("lhc-machine",0),
+	BEAM_ACTIVE("beam-active",0),
 	NO_RATE("no-rate",0),
 	DOWNTIME("dt",0),
 	DEADTIME("deadtime",0),
+	CRITICAL_DEADTIME("critical-deadtime",0),
 	FED_DEADTIME("feddead",0),
 	PARTITION_DEADTIME("partition-dead",0),
 	AVOIDABLE_DOWNTIME("adt",0),

@@ -59,11 +59,11 @@ public class ExpertPersistorManager extends PersistorManager {
 		List<File> candidates = new ArrayList<>();
 		String candidateDir = null;
 
-		logger.info("Searching snapshot for date: " + date + ", base dir: " + snapshotPersistenceDir);
+		logger.debug("Searching snapshot for date: " + date + ", base dir: " + snapshotPersistenceDir);
 
 		candidateDir = this.getTimeDir(snapshotPersistenceDir, date);
 
-		logger.info("Candidates will be searched in " + candidateDir);
+		logger.debug("Candidates will be searched in " + candidateDir);
 
 		try {
 			candidates.addAll(persistenceExplorer.getFileSystemConnector().getFiles(candidateDir));
@@ -115,14 +115,15 @@ public class ExpertPersistorManager extends PersistorManager {
 				}
 			}
 
-			logger.info("Best file found: " + bestFile + " with time diff: " + diff + "ms.");
+			logger.debug("Best file found: " + bestFile + " with time diff: " + diff + "ms.");
 			best = structurePersistor.deserialize(bestFile, PersistenceFormat.SMILE);
 			return best;
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO problem finding snapshot", e);
 		}
 
+		logger.warn("No snapshot found for date " + date);
 		return null;
 	}
 

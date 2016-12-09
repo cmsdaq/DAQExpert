@@ -38,7 +38,7 @@ public class SnapshotAPI extends HttpServlet {
 			throws ServletException, IOException {
 
 		String time = request.getParameter("time");
-		logger.info("Requested snapshot date: " + time);
+		logger.debug("Requested snapshot date: " + time);
 		Date timeDate = objectMapper.readValue(time, Date.class);
 		logger.debug("Parsed requested snapshot date: " + timeDate);
 		String json = "";
@@ -52,9 +52,10 @@ public class SnapshotAPI extends HttpServlet {
 
 			json = baos.toString(java.nio.charset.StandardCharsets.UTF_8.toString());
 
-			logger.info("Found snapshot with timestamp: " + new Date(result.getLastUpdate()));
+			logger.debug("Found snapshot with timestamp: " + new Date(result.getLastUpdate()));
 			logger.debug("Snapshot fragment: " + json.substring(0, 1000));
 		} catch (RuntimeException e) {
+			logger.warn("Requested snapshot with date: " + time + " could not be found");
 			Map<String, String> result = new HashMap<>();
 			result.put("message", "Could not find snapshot");
 			json = objectMapper.writeValueAsString(result);

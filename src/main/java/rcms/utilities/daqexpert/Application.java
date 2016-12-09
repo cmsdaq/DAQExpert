@@ -10,20 +10,14 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqaggregator.DAQException;
+import rcms.utilities.daqaggregator.DAQExceptionCode;
+import rcms.utilities.daqaggregator.Settings;
 import rcms.utilities.daqexpert.processing.JobManager;
 
 public class Application {
 
 	private static final Logger logger = Logger.getLogger(Application.class);
-
-	public static final String NM_DASHBOARD = "nm.dashboard";
-	public static final String NM_NOTIFICATIONS = "nm.notifications";
-	public static final String NM_API_CREATE = "nm.api.create";
-	public static final String NM_API_CLOSE = "nm.api.close";
-	public static final String SNAPSHOTS_DIR = "snapshots";
-	public static final String LANDING = "landing";
-	public static final String OFFSET = "nm.offset";
-	public static final String EXPERIMENTAL_DIR = "experimental";
 
 	private DataManager dataManager;
 
@@ -38,29 +32,21 @@ public class Application {
 		return instance;
 	}
 
-	public static void initialize(String propertiesFile) {
-		String message = "Required property missing ";
-		List<String> missing = new ArrayList<>();
-		instance = new Application(propertiesFile);
-		if (!instance.prop.containsKey(NM_DASHBOARD))
-			missing.add(NM_DASHBOARD);
-		if (!instance.prop.containsKey(SNAPSHOTS_DIR))
-			missing.add(SNAPSHOTS_DIR);
-		if (!instance.prop.containsKey(NM_API_CREATE))
-			missing.add(NM_API_CREATE);
-		if (!instance.prop.containsKey(NM_API_CLOSE))
-			missing.add(NM_API_CLOSE);
-		if (!instance.prop.containsKey(LANDING))
-			missing.add(LANDING);
-		if (!instance.prop.containsKey(OFFSET))
-			missing.add(OFFSET);
-		if (!instance.prop.containsKey(EXPERIMENTAL_DIR))
-			missing.add(EXPERIMENTAL_DIR);
-
-		if (missing.size() > 0) {
-			logger.fatal(message + missing);
-			throw new RuntimeException(message + missing);
+	/**
+	 * Check if all required settings are present in configuration file
+	 */
+	private static void checkRequiredSettings() {
+		for (Setting setting : Setting.values()) {
+			if (setting.isRequired()) {
+				if (!instance.prop.containsKey(setting.getKey()))
+					throw new DAQException(DAQExceptionCode.MissingProperty, ": Required property missing " + setting.getKey());
+			}
 		}
+	}
+
+	public static void initialize(String propertiesFile) {
+		instance = new Application(propertiesFile);
+		checkRequiredSettings();
 	}
 
 	private Application(String propertiesFile) {
@@ -99,6 +85,15 @@ public class Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Cannot run application without configuration file");
+		}
+	}
+
+	public String getProp(Setting setting) {
+		Object property = prop.get(setting.getKey());
+		if (property != null) {
+			return property.toString();
+		} else {
+			throw new RuntimeException("Problem retrieving property: " + setting);
 		}
 	}
 

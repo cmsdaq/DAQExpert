@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.processing.ExperimentalProcessor;
 
 /**
@@ -37,7 +38,7 @@ public class ScriptsExperimentalAPI extends HttpServlet {
 	public ScriptsExperimentalAPI() {
 		try {
 			experimentalProcessor = new ExperimentalProcessor(
-					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
+					Application.get().getProp(Setting.EXPERIMENTAL_DIR));
 		} catch (IOException | ResourceException | ScriptException e) {
 			experimentalProcessor = null;
 			e.printStackTrace();

@@ -4,26 +4,28 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class WarningInSubsystem extends ActionLogicModule {
+public class SubsystemRunningDegraded extends ActionLogicModule {
 
-	public WarningInSubsystem() {
-		this.name = "Warning in partition";
-		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is in warning {{WARNING}}, it may affect rate.";
-		this.action = new SimpleAction("No action");
-		this.group = EventGroup.Warning;
+	public SubsystemRunningDegraded() {
+		this.name = "Subsystem running degraded";
+		this.description = "{{SUBSYSTEM}} subsystem is in running degraded";
+		this.action = new SimpleAction("");
+		this.group = EventGroup.SUBSYS_DEGRADED;
 		this.priority = EventPriority.DEFAULTT;
+		this.setNotificationPlay(true);
+		this.setNotificationDisplay(true);
 	}
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
+
 		if (!runOngoing)
 			return false;
 		
@@ -38,15 +40,9 @@ public class WarningInSubsystem extends ActionLogicModule {
 		boolean result = false;
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
-
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
-
-				if (ttcp.getPercentWarning() > 50F) {
-					context.register("TTCP", ttcp.getName());
-					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("WARNING", ttcp.getPercentWarning());
-					result = true;
-				}
+			if ("RunningDegraded".equalsIgnoreCase(subSystem.getStatus())) {
+				context.register("SUBSYSTEM", subSystem.getName());
+				result = true;
 			}
 		}
 

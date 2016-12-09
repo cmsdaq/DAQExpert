@@ -11,12 +11,14 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -50,11 +52,13 @@ public class JobManager {
 	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		int offset = Integer.parseInt(Application.get().getProp().get(Application.OFFSET).toString());
+		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
 		long startTime = utcCalendar.getTimeInMillis() - offset;
 		utcCalendar.setTimeInMillis(startTime);
 		Date startDate = utcCalendar.getTime();
-		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offset + "ms)");
+		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+
+		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offsetString + ")");
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {

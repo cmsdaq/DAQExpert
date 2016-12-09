@@ -3,7 +3,6 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -13,13 +12,15 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class Deadtime extends SimpleLogicModule {
 
-	public Deadtime() {
+	private final float threshold;
+
+	public Deadtime(float threshold) {
 		this.name = "Deadtime";
 		this.group = EventGroup.DEADTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Deadtime is greater than 5%";
-		this.setNotificationPlay(true);// TODO: make it true
-		this.setSoundToPlay(Sound.DEADTIME);
+		this.setNotificationPlay(false);
+		this.threshold = threshold;
 	}
 
 	/**
@@ -28,16 +29,17 @@ public class Deadtime extends SimpleLogicModule {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean transition = false;
-		boolean expectedRate = false;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName());
-		if (!expectedRate)
-			return false;
-		transition = results.get(LongTransition.class.getSimpleName());
-		if (transition)
-			return false;
+		double deadtime = 0;
+		try {
+			if (results.get(BeamActive.class.getSimpleName())) {
+				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("beamactive_total");
+			} else {
+				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("total");
+			}
+		} catch (NullPointerException e) {
+		}
 
-		if (daq.getTcdsGlobalInfo().getDeadTimes().get("total") > 5)
+		if (deadtime > threshold)
 			return true;
 		else
 			return false;

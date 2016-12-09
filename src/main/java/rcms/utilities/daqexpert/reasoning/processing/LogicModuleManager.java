@@ -14,20 +14,28 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
+import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
+import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.LongTransition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.PartitionDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemError;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
+import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
@@ -68,21 +76,36 @@ public class LogicModuleManager {
 	 *            daq object to analyze
 	 */
 	public LogicModuleManager(EventProducer eventProducer) {
+
+		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
+		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
+		int thresholdFED = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED));
+		int thresholdPartition = Integer
+				.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION));
+		int thresholdTotal = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL));
+
 		this.eventProducer = eventProducer;
 		// Level 0 Independent
-		checkers.add(new RateOutOfRange());
+		checkers.add(new RateOutOfRange(level0RateMin, level0RateMax));
 		checkers.add(new NoRate());
+		checkers.add(new BeamActive());
 		checkers.add(new RunOngoing());
 		checkers.add(new ExpectedRate());
 		checkers.add(new Transition());
 		checkers.add(new LongTransition());
 		checkers.add(new WarningInSubsystem());
+		checkers.add(new SubsystemRunningDegraded());
+		checkers.add(new SubsystemError());
+		checkers.add(new SubsystemSoftError());
+		checkers.add(new FEDDeadtime(thresholdFED));
+		checkers.add(new PartitionDeadtime(thresholdPartition));
 		checkers.add(new StableBeams());
 
 		// Level 1 (depends on L0)
 		checkers.add(new NoRateWhenExpected());
 		checkers.add(new Downtime());
-		checkers.add(new Deadtime());
+		checkers.add(new Deadtime(thresholdTotal));
+		checkers.add(new CriticalDeadtime());
 		// checkers.add(new AvoidableDowntime());
 
 		// Level 2 (depends on L1)
@@ -108,8 +131,7 @@ public class LogicModuleManager {
 		// comparators.add(new EVMComparator());
 
 		try {
-			experimentalProcessor = new ExperimentalProcessor(
-					Application.get().getProp().getProperty(Application.EXPERIMENTAL_DIR));
+			experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));
 			// experimentalProcessor.loadExperimentalLogicModules();
 		} catch (IOException | ResourceException | ScriptException e) {
 			experimentalProcessor = null;

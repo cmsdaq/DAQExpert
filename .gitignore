@@ -2,6 +2,7 @@
 .project
 .settings
 .metadata
+.idea
 
 *.class
 *.jar
@@ -11,3 +12,4 @@
 target
 /doc/
 /logs/
+/DAQExpert.iml

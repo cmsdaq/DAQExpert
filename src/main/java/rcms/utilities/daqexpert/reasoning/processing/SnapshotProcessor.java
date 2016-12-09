@@ -1,15 +1,18 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
-import oracle.net.aso.e;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -34,17 +37,23 @@ public class SnapshotProcessor {
 
 		this.eventProducer = eventProducer;
 		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
-		
-		int offset = 0;
-		try{
-			offset = Integer.parseInt(Application.get().getProp().getProperty(Application.OFFSET));
-		}catch(NumberFormatException e){
+
+		long offset = 0;
+		try {
+			offset = Long.parseLong(Application.get().getProp(Setting.NM_OFFSET));
+		} catch (NumberFormatException e) {
 			logger.error("Problem parsing offset");
 		}
+		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		long startTime = utcCalendar.getTimeInMillis() - offset;
+		utcCalendar.setTimeInMillis(startTime);
+		Date startDate = utcCalendar.getTime();
+		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+		logger.info("Notifications will generated from: " + startDate + " (now minus offset of " + offsetString + ")");
 
 		this.notificationSender = new NotificationSignalSender(notificationConnector,
-				Application.get().getProp().getProperty(Application.NM_API_CREATE),
-				Application.get().getProp().getProperty(Application.NM_API_CLOSE), System.currentTimeMillis()-offset);
+				Application.get().getProp(Setting.NM_API_CREATE),
+				Application.get().getProp(Setting.NM_API_CLOSE), System.currentTimeMillis() - offset);
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 

@@ -11,6 +11,10 @@ public enum Setting {
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
 
+	EXPERT_LOGIC_DEADTIME_THESHOLD_FED("expert.logic.deadtime.threshold.fed"),
+	EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION("expert.logic.deadtime.threshold.partition"),
+	EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL("expert.logic.deadtime.threshold.total"),
+
 	EXPERT_OFFSET("expert.offset"),
 	SNAPSHOTS_DIR("snapshots"),
 	LANDING("landing"),

@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<%@page import="rcms.utilities.daqexpert.Setting"%>
 <html>
 
 <head>
@@ -39,6 +40,7 @@
 
 <body>
 	<%@  page import="rcms.utilities.daqexpert.Application"%>
+	<%@  page import="rcms.utilities.daqexpert.Setting"%>
 
 	<nav class="navbar navbar-default navbar-xs" role="navigation">
 
@@ -51,7 +53,7 @@
 					class="icon-bar"></span>
 			</button>
 			<a class="navbar-brand"
-				href="<%out.println(Application.get().getProp().getProperty(Application.LANDING));%>"><b>DAQ</b>
+				href="<%out.println(Application.get().getProp(Setting.LANDING));%>"><b>DAQ</b>
 				Expert</a>
 		</div>
 
@@ -68,12 +70,12 @@
 
 				<!-- NM DASHBOARD -->
 				<li><a
-					href="<%out.println(Application.get().getProp().getProperty(Application.NM_DASHBOARD));%>"><i
+					href="<%out.println(Application.get().getProp(Setting.NM_DASHBOARD));%>"><i
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
 
 				<!-- NM NOTIFICATIONS -->
 				<li><a
-					href="<%out.println(Application.get().getProp().getProperty(Application.NM_NOTIFICATIONS));%>"><i
+					href="<%out.println(Application.get().getProp(Setting.NM_NOTIFICATIONS));%>"><i
 						class="glyphicon glyphicon-calendar"></i> Notifications</a></li>
 
 			</ul>

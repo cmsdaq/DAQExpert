@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.io.File;
@@ -39,18 +34,12 @@ public class FlowchartCase1Test
   public static void prepare() throws URISyntaxException, IOException {
 
     StructureSerializer serializer = new StructureSerializer();
-
-    
-    
     
     java.net.URL url = FlowchartCase1.class.getResource("1480809927880.smile");
 		File file = new File(url.toURI());
 		
     snapshot = serializer.deserialize(file.getAbsolutePath(), 
             PersistenceFormat.SMILE);
-
-
-    
     
   }
   
@@ -60,7 +49,6 @@ public class FlowchartCase1Test
   @Test
   public void testSatisfied()
   {
-    System.out.println("satisfied");
     Map<String, Boolean> results = new HashMap();
     
     boolean res = false;
@@ -97,8 +85,6 @@ public class FlowchartCase1Test
     boolean expResult = true;
     boolean result = instance.satisfied(snapshot, results);
     assertEquals(expResult, result);
-    System.out.println("result=" + result);
-    
   }
   
 }

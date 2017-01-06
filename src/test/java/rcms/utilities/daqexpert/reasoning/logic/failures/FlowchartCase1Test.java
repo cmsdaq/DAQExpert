@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
@@ -30,6 +31,18 @@ public class FlowchartCase1Test
   {
   }
   
+	private static DAQ getSnapshot(String fname) throws URISyntaxException {
+		
+		StructureSerializer serializer = new StructureSerializer();
+		
+		URL url = FlowchartCase1.class.getResource(fname);
+		
+		File file = new File(url.toURI());
+		
+		return serializer.deserialize(file.getAbsolutePath(), 
+           PersistenceFormat.SMILE);
+	}
+	
   @BeforeClass
   public static void prepare() throws URISyntaxException, IOException {
 

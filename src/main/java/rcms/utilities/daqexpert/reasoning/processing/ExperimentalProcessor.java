@@ -176,14 +176,19 @@ public class ExperimentalProcessor {
 				logger.info("Groovy returned non-boolean value: " + gresult + ", cannot add to results");
 			}
 		} catch (IllegalAccessException e) {
+      logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (IllegalArgumentException e) {
+      logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (InvocationTargetException e) {
+      logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (NoSuchMethodException e) {
+      logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (SecurityException e) {
+      logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		}
 		return null;

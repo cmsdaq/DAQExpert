@@ -31,13 +31,13 @@ public class FlowchartCase1Test
 		File file = new File(url.toURI());
 		
 		return serializer.deserialize(file.getAbsolutePath(), 
-           PersistenceFormat.SMILE);
+						PersistenceFormat.SMILE);
 	}
 	
   @BeforeClass
   public static void prepare() throws URISyntaxException, IOException {
 
-    snapshot = getSnapshot("1480809948643.smile");
+		snapshot = getSnapshot("1480809948643.smile");
 
 	}
 	
@@ -58,10 +58,10 @@ public class FlowchartCase1Test
 
 		FlowchartCase1 fc1 = new FlowchartCase1();
     
-    boolean result = fc1.satisfied(snapshot, results);
+		boolean result = fc1.satisfied(snapshot, results);
 
 		boolean expResult = true;
-    assertEquals(expResult, result);
+		assertEquals(expResult, result);
 
 	}
   

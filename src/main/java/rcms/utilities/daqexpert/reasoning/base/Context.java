@@ -28,6 +28,7 @@ public class Context implements Serializable {
 
 	public Context() {
 		this.context = new HashMap<>();
+		this.actionKey = new HashSet<>();
 	}
 
 	public void register(String key, Object object) {

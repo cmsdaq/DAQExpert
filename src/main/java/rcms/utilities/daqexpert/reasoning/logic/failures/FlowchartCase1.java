@@ -1,6 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
@@ -20,6 +22,9 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
  *
  */
 public class FlowchartCase1 extends KnownFailure {
+
+	/** regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message */
+	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
 
 	public FlowchartCase1() {
 		this.name = "FC1";

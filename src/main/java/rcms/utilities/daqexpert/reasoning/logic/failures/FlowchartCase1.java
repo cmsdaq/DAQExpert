@@ -71,10 +71,14 @@ public class FlowchartCase1 extends KnownFailure {
 		// note that the l0state may e.g. be 'Error' 
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
 
+			// for the moment, just find the first RU in SyncLoss
+			RU syncLossRU = null;
 
 			for (RU ru : daq.getRus()) {
 				if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
 					context.register("RU", ru.getHostname());
+					syncLossRU = ru;
+					break;
 				}
 			}
 

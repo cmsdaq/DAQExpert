@@ -61,15 +61,17 @@ public class FlowchartCase1 extends KnownFailure {
 	
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
-		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
 		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
+		
+		// note that the l0state may e.g. be 'Error' 
+		if (RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
 
-		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
+
 			for (RU ru : daq.getRus()) {
 				if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
 					context.register("RU", ru.getHostname());
@@ -97,7 +99,7 @@ public class FlowchartCase1 extends KnownFailure {
 
 			}
 			return true;
-		}
+		} // if runblocked state
 
 		return false;
 	}

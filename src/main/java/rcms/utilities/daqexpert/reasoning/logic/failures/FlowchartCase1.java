@@ -50,6 +50,15 @@ public class FlowchartCase1 extends KnownFailure {
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
 
+	/** sets keys FED, TTCP and SUBSYSTEM to the given string */ 
+	private void setContextValues(String text) {
+		
+		context.register("FED", text);
+		context.register("TTCP", text);
+		context.register("SUBSYSTEM", text);
+		
+	}
+	
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		String l0state = daq.getLevelZeroState();

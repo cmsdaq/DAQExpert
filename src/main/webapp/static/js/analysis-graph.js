@@ -165,7 +165,9 @@ var options = {
 		item : {
 			horizontal : 0
 		}
-	}
+	},
+	zoomMin: 1000 * 60,                   // one minute in milliseconds
+	zoomMax: 1000 * 60 * 60 * 24 * 31 * 3// about three months in milliseconds
 };
 
 var initAnalysisGraph = function() {

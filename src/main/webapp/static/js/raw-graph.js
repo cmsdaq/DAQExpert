@@ -6,6 +6,8 @@ var rawoptions = {
 	height : '300px',
 	interpolation : false,
 	orientation : 'bottom',
+    zoomMin: 1000 * 60,                   // one minute in milliseconds
+    zoomMax: 1000 * 60 * 60 * 24 * 31 * 3,// about three months in milliseconds
 
 	dataAxis : {
 		width : '50px',

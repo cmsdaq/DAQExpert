@@ -103,7 +103,7 @@ public class FlowchartCase1 extends KnownFailure {
 					context.register("FED", mo.group(1));
 
 					// get the FED object
-					FED problematicFED = daq.getFEDbyId(fedId);
+					FED problematicFED = daq.getFEDbySrcId(fedId);
 					
 					if (problematicFED != null)
 					{

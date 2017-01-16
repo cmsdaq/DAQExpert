@@ -89,7 +89,7 @@
 
 		<!-- <div id="guide-available-message" class="alert alert-success"
 			role="alert">
-			<button type="button" class="close" data-dismiss="alert">×</button>
+			<button type="button" class="close" data-dismiss="alert">Ã—</button>
 			<strong>Experimental mode now available!</strong> Learn more about
 			experimental mode in this <a
 				href="http://daq-expert.cern.ch/logic-contributing.html">step by
@@ -103,7 +103,7 @@
 				class="mode-btn btn btn-sm btn-default">Extended</button>
 			<button id="mode3" type="button"
 				class="mode-btn btn btn-sm btn-default">
-				Experimental <span><sup><b>beta</b></sup></span>
+				LMFactory <span><sup><b>beta</b></sup></span>
 			</button>
 		</div>
 

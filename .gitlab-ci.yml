@@ -1,0 +1,23 @@
+build for staging:
+  stage: build
+  environment: staging
+  only:
+  - dev
+  tags:
+  - dev
+  script: "mvn install -B -U"
+  artifacts:
+    expire_in: 1 week
+    paths:
+     - target/*.war
+
+deploy to staging :
+  stage: deploy
+  environment: staging
+  only:
+  - dev
+  tags:
+  - dev
+  script:
+  - echo 'Deoplying DAQExpert to private server - STAGING'
+  - cp target/*.war /var/lib/tomcat/webapps/DAQExpert.war

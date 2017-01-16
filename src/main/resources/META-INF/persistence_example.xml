@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+	version="1.0">
+
+
+
+	<persistence-unit name="history"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<class>rcms.utilities.daqexpert.reasoning.base.Entry</class>
+
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<!-- <property name="hibernate.generate_statistics" value="true" /> -->
+
+
+			<!-- P5 PRO DB -->
+			<!-- <property name="hibernate.connection.driver_class" value="oracle.jdbc.driver.OracleDriver" 
+				/> <property name="hibernate.connection.url" value="jdbc:oracle:thin:@cmsonr1-v.cern.ch:10121/cms_rcms.cern.ch" 
+				/> <property name="hibernate.connection.username" value="" 
+				/> <property name="hibernate.connection.password" value="" /> -->
+
+			<!-- P5 DEV DB -->
+			<!-- <property name="hibernate.connection.driver_class" value="oracle.jdbc.driver.OracleDriver" 
+				/> <property name="hibernate.connection.url" value="jdbc:oracle:thin:@int2r1-v.cern.ch:10121/int2r_lb.cern.ch" 
+				/> <property name="hibernate.connection.username" value="" 
+				/> <property name="hibernate.connection.password" value="" /> -->
+
+
+			<!-- LOCAL DB -->
+			<property name="hibernate.connection.driver_class" value="oracle.jdbc.driver.OracleDriver" />
+			<property name="hibernate.connection.url" value="jdbc:oracle:thin:@localhost:1521/xe" />
+			<property name="hibernate.connection.username" value="" />
+			<property name="hibernate.connection.password" value="" />
+
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.hbm2ddl.auto" value="validate" />
+			<!-- <property name="hibernate.ddl-generation" value="drop-and-create-tables" 
+				/> -->
+
+			<!-- Configuring Connection Pool -->
+			<property name="hibernate.c3p0.min_size" value="5" />
+			<property name="hibernate.c3p0.max_size" value="20" />
+			<property name="hibernate.c3p0.timeout" value="500" />
+			<property name="hibernate.c3p0.max_statements" value="50" />
+			<property name="hibernate.c3p0.idle_test_period" value="2000" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

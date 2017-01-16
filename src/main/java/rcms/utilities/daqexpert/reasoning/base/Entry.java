@@ -2,6 +2,15 @@ package rcms.utilities.daqexpert.reasoning.base;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -13,45 +22,63 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
+
+@Entity
 public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore
+	@Transient
+	private static long globalId = 1;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	private Long id;
+
+	@JsonIgnore
+	@Transient
 	private long duration;
 
 	@JsonIgnore
-	private static long globalId = 1;
-
-	@JsonIgnore
+	@Transient
 	private boolean show;
 
 	@JsonIgnore
+	@Transient
 	private EntryState state;
 
 	@JsonIgnore
+	@Transient
 	private LogicModule eventFinder;
 
 	@JsonIgnore
+	@Transient
 	private Context finishedContext;
-
-	private long id;
 
 	/**
 	 * Short description of event. Displayed in main expert view
 	 */
+	@Column(columnDefinition = "VARCHAR2(4000)")
 	private String content;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "START_DATE")
 	private Date start;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "END_DATE")
 	private Date end;
 
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
+	@Transient
 	private String group;
 
 	/**
 	 * Class name of the event, indicates if event is important and should be
 	 * highlighted or not TODO: enum this
 	 */
+	@Transient
 	private String className;
 
 	public String getGroup() {
@@ -71,11 +98,16 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public Entry() {
-		this.id = ++globalId;
+		id = globalId++;
 		show = true;
 		this.state = EntryState.NEW;
 	}
 
+	/**
+	 * TODO: What exactly is the reason of this constructor
+	 * 
+	 * @param entry
+	 */
 	public Entry(Entry entry) {
 		this.id = -entry.id;
 		this.start = entry.start;

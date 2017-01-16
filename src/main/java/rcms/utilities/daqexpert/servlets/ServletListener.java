@@ -2,6 +2,8 @@ package rcms.utilities.daqexpert.servlets;
 
 import java.util.Set;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -24,6 +26,9 @@ public class ServletListener implements ServletContextListener {
 		if (propertyFilePath == null) {
 			logger.info("No configuration file supplied with environment variable EXPERT_CONF");
 		}
+
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("history");
+		logger.info("Persistence initialization finished");
 
 		Application.initialize(propertyFilePath);
 

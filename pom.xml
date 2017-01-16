@@ -18,6 +18,10 @@
 		</repository>
 	</repositories>
 
+	<properties>
+		<hibernate.version>3.6.10.Final</hibernate.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -98,11 +102,12 @@
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-             		<artifactId>commons-collections4</artifactId>
-             		<version>4.0</version>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.0</version>
 		</dependency>
-		
 
+
+		<!-- Script language for Logic Module factory -->
 		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
@@ -111,12 +116,28 @@
 		</dependency>
 
 
+		<!-- Testing using mocks -->
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+
 
 
 	</dependencies>

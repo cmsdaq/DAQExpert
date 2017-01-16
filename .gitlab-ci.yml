@@ -2,7 +2,7 @@ build for staging:
   stage: build
   environment: staging
   only:
-  - master
+  - dev
   tags:
   - dev
   script: "mvn install -B -U"
@@ -15,7 +15,7 @@ deploy to staging :
   stage: deploy
   environment: staging
   only:
-  - master
+  - dev
   tags:
   - dev
   script:

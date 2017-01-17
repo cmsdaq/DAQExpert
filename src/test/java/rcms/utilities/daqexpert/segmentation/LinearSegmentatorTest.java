@@ -31,13 +31,13 @@ public class LinearSegmentatorTest {
 		java.net.URL url = LinearSegmentator.class.getResource("1h.json");
 		File file = new File(url.toURI());
 
-		logger.info("Deserialize file: " + file.getAbsolutePath());
+		logger.debug("Deserialize file: " + file.getAbsolutePath());
 
 		Class<List<Pair<Long, Float>>> clazz = (Class) List.class;
 
 		List<Pair<Long, Float>> result = mapper.readValue(file, clazz);
 
-		logger.info("There is " + result.size());
+		logger.debug("There is " + result.size());
 
 		realDataExample = new ArrayList<>();
 		Iterator<?> iterator = result.iterator();
@@ -124,7 +124,7 @@ public class LinearSegmentatorTest {
 		ObjectMapper om = new ObjectMapper();
 		try {
 			String result = om.writeValueAsString(stream);
-			System.out.println(result);
+			logger.debug(result);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

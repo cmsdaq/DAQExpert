@@ -190,11 +190,19 @@ public class Entry implements Comparable<Entry> {
 		this.finishedContext = finishedContext;
 	}
 
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((className == null) ? 0 : className.hashCode());
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + ((end == null) ? 0 : end.hashCode());
+		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + (show ? 1231 : 1237);
+		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		return result;
 	}
 
@@ -207,7 +215,36 @@ public class Entry implements Comparable<Entry> {
 		if (getClass() != obj.getClass())
 			return false;
 		Entry other = (Entry) obj;
-		if (id != other.id)
+		if (className == null) {
+			if (other.className != null)
+				return false;
+		} else if (!className.equals(other.className))
+			return false;
+		if (content == null) {
+			if (other.content != null)
+				return false;
+		} else if (!content.equals(other.content))
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (end == null) {
+			if (other.end != null)
+				return false;
+		} else if (!end.equals(other.end))
+			return false;
+		if (group == null) {
+			if (other.group != null)
+				return false;
+		} else if (!group.equals(other.group))
+			return false;
+		if (show != other.show)
+			return false;
+		if (start == null) {
+			if (other.start != null)
+				return false;
+		} else if (!start.equals(other.start))
+			return false;
+		if (state != other.state)
 			return false;
 		return true;
 	}

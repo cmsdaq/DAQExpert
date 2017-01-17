@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -31,7 +32,7 @@ public class EventProducerTest {
 	@Test
 	public void eventProducingTest() {
 
-		EventProducer eventProducer = Mockito.spy(new EventProducer(null));
+		EventProducer eventProducer = Mockito.spy(new EventProducer(new PersistenceManagerStub()));
 
 		SimpleLogicModule checker = new NoRate();
 		boolean value = false;
@@ -65,7 +66,7 @@ public class EventProducerTest {
 	@Test
 	public void eventProducintTestNoChange() {
 
-		EventProducer eventProducer = Mockito.spy(new EventProducer(null));
+		EventProducer eventProducer = Mockito.spy(new EventProducer(new PersistenceManagerStub()));
 
 		SimpleLogicModule checker = new NoRate();
 		boolean value = false;
@@ -94,7 +95,7 @@ public class EventProducerTest {
 	@Test
 	public void comparatorLMTest() {
 
-		EventProducer eventProducer = Mockito.spy(new EventProducer(null));
+		EventProducer eventProducer = Mockito.spy(new EventProducer(new PersistenceManagerStub()));
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
 		Pair<Boolean, Entry> a = eventProducer.produce(checker, true, t1, t2);
@@ -150,7 +151,7 @@ public class EventProducerTest {
 	@Test
 	public void finishEventTest() {
 
-		EventProducer eventProducer = Mockito.spy(new EventProducer(null));
+		EventProducer eventProducer = Mockito.spy(new EventProducer(new PersistenceManagerStub()));
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
 		Pair<Boolean, Entry> a = eventProducer.produce(checker, true, t1, t2);
@@ -169,22 +170,34 @@ public class EventProducerTest {
 	@Test
 	public void unchangedCompareLMTest() {
 
-		EventProducer eventProducer = Mockito.spy(new EventProducer(null));
+		EventProducer eventProducer = Mockito.spy(new EventProducer(new PersistenceManagerStub()));
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
 		Pair<Boolean, Entry> a = eventProducer.produce(checker, false, t1, t2);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
-		
-		//TODO: check this assertions
-		//Assert.assertEquals(1, eventProducer.getUnfinished().size());
-		//Assert.assertNull(a.getRight());
+
+		// TODO: check this assertions
+		// Assert.assertEquals(1, eventProducer.getUnfinished().size());
+		// Assert.assertNull(a.getRight());
 
 		eventProducer.finish(t3);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(0, eventProducer.getUnfinished().size());
-		//Assert.assertEquals(t3, a.getRight().getEnd());
+		// Assert.assertEquals(t3, a.getRight().getEnd());
+	}
+
+	private class PersistenceManagerStub extends PersistenceManager {
+
+		public PersistenceManagerStub() {
+			super("history-test");
+		}
+
+		@Override
+		public void persist(Entry entry) {
+		}
+
 	}
 
 }

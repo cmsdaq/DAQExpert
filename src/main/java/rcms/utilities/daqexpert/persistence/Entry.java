@@ -40,6 +40,16 @@ public class Entry {
 	 */
 	private int duration;
 
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "CLASS_NAME")
+	private String className;
+
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "GROUP_NAME")
+	private String group;
+
+	private boolean show;
+
 	public Long getId() {
 		return id;
 	}
@@ -86,6 +96,30 @@ public class Entry {
 
 	public void setDuration(int duration) {
 		this.duration = duration;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	public boolean isShow() {
+		return show;
+	}
+
+	public void setShow(boolean show) {
+		this.show = show;
 	}
 
 }

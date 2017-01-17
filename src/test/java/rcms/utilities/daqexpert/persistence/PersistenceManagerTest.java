@@ -34,7 +34,7 @@ public class PersistenceManagerTest {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("history");
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
-		List<Entry> result = entityManager.createQuery("from Event", Entry.class).getResultList();
+		List<Entry> result = entityManager.createQuery("from Entry", Entry.class).getResultList();
 		for (Entry event : result) {
 			System.out.println("Event (" + event.getStart() + ") : " + event.getContent());
 		}

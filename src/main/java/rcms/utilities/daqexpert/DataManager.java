@@ -1,10 +1,8 @@
 package rcms.utilities.daqexpert;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +27,8 @@ public class DataManager {
 	private static final Logger logger = Logger.getLogger(DataManager.class);
 
 	/** All produced reasons are kept in this list */
-	private final Set<Entry> result;
+	@Deprecated
+	private Set<Entry> result;
 
 	/**
 	 * TODO: check if this field is really necessary
@@ -46,8 +45,6 @@ public class DataManager {
 		experimental.put("test", new HashSet<Entry>());
 
 		rawDataByResolution = new HashMap<>();
-
-		result = Collections.synchronizedSet(new LinkedHashSet<Entry>());
 
 		StreamProcessor minuteStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Minute),
 				SegmentationSettings.Minute);
@@ -130,7 +127,8 @@ public class DataManager {
 	 * 
 	 * @return list of events produced
 	 */
-	public Set<Entry> getResult() {
+	@Deprecated
+	private Set<Entry> getResult() {
 		return result;
 	}
 

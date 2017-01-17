@@ -23,7 +23,7 @@ public class PersistenceManager {
 		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
 		entityManager = entityManagerFactory.createEntityManager();
 	}
-	
+
 	public void persist(Entry entry) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(entry);
@@ -41,6 +41,12 @@ public class PersistenceManager {
 		elementsCriteria.add(Restrictions.between("start", startDate, endDate));
 
 		return elementsCriteria.list();
+	}
+
+	public Entry getEntryById(Long id) {
+
+		Entry entry = entityManager.find(Entry.class, id);
+		return entry;
 	}
 
 	public List<Entry> getEntries2(Date start, Date end) {

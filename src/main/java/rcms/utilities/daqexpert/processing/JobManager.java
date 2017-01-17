@@ -52,7 +52,7 @@ public class JobManager {
 
 	private final JobScheduler readerRaskController;
 
-	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
+	public JobManager(String sourceDirectory, DataManager dataManager) {
 		
 		this.persistenceManager = new PersistenceManager("history");
 
@@ -81,7 +81,7 @@ public class JobManager {
 		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination, dataManager, snapshotProcessor);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
@@ -94,10 +94,9 @@ public class JobManager {
 
 		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
-		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null,
+		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null,
 				snapshotProcessor2);
 		onDemandReader.setTimeSpan(startTime, endTime);
-		onDemandDataJob.setDestination(destination);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);

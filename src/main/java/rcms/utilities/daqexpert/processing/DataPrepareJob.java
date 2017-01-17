@@ -29,17 +29,15 @@ public class DataPrepareJob implements Runnable {
 	private final ReaderJob readerJob;
 	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(DataPrepareJob.class);
-	private Set<Entry> destination;
 	private DataManager dataManager;
 
 	private final SnapshotProcessor snapshotProcessor;
 
-	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, Set<Entry> destination,
-			DataManager dataManager, SnapshotProcessor snapshotProcessor) {
+	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
+			SnapshotProcessor snapshotProcessor) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
-		this.destination = destination;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
 	}
@@ -64,9 +62,11 @@ public class DataPrepareJob implements Runnable {
 				Future<Set<Entry>> future = executorService.submit(processJob);
 
 				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
-				if (destination != null) {
-					destination.addAll(result);
-				} else {
+				try {
+
+					// TODO: batch persistence here
+
+				} catch (RuntimeException e) {
 					logger.warn("No desitnation for processing job - results will be forgotten");
 				}
 
@@ -76,14 +76,6 @@ public class DataPrepareJob implements Runnable {
 			throw new ExpertException(ExpertExceptionCode.ExpertProblem, e.getMessage());
 		}
 
-	}
-
-	protected Set<Entry> getDestination() {
-		return destination;
-	}
-
-	protected void setDestination(Set<Entry> destination) {
-		this.destination = destination;
 	}
 
 	protected SnapshotProcessor getSnapshotProcessor() {

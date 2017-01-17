@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -30,8 +31,12 @@ public class ReasonsAPI extends HttpServlet {
 
 	private static final Logger logger = Logger.getLogger(ReasonsAPI.class);
 
+	//TODO: is it optimal? move key to one place
+	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
+
 	int maxDuration = 1000000;
 	ObjectMapper objectMapper = new ObjectMapper();
+	
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -73,7 +78,7 @@ public class ReasonsAPI extends HttpServlet {
 		Collection<Entry> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
 			logger.debug("API runs in standard mode");
-			allElements = Application.get().getDataManager().getResult();
+			allElements = persistenceManager.getEntries(startDate, endDate);
 		} else {
 			logger.debug("API runs in experimental mode: " + experimentalKey);
 			allElements = Application.get().getDataManager().experimental.get(experimentalKey);
@@ -86,11 +91,11 @@ public class ReasonsAPI extends HttpServlet {
 
 				for (Entry entry : allElements) {
 
-					if (entry.getEventFinder().getGroup() != EventGroup.HIDDEN) {
+					// TODO: may be optimized
+					if (!EventGroup.HIDDEN.getCode().equals(entry.getGroup())) {
 
-						// this needs to be optimized
 						try {
-							if (entry.getStart().before(endDate) && entry.getEnd().after(startDate) && entry.isShow()) {
+							if (entry.isShow()) {
 
 								if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode()
 										&& entry.getContent().equals("STABLE BEAMS"))

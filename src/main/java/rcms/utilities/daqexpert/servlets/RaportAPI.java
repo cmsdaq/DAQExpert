@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
@@ -23,6 +24,9 @@ import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+	// TODO: is it optimal? move key to one place
+	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	private static final Logger logger = Logger.getLogger(RaportAPI.class);
 
@@ -35,47 +39,42 @@ public class RaportAPI extends HttpServlet {
 		String idString = request.getParameter("id");
 		logger.info("Requested explanation of event: " + idString);
 		try {
-			int id = Integer.parseInt(idString);
+			Long id = Long.parseLong(idString);
 
 			Map<String, Object> result = new HashMap<>();
-			Collection<Entry> entries = Application.get().getDataManager().getResult();
-			for (Entry entry : entries) {
-				// FIXME: map should be used
-				if (entry.getId() == id) {
 
-					String description;
-					List<String> actionSteps;
-					LogicModule eventFinder = entry.getEventFinder();
+			Entry entry = persistenceManager.getEntryById(id);
 
-					/* Case of Extended condition */
-					if (eventFinder instanceof ActionLogicModule) {
-						ActionLogicModule extendedCondition = (ActionLogicModule) eventFinder;
-						Context context = entry.getFinishedContext();
-						if (context != null) {
-							description = context.getMessageWithContext(extendedCondition.getDescription());
-							actionSteps = context.getActionWithContext(extendedCondition.getAction());
-							
-						} else {
-							description = extendedCondition.getDescription();
-							actionSteps = extendedCondition.getAction().getSteps();
-						}
+			String description;
+			List<String> actionSteps;
+			LogicModule eventFinder = entry.getEventFinder();
 
-						result.put("description", description);
-						result.put("action", actionSteps);
-						result.put("elements", entry.getFinishedContext().getContext());
-					}
+			/* Case of Extended condition */
+			if (eventFinder instanceof ActionLogicModule) {
+				ActionLogicModule extendedCondition = (ActionLogicModule) eventFinder;
+				Context context = entry.getFinishedContext();
+				if (context != null) {
+					description = context.getMessageWithContext(extendedCondition.getDescription());
+					actionSteps = context.getActionWithContext(extendedCondition.getAction());
 
-					/* case of every other condition */
-					else {
-						description = eventFinder.getDescription();
-					}
-
-					result.put("description", description);
-					result.put("name", entry.getContent());
-					result.put("duration", entry.getDuration());
+				} else {
+					description = extendedCondition.getDescription();
+					actionSteps = extendedCondition.getAction().getSteps();
 				}
 
+				result.put("description", description);
+				result.put("action", actionSteps);
+				result.put("elements", entry.getFinishedContext().getContext());
 			}
+
+			/* case of every other condition */
+			else {
+				description = eventFinder.getDescription();
+			}
+
+			result.put("description", description);
+			result.put("name", entry.getContent());
+			result.put("duration", entry.getDuration());
 
 			String json = objectMapper.writeValueAsString(result);
 			// TODO: externalize the Allow-Origin

@@ -127,7 +127,12 @@ public class ReasonsAPI extends HttpServlet {
 
 									// create base from this if not found
 									if (base == null) {
-										base = new Entry(entry);
+										base = new Entry();
+										base.setStart(entry.getStart());
+										base.setEnd(entry.getEnd());
+										base.setGroup(entry.getGroup());
+										base.calculateDuration();
+										base.setState(entry.getState());
 										base.setId(-base.getId());
 										if (EventPriority.CRITICAL.getCode().equals(entry.getClassName())) {
 											base.setClassName(EventPriority.FILTERED_IMPORTANT.getCode());

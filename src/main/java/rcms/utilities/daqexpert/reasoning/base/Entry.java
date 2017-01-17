@@ -22,23 +22,17 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-
+@Entity
 public class Entry implements Comparable<Entry> {
-
-	@JsonIgnore
-	@Transient
-	private static long globalId = 1;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Long id;
 
 	@JsonIgnore
-	@Transient
 	private long duration;
 
 	@JsonIgnore
-	@Transient
 	private boolean show;
 
 	@JsonIgnore
@@ -70,14 +64,16 @@ public class Entry implements Comparable<Entry> {
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
-	@Transient
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "GROUP_NAME")
 	private String group;
 
 	/**
 	 * Class name of the event, indicates if event is important and should be
 	 * highlighted or not TODO: enum this
 	 */
-	@Transient
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "CLASS_NAME")
 	private String className;
 
 	public String getGroup() {
@@ -97,23 +93,8 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public Entry() {
-		id = globalId++;
 		show = true;
 		this.state = EntryState.NEW;
-	}
-
-	/**
-	 * TODO: What exactly is the reason of this constructor
-	 * 
-	 * @param entry
-	 */
-	public Entry(Entry entry) {
-		this.id = -entry.id;
-		this.start = entry.start;
-		this.end = entry.end;
-		this.group = entry.group;
-		this.duration = entry.duration;
-		this.state = entry.state;
 	}
 
 	/**

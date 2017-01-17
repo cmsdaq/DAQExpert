@@ -19,6 +19,7 @@ import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -40,6 +41,8 @@ public class JobManager {
 
 	/** Initial queue size */
 	private static final int INITIAL_QUEUE_SIZE = 3;
+	
+	private final PersistenceManager persistenceManager;
 
 	private final ThreadPoolExecutor mainExecutor;
 
@@ -50,6 +53,8 @@ public class JobManager {
 	private final JobScheduler readerRaskController;
 
 	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
+		
+		this.persistenceManager = new PersistenceManager("history");
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
@@ -73,7 +78,7 @@ public class JobManager {
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
-		EventProducer eventProducer = new EventProducer();
+		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination, dataManager, snapshotProcessor);
@@ -87,7 +92,7 @@ public class JobManager {
 
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination, String scriptName) {
 
-		EventProducer eventProducer = new EventProducer();
+		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null,
 				snapshotProcessor2);

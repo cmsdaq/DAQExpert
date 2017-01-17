@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
@@ -29,11 +30,14 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class EventProducer {
 
-	public EventProducer() {
+	public EventProducer(PersistenceManager persistenceManager) {
 		unfinished = new HashMap<>();
 		states = new HashMap<>();
 		finishedThisRound = new ArrayList<>();
+		this.persistenceManager = persistenceManager;
 	}
+	
+	private final PersistenceManager persistenceManager;
 
 	/** Logger */
 	private static final Logger logger = Logger.getLogger(EventProducer.class);
@@ -157,6 +161,7 @@ public class EventProducer {
 		entry.setShow(value);
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
+		persistenceManager.persist(entry);
 
 		// result.add(entry);
 

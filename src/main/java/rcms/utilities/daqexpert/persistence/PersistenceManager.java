@@ -12,6 +12,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import rcms.utilities.daqexpert.reasoning.base.Entry;
+
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
@@ -21,7 +23,7 @@ public class PersistenceManager {
 		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
 		entityManager = entityManagerFactory.createEntityManager();
 	}
-
+	
 	public void persist(Entry entry) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(entry);

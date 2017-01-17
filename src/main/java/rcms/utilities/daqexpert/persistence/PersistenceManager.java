@@ -37,8 +37,9 @@ public class PersistenceManager {
 		Session session = entityManager.unwrap(Session.class);
 
 		Criteria elementsCriteria = session.createCriteria(Entry.class);
-		elementsCriteria.addOrder(Order.desc("start"));
-		elementsCriteria.add(Restrictions.between("start", startDate, endDate));
+		//elementsCriteria.addOrder(Order.desc("start"));
+		elementsCriteria.add(Restrictions.le("start", endDate));
+		elementsCriteria.add(Restrictions.ge("end", startDate));
 
 		return elementsCriteria.list();
 	}

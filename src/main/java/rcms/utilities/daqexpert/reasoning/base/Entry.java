@@ -23,7 +23,6 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  *
  */
 
-@Entity
 public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore

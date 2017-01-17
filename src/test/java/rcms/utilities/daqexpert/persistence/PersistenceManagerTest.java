@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -15,23 +16,36 @@ public class PersistenceManagerTest {
 
 		PersistenceManager pm = new PersistenceManager("history-test");
 
-		Date t1 = DatatypeConverter.parseDateTime("2017-01-17T10:35:00Z").getTime();
-		Date t2 = DatatypeConverter.parseDateTime("2017-01-17T11:35:00Z").getTime();
+		Date entry1Start = DatatypeConverter.parseDateTime("2017-01-17T10:35:00Z").getTime();
+		Date entry2Start = DatatypeConverter.parseDateTime("2017-01-17T11:35:00Z").getTime();
 
-		pm.persist(getTestObject(t1, "test1"));
-		pm.persist(getTestObject(t2, "test2"));
+		pm.persist(getTestObject(entry1Start, "test1", 1000));
+		pm.persist(getTestObject(entry2Start, "test2", 1000));
 
 		Date ts = DatatypeConverter.parseDateTime("2017-01-17T10:30:00Z").getTime();
 		Date te = DatatypeConverter.parseDateTime("2017-01-17T11:30:00Z").getTime();
 		List<Entry> result = pm.getEntries(ts, te);
 
 		Assert.assertEquals(1, result.size());
+		Entry retrievedEntry = result.iterator().next();
+		Assert.assertEquals("test1", retrievedEntry.getName());
+		Assert.assertEquals(DatatypeConverter.parseDateTime("2017-01-17T10:35:01Z").getTime(), retrievedEntry.getEnd());
 	}
 
-	private Entry getTestObject(Date date, String content) {
+	private Entry getTestObject(Date startDate, String name, int duration) {
 		Entry entry = new Entry();
-		entry.setContent(content);
-		entry.setStart(date);
+		entry.setName(name);
+		entry.setContent("Content of entry: " + name);
+		entry.setDuration(duration);
+		entry.setStart(startDate);
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(startDate);
+		cal.add(Calendar.MILLISECOND, duration);
+		Date endDate = cal.getTime();
+
+		entry.setEnd(endDate);
+
 		return entry;
 	}
 

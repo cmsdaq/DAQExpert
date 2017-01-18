@@ -156,6 +156,12 @@ var groupsList = [ {
 	name : 'Warn',
 	title : 'Warnings',
 	primary : false
+}, {
+	id : 'experimental',
+	content : 'Exp. (0)',
+	name : 'Exp.',
+	title : 'Experimental LM',
+	primary : false
 } ];
 
 var options = {

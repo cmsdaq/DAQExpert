@@ -8,7 +8,7 @@
 
 	<persistence-unit name="history" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.persistence.Entry</class>
+		<class>rcms.utilities.daqexpert.reasoning.base.Entry</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
@@ -50,7 +50,7 @@
 	<persistence-unit name="history-test"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.persistence.Entry</class>
+		<class>rcms.utilities.daqexpert.reasoning.base.Entry</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>

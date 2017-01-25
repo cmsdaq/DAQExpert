@@ -36,7 +36,7 @@ public class EventProducer {
 		finishedThisRound = new ArrayList<>();
 		this.persistenceManager = persistenceManager;
 	}
-	
+
 	private final PersistenceManager persistenceManager;
 
 	/** Logger */
@@ -150,8 +150,11 @@ public class EventProducer {
 			toFinish.calculateDuration();
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
-			if (!toFinish.getStart().equals(toFinish.getEnd()))
+			if (!toFinish.getStart().equals(toFinish.getEnd()) && toFinish.getId() != null){
+				logger.info("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
 				finishedThisRound.add(toFinish);
+				persistenceManager.persist(toFinish);
+			}
 		}
 
 		/* add new entry */
@@ -161,7 +164,10 @@ public class EventProducer {
 		entry.setShow(value);
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
-		persistenceManager.persist(entry);
+		if (entry.isShow()){
+			persistenceManager.persist(entry);
+			logger.info("Persisted entry: " + entry.getContent() + " with id: " + entry.getId());
+		}
 
 		// result.add(entry);
 

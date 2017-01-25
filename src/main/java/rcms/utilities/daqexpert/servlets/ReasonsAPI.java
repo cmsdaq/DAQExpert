@@ -31,12 +31,11 @@ public class ReasonsAPI extends HttpServlet {
 
 	private static final Logger logger = Logger.getLogger(ReasonsAPI.class);
 
-	//TODO: is it optimal? move key to one place
+	// TODO: is it optimal? move key to one place
 	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	int maxDuration = 1000000;
 	ObjectMapper objectMapper = new ObjectMapper();
-	
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -62,23 +61,14 @@ public class ReasonsAPI extends HttpServlet {
 
 		Map<String, Long> durations = new HashMap<>();
 
-		/*
-		 * minimum width for filtering the blocks is calculated based on this.
-		 * This amount of sequential blocks of the same width is the threshold
-		 */
-		int elementsInRow = 100;
+		
 
-		/*
-		 * Filter entries based on the duration and requested range
-		 */
-		long rangeInMs = endDate.getTime() - startDate.getTime();
-		long durationThreshold = rangeInMs / elementsInRow;
-		logger.debug("Duration thresshold: " + durationThreshold);
+		
 
 		Collection<Entry> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
 			logger.debug("API runs in standard mode");
-			allElements = persistenceManager.getEntries(startDate, endDate);
+			allElements = persistenceManager.getEntriesWithMask(startDate, endDate);
 		} else {
 			logger.debug("API runs in experimental mode: " + experimentalKey);
 			allElements = Application.get().getDataManager().experimental.get(experimentalKey);
@@ -86,118 +76,43 @@ public class ReasonsAPI extends HttpServlet {
 
 		if (allElements != null) {
 
-			logger.debug("There are " + allElements.size() + " in DataManager");
-			synchronized (allElements) {
+			logger.info("There are " + allElements + " in Database");
 
-				for (Entry entry : allElements) {
+			for (Entry entry : allElements) {
 
-					// TODO: may be optimized
-					if (!EventGroup.HIDDEN.getCode().equals(entry.getGroup())) {
+				try {
 
-						try {
-							if (entry.isShow()) {
-
-								if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode()
-										&& entry.getContent().equals("STABLE BEAMS"))
-										|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
-										|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
-									long current = 0;
-									if (durations.containsKey(entry.getGroup())) {
-										current = durations.get(entry.getGroup());
-									}
-									durations.put(entry.getGroup(), current + entry.getDuration());
-								}
-
-								if (entry.getDuration() > durationThreshold) {
-									entryList.add(entry);
-								} else {
-									logger.debug("Entry " + entry.getId() + " with duration " + entry.getDuration()
-											+ " will be filtered");
-									if (!groupedMap.containsKey(entry.getGroup())) {
-										groupedMap.put(entry.getGroup(), new HashSet<Entry>());
-									}
-
-									// find existing group to merge to
-									Entry base = null;
-									for (Entry potentialBase : groupedMap.get(entry.getGroup())) {
-
-										if (potentialBase.getStart().getTime() - durationThreshold <= entry.getStart()
-												.getTime()
-												&& potentialBase.getEnd().getTime() + durationThreshold >= entry
-														.getEnd().getTime()) {
-											base = potentialBase;
-											break;
-										}
-									}
-
-									// create base from this if not found
-									if (base == null) {
-										base = new Entry();
-										base.setStart(entry.getStart());
-										base.setEnd(entry.getEnd());
-										base.setGroup(entry.getGroup());
-										base.calculateDuration();
-										base.setState(entry.getState());
-										base.setId(-base.getId());
-										if (EventPriority.CRITICAL.getCode().equals(entry.getClassName())) {
-											base.setClassName(EventPriority.FILTERED_IMPORTANT.getCode());
-										} else {
-											base.setClassName(EventPriority.FILTERED.getCode());
-										}
-										// type: 'background',
-										base.setContent("1");
-									}
-
-									// merge
-									else {
-										if (base.getStart().after(entry.getStart()))
-											base.setStart(entry.getStart());
-										if (base.getEnd().before(entry.getEnd())) {
-											base.setEnd(entry.getEnd());
-										}
-										base.calculateDuration();
-										int filteredElements = Integer.parseInt(base.getContent());
-										base.setContent((filteredElements + 1) + "");
-
-										if (EventPriority.CRITICAL.getCode().equals(entry.getClassName())) {
-											base.setClassName(EventPriority.FILTERED_IMPORTANT.getCode());
-										}
-									}
-
-									groupedMap.get(entry.getGroup()).add(base);
-								}
-							}
-						} catch (NullPointerException e) {
-							// it means that some of reasons are being builed by
-							// event
-							// builder, just dont show them yet, they will be
-							// ready
-							// on
-							// next
-							// request
+					/** durations */
+					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getContent().equals("STABLE BEAMS"))
+							|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
+							|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
+						long current = 0;
+						if (durations.containsKey(entry.getGroup())) {
+							current = durations.get(entry.getGroup());
 						}
+						durations.put(entry.getGroup(), current + entry.getDuration());
 					}
 
-				}
-			}
-			for (Set<Entry> groupedEntries : groupedMap.values()) {
-
-				for (Entry groupedEntry : groupedEntries) {
-					if (groupedEntry.getDuration() < durationThreshold) {
-						int append = (int) (durationThreshold - groupedEntry.getDuration());
-
-						Date alteredStart = new Date(groupedEntry.getStart().getTime() - append / 2);
-						Date alteredEnd = new Date(groupedEntry.getEnd().getTime() + append / 2);
-						groupedEntry.setStart(alteredStart);
-						groupedEntry.setEnd(alteredEnd);
-						groupedEntry.calculateDuration();
+					/* fake end for unfinished entries */
+					if (entry.getEnd() == null) {
+						logger.info("Unfinished entry fake finish: " + entry.getContent());
+						entry.setEnd(endDate);
 					}
+
+					entryList.add(entry);
+
+				} catch (NullPointerException e) {
+					// it means that some of reasons are being builed by
+					// event
+					// builder, just dont show them yet, they will be
+					// ready
+					// on
+					// next
+					// request
 				}
 
-				entryList.addAll(groupedEntries);
-
 			}
-		}else {
+		} else {
 			logger.warn("There is no data for reasons API. It will return nothing.");
 		}
 

@@ -33,6 +33,7 @@ public class Entry implements Comparable<Entry> {
 	private long duration;
 
 	@JsonIgnore
+	@Transient
 	private boolean show;
 
 	@JsonIgnore
@@ -110,11 +111,11 @@ public class Entry implements Comparable<Entry> {
 		this.duration = this.getEnd().getTime() - this.getStart().getTime();
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

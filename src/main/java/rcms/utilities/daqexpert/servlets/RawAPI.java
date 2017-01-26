@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
-import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
 /**
@@ -68,11 +68,8 @@ public class RawAPI extends HttpServlet {
 
 		// SortedSet<HashMap<String, Long>> data = new TreeSet<>();
 
-		RangeResolver rangeResolver = new RangeResolver();
-		DataResolution range = rangeResolver.resolve(startDate, endDate);
 
 		Map<DataStream, List<Point>> targetData = null;
-		DataManager dataManager = Application.get().getDataManager();
 		targetData = dataManager.getRawDataByResolution().get(range);
 
 		logger.debug("resolution of data to RAW API " + range);

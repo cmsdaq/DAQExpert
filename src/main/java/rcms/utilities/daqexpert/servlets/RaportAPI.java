@@ -16,10 +16,10 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 public class RaportAPI extends HttpServlet {

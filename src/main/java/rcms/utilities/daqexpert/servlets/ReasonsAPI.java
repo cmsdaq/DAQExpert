@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 

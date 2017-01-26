@@ -23,7 +23,6 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
@@ -40,10 +39,33 @@ public class PersistenceManager {
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
+	/**
+	 * Persist analysis entry
+	 * 
+	 * @param entry
+	 */
 	public void persist(Entry entry) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(entry);
 		entityManager.getTransaction().commit();
+	}
+
+	public List<Point> get(Date startDate, Date endDate) {
+		
+
+		RangeResolver rangeResolver = new RangeResolver();
+		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
+
+		// TODO: close session?
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Point.class);
+
+		elementsCriteria.add(Restrictions.le("x", endDate));
+		elementsCriteria.add(Restrictions.ge("x", startDate));
+		elementsCriteria.add(Restrictions.ne("resolution", resolution.ordinal()));
+
+		return elementsCriteria.list();
 	}
 
 	/**
@@ -81,10 +103,6 @@ public class PersistenceManager {
 		disjunction.add(eventUninishedRestrictions);
 
 		elementsCriteria.add(disjunction);
-
-		if (includeTinyEntriesMask) {
-			// elementsCriteria.add
-		}
 
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));

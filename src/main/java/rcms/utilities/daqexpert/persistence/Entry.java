@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.base;
+package rcms.utilities.daqexpert.persistence;
 
 import java.util.Date;
 
@@ -13,6 +13,8 @@ import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**

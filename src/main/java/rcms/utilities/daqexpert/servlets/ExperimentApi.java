@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
 
 /**
  * Api to request rerun of experimental logic modules on chosen time span

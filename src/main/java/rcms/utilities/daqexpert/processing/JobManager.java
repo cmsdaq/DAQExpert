@@ -19,8 +19,8 @@ import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 

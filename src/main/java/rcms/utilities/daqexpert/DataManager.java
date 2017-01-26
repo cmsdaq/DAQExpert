@@ -12,13 +12,13 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DAQConverter;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 import rcms.utilities.daqexpert.segmentation.LinearSegmentator;
-import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.segmentation.SegmentationSettings;
 import rcms.utilities.daqexpert.segmentation.StreamProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;

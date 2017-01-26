@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.segmentation;
 
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class DAQConverter {

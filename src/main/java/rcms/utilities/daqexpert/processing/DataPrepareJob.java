@@ -15,7 +15,7 @@ import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**

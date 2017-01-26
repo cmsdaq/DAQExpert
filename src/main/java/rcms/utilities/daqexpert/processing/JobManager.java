@@ -64,6 +64,7 @@ public class JobManager {
 		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
 
 		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offsetString + ")");
+		Application.get().getDataManager().setLastUpdate(startDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {

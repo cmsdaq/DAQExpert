@@ -173,7 +173,7 @@ var options = {
 		}
 	},
 	zoomMin : 1000 * 60, // one minute in milliseconds
-	zoomMax : 1000 * 60 * 60 * 24 * 31 * 3// about three months in
+	zoomMax : 1000 * 60 * 60 * 24 * 31 * 12// about 12 months in
 											// milliseconds
 };
 
@@ -266,7 +266,7 @@ function getDatap(parameters) {
 			"reasons",
 			parameters,
 			function(data) {
-				load(data['entries']);
+				load(data['entries'],data['fake-end']);
 				$.each(data['durations'], function(key, value) {
 					console.log(key + ": " + moment.duration(value).format()
 							+ ", humanized: "
@@ -288,7 +288,7 @@ function loadNewData(event, properties) {
 			.toISOString());
 };
 
-function load(data) {
+function load(data, fakeEnd) {
 	var visibleData = [];
 	countPerGroup = {};
 
@@ -305,6 +305,10 @@ function load(data) {
 		// for (prop in timeline) {
 		// console.log("groups: " + prop);
 		// }
+		
+		if(value['end'] == null){
+			value['end'] = fakeEnd;
+		}
 
 		var current = groups.get(groupName);
 

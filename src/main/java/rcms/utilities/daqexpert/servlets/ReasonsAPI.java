@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
@@ -43,6 +44,8 @@ public class ReasonsAPI extends HttpServlet {
 
 		String experimentalKey = request.getParameter("mode");
 
+		Date fakeEnd = Application.get().getDataManager().getLastUpdate();
+
 		/* requested range dates */
 		String startRange = request.getParameter("start");
 		String endRange = request.getParameter("end");
@@ -57,13 +60,7 @@ public class ReasonsAPI extends HttpServlet {
 
 		List<Entry> entryList = new ArrayList<>();
 
-		Map<String, Set<Entry>> groupedMap = new HashMap<>();
-
 		Map<String, Long> durations = new HashMap<>();
-
-		
-
-		
 
 		Collection<Entry> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
@@ -91,12 +88,6 @@ public class ReasonsAPI extends HttpServlet {
 							current = durations.get(entry.getGroup());
 						}
 						durations.put(entry.getGroup(), current + entry.getDuration());
-					}
-
-					/* fake end for unfinished entries */
-					if (entry.getEnd() == null) {
-						logger.info("Unfinished entry fake finish: " + entry.getContent());
-						entry.setEnd(endDate);
 					}
 
 					entryList.add(entry);
@@ -132,6 +123,7 @@ public class ReasonsAPI extends HttpServlet {
 
 		result.put("entries", entryList);
 		result.put("durations", durations);
+		result.put("fake-end", fakeEnd);
 		/* return the response */
 		String json = objectMapper.writeValueAsString(result);
 		logger.debug("Response JSON: " + json);

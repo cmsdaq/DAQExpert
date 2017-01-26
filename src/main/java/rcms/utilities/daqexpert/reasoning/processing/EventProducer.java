@@ -151,7 +151,7 @@ public class EventProducer {
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
 			if (!toFinish.getStart().equals(toFinish.getEnd()) && toFinish.getId() != null){
-				logger.info("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
+				logger.debug("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
 				finishedThisRound.add(toFinish);
 				persistenceManager.persist(toFinish);
 			}
@@ -166,7 +166,7 @@ public class EventProducer {
 		entry.setGroup(level.getCode());
 		if (entry.isShow()){
 			persistenceManager.persist(entry);
-			logger.info("Persisted entry: " + entry.getContent() + " with id: " + entry.getId());
+			logger.debug("Persisted entry: " + entry.getContent() + " with id: " + entry.getId());
 		}
 
 		// result.add(entry);

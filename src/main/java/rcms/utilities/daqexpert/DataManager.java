@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,8 @@ public class DataManager {
 	/** All produced reasons are kept in this list */
 	@Deprecated
 	private Set<Entry> result;
+	
+	private Date lastUpdate;
 
 	/**
 	 * TODO: check if this field is really necessary
@@ -138,6 +141,14 @@ public class DataManager {
 
 	public DataResolutionManager getDataResolutionManager() {
 		return dataResolutionManager;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 
 }

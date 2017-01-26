@@ -80,6 +80,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 					if (dataManager != null) {
 						// this is not done in on-demand requests
 						dataManager.addSnapshot(new DummyDAQ(daq));
+						dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
 					}
 					Long endSegmenting = System.currentTimeMillis();
 					segmentingTime += (endSegmenting - startSegmenting);

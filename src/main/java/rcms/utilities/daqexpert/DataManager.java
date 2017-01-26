@@ -29,7 +29,7 @@ public class DataManager {
 	private static final Logger logger = Logger.getLogger(DataManager.class);
 	// TODO: is it optimal? move key to one place
 	// TODO: make it a singleton
-	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
+	protected PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	/** All produced reasons are kept in this list */
 	@Deprecated
@@ -133,7 +133,6 @@ public class DataManager {
 		this.lastUpdate = lastUpdate;
 	}
 
-
 	/**
 	 * Get all results produced by event producer
 	 * 
@@ -143,6 +142,5 @@ public class DataManager {
 	private Set<Entry> getResult() {
 		return result;
 	}
-
 
 }

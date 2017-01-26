@@ -150,7 +150,7 @@ public class EventProducer {
 			toFinish.calculateDuration();
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
-			if (!toFinish.getStart().equals(toFinish.getEnd()) && toFinish.getId() != null){
+			if (!toFinish.getStart().equals(toFinish.getEnd()) ){
 				logger.debug("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
 				finishedThisRound.add(toFinish);
 				persistenceManager.persist(toFinish);

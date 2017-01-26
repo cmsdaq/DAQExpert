@@ -103,7 +103,7 @@ public class PersistenceManagerTest {
 		Date ts = DatatypeConverter.parseDateTime("2017-01-17T10:30:00Z").getTime();
 		Date te = DatatypeConverter.parseDateTime("2017-01-17T13:30:00Z").getTime();
 
-		List<TinyEntryMapObject> resultWithLimit = pm.getTinyEntriesMask(ts, te, 5000, true, DataResolution.Hour);
+		List<TinyEntryMapObject> resultWithLimit = pm.getTinyEntriesMask(ts, te, 5000, true, DataResolution.Minute);
 
 		ObjectMapper mapper = new ObjectMapper();
 

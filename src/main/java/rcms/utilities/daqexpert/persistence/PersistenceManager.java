@@ -99,8 +99,9 @@ public class PersistenceManager {
 		List<TinyEntryMapObject> resultTiny = new ArrayList<TinyEntryMapObject>();
 		StringBuilder sb = new StringBuilder();
 		sb.append("select e.group, count(e.id), min(e.start), max(e.end) from Entry e ");
-		sb.append("where duration < " + durationThreshold);
-		sb.append("and END_DATE is not null ");
+		sb.append("where duration < :threshold ");
+		sb.append("and start_date < :endDate ");
+		sb.append("and end_date > :startDate ");
 		sb.append("group by GROUP_NAME ");
 
 		switch (resolution) {
@@ -133,6 +134,10 @@ public class PersistenceManager {
 
 		ObjectMapper mapper = new ObjectMapper();
 		Query q2 = entityManager.createQuery(sb.toString());
+
+		q2.setParameter("endDate", endDate);
+		q2.setParameter("startDate", startDate);
+		q2.setParameter("threshold", durationThreshold);
 		// Query q2 = entityManager.createQuery("SELECT c FROM Country c");
 		List<Object[]> result = q2.getResultList();
 		Calendar calendar = Calendar.getInstance();

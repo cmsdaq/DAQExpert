@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
@@ -39,6 +40,10 @@ public class RawAPI extends HttpServlet {
 
 	ObjectMapper objectMapper = new ObjectMapper();
 
+	// TODO: is it optimal? move key to one place
+	// TODO: make it a singleton
+	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
+
 	private static final Logger logger = Logger.getLogger(RawAPI.class);
 
 	@Override
@@ -52,63 +57,13 @@ public class RawAPI extends HttpServlet {
 		Date startDate = DatatypeConverter.parseDateTime(startRange).getTime();
 		Date endDate = DatatypeConverter.parseDateTime(endRange).getTime();
 
-		// extend slightly timespan so that few snapshots more on the left and
-		// right are loaded to the chart - avoid cutting the chart lines
-		Calendar c = Calendar.getInstance();
-		c.setTime(startDate);
-		c.add(Calendar.SECOND, -10);
-		startDate = c.getTime();
-		c.setTime(endDate);
-		c.add(Calendar.SECOND, 10);
-		endDate = c.getTime();
-
 		logger.debug("Parsed range from : " + startDate + " to " + endDate);
 
-		List<HashMap<String, Long>> data = new ArrayList<>();
-
-		// SortedSet<HashMap<String, Long>> data = new TreeSet<>();
-
-
-		Map<DataStream, List<Point>> targetData = null;
-		targetData = dataManager.getRawDataByResolution().get(range);
-
-		logger.debug("resolution of data to RAW API " + range);
-
-		synchronized (targetData) {
-			for (Point daq : targetData.get(DataStream.RATE)) {
-				if (daq.x >= startDate.getTime() && daq.x <= endDate.getTime()) {
-					HashMap<String, Long> rateObject = new HashMap<>();
-
-					// rate in kHz
-					rateObject.put("y", (long) daq.y);
-
-					rateObject.put("x", daq.x);
-					rateObject.put("group", 0L);
-					data.add(rateObject);
-				}
-			}
-
-			for (Point daq : targetData.get(DataStream.EVENTS)) {
-				if (daq.x >= startDate.getTime() && daq.x <= endDate.getTime()) {
-					HashMap<String, Long> eventObject = new HashMap<>();
-
-					// rate in kHz
-					eventObject.put("y", (long) daq.y);
-
-					eventObject.put("x", daq.x);
-					eventObject.put("group", 1L);
-					data.add(eventObject);
-				}
-
-			}
-
-		}
-
-		logger.debug("Range: " + range + ", elements to process: " + targetData.size());
+		List<Point> targetData = persistenceManager.getRawData(startDate, endDate);
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		String json = objectMapper.writeValueAsString(data);
+		String json = objectMapper.writeValueAsString(targetData);
 
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Allow-Methods", "GET");
@@ -119,7 +74,7 @@ public class RawAPI extends HttpServlet {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 
-		logger.debug("Number of elements returned: " + data.size() + ", using " + range + " data");
+		logger.debug("Number of elements returned: " + targetData.size());
 
 		response.getWriter().write(json);
 

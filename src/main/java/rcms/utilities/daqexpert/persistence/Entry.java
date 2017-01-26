@@ -22,6 +22,8 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * Base object of analysis result.
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ * 
+ * TODO: index on dates
  *
  */
 @Entity

@@ -1,18 +1,39 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+/**
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ *         TODO: index on dates
+ */
+@Entity
 public class Point {
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	private Long id;
 
-	public final int group;
-	public final int resolution;
-	public final long x;
-	public final float y;
+	@Column(name = "stream_id")
+	private int group;
 
-	public Point(long x, float y, int group, int resolution) {
-		this.x = x;
-		this.y = y;
-		this.group = group;
-		this.resolution = resolution;
-	}
+	@Column(name = "resolution_id")
+	private int resolution;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date x;
+
+	private float y;
+
 
 	public String toString() {
 		return "(" + x + "," + y + ")";
@@ -26,11 +47,35 @@ public class Point {
 		return resolution;
 	}
 
-	public long getX() {
+	public Date getX() {
 		return x;
 	}
 
 	public float getY() {
 		return y;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setGroup(int group) {
+		this.group = group;
+	}
+
+	public void setResolution(int resolution) {
+		this.resolution = resolution;
+	}
+
+	public void setX(Date x) {
+		this.x = x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
 	}
 }

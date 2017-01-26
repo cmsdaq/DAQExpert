@@ -97,6 +97,8 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 			} catch (RuntimeException e) {
 				logger.error("Error processing files " + file);
+				logger.error(e);
+				e.printStackTrace();
 			}
 
 		}
@@ -108,8 +110,6 @@ public class ProcessJob implements Callable<Set<Entry>> {
 			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
-		logger.trace("values in data manager " + Application.get().getDataManager().getRawDataByResolution()
-				.get(DataResolution.Full).get(DataStream.EVENTS));
 
 		if (daq != null) {
 			logger.debug("Temporarly finishing events");

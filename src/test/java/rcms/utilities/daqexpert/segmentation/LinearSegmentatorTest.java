@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class LinearSegmentatorTest {
 
 			logger.debug(llentry.getKey());
 			logger.debug(llentry.getValue());
-			realDataExample.add(new Point(time, value));
+			realDataExample.add(new PointMock(time, value));
 		}
 
 		Assert.assertEquals(1327, realDataExample.size());
@@ -138,9 +139,9 @@ public class LinearSegmentatorTest {
 
 		List<Point> inputStream = new ArrayList<Point>();
 
-		inputStream.add(new Point(1, 0));
-		inputStream.add(new Point(2, 0));
-		inputStream.add(new Point(3, 0));
+		inputStream.add(new PointMock(1, 0));
+		inputStream.add(new PointMock(2, 0));
+		inputStream.add(new PointMock(3, 0));
 
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Day);
 
@@ -155,9 +156,9 @@ public class LinearSegmentatorTest {
 
 		List<Point> inputStream = new ArrayList<Point>();
 
-		inputStream.add(new Point(1, 3));
-		inputStream.add(new Point(2, 4));
-		inputStream.add(new Point(3, 5));
+		inputStream.add(new PointMock(1, 3));
+		inputStream.add(new PointMock(2, 4));
+		inputStream.add(new PointMock(3, 5));
 
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Day);
 
@@ -172,12 +173,12 @@ public class LinearSegmentatorTest {
 
 		List<Point> inputStream = new ArrayList<Point>();
 
-		inputStream.add(new Point(1, 3));
-		inputStream.add(new Point(2, 4));
-		inputStream.add(new Point(3, 5));
-		inputStream.add(new Point(4, 3));
-		inputStream.add(new Point(5, 1));
-		inputStream.add(new Point(6, -1));
+		inputStream.add(new PointMock(1, 3));
+		inputStream.add(new PointMock(2, 4));
+		inputStream.add(new PointMock(3, 5));
+		inputStream.add(new PointMock(4, 3));
+		inputStream.add(new PointMock(5, 1));
+		inputStream.add(new PointMock(6, -1));
 
 		LinearSegmentator ls = new LinearSegmentator(SegmentationSettings.Day);
 
@@ -187,4 +188,12 @@ public class LinearSegmentatorTest {
 		logger.debug(outputStream);
 	}
 
+}
+
+class PointMock extends Point {
+	public PointMock(long timestamp, float value) {
+		super();
+		this.setY(value);
+		this.setX(new Date(timestamp));
+	}
 }

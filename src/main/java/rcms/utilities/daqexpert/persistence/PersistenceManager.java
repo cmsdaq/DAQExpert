@@ -17,6 +17,7 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
@@ -50,11 +51,50 @@ public class PersistenceManager {
 		entityManager.getTransaction().commit();
 	}
 
-	public List<Point> get(Date startDate, Date endDate) {
-		
+	public void persist(Point test) {
+		entityManager.getTransaction().begin();
+		entityManager.persist(test);
+		entityManager.getTransaction().commit();
+	}
+
+	public void persist2(List<Point> points) {
+
+		entityManager.getTransaction().begin();
+		for (Point point : points) {
+
+			entityManager.persist(point);
+		}
+		entityManager.getTransaction().commit();
+	}
+
+	public void persist(List<Point> points) {
+
+		Session session = entityManager.unwrap(Session.class);
+		Transaction tx = session.beginTransaction();
+		for (Point point : points) {
+
+			session.save(point);
+		}
+		tx.commit();
+		//session.close();
+	}
+
+	public List<Point> getRawData(Date startDate, Date endDate) {
 
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
+
+		logger.info("resolution of data to RAW API " + resolution);
+
+		// extend slightly timespan so that few snapshots more on the left and
+		// right are loaded to the chart - avoid cutting the chart lines
+		Calendar c = Calendar.getInstance();
+		c.setTime(startDate);
+		c.add(Calendar.SECOND, -10);
+		startDate = c.getTime();
+		c.setTime(endDate);
+		c.add(Calendar.SECOND, 10);
+		endDate = c.getTime();
 
 		// TODO: close session?
 		Session session = entityManager.unwrap(Session.class);
@@ -63,9 +103,11 @@ public class PersistenceManager {
 
 		elementsCriteria.add(Restrictions.le("x", endDate));
 		elementsCriteria.add(Restrictions.ge("x", startDate));
-		elementsCriteria.add(Restrictions.ne("resolution", resolution.ordinal()));
+		elementsCriteria.add(Restrictions.eq("resolution", resolution.ordinal()));
+		List<Point> result = elementsCriteria.list();
+		logger.info(result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved" );
 
-		return elementsCriteria.list();
+		return result;
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -8,12 +9,13 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
 
+import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
@@ -108,7 +110,7 @@ public class PersistenceManagerTest {
 
 		for (TinyEntryMapObject result : resultWithLimit) {
 			// System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
-			//System.out.println(result);
+			// System.out.println(result);
 		}
 
 		Assert.assertEquals(2, resultWithLimit.size());
@@ -123,17 +125,43 @@ public class PersistenceManagerTest {
 		Assert.assertEquals(endDate, retrievedEntry.getEnd());
 
 	}
-	
+
 	@Test
-	public void entriesAndMaskTest(){
+	public void entriesAndMaskTest() {
 		Date ts = DatatypeConverter.parseDateTime("2017-01-17T10:30:00Z").getTime();
 		Date te = DatatypeConverter.parseDateTime("2017-01-17T13:30:00Z").getTime();
 
 		List<TinyEntryMapObject> resultWithLimit = pm.getTinyEntriesMask(ts, te, 5000, true, DataResolution.Hour);
-		
+
 	}
-	
-	
+
+	@Test
+	@Ignore
+	public void insertPointsTest() {
+		List<Point> points = new ArrayList<Point>();
+
+		for (int i = 0; i < 10000; i++) {
+			Point test = new Point();
+			test.setGroup(DataStream.RATE.ordinal());
+			test.setResolution(DataResolution.Full.ordinal());
+			test.setX(new Date());
+			test.setY(i);
+			points.add(test);
+		}
+
+		pm.persist(points);
+
+	}
+
+	@Test
+	public void insertPointTest() {
+		Point test = new Point();
+		test.setGroup(DataStream.RATE.ordinal());
+		test.setResolution(DataResolution.Full.ordinal());
+		test.setX(new Date());
+		test.setY(123);
+		pm.persist(test);
+	}
 
 	private static Entry getFinishedEntry(Date startDate, String name, int duration) {
 		Entry entry = new Entry();

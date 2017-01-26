@@ -26,6 +26,7 @@ public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	// TODO: is it optimal? move key to one place
+	// TODO: make it a singleton
 	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	private static final Logger logger = Logger.getLogger(RaportAPI.class);

@@ -10,11 +10,14 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqaggregator.DAQExceptionCode;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
 
 public class Application {
 
 	private static final Logger logger = Logger.getLogger(Application.class);
+
+	private PersistenceManager persistenceManager;
 
 	private DataManager dataManager;
 
@@ -44,11 +47,12 @@ public class Application {
 	public static void initialize(String propertiesFile) {
 		instance = new Application(propertiesFile);
 		checkRequiredSettings();
+		instance.persistenceManager = new PersistenceManager("history");
+		instance.setDataManager(new DataManager(instance.persistenceManager));
 	}
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
-		this.setDataManager(new DataManager());
 	}
 
 	private static Application instance;
@@ -112,5 +116,9 @@ public class Application {
 
 	public void setJobManager(JobManager jobManager) {
 		this.jobManager = jobManager;
+	}
+
+	public PersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 }

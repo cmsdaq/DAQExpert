@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
-	// TODO: is it optimal? move key to one place
-	// TODO: make it a singleton
-	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	private static final Logger logger = Logger.getLogger(RaportAPI.class);
 
@@ -44,7 +38,7 @@ public class RaportAPI extends HttpServlet {
 
 			Map<String, Object> result = new HashMap<>();
 
-			Entry entry = persistenceManager.getEntryById(id);
+			Entry entry = Application.get().getPersistenceManager().getEntryById(id);
 
 			String description;
 			List<String> actionSteps;

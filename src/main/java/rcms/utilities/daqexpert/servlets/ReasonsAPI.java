@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,19 +19,13 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 public class ReasonsAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(ReasonsAPI.class);
-
-	// TODO: is it optimal? move key to one place
-	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	int maxDuration = 1000000;
 	ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +57,7 @@ public class ReasonsAPI extends HttpServlet {
 		Collection<Entry> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
 			logger.debug("API runs in standard mode");
-			allElements = persistenceManager.getEntriesWithMask(startDate, endDate);
+			allElements = Application.get().getPersistenceManager().getEntriesWithMask(startDate, endDate);
 		} else {
 			logger.debug("API runs in experimental mode: " + experimentalKey);
 			allElements = Application.get().getDataManager().experimental.get(experimentalKey);

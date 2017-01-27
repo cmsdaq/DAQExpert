@@ -1,12 +1,8 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,12 +15,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.segmentation.DataResolution;
-import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
 /**
  * Event occurrences servlet API, used for async requests in autoupdate mode.
@@ -39,10 +30,6 @@ public class RawAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	ObjectMapper objectMapper = new ObjectMapper();
-
-	// TODO: is it optimal? move key to one place
-	// TODO: make it a singleton
-	private static final PersistenceManager persistenceManager = new PersistenceManager("history");
 
 	private static final Logger logger = Logger.getLogger(RawAPI.class);
 
@@ -59,7 +46,7 @@ public class RawAPI extends HttpServlet {
 
 		logger.debug("Parsed range from : " + startDate + " to " + endDate);
 
-		List<Point> targetData = persistenceManager.getRawData(startDate, endDate);
+		List<Point> targetData = Application.get().getPersistenceManager().getRawData(startDate, endDate);
 
 		ObjectMapper objectMapper = new ObjectMapper();
 

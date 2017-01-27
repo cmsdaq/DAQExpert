@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,6 +39,19 @@ public class PersistenceManager {
 	public PersistenceManager(String persistenceUnitName) {
 		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
 		entityManager = entityManagerFactory.createEntityManager();
+	}
+
+	public void persist(Set<Entry> points) {
+
+		Session session = entityManager.unwrap(Session.class);
+		Transaction tx = session.beginTransaction();
+		for (Entry point : points) {
+
+			if (point.isShow())
+				session.save(point);
+		}
+		tx.commit();
+		// session.close();
 	}
 
 	/**
@@ -76,7 +90,7 @@ public class PersistenceManager {
 			session.save(point);
 		}
 		tx.commit();
-		//session.close();
+		// session.close();
 	}
 
 	public List<Point> getRawData(Date startDate, Date endDate) {
@@ -105,7 +119,7 @@ public class PersistenceManager {
 		elementsCriteria.add(Restrictions.ge("x", startDate));
 		elementsCriteria.add(Restrictions.eq("resolution", resolution.ordinal()));
 		List<Point> result = elementsCriteria.list();
-		logger.info(result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved" );
+		logger.debug(result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved");
 
 		return result;
 	}
@@ -237,15 +251,15 @@ public class PersistenceManager {
 		 */
 		long rangeInMs = endDate.getTime() - startDate.getTime();
 		long durationThreshold = rangeInMs / elementsInRow;
-		logger.info("Duration thresshold: " + durationThreshold);
+		logger.debug("Duration thresshold: " + durationThreshold);
 
 		List<Entry> thresholdData = getEntriesThreshold(startDate, endDate, durationThreshold);
-		logger.info("Data resolution: " + dr);
-		logger.info("Retrieved " + thresholdData.size() + " thresholded entries");
+		logger.debug("Data resolution: " + dr);
+		logger.debug("Retrieved " + thresholdData.size() + " thresholded entries");
 
 		List<TinyEntryMapObject> tinyData = getTinyEntriesMask(startDate, endDate, durationThreshold, true, dr);
 
-		logger.info("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
+		logger.debug("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
 
 		for (TinyEntryMapObject mapObject : tinyData) {
 			Entry curr = new Entry();

@@ -27,9 +27,8 @@ import rcms.utilities.daqexpert.servlets.DummyDAQ;
 public class DataManager {
 
 	private static final Logger logger = Logger.getLogger(DataManager.class);
-	// TODO: is it optimal? move key to one place
-	// TODO: make it a singleton
-	protected PersistenceManager persistenceManager = new PersistenceManager("history");
+	
+	protected final PersistenceManager persistenceManager;
 
 	/** All produced reasons are kept in this list */
 	@Deprecated
@@ -46,7 +45,8 @@ public class DataManager {
 
 	private final DataResolutionManager dataResolutionManager;
 
-	public DataManager() {
+	public DataManager(PersistenceManager persistenceManager) {
+		this.persistenceManager = persistenceManager;
 		buf = new CircularFifoQueue<>(5000);
 		experimental = new HashMap<>();
 		experimental.put("test", new HashSet<Entry>());

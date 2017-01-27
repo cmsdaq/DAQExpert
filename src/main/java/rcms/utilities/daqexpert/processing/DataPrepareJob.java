@@ -16,6 +16,7 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
@@ -30,16 +31,18 @@ public class DataPrepareJob implements Runnable {
 	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(DataPrepareJob.class);
 	private DataManager dataManager;
+	private final PersistenceManager persistenceManager;
 
 	private final SnapshotProcessor snapshotProcessor;
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
-			SnapshotProcessor snapshotProcessor) {
+			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager ) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
+		this.persistenceManager = persistenceManager;
 	}
 
 	private static int priority = 0;
@@ -64,10 +67,12 @@ public class DataPrepareJob implements Runnable {
 				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
 				try {
 
+					persistenceManager.persist(result);
 					// TODO: batch persistence here
 
 				} catch (RuntimeException e) {
-					logger.warn("No desitnation for processing job - results will be forgotten");
+					logger.warn("Exception during result persistence - results will be forgotten");
+					logger.error(e);
 				}
 
 			}

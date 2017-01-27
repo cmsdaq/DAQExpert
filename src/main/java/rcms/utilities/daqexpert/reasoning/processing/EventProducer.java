@@ -30,14 +30,13 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class EventProducer {
 
+	//FIXME: remove argument
 	public EventProducer(PersistenceManager persistenceManager) {
 		unfinished = new HashMap<>();
 		states = new HashMap<>();
 		finishedThisRound = new ArrayList<>();
-		this.persistenceManager = persistenceManager;
+		//this.persistenceManager = persistenceManager;
 	}
-
-	private final PersistenceManager persistenceManager;
 
 	/** Logger */
 	private static final Logger logger = Logger.getLogger(EventProducer.class);
@@ -153,7 +152,6 @@ public class EventProducer {
 			if (!toFinish.getStart().equals(toFinish.getEnd()) ){
 				logger.debug("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
 				finishedThisRound.add(toFinish);
-				persistenceManager.persist(toFinish);
 			}
 		}
 
@@ -164,10 +162,6 @@ public class EventProducer {
 		entry.setShow(value);
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
-		if (entry.isShow()){
-			persistenceManager.persist(entry);
-			logger.debug("Persisted entry: " + entry.getContent() + " with id: " + entry.getId());
-		}
 
 		// result.add(entry);
 

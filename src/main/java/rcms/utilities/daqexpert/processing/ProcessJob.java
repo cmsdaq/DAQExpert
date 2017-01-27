@@ -12,11 +12,9 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
-import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
-import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
@@ -96,9 +94,9 @@ public class ProcessJob implements Callable<Set<Entry>> {
 				}
 
 			} catch (RuntimeException e) {
-				logger.error("Error processing files " + file);
-				logger.error(e);
-				e.printStackTrace();
+				// logger.error("Error processing files " + file);
+				// logger.error(e);
+				// e.printStackTrace();
 			}
 
 		}

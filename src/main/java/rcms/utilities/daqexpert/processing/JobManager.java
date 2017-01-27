@@ -54,7 +54,7 @@ public class JobManager {
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 		
-		this.persistenceManager = new PersistenceManager("history");
+		this.persistenceManager = Application.get().getPersistenceManager();
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
@@ -82,7 +82,7 @@ public class JobManager {
 		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,persistenceManager);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
@@ -96,7 +96,7 @@ public class JobManager {
 		EventProducer eventProducer = new EventProducer(persistenceManager);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null,
-				snapshotProcessor2);
+				snapshotProcessor2,persistenceManager);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);

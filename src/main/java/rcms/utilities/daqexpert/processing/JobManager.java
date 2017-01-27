@@ -41,7 +41,7 @@ public class JobManager {
 
 	/** Initial queue size */
 	private static final int INITIAL_QUEUE_SIZE = 3;
-	
+
 	private final PersistenceManager persistenceManager;
 
 	private final ThreadPoolExecutor mainExecutor;
@@ -53,7 +53,7 @@ public class JobManager {
 	private final JobScheduler readerRaskController;
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
-		
+
 		this.persistenceManager = Application.get().getPersistenceManager();
 
 		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -79,10 +79,11 @@ public class JobManager {
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
 
-		EventProducer eventProducer = new EventProducer(persistenceManager);
+		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,persistenceManager);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,
+				persistenceManager);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
@@ -93,10 +94,10 @@ public class JobManager {
 
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination, String scriptName) {
 
-		EventProducer eventProducer = new EventProducer(persistenceManager);
+		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
-		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null,
-				snapshotProcessor2,persistenceManager);
+		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
+				persistenceManager);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);

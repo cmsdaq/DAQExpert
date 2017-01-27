@@ -12,7 +12,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
@@ -30,12 +29,10 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  */
 public class EventProducer {
 
-	//FIXME: remove argument
-	public EventProducer(PersistenceManager persistenceManager) {
+	public EventProducer() {
 		unfinished = new HashMap<>();
 		states = new HashMap<>();
 		finishedThisRound = new ArrayList<>();
-		//this.persistenceManager = persistenceManager;
 	}
 
 	/** Logger */

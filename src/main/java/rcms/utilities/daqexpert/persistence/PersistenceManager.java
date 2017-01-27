@@ -29,6 +29,17 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
+/**
+ * Unit managing persistence of analysis results and multiple resolutions of raw
+ * parameters
+ * 
+ * 
+ * Performance test: Time to insert 10000 Entries individually was 55315 ms
+ * Performance test: Time to insert 10000 Entries at once      was   456 ms
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
@@ -41,11 +52,11 @@ public class PersistenceManager {
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public void persist(Set<Entry> points) {
+	public void persist(Set<Entry> entries) {
 
 		Session session = entityManager.unwrap(Session.class);
 		Transaction tx = session.beginTransaction();
-		for (Entry point : points) {
+		for (Entry point : entries) {
 
 			if (point.isShow())
 				session.save(point);
@@ -68,16 +79,6 @@ public class PersistenceManager {
 	public void persist(Point test) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(test);
-		entityManager.getTransaction().commit();
-	}
-
-	public void persist2(List<Point> points) {
-
-		entityManager.getTransaction().begin();
-		for (Point point : points) {
-
-			entityManager.persist(point);
-		}
 		entityManager.getTransaction().commit();
 	}
 
@@ -119,7 +120,8 @@ public class PersistenceManager {
 		elementsCriteria.add(Restrictions.ge("x", startDate));
 		elementsCriteria.add(Restrictions.eq("resolution", resolution.ordinal()));
 		List<Point> result = elementsCriteria.list();
-		logger.debug(result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved");
+		logger.debug(
+				result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved");
 
 		return result;
 	}

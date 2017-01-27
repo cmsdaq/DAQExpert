@@ -3,7 +3,9 @@ package rcms.utilities.daqexpert.persistence;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -56,6 +58,23 @@ public class PersistenceManagerTest {
 		pm.persist(getFinishedEntry(entry4Start, "test4", 1000));
 		pm.persist(getFinishedEntry(entry5Start, "test5", 1000));
 		pm.persist(getFinishedEntry(entry6Start, "test6", 1000));
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(entry6Start);
+
+		int num = 0;//1000000;
+		Long start = System.currentTimeMillis();	
+		Set<Entry> testData = new HashSet<Entry>();
+		for(int i=0; i<num; i++){
+			cal.add(Calendar.MILLISECOND, 100 );
+			Date endDate = cal.getTime();
+			testData.add(getFinishedEntry(endDate, "generated " + i, i));
+			//pm.persist(getFinishedEntry(endDate, "generated " + i, i));
+		}
+		pm.persist(testData);
+		Long end = System.currentTimeMillis();	
+		System.out.print("Time to insert " + num + " was " + (end-start) + " ms");
+		
 	}
 
 	/**
@@ -72,7 +91,13 @@ public class PersistenceManagerTest {
 		List<Entry> result = pm.getEntriesPlain(ts, te);
 
 		Assert.assertEquals(3, result.size());
+
+		Date ts2 = DatatypeConverter.parseDateTime("2017-01-17T10:35:09Z").getTime();
+		Date te2 = DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime();
+		result = pm.getEntriesPlain(ts2, te2);
+		Assert.assertEquals(1, result.size());
 		Entry retrievedEntry = result.iterator().next();
+		
 		Assert.assertEquals("test1", retrievedEntry.getClassName());
 		Assert.assertEquals(DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime(), retrievedEntry.getEnd());
 	}

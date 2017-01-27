@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
@@ -27,19 +25,10 @@ import rcms.utilities.daqexpert.servlets.DummyDAQ;
 public class DataManager {
 
 	private static final Logger logger = Logger.getLogger(DataManager.class);
-	
+
 	protected final PersistenceManager persistenceManager;
 
-	/** All produced reasons are kept in this list */
-	@Deprecated
-	private Set<Entry> result;
-
 	private Date lastUpdate;
-
-	/**
-	 * TODO: check if this field is really necessary
-	 */
-	public CircularFifoQueue<DAQ> buf;
 
 	public Map<String, Set<Entry>> experimental;
 
@@ -47,7 +36,6 @@ public class DataManager {
 
 	public DataManager(PersistenceManager persistenceManager) {
 		this.persistenceManager = persistenceManager;
-		buf = new CircularFifoQueue<>(5000);
 		experimental = new HashMap<>();
 		experimental.put("test", new HashSet<Entry>());
 
@@ -131,16 +119,6 @@ public class DataManager {
 
 	public void setLastUpdate(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
-	}
-
-	/**
-	 * Get all results produced by event producer
-	 * 
-	 * @return list of events produced
-	 */
-	@Deprecated
-	private Set<Entry> getResult() {
-		return result;
 	}
 
 }

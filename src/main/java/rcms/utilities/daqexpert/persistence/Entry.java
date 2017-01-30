@@ -7,9 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Index;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -60,10 +63,12 @@ public class Entry implements Comparable<Entry> {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "START_DATE")
+    @Index(name = "IDX_STARTDATEINDEX")
 	private Date start;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "END_DATE")
+    @Index(name = "IDX_ENDDATEINDEX")
 	private Date end;
 
 	/**

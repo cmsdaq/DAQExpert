@@ -65,7 +65,7 @@ public class ReasonsAPI extends HttpServlet {
 
 		if (allElements != null) {
 
-			logger.info("There are " + allElements + " in Database");
+			logger.debug("There are " + allElements + " in Database");
 
 			for (Entry entry : allElements) {
 

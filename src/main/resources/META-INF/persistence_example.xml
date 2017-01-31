@@ -8,7 +8,8 @@
 
 	<persistence-unit name="history" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.reasoning.base.Entry</class>
+		<class>rcms.utilities.daqexpert.persistence.Entry</class>
+		<class>rcms.utilities.daqexpert.persistence.Point</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
@@ -35,7 +36,7 @@
 			<property name="hibernate.connection.password" value="" />
 
 			<property name="hibernate.show_sql" value="false" />
-			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.hbm2ddl.auto" value="validate" />
 
 			<!-- Configuring Connection Pool -->
@@ -50,7 +51,8 @@
 	<persistence-unit name="history-test"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.reasoning.base.Entry</class>
+		<class>rcms.utilities.daqexpert.persistence.Entry</class>
+		<class>rcms.utilities.daqexpert.persistence.Point</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
@@ -58,8 +60,8 @@
 			<!-- LOCAL DB -->
 			<property name="hibernate.connection.driver_class" value="oracle.jdbc.driver.OracleDriver" />
 			<property name="hibernate.connection.url" value="jdbc:oracle:thin:@localhost:1521/xe" />
-			<property name="hibernate.connection.username" value="" />
-			<property name="hibernate.connection.password" value="" />
+			<property name="hibernate.connection.username" value="nm" />
+			<property name="hibernate.connection.password" value="nm" />
 
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />

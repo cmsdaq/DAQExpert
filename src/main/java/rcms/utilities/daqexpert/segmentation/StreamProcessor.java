@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 
 public class StreamProcessor {

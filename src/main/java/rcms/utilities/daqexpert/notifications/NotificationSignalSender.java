@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;

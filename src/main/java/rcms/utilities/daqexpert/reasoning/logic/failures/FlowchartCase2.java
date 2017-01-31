@@ -81,7 +81,7 @@ public class FlowchartCase2 extends KnownFailure {
 				}
 			}
 
-			logger.info("FC2 " + i);
+			logger.debug("FC2 " + i);
 		}
 		return result;
 	}

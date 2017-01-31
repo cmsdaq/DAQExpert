@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.persistence.Point;
+
 /**
  * Linear segmentator
  * 
@@ -30,11 +32,11 @@ public class LinearSegmentator {
 		i = i - 1;
 		long t1;
 		long t2;
-		t1 = stream.get(i + 1).x;
-		t2 = stream.get(i).x;
+		t1 = stream.get(i + 1).getX().getTime();
+		t2 = stream.get(i).getX().getTime();
 		double dt = Math.abs(t1 - t2);
 
-		double result = Math.atan((stream.get(i + 1).y - stream.get(i).y) / dt);
+		double result = Math.atan((stream.get(i + 1).getY() - stream.get(i).getY()) / dt);
 		return result;
 	}
 
@@ -45,9 +47,9 @@ public class LinearSegmentator {
 		List<Point> s = new ArrayList<Point>();
 		List<Long> history = new ArrayList<Long>();
 		for (int i = 0; i < stream.size(); i++) {
-			if (!history.contains(stream.get(i).x)) {
+			if (!history.contains(stream.get(i).getX().getTime())) {
 				s.add(stream.get(i));
-				history.add(new Long(stream.get(i).x));
+				history.add(new Long(stream.get(i).getX().getTime()));
 			} else {
 				// System.out.println("Found two values at time "
 				// + stream.get(i).x);

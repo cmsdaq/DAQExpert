@@ -11,10 +11,10 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -146,8 +146,10 @@ public class EventProducer {
 			toFinish.calculateDuration();
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
-			if (!toFinish.getStart().equals(toFinish.getEnd()))
+			if (!toFinish.getStart().equals(toFinish.getEnd()) ){
+				logger.debug("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
 				finishedThisRound.add(toFinish);
+			}
 		}
 
 		/* add new entry */

@@ -12,11 +12,9 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
-import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
-import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 /**
@@ -65,12 +63,18 @@ public class ProcessJob implements Callable<Set<Entry>> {
 			snapshotProcessor.getCheckManager().getExperimentalProcessor().loadExperimentalLogicModules();
 		}
 
+		Long firstSnapshot = null;
+		Long lastSnapshot = null;
+
 		for (File file : entries) {
 
 			try {
 
 				Long startDeserializing = System.currentTimeMillis();
 				daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+				if (firstSnapshot == null) {
+					firstSnapshot = daq.getLastUpdate();
+				}
 				Long endDeserializing = System.currentTimeMillis();
 				deserializingTime += (endDeserializing - startDeserializing);
 
@@ -80,6 +84,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 					if (dataManager != null) {
 						// this is not done in on-demand requests
 						dataManager.addSnapshot(new DummyDAQ(daq));
+						dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
 					}
 					Long endSegmenting = System.currentTimeMillis();
 					segmentingTime += (endSegmenting - startSegmenting);
@@ -95,20 +100,24 @@ public class ProcessJob implements Callable<Set<Entry>> {
 				}
 
 			} catch (RuntimeException e) {
-				logger.error("Error processing files " + file);
+				// logger.error("Error processing files " + file);
+				// logger.error(e);
+				// e.printStackTrace();
 			}
 
 		}
 
+		lastSnapshot = daq.getLastUpdate();
+
 		Long end = System.currentTimeMillis();
 		int time = (int) (end - start);
 
-		if (entries.size() > 0)
+		if (entries.size() > 0) {
 			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
-		logger.trace("values in data manager " + Application.get().getDataManager().getRawDataByResolution()
-				.get(DataResolution.Full).get(DataStream.EVENTS));
+			logger.info("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));
+		}
 
 		if (daq != null) {
 			logger.debug("Temporarly finishing events");

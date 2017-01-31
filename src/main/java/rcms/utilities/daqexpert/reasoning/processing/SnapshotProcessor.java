@@ -15,7 +15,7 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
 
 /**
  * Processes snapshot in analysis

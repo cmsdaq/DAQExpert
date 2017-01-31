@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,14 +25,27 @@ public class ForwardReaderJob implements ReaderJob {
 	private final static Logger logger = Logger.getLogger(ForwardReaderJob.class);
 
 	private final PersistenceExplorer persistenceExplorer;
+
+	/** Tmp variable indicating date of last snapshot processed */
 	private Long last;
+
+	/**
+	 * Optional limitation on data to process. Older snapshots will not be
+	 * processed
+	 */
+	private final Long limit;
+
 	private final String sourceDirectory;
 
-	public ForwardReaderJob(PersistenceExplorer persistenceExplorer, Long last, String sourceDirectory) {
+	private boolean finished;
+
+	public ForwardReaderJob(PersistenceExplorer persistenceExplorer, Long last, Long limit, String sourceDirectory) {
 		super();
 		this.persistenceExplorer = persistenceExplorer;
 		this.last = last;
 		this.sourceDirectory = sourceDirectory;
+		this.limit = limit;
+		this.finished = false;
 	}
 
 	@Override
@@ -40,10 +54,15 @@ public class ForwardReaderJob implements ReaderJob {
 		Pair<Long, List<File>> entry;
 		try {
 			logger.debug("Exploring with " + last);
-			entry = persistenceExplorer.explore(last, sourceDirectory);
+			if (limit == null) {
+				logger.info("Exploring without upper limit");
+				entry = persistenceExplorer.explore(last, sourceDirectory);
+			} else {
+				logger.info("Exploring with upper limit of " + new Date(limit));
+				entry = persistenceExplorer.explore(last, limit, sourceDirectory);
+			}
 			// remember last explored snapshot timestamp
 			if (entry != null && entry.getLeft() != null && entry.getLeft() != 0) {
-
 				last = entry.getLeft();
 				return entry;
 			} else {
@@ -63,7 +82,7 @@ public class ForwardReaderJob implements ReaderJob {
 
 	@Override
 	public boolean finished() {
-		return false;
+		return finished;
 	}
 
 }

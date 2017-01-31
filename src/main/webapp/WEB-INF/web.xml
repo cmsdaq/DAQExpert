@@ -23,15 +23,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>API</servlet-name>
-		<servlet-class>rcms.utilities.daqexpert.servlets.API</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>API</servlet-name>
-		<url-pattern>/api</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>ReasonsAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.ReasonsAPI</servlet-class>
 	</servlet>

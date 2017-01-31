@@ -4,20 +4,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqaggregator.DAQExceptionCode;
-import rcms.utilities.daqaggregator.Settings;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
 
 public class Application {
 
 	private static final Logger logger = Logger.getLogger(Application.class);
+
+	private PersistenceManager persistenceManager;
 
 	private DataManager dataManager;
 
@@ -39,7 +39,8 @@ public class Application {
 		for (Setting setting : Setting.values()) {
 			if (setting.isRequired()) {
 				if (!instance.prop.containsKey(setting.getKey()))
-					throw new DAQException(DAQExceptionCode.MissingProperty, ": Required property missing " + setting.getKey());
+					throw new DAQException(DAQExceptionCode.MissingProperty,
+							": Required property missing " + setting.getKey());
 			}
 		}
 	}
@@ -47,11 +48,14 @@ public class Application {
 	public static void initialize(String propertiesFile) {
 		instance = new Application(propertiesFile);
 		checkRequiredSettings();
+		String v = instance.getClass().getPackage().getImplementationVersion();
+		logger.info("DAQExpert version: " + v);
+		instance.persistenceManager = new PersistenceManager("history");
+		instance.setDataManager(new DataManager(instance.persistenceManager));
 	}
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
-		this.setDataManager(new DataManager());
 	}
 
 	private static Application instance;
@@ -115,5 +119,9 @@ public class Application {
 
 	public void setJobManager(JobManager jobManager) {
 		this.jobManager = jobManager;
+	}
+
+	public PersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 }

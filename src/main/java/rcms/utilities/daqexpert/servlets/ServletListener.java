@@ -1,7 +1,7 @@
 package rcms.utilities.daqexpert.servlets;
 
-import java.util.Set;
-
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -12,7 +12,6 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.processing.JobManager;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
 public class ServletListener implements ServletContextListener {
@@ -24,6 +23,9 @@ public class ServletListener implements ServletContextListener {
 		if (propertyFilePath == null) {
 			logger.info("No configuration file supplied with environment variable EXPERT_CONF");
 		}
+
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("history");
+		logger.info("Persistence initialization finished");
 
 		Application.initialize(propertyFilePath);
 
@@ -48,10 +50,9 @@ public class ServletListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent e) {
 		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 
-		Set<Entry> destination = Application.get().getDataManager().getResult();
 		DataManager dataManager = Application.get().getDataManager();
 
-		JobManager jobManager = new JobManager(sourceDirectory, destination, dataManager);
+		JobManager jobManager = new JobManager(sourceDirectory, dataManager);
 		jobManager.startJobs();
 
 		Application.get().setJobManager(jobManager);

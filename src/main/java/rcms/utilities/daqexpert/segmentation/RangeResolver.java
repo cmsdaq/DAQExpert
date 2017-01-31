@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class RangeResolver {
 
-	public DataResolution resolve(Date start, Date end) {
+	public static DataResolution resolve(Date start, Date end) {
 
 		long diffInMiliseconds = end.getTime() - start.getTime();
 

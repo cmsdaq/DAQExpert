@@ -1,9 +1,23 @@
-package rcms.utilities.daqexpert.reasoning.base;
+package rcms.utilities.daqexpert.persistence;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Index;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
@@ -11,47 +25,65 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * Base object of analysis result.
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ * 
+ * TODO: index on dates
  *
  */
+@Entity
 public class Entry implements Comparable<Entry> {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.TABLE)
+	private Long id;
 
 	@JsonIgnore
 	private long duration;
 
 	@JsonIgnore
-	private static long globalId = 1;
-
-	@JsonIgnore
+	@Transient
 	private boolean show;
 
 	@JsonIgnore
+	@Transient
 	private EntryState state;
 
 	@JsonIgnore
+	@Transient
 	private LogicModule eventFinder;
 
 	@JsonIgnore
+	@Transient
 	private Context finishedContext;
-
-	private long id;
 
 	/**
 	 * Short description of event. Displayed in main expert view
 	 */
+	@Column(columnDefinition = "VARCHAR2(4000)")
 	private String content;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "START_DATE")
+    @Index(name = "IDX_STARTDATEINDEX")
 	private Date start;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "END_DATE")
+    @Index(name = "IDX_ENDDATEINDEX")
 	private Date end;
 
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "GROUP_NAME")
 	private String group;
 
 	/**
 	 * Class name of the event, indicates if event is important and should be
 	 * highlighted or not TODO: enum this
 	 */
+	/** TODO: replace by enum/id */
+	@Column(columnDefinition = "VARCHAR2(20)", name = "CLASS_NAME")
 	private String className;
 
 	public String getGroup() {
@@ -71,18 +103,8 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public Entry() {
-		this.id = ++globalId;
 		show = true;
 		this.state = EntryState.NEW;
-	}
-
-	public Entry(Entry entry) {
-		this.id = -entry.id;
-		this.start = entry.start;
-		this.end = entry.end;
-		this.group = entry.group;
-		this.duration = entry.duration;
-		this.state = entry.state;
 	}
 
 	/**
@@ -98,11 +120,11 @@ public class Entry implements Comparable<Entry> {
 		this.duration = this.getEnd().getTime() - this.getStart().getTime();
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -178,11 +200,19 @@ public class Entry implements Comparable<Entry> {
 		this.finishedContext = finishedContext;
 	}
 
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((className == null) ? 0 : className.hashCode());
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + ((end == null) ? 0 : end.hashCode());
+		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + (show ? 1231 : 1237);
+		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
 		return result;
 	}
 
@@ -195,7 +225,36 @@ public class Entry implements Comparable<Entry> {
 		if (getClass() != obj.getClass())
 			return false;
 		Entry other = (Entry) obj;
-		if (id != other.id)
+		if (className == null) {
+			if (other.className != null)
+				return false;
+		} else if (!className.equals(other.className))
+			return false;
+		if (content == null) {
+			if (other.content != null)
+				return false;
+		} else if (!content.equals(other.content))
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (end == null) {
+			if (other.end != null)
+				return false;
+		} else if (!end.equals(other.end))
+			return false;
+		if (group == null) {
+			if (other.group != null)
+				return false;
+		} else if (!group.equals(other.group))
+			return false;
+		if (show != other.show)
+			return false;
+		if (start == null) {
+			if (other.start != null)
+				return false;
+		} else if (!start.equals(other.start))
+			return false;
+		if (state != other.state)
 			return false;
 		return true;
 	}

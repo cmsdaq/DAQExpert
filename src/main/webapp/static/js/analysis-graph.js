@@ -114,7 +114,7 @@ var groupsList = [ {
 	name : 'Dead. ',
 	title : 'Total deadtime',
 	primary : false
-},{
+}, {
 	id : 'critical-deadtime',
 	content : 'CDead. (0)',
 	name : 'CDead. ',
@@ -157,6 +157,12 @@ var groupsList = [ {
 	title : 'Warnings',
 	primary : false
 }, {
+	id : 'ver',
+	content : 'Ver. (0)',
+	name : 'Ver.',
+	title : 'Software version',
+	primary : false
+}, {
 	id : 'experimental',
 	content : 'Exp. (0)',
 	name : 'Exp.',
@@ -172,8 +178,9 @@ var options = {
 			horizontal : 0
 		}
 	},
-	zoomMin: 1000 * 60,                   // one minute in milliseconds
-	zoomMax: 1000 * 60 * 60 * 24 * 31 * 3// about three months in milliseconds
+	zoomMin : 1000 * 60, // one minute in milliseconds
+	zoomMax : 1000 * 60 * 60 * 24 * 31 * 12// about 12 months in
+											// milliseconds
 };
 
 var initAnalysisGraph = function() {
@@ -265,7 +272,7 @@ function getDatap(parameters) {
 			"reasons",
 			parameters,
 			function(data) {
-				load(data['entries']);
+				load(data['entries'],data['fake-end']);
 				$.each(data['durations'], function(key, value) {
 					console.log(key + ": " + moment.duration(value).format()
 							+ ", humanized: "
@@ -287,7 +294,7 @@ function loadNewData(event, properties) {
 			.toISOString());
 };
 
-function load(data) {
+function load(data, fakeEnd) {
 	var visibleData = [];
 	countPerGroup = {};
 
@@ -304,27 +311,39 @@ function load(data) {
 		// for (prop in timeline) {
 		// console.log("groups: " + prop);
 		// }
+		
+		if(value['end'] == null){
+			value['end'] = fakeEnd;
+		}
 
 		var current = groups.get(groupName);
-		if (filtering == false) {
-			visibleData.push(value);
-		} else {
-			if (current['primary'] == true)
+
+		if (current != null) {
+
+			if (filtering == false) {
 				visibleData.push(value);
-		}
+			} else {
+				if (current['primary'] == true)
+					visibleData.push(value);
+			}
 
-		/* Get current count */
-		if (groupName in countPerGroup) {
-			currCount = countPerGroup[groupName];
-		}
+			/* Get current count */
+			if (groupName in countPerGroup) {
+				currCount = countPerGroup[groupName];
+			}
 
-		/* add current element */
-		if (value['className'] == 'filtered'
-				|| value['className'] == 'filtered-important') {
-			countPerGroup[groupName] = currCount + parseInt(value['content']);
-			value['type'] = 'background';
+			/* add current element */
+			if (value['className'] == 'filtered'
+					|| value['className'] == 'filtered-important') {
+				countPerGroup[groupName] = currCount
+						+ parseInt(value['content']);
+				value['type'] = 'background';
+			} else {
+				countPerGroup[groupName] = currCount + 1;
+			}
 		} else {
-			countPerGroup[groupName] = currCount + 1;
+			console.log("Group " + groupName + " will be ignored");
+
 		}
 	});
 
@@ -340,9 +359,9 @@ function load(data) {
 
 	/* Update groups content */
 	$.each(countPerGroup, function(index, value) {
-		// console.log("Current: "+JSON.stringify(index));
+		//console.log("Current: " + JSON.stringify(index));
 		var current = groups.get(index);
-		// console.log("Current: "+JSON.stringify(current));
+		//console.log("Current: " + JSON.stringify(current));
 
 		var newContent = "";
 

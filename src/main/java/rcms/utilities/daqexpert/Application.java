@@ -39,7 +39,8 @@ public class Application {
 		for (Setting setting : Setting.values()) {
 			if (setting.isRequired()) {
 				if (!instance.prop.containsKey(setting.getKey()))
-					throw new DAQException(DAQExceptionCode.MissingProperty, ": Required property missing " + setting.getKey());
+					throw new DAQException(DAQExceptionCode.MissingProperty,
+							": Required property missing " + setting.getKey());
 			}
 		}
 	}
@@ -47,6 +48,8 @@ public class Application {
 	public static void initialize(String propertiesFile) {
 		instance = new Application(propertiesFile);
 		checkRequiredSettings();
+		String v = instance.getClass().getPackage().getImplementationVersion();
+		logger.info("DAQExpert version: " + v);
 		instance.persistenceManager = new PersistenceManager("history");
 		instance.setDataManager(new DataManager(instance.persistenceManager));
 	}

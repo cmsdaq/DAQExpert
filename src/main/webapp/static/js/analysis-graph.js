@@ -157,6 +157,12 @@ var groupsList = [ {
 	title : 'Warnings',
 	primary : false
 }, {
+	id : 'ver',
+	content : 'Ver. (0)',
+	name : 'Ver.',
+	title : 'Software version',
+	primary : false
+}, {
 	id : 'experimental',
 	content : 'Exp. (0)',
 	name : 'Exp.',

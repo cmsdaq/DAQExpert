@@ -28,6 +28,7 @@ public enum EventGroup {
 	SUBSYS_DEGRADED("ssdegraded",0),
 	SUBSYS_SOFT_ERR("ss-soft-err",0),
 	SUBSYS_ERROR("ss-err",0),
+	EXPERT_VERSION("ver",0),
 	HIDDEN("hidden",0);
 
 	private final String code;

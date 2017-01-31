@@ -20,6 +20,8 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
@@ -54,14 +56,17 @@ public class JobManager {
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
 		this.persistenceManager = Application.get().getPersistenceManager();
+		
 
 		Date startDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_START_DATETIME))
 				.getTime();
 		Date endDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_END_DATETIME))
 				.getTime();
 
+		
 		logger.info("Data will be processed from: " + startDate + ", to: " + endDate);
 		Application.get().getDataManager().setLastUpdate(startDate);
+		persistVersion(startDate,endDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {
@@ -83,6 +88,19 @@ public class JobManager {
 				persistenceManager);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
+	}
+	
+	private void persistVersion(Date startDate, Date endDate){
+
+		Entry entry = new Entry();
+		entry.setStart(startDate);
+		entry.setEnd(endDate);
+		entry.calculateDuration();
+		//TODO: class name vs priority - decide on one convention
+		entry.setClassName(EventPriority.DEFAULTT.getCode());
+		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
+		entry.setContent(this.getClass().getPackage().getImplementationVersion());
+		this.persistenceManager.persist(entry);
 	}
 
 	public void startJobs() {

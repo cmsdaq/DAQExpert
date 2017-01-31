@@ -63,12 +63,18 @@ public class ProcessJob implements Callable<Set<Entry>> {
 			snapshotProcessor.getCheckManager().getExperimentalProcessor().loadExperimentalLogicModules();
 		}
 
+		Long firstSnapshot = null;
+		Long lastSnapshot = null;
+
 		for (File file : entries) {
 
 			try {
 
 				Long startDeserializing = System.currentTimeMillis();
 				daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+				if (firstSnapshot == null) {
+					firstSnapshot = daq.getLastUpdate();
+				}
 				Long endDeserializing = System.currentTimeMillis();
 				deserializingTime += (endDeserializing - startDeserializing);
 
@@ -101,13 +107,17 @@ public class ProcessJob implements Callable<Set<Entry>> {
 
 		}
 
+		lastSnapshot = daq.getLastUpdate();
+
 		Long end = System.currentTimeMillis();
 		int time = (int) (end - start);
 
-		if (entries.size() > 0)
+		if (entries.size() > 0) {
 			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
+			logger.info("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));
+		}
 
 		if (daq != null) {
 			logger.debug("Temporarly finishing events");

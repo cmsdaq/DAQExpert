@@ -1,9 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -11,7 +9,8 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
@@ -56,14 +55,12 @@ public class JobManager {
 
 		this.persistenceManager = Application.get().getPersistenceManager();
 
-		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
-		long startTime = utcCalendar.getTimeInMillis() - offset;
-		utcCalendar.setTimeInMillis(startTime);
-		Date startDate = utcCalendar.getTime();
-		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+		Date startDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_START_DATETIME))
+				.getTime();
+		Date endDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_END_DATETIME))
+				.getTime();
 
-		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offsetString + ")");
+		logger.info("Data will be processed from: " + startDate + ", to: " + endDate);
 		Application.get().getDataManager().setLastUpdate(startDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
@@ -77,7 +74,7 @@ public class JobManager {
 
 		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
-		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
+		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(), endDate.getTime(), sourceDirectory);
 
 		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);

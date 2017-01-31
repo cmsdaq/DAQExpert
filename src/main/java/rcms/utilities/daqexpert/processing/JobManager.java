@@ -17,6 +17,8 @@ import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
@@ -56,17 +58,26 @@ public class JobManager {
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
 		this.persistenceManager = Application.get().getPersistenceManager();
-		
 
 		Date startDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_START_DATETIME))
 				.getTime();
-		Date endDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_END_DATETIME))
-				.getTime();
 
-		
-		logger.info("Data will be processed from: " + startDate + ", to: " + endDate);
+		Date endDate = null;
+		String endDateString = Application.get().getProp(Setting.PROCESSING_END_DATETIME);
+		if (endDateString.equalsIgnoreCase("unlimited")) {
+			logger.info("Expert run unlimited, will process as long as there are new snapshots");
+		} else {
+			try {
+				endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+			} catch (IllegalArgumentException e) {
+				throw new ExpertException(ExpertExceptionCode.CannotParseProcessingEndDate,
+						"Cannot parse end date " + endDateString + ", (special key possible 'unlimited')");
+			}
+		}
+
+		logger.info("Data will be processed from: " + startDate +  (endDate != null? ", to: " + endDate : ""));
 		Application.get().getDataManager().setLastUpdate(startDate);
-		persistVersion(startDate,endDate);
+		persistVersion(startDate, endDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {
@@ -79,7 +90,8 @@ public class JobManager {
 
 		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
-		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(), endDate.getTime(), sourceDirectory);
+		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(),
+				endDate != null ? endDate.getTime() : null, sourceDirectory);
 
 		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
@@ -89,14 +101,16 @@ public class JobManager {
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
-	
-	private void persistVersion(Date startDate, Date endDate){
+
+	private void persistVersion(Date startDate, Date endDate) {
 
 		Entry entry = new Entry();
 		entry.setStart(startDate);
 		entry.setEnd(endDate);
-		entry.calculateDuration();
-		//TODO: class name vs priority - decide on one convention
+		if (endDate != null) {
+			entry.calculateDuration();
+		}
+		// TODO: class name vs priority - decide on one convention
 		entry.setClassName(EventPriority.DEFAULTT.getCode());
 		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
 		entry.setContent(this.getClass().getPackage().getImplementationVersion());

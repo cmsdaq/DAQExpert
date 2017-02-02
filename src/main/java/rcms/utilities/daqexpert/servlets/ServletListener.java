@@ -1,5 +1,10 @@
 package rcms.utilities.daqexpert.servlets;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
@@ -9,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.processing.JobManager;
@@ -19,26 +25,34 @@ public class ServletListener implements ServletContextListener {
 	public ServletListener() {
 
 		super();
-		String propertyFilePath = System.getenv("EXPERT_CONF");
-		if (propertyFilePath == null) {
-			logger.info("No configuration file supplied with environment variable EXPERT_CONF");
+
+		try {
+			String propertyFilePath = System.getenv("EXPERT_CONF");
+			if (propertyFilePath == null) {
+				logger.info("No configuration file supplied with environment variable EXPERT_CONF");
+			}
+
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("history");
+			logger.info("Persistence initialization finished");
+
+			Application.initialize(propertyFilePath);
+
+			String snapshotsDir = Application.get().getProp(Setting.SNAPSHOTS_DIR);
+
+			if (snapshotsDir != null)
+				logger.info("Loading snapshots from directory: " + snapshotsDir);
+			else {
+				logger.warn(
+						"Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
+				return;
+			}
+
+			persistorManager = new ExpertPersistorManager(snapshotsDir);
+		} catch (ExpertException e) {
+			logger.fatal("Failed to start expert: " + e.getCode().getName());
+			logger.error(e);
+			throw e;
 		}
-
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("history");
-		logger.info("Persistence initialization finished");
-
-		Application.initialize(propertyFilePath);
-
-		String snapshotsDir = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-
-		if (snapshotsDir != null)
-			logger.info("Loading snapshots from directory: " + snapshotsDir);
-		else {
-			logger.warn("Could not load snapshot directory from neither SNAPSHOTS env var nor config.properties file");
-			return;
-		}
-
-		persistorManager = new ExpertPersistorManager(snapshotsDir);
 
 	}
 
@@ -46,19 +60,36 @@ public class ServletListener implements ServletContextListener {
 
 	ExpertPersistorManager persistorManager;
 	DataResolutionManager dataSegmentator;
+	JobManager jobManager;
 
 	public void contextInitialized(ServletContextEvent e) {
 		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 
 		DataManager dataManager = Application.get().getDataManager();
 
-		JobManager jobManager = new JobManager(sourceDirectory, dataManager);
+		jobManager = new JobManager(sourceDirectory, dataManager);
 		jobManager.startJobs();
 
 		Application.get().setJobManager(jobManager);
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {
+		logger.info("Expert will go down now, starting shutdown sequence");
+
+		jobManager.stop();
+
+		Enumeration<Driver> drivers = DriverManager.getDrivers();
+		while (drivers.hasMoreElements()) {
+			Driver driver = drivers.nextElement();
+			try {
+				DriverManager.deregisterDriver(driver);
+				logger.info(String.format("deregistering jdbc driver: %s", driver));
+			} catch (SQLException ex) {
+				logger.error(String.format("Error deregistering driver %s", driver), ex);
+			}
+
+		}
+		logger.info("Shutdown sequence completed, expert is down");
 	}
 
 }

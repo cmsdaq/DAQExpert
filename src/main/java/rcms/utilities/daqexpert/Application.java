@@ -39,7 +39,7 @@ public class Application {
 		for (Setting setting : Setting.values()) {
 			if (setting.isRequired()) {
 				if (!instance.prop.containsKey(setting.getKey()))
-					throw new DAQException(DAQExceptionCode.MissingProperty,
+					throw new ExpertException(ExpertExceptionCode.MissingProperty,
 							": Required property missing " + setting.getKey());
 			}
 		}

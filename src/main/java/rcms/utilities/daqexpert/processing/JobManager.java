@@ -75,7 +75,7 @@ public class JobManager {
 			}
 		}
 
-		logger.info("Data will be processed from: " + startDate +  (endDate != null? ", to: " + endDate : ""));
+		logger.info("Data will be processed from: " + startDate + (endDate != null ? ", to: " + endDate : ""));
 		Application.get().getDataManager().setLastUpdate(startDate);
 		persistVersion(startDate, endDate);
 
@@ -133,5 +133,21 @@ public class JobManager {
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
 		return readerRaskController.scheduleOnDemandReaderTask(onDemandDataJob);
+	}
+
+	public void stop() {
+
+		readerRaskController.stopExecutors();
+		mainExecutor.shutdown();
+
+		try {
+			mainExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+			logger.info("All jobs gracefully terminated");
+		} catch (InterruptedException e) {
+
+			logger.error("Could not gracefully terminate jobs");
+			logger.error(e);
+		}
 	}
 }

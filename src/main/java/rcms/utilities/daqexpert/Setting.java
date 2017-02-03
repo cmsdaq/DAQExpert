@@ -19,7 +19,13 @@ public enum Setting {
 	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),
 	LANDING("landing"),
-	EXPERIMENTAL_DIR("experimental");
+	EXPERIMENTAL_DIR("experimental"),
+
+	DATABASE_USER("hibernate.connection.username"),
+	DATABASE_PASSWORD("hibernate.connection.password"),
+	DATABASE_URL("hibernate.connection.url"),
+
+	;
 
 	private final String key;
 

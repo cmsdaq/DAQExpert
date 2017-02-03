@@ -3,13 +3,10 @@ package rcms.utilities.daqexpert;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DAQException;
-import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
 
@@ -50,7 +47,7 @@ public class Application {
 		checkRequiredSettings();
 		String v = instance.getClass().getPackage().getImplementationVersion();
 		logger.info("DAQExpert version: " + v);
-		instance.persistenceManager = new PersistenceManager("history");
+		instance.persistenceManager = new PersistenceManager("history", instance.getProp());
 		instance.setDataManager(new DataManager(instance.persistenceManager));
 	}
 
@@ -64,32 +61,21 @@ public class Application {
 
 		try {
 
-			if (propertiesFile == null) {
-				logger.info("Loading properties from default location");
-				String resourceName = "config.properties"; // could also be a
-															// constant
-				ClassLoader loader = Thread.currentThread().getContextClassLoader();
-				Properties props = new Properties();
-				try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-					props.load(resourceStream);
-				}
-				return props;
+			logger.info("Loading properties from environment variable location");
+			FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
+			Properties properties = new Properties();
+			properties.load(propertiesInputStream);
+			return properties;
 
-			} else {
-				logger.info("Loading properties from environment variable location");
-				FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
-				Properties properties = new Properties();
-				properties.load(propertiesInputStream);
-				return properties;
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot run application without configuration file");
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot run application without configuration file");
 		}
+
+		catch (FileNotFoundException e) {
+			throw new ExpertException(ExpertExceptionCode.MissingConfigurationFile,
+					propertiesFile + " cannot be found. " + e.getMessage());
+		} catch (IOException e) {
+			throw new ExpertException(ExpertExceptionCode.MissingConfigurationFile, e.getMessage());
+		}
+
 	}
 
 	public String getProp(Setting setting) {

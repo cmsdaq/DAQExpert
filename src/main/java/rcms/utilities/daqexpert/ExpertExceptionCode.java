@@ -4,8 +4,9 @@ public enum ExpertExceptionCode {
 
 	/* General errors */
 	ExpertProblem(100, "Expert problem"),
-	MissingProperty(101,"Required configuration property missing"),
-	CannotParseProcessingEndDate(102, "Canot parse end date of expert processing, should be ISO8601"),
+	MissingConfigurationFile(101, "Missing configuration file"),
+	MissingProperty(102, "Required configuration property missing"),
+	CannotParseProcessingEndDate(103, "Canot parse end date of expert processing, should be ISO8601"),
 
 	/* Reasoning errors */
 	ReasoningProblem(200, "Reasoning problem"),

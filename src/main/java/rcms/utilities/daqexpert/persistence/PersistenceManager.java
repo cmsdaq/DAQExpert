@@ -1,10 +1,12 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.io.FileInputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -47,8 +49,9 @@ public class PersistenceManager {
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
-	public PersistenceManager(String persistenceUnitName) {
-		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
+	public PersistenceManager(String persistenceUnitName,Properties props) {
+
+		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName,props);
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 

@@ -1,9 +1,13 @@
 package rcms.utilities.daqexpert.servlets;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -15,6 +19,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.processing.JobManager;
@@ -25,14 +30,14 @@ public class ServletListener implements ServletContextListener {
 	public ServletListener() {
 
 		super();
-
+		String propertyFilePath = null;
 		try {
-			String propertyFilePath = System.getenv("EXPERT_CONF");
+			propertyFilePath = System.getenv("EXPERT_CONF");
 			if (propertyFilePath == null) {
-				logger.info("No configuration file supplied with environment variable EXPERT_CONF");
+				throw new ExpertException(ExpertExceptionCode.MissingConfigurationFile,
+						"No configuration file supplied with environment variable EXPERT_CONF");
 			}
 
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("history");
 			logger.info("Persistence initialization finished");
 
 			Application.initialize(propertyFilePath);

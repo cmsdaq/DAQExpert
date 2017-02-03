@@ -11,6 +11,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Index;
+
 /**
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
@@ -27,9 +29,11 @@ public class Point {
 	private int group;
 
 	@Column(name = "resolution_id")
+    @Index(name = "idx_resolution")
 	private int resolution;
 
 	@Temporal(TemporalType.TIMESTAMP)
+    @Index(name = "idx_x")
 	private Date x;
 
 	private float y;

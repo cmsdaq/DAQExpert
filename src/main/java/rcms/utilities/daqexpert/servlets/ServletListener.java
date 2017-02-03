@@ -38,9 +38,12 @@ public class ServletListener implements ServletContextListener {
 						"No configuration file supplied with environment variable EXPERT_CONF");
 			}
 
-			logger.info("Persistence initialization finished");
 
 			Application.initialize(propertyFilePath);
+			
+
+			logger.info("Database mode: " + Application.get().getProp(Setting.DATABASE_MODE));
+			logger.info("Database url : " + Application.get().getProp(Setting.DATABASE_URL));
 
 			String snapshotsDir = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 

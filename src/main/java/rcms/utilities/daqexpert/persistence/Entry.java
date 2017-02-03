@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -58,24 +57,24 @@ public class Entry implements Comparable<Entry> {
 	/**
 	 * Short description of event. Displayed in main expert view
 	 */
-	@Column(columnDefinition = "VARCHAR2(4000)")
+	@Column(columnDefinition = "varchar(4000)")
 	private String content;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "START_DATE")
-    @Index(name = "IDX_STARTDATEINDEX")
+	@Column(name = "start_date")
+    @Index(name = "idx_startdate")
 	private Date start;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "END_DATE")
-    @Index(name = "IDX_ENDDATEINDEX")
+	@Column(name = "end_date")
+    @Index(name = "idx_enddate")
 	private Date end;
 
 	/**
 	 * Group in which will be displayed in main expert view
 	 */
 	/** TODO: replace by enum/id */
-	@Column(columnDefinition = "VARCHAR2(20)", name = "GROUP_NAME")
+	@Column(columnDefinition = "varchar(20)", name = "group_name")
 	private String group;
 
 	/**
@@ -83,7 +82,7 @@ public class Entry implements Comparable<Entry> {
 	 * highlighted or not TODO: enum this
 	 */
 	/** TODO: replace by enum/id */
-	@Column(columnDefinition = "VARCHAR2(20)", name = "CLASS_NAME")
+	@Column(columnDefinition = "varchar(20)", name = "class_name")
 	private String className;
 
 	public String getGroup() {

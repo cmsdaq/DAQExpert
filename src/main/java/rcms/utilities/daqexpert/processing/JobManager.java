@@ -113,7 +113,12 @@ public class JobManager {
 		// TODO: class name vs priority - decide on one convention
 		entry.setClassName(EventPriority.DEFAULTT.getCode());
 		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
-		entry.setContent(this.getClass().getPackage().getImplementationVersion());
+		String version = this.getClass().getPackage().getImplementationVersion();
+		if(version == null){
+			logger.info("Problem detecting version");
+			version = "unknown";
+		}
+		entry.setContent(version);
 		this.persistenceManager.persist(entry);
 	}
 

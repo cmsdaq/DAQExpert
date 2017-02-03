@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
@@ -16,7 +17,7 @@ import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
-@Ignore
+@Ignore // TODO: too long
 public class DataManagerTest {
 
 	private long counter;
@@ -95,7 +96,7 @@ class PersistenceManagerMock extends PersistenceManager {
 	final Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution;
 
 	public PersistenceManagerMock(Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution) {
-		super("history-test");
+		super("history-test", new Properties());
 		this.rawDataByResolution = rawDataByResolution;
 	}
 
@@ -122,9 +123,8 @@ class PersistenceManagerMock extends PersistenceManager {
 class DataManagerMock extends DataManager {
 
 	public DataManagerMock() {
-		super(null);
+		super(new PersistenceManager("history-test", new Properties()));
 		rawDataByResolution = new HashMap<>();
-		// this.persistenceManager = null;
 		initialize();
 	}
 

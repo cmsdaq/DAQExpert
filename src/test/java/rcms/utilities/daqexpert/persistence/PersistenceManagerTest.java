@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
@@ -49,7 +50,7 @@ public class PersistenceManagerTest {
 	 */
 	@BeforeClass
 	public static void initializeObjects() {
-		pm = new PersistenceManager("history-test");
+		pm = new PersistenceManager("history-test", new Properties());
 
 		pm.persist(getFinishedEntry(entry1Start, "test1", 10000));
 		pm.persist(getFinishedEntry(entry2Start, "test2", 10000));

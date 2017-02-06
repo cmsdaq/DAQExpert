@@ -42,17 +42,21 @@ public class FlowchartCase3 extends KnownFailure {
 
 		boolean result = false;
 
-		for (SubSystem subSystem : daq.getSubSystems()) {
+		String daqstate = daq.getDaqState();
+		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
 
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+			for (SubSystem subSystem : daq.getSubSystems()) {
 
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
+				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
-					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("TTCP", ttcp.getName());
-					context.register("STATE", currentState.name());
-					result = true;
+					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+					if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
+
+						context.register("SUBSYSTEM", subSystem.getName());
+						context.register("TTCP", ttcp.getName());
+						context.register("STATE", currentState.name());
+						result = true;
+					}
 				}
 			}
 		}

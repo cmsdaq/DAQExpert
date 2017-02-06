@@ -50,38 +50,41 @@ public class FlowchartCase2 extends KnownFailure {
 		boolean result = false;
 		int i = 0;
 
-		if (ERROR_STATE.equalsIgnoreCase(l0state) && ERROR_STATE.equalsIgnoreCase(daqstate)) {
+		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
 
-			for (FEDBuilder fb : daq.getFedBuilders()) {
-				RU ru = fb.getRu();
-				if (ru.getStateName().equalsIgnoreCase("Failed")) {
+			if (ERROR_STATE.equalsIgnoreCase(l0state) && ERROR_STATE.equalsIgnoreCase(daqstate)) {
 
-					i++;
-					context.register("RU", ru.getHostname());
-					result = true;
-				}
-			}
+				for (FEDBuilder fb : daq.getFedBuilders()) {
+					RU ru = fb.getRu();
+					if (ru.getStateName().equalsIgnoreCase("Failed")) {
 
-			for (FED fed : daq.getFeds()) {
-				if (fed.getRuFedDataCorruption() > 0) {
-
-					TTCPartition ttcp = fed.getTtcp();
-					String ttcpName = "-";
-					String subsystemName = "-";
-
-					if (ttcp != null) {
-						ttcpName = ttcp.getName();
-						if (ttcp.getSubsystem() != null)
-							subsystemName = ttcp.getSubsystem().getName();
+						i++;
+						context.register("RU", ru.getHostname());
+						result = true;
 					}
-					context.register("FED", fed.getSrcIdExpected());
-					context.register("TTCP", ttcpName);
-					context.register("SUBSYSTEM", subsystemName);
-					i++;
 				}
-			}
 
-			logger.debug("FC2 " + i);
+				for (FED fed : daq.getFeds()) {
+					if (fed.getRuFedDataCorruption() > 0) {
+
+						TTCPartition ttcp = fed.getTtcp();
+						String ttcpName = "-";
+						String subsystemName = "-";
+
+						if (ttcp != null) {
+							ttcpName = ttcp.getName();
+							if (ttcp.getSubsystem() != null)
+								subsystemName = ttcp.getSubsystem().getName();
+						}
+						context.register("FED", fed.getSrcIdExpected());
+						context.register("TTCP", ttcpName);
+						context.register("SUBSYSTEM", subsystemName);
+						i++;
+					}
+				}
+
+				logger.debug("FC2 " + i);
+			}
 		}
 		return result;
 	}

@@ -56,28 +56,28 @@ public class FlowchartCase5 extends KnownFailure {
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
-		if (RUNBLOCKED_STATE.equalsIgnoreCase(l0state) && RUNBLOCKED_STATE.equalsIgnoreCase(daqstate))
-			return false;
+		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
 
-		for (SubSystem subSystem : daq.getSubSystems()) {
+			for (SubSystem subSystem : daq.getSubSystems()) {
 
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+					if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-					for (FED fed : ttcp.getFeds()) {
-						TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-						if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-								&& fed.getPercentBackpressure() == 0F) {
+						for (FED fed : ttcp.getFeds()) {
+							TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+							if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+									&& fed.getPercentBackpressure() == 0F) {
 
-							context.register("TTCP", ttcp.getName());
-							context.register("TTCPSTATE", currentState.name());
-							context.register("SUBSYSTEM", subSystem.getName());
-							context.register("FED", fed.getSrcIdExpected());
-							context.register("FEDSTATE", currentFedState.name());
-							context.setActionKey(subSystem.getName());
-							result = true;
+								context.register("TTCP", ttcp.getName());
+								context.register("TTCPSTATE", currentState.name());
+								context.register("SUBSYSTEM", subSystem.getName());
+								context.register("FED", fed.getSrcIdExpected());
+								context.register("FEDSTATE", currentFedState.name());
+								context.setActionKey(subSystem.getName());
+								result = true;
+							}
 						}
 					}
 				}

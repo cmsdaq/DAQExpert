@@ -1,9 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -11,15 +9,21 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
+import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
@@ -41,6 +45,8 @@ public class JobManager {
 	/** Initial queue size */
 	private static final int INITIAL_QUEUE_SIZE = 3;
 
+	private final PersistenceManager persistenceManager;
+
 	private final ThreadPoolExecutor mainExecutor;
 
 	private final OnDemandReaderJob onDemandReader;
@@ -49,16 +55,29 @@ public class JobManager {
 
 	private final JobScheduler readerRaskController;
 
-	public JobManager(String sourceDirectory, Set<Entry> destination, DataManager dataManager) {
+	public JobManager(String sourceDirectory, DataManager dataManager) {
 
-		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		long offset = Long.parseLong(Application.get().getProp(Setting.EXPERT_OFFSET).toString());
-		long startTime = utcCalendar.getTimeInMillis() - offset;
-		utcCalendar.setTimeInMillis(startTime);
-		Date startDate = utcCalendar.getTime();
-		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+		this.persistenceManager = Application.get().getPersistenceManager();
 
-		logger.info("Data will be processed from: " + startDate + " (now minus offset of " + offsetString + ")");
+		Date startDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_START_DATETIME))
+				.getTime();
+
+		Date endDate = null;
+		String endDateString = Application.get().getProp(Setting.PROCESSING_END_DATETIME);
+		if (endDateString.equalsIgnoreCase("unlimited")) {
+			logger.info("Expert run unlimited, will process as long as there are new snapshots");
+		} else {
+			try {
+				endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+			} catch (IllegalArgumentException e) {
+				throw new ExpertException(ExpertExceptionCode.CannotParseProcessingEndDate,
+						"Cannot parse end date " + endDateString + ", (special key possible 'unlimited')");
+			}
+		}
+
+		logger.info("Data will be processed from: " + startDate + (endDate != null ? ", to: " + endDate : ""));
+		Application.get().getDataManager().setLastUpdate(startDate);
+		persistVersion(startDate, endDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
 				new PriorityBlockingQueue<Runnable>(INITIAL_QUEUE_SIZE, new PriorityFutureComparator())) {
@@ -71,14 +90,36 @@ public class JobManager {
 
 		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
-		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startTime, sourceDirectory);
+		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(),
+				endDate != null ? endDate.getTime() : null, sourceDirectory);
 
 		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, destination, dataManager, snapshotProcessor);
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,
+				persistenceManager);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
+	}
+
+	private void persistVersion(Date startDate, Date endDate) {
+
+		Entry entry = new Entry();
+		entry.setStart(startDate);
+		entry.setEnd(endDate);
+		if (endDate != null) {
+			entry.calculateDuration();
+		}
+		// TODO: class name vs priority - decide on one convention
+		entry.setClassName(EventPriority.DEFAULTT.getCode());
+		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
+		String version = this.getClass().getPackage().getImplementationVersion();
+		if(version == null){
+			logger.info("Problem detecting version");
+			version = "unknown";
+		}
+		entry.setContent(version);
+		this.persistenceManager.persist(entry);
 	}
 
 	public void startJobs() {
@@ -89,14 +130,29 @@ public class JobManager {
 
 		EventProducer eventProducer = new EventProducer();
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
-		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, null,
-				snapshotProcessor2);
+		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
+				persistenceManager);
 		onDemandReader.setTimeSpan(startTime, endTime);
-		onDemandDataJob.setDestination(destination);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
 		return readerRaskController.scheduleOnDemandReaderTask(onDemandDataJob);
+	}
+
+	public void stop() {
+
+		readerRaskController.stopExecutors();
+		mainExecutor.shutdown();
+
+		try {
+			mainExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+			logger.info("All jobs gracefully terminated");
+		} catch (InterruptedException e) {
+
+			logger.error("Could not gracefully terminate jobs");
+			logger.error(e);
+		}
 	}
 }

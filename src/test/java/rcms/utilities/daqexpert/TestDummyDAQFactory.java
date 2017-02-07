@@ -1,13 +1,18 @@
 package rcms.utilities.daqexpert;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
-import rcms.utilities.daqexpert.segmentation.Point;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 public class TestDummyDAQFactory {
@@ -19,7 +24,7 @@ public class TestDummyDAQFactory {
 		return daq;
 	}
 
-	public static void print(DataManager dm) {
+	public static void print(DataManagerMock dm) {
 		System.out.println("RAW:" + dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE).size());
 		System.out.println("MIN:" + dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE).size());
 		System.out.println("HOR:" + dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE).size());
@@ -43,3 +48,4 @@ public class TestDummyDAQFactory {
 				"var " + name + " = " + om.writeValueAsString(list.subList(0, Math.min(list.size(), 400))) + ";");
 	}
 }
+

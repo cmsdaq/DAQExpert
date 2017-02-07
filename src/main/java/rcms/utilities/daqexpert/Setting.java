@@ -15,10 +15,19 @@ public enum Setting {
 	EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION("expert.logic.deadtime.threshold.partition"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL("expert.logic.deadtime.threshold.total"),
 
-	EXPERT_OFFSET("expert.offset"),
+	PROCESSING_START_DATETIME("processing.start"),
+	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),
 	LANDING("landing"),
-	EXPERIMENTAL_DIR("experimental");
+	EXPERIMENTAL_DIR("experimental"),
+
+	DATABASE_USER("hibernate.connection.username"),
+	DATABASE_PASSWORD("hibernate.connection.password"),
+	DATABASE_URL("hibernate.connection.url"),
+	DATABASE_DRIVER("hibernate.connection.driver_class"),
+	DATABASE_MODE("hibernate.hbm2ddl.auto"),
+
+	;
 
 	private final String key;
 

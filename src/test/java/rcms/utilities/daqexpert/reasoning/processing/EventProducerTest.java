@@ -10,9 +10,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.Entry;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
@@ -175,16 +175,16 @@ public class EventProducerTest {
 		Pair<Boolean, Entry> a = eventProducer.produce(checker, false, t1, t2);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
-		
-		//TODO: check this assertions
-		//Assert.assertEquals(1, eventProducer.getUnfinished().size());
-		//Assert.assertNull(a.getRight());
+
+		// TODO: check this assertions
+		// Assert.assertEquals(1, eventProducer.getUnfinished().size());
+		// Assert.assertNull(a.getRight());
 
 		eventProducer.finish(t3);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(0, eventProducer.getUnfinished().size());
-		//Assert.assertEquals(t3, a.getRight().getEnd());
+		// Assert.assertEquals(t3, a.getRight().getEnd());
 	}
 
 }

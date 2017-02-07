@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.processing;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.jmock.lib.concurrent.DeterministicScheduler;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -9,11 +10,13 @@ import org.junit.Test;
 
 public class JobSchedulerTest {
 
+	private static final Logger logger = Logger.getLogger(JobScheduler.class);
+
 	Runnable simplePastTask = new Runnable() {
 
 		@Override
 		public void run() {
-			System.out.println("P");
+			logger.debug("P");
 			counter += 10;
 		}
 	};
@@ -22,7 +25,7 @@ public class JobSchedulerTest {
 
 		@Override
 		public void run() {
-			System.out.println("RT");
+			logger.debug("RT");
 			counter += 1;
 		}
 	};

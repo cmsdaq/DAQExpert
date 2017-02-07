@@ -1,12 +1,23 @@
 package rcms.utilities.daqexpert;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
+@Ignore // TODO: too long
 public class DataManagerTest {
 
 	private long counter;
@@ -35,7 +46,7 @@ public class DataManagerTest {
 	@Test
 	public void segmentationOfSquareWaveFunctionTest() {
 
-		DataManager dm = new DataManager();
+		DataManagerMock dm = new DataManagerMock();
 
 		for (int i = 0; i < 100000; i++) {
 			Pair<Long, Integer> a = getSquareWave();
@@ -58,7 +69,7 @@ public class DataManagerTest {
 	@Test
 	public void segmentationOfSinFunctionTest() {
 
-		DataManager dm = new DataManager();
+		DataManagerMock dm = new DataManagerMock();
 
 		for (int i = 0; i < 100000; i++) {
 			Pair<Long, Integer> a = multipleSins();
@@ -78,4 +89,70 @@ public class DataManagerTest {
 
 	}
 
+}
+
+class PersistenceManagerMock extends PersistenceManager {
+
+	final Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution;
+
+	public PersistenceManagerMock(Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution) {
+		super("history-test", new Properties());
+		this.rawDataByResolution = rawDataByResolution;
+	}
+
+	@Override
+	public void persist(Entry entry) {
+	}
+
+	@Override
+	public void persist(Point test) {
+		rawDataByResolution.get(DataResolution.values()[test.getResolution()]).get(DataStream.values()[test.getGroup()])
+				.add(test);
+	}
+
+	@Override
+	public void persist(List<Point> points) {
+		for (Point test : points) {
+			rawDataByResolution.get(DataResolution.values()[test.getResolution()])
+					.get(DataStream.values()[test.getGroup()]).add(test);
+		}
+	}
+
+}
+
+class DataManagerMock extends DataManager {
+
+	public DataManagerMock() {
+		super(new PersistenceManager("history-test", new Properties()));
+		rawDataByResolution = new HashMap<>();
+		initialize();
+	}
+
+	public Map<DataResolution, Map<DataStream, List<Point>>> getRawDataByResolution() {
+		return rawDataByResolution;
+	}
+
+	private void initialize() {
+		rawDataByResolution.put(DataResolution.Full, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Minute, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Hour, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Day, new HashMap<DataStream, List<Point>>());
+		rawDataByResolution.put(DataResolution.Month, new HashMap<DataStream, List<Point>>());
+
+		rawDataByResolution.get(DataResolution.Full).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Full).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Minute).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Minute).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Hour).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Hour).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Day).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Day).put(DataStream.EVENTS, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Month).put(DataStream.RATE, new ArrayList<Point>());
+		rawDataByResolution.get(DataResolution.Month).put(DataStream.EVENTS, new ArrayList<Point>());
+	}
+
+	/**
+	 * Processed multiresolution data
+	 */
+	private final Map<DataResolution, Map<DataStream, List<Point>>> rawDataByResolution;
 }

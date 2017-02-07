@@ -52,27 +52,31 @@ public class FlowchartCase6 extends KnownFailure {
 
 		boolean result = false;
 
-		for (SubSystem subSystem : daq.getSubSystems()) {
+		String daqstate = daq.getDaqState();
 
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
+			for (SubSystem subSystem : daq.getSubSystems()) {
 
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
-					for (FED fed : ttcp.getFeds()) {
-						TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-						if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-								&& fed.getPercentBackpressure() > 0F) {
+					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+					if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-							context.register("TTCP", ttcp.getName());
-							context.register("TTCPSTATE", currentState.name());
-							context.register("SUBSYSTEM", subSystem.getName());
-							context.register("FED", fed.getSrcIdExpected());
-							context.register("FEDSTATE", currentFedState.name());
+						for (FED fed : ttcp.getFeds()) {
+							TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+							if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+									&& fed.getPercentBackpressure() > 0F) {
 
-							logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
-									+ new Date(daq.getLastUpdate()));
-							result = true;
+								context.register("TTCP", ttcp.getName());
+								context.register("TTCPSTATE", currentState.name());
+								context.register("SUBSYSTEM", subSystem.getName());
+								context.register("FED", fed.getSrcIdExpected());
+								context.register("FEDSTATE", currentFedState.name());
+
+								logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
+										+ new Date(daq.getLastUpdate()));
+								result = true;
+							}
 						}
 					}
 				}

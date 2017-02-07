@@ -7,11 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 
 public class ReaderJobTestBase {
+
+	private static final Logger logger = Logger.getLogger(ReaderJobTestBase.class);
 
 	public ReaderJobTestBase() {
 		testSet.addAll(Arrays.asList(1473858460000L, 1473858461000L, 1473858462000L, 1473858463000L, 1473858464000L,
@@ -30,7 +33,7 @@ public class ReaderJobTestBase {
 		public Pair<Long, List<File>> explore(Long startTimestamp, Long endTimestamp, String dir, int chunkSize)
 				throws IOException {
 
-			System.out.println("Explore stub");
+			logger.debug("Explore stub");
 			List<File> files = new ArrayList<File>();
 			Long last = null;
 

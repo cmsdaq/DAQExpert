@@ -60,4 +60,24 @@ public class JobScheduler {
 		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_SECONDS, SECONDS);
 	}
 
+	public void stopExecutors() {
+		onDemandScheduler.shutdown();
+		realTimeScheduler.shutdown();
+		try {
+			onDemandScheduler.awaitTermination(5, SECONDS);
+			logger.info("Successfully terminated on-demand scheduler");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			realTimeScheduler.awaitTermination(5, SECONDS);
+			logger.info("Successfully terminated real-time scheduler");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 }

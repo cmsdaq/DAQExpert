@@ -36,21 +36,26 @@ public class FlowchartCase4 extends KnownFailure {
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
 		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
-		
+
 		boolean result = false;
 
-		for (SubSystem subSystem : daq.getSubSystems()) {
+		String daqstate = daq.getDaqState();
+		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
 
-			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+			for (SubSystem subSystem : daq.getSubSystems()) {
 
-				TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-				if (currentState == TTSState.DISCONNECTED) {
+				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
-					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("TTCP", ttcp.getName());
-					result = true;
+					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+					if (currentState == TTSState.DISCONNECTED) {
+
+						context.register("SUBSYSTEM", subSystem.getName());
+						context.register("TTCP", ttcp.getName());
+						result = true;
+					}
 				}
 			}
+
 		}
 
 		return result;

@@ -3,21 +3,18 @@ package rcms.utilities.daqexpert;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DAQException;
-import rcms.utilities.daqaggregator.DAQExceptionCode;
-import rcms.utilities.daqaggregator.Settings;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
 
 public class Application {
 
 	private static final Logger logger = Logger.getLogger(Application.class);
+
+	private PersistenceManager persistenceManager;
 
 	private DataManager dataManager;
 
@@ -39,7 +36,8 @@ public class Application {
 		for (Setting setting : Setting.values()) {
 			if (setting.isRequired()) {
 				if (!instance.prop.containsKey(setting.getKey()))
-					throw new DAQException(DAQExceptionCode.MissingProperty, ": Required property missing " + setting.getKey());
+					throw new ExpertException(ExpertExceptionCode.MissingProperty,
+							": Required property missing " + setting.getKey());
 			}
 		}
 	}
@@ -47,11 +45,14 @@ public class Application {
 	public static void initialize(String propertiesFile) {
 		instance = new Application(propertiesFile);
 		checkRequiredSettings();
+		String v = instance.getClass().getPackage().getImplementationVersion();
+		logger.info("DAQExpert version: " + v);
+		instance.persistenceManager = new PersistenceManager("history", instance.getProp());
+		instance.setDataManager(new DataManager(instance.persistenceManager));
 	}
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
-		this.setDataManager(new DataManager());
 	}
 
 	private static Application instance;
@@ -60,32 +61,21 @@ public class Application {
 
 		try {
 
-			if (propertiesFile == null) {
-				logger.info("Loading properties from default location");
-				String resourceName = "config.properties"; // could also be a
-															// constant
-				ClassLoader loader = Thread.currentThread().getContextClassLoader();
-				Properties props = new Properties();
-				try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-					props.load(resourceStream);
-				}
-				return props;
+			logger.info("Loading properties from environment variable location");
+			FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
+			Properties properties = new Properties();
+			properties.load(propertiesInputStream);
+			return properties;
 
-			} else {
-				logger.info("Loading properties from environment variable location");
-				FileInputStream propertiesInputStream = new FileInputStream(propertiesFile);
-				Properties properties = new Properties();
-				properties.load(propertiesInputStream);
-				return properties;
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot run application without configuration file");
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot run application without configuration file");
 		}
+
+		catch (FileNotFoundException e) {
+			throw new ExpertException(ExpertExceptionCode.MissingConfigurationFile,
+					propertiesFile + " cannot be found. " + e.getMessage());
+		} catch (IOException e) {
+			throw new ExpertException(ExpertExceptionCode.MissingConfigurationFile, e.getMessage());
+		}
+
 	}
 
 	public String getProp(Setting setting) {
@@ -115,5 +105,9 @@ public class Application {
 
 	public void setJobManager(JobManager jobManager) {
 		this.jobManager = jobManager;
+	}
+
+	public PersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 }

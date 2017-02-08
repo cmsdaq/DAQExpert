@@ -81,6 +81,7 @@ public class DataPrepareJob implements Runnable {
 				} catch (RuntimeException e) {
 					logger.warn("Exception during result persistence - results will be forgotten");
 					logger.error(e);
+					e.printStackTrace();
 				}
 
 			}

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -37,7 +38,7 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
  * 
  * 
  * Performance test: Time to insert 10000 Entries individually was 55315 ms
- * Performance test: Time to insert 10000 Entries at once      was   456 ms
+ * Performance test: Time to insert 10000 Entries at once was 456 ms
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
@@ -45,27 +46,32 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
-	private final EntityManager entityManager;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
-	public PersistenceManager(String persistenceUnitName,Properties props) {
+	private final EntityManager entryEntityManager;
 
-		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName,props);
-		entityManager = entityManagerFactory.createEntityManager();
+	public PersistenceManager(String persistenceUnitName, Properties props) {
+
+		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
+		entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
+	/**
+	 * Persiste multipe entries in one transaction
+	 * 
+	 * @param entries
+	 */
 	public void persist(Set<Entry> entries) {
 
-		Session session = entityManager.unwrap(Session.class);
-		Transaction tx = session.beginTransaction();
+		EntityTransaction tx = entryEntityManager.getTransaction();
+		tx.begin();
 		for (Entry point : entries) {
 
 			if (point.isShow())
-				session.save(point);
+				entryEntityManager.persist(point);
 		}
 		tx.commit();
-		// session.close();
 	}
 
 	/**
@@ -74,27 +80,34 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Entry entry) {
-		entityManager.getTransaction().begin();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		entityManager.persist(entry);
-		entityManager.getTransaction().commit();
+		tx.commit();
+		entityManager.close();
 	}
 
 	public void persist(Point test) {
-		entityManager.getTransaction().begin();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		entityManager.persist(test);
-		entityManager.getTransaction().commit();
+		tx.commit();
+		entityManager.close();
 	}
 
 	public void persist(List<Point> points) {
 
-		Session session = entityManager.unwrap(Session.class);
-		Transaction tx = session.beginTransaction();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		for (Point point : points) {
 
-			session.save(point);
+			entityManager.persist(point);
 		}
 		tx.commit();
-		// session.close();
+		entityManager.close();
 	}
 
 	public List<Point> getRawData(Date startDate, Date endDate) {
@@ -114,7 +127,7 @@ public class PersistenceManager {
 		c.add(Calendar.SECOND, 10);
 		endDate = c.getTime();
 
-		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		Criteria elementsCriteria = session.createCriteria(Point.class);
@@ -126,6 +139,7 @@ public class PersistenceManager {
 		logger.debug(
 				result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved");
 
+		entityManager.close();
 		return result;
 	}
 
@@ -143,6 +157,7 @@ public class PersistenceManager {
 	public List<Entry> getEntries(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
 		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		Criteria elementsCriteria = session.createCriteria(Entry.class);
@@ -168,12 +183,16 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));
 
-		return elementsCriteria.list();
+		List<Entry> result = elementsCriteria.list();
+		entityManager.close();
+
+		return result;
 	}
 
 	public List<TinyEntryMapObject> getTinyEntriesMask(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask, DataResolution resolution) {
 		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		List<TinyEntryMapObject> resultTiny = new ArrayList<TinyEntryMapObject>();
 		StringBuilder sb = new StringBuilder();
@@ -232,6 +251,7 @@ public class PersistenceManager {
 			curr.setEnd(calendar.getTime());
 			resultTiny.add(curr);
 		}
+		entityManager.close();
 		return resultTiny;
 
 	}
@@ -294,7 +314,8 @@ public class PersistenceManager {
 	@SuppressWarnings("unchecked")
 	public List<Entry> getEntries2(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
-		// TODO: close session?
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -329,7 +350,9 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));
 
-		return elementsCriteria.list();
+		List<Entry> result = elementsCriteria.list();
+		entityManager.close();
+		return result;
 	}
 
 	/**
@@ -357,11 +380,15 @@ public class PersistenceManager {
 
 	public Entry getEntryById(Long id) {
 
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
 		Entry entry = entityManager.find(Entry.class, id);
+		entityManager.close();
 		return entry;
 	}
 
 	public List<Entry> getEntries2(Date start, Date end) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
 		List<Entry> result = entityManager.createQuery("from Entry", Entry.class).getResultList();
 		for (Entry event : result) {

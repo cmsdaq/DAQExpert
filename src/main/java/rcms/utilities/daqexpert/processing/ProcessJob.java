@@ -1,12 +1,14 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -14,6 +16,7 @@ import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
@@ -23,7 +26,7 @@ import rcms.utilities.daqexpert.servlets.DummyDAQ;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class ProcessJob implements Callable<Set<Entry>> {
+public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
 	private final static StructureSerializer structureSerializer = new StructureSerializer();
 	private final SnapshotProcessor snapshotProcessor;
 	private final static Logger logger = Logger.getLogger(ProcessJob.class);
@@ -46,7 +49,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 		}
 	}
 
-	public Set<Entry> call() throws Exception {
+	public Pair<Set<Entry>, List<Point>> call() throws Exception {
 
 		Long start = System.currentTimeMillis();
 
@@ -55,6 +58,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 		int segmentingTime = 0;
 
 		Set<Entry> result = new LinkedHashSet<>();
+		List<Point> points = new ArrayList<>();
 
 		DAQ daq = null;
 
@@ -83,7 +87,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 					Long startSegmenting = System.currentTimeMillis();
 					if (dataManager != null) {
 						// this is not done in on-demand requests
-						dataManager.addSnapshot(new DummyDAQ(daq));
+						points.addAll(dataManager.addSnapshot(new DummyDAQ(daq)));
 						dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
 					}
 					Long endSegmenting = System.currentTimeMillis();
@@ -127,7 +131,7 @@ public class ProcessJob implements Callable<Set<Entry>> {
 			result.addAll(finished);
 		}
 
-		return result;
+		return Pair.of(result, points);
 	}
 
 	public int getPriority() {

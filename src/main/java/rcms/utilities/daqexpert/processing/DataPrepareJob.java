@@ -17,6 +17,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Entry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
@@ -36,7 +37,7 @@ public class DataPrepareJob implements Runnable {
 	private final SnapshotProcessor snapshotProcessor;
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
-			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager ) {
+			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -62,13 +63,20 @@ public class DataPrepareJob implements Runnable {
 					priority++;
 
 				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager, snapshotProcessor);
-				Future<Set<Entry>> future = executorService.submit(processJob);
+				Future<Pair<Set<Entry>, List<Point>>> future = executorService.submit(processJob);
 
-				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
+				Pair<Set<Entry>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
 				try {
 
-					persistenceManager.persist(result);
-					// TODO: batch persistence here
+					long t1 = System.currentTimeMillis();
+					persistenceManager.persist(result.getLeft());
+					long t2 = System.currentTimeMillis();
+					persistenceManager.persist(result.getRight());
+					long t3 = System.currentTimeMillis();
+
+					logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
+							+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
+							+ (t3 - t2) + "ms");
 
 				} catch (RuntimeException e) {
 					logger.warn("Exception during result persistence - results will be forgotten");

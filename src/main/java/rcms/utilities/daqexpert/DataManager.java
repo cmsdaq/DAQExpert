@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DAQConverter;
@@ -26,16 +25,13 @@ public class DataManager {
 
 	private static final Logger logger = Logger.getLogger(DataManager.class);
 
-	protected final PersistenceManager persistenceManager;
-
 	private Date lastUpdate;
 
 	public Map<String, Set<Entry>> experimental;
 
 	private final DataResolutionManager dataResolutionManager;
 
-	public DataManager(PersistenceManager persistenceManager) {
-		this.persistenceManager = persistenceManager;
+	public DataManager() {
 		experimental = new HashMap<>();
 		experimental.put("test", new HashSet<Entry>());
 
@@ -53,7 +49,7 @@ public class DataManager {
 
 	}
 
-	public void addSnapshot(DummyDAQ dummyDAQ) {
+	public List<Point> addSnapshot(DummyDAQ dummyDAQ) {
 
 		logger.debug("New snapshot received");
 
@@ -61,22 +57,24 @@ public class DataManager {
 
 		readyToPersist.add(DAQConverter.convertToRatePoint(dummyDAQ));
 		readyToPersist.add(DAQConverter.convertToEventPoint(dummyDAQ));
-		persistenceManager.persist(readyToPersist);
 
 		Map<DataResolution, Boolean> resultsReady = dataResolutionManager.queue(dummyDAQ);
 
 		if (resultsReady.get(DataResolution.Minute)) {
-			transferData(DataResolution.Minute, dataResolutionManager.getMinuteStreamProcessor());
+			readyToPersist
+					.addAll(transferData(DataResolution.Minute, dataResolutionManager.getMinuteStreamProcessor()));
 		}
 		if (resultsReady.get(DataResolution.Hour)) {
-			transferData(DataResolution.Hour, dataResolutionManager.getHourStreamProcessor());
+			readyToPersist.addAll(transferData(DataResolution.Hour, dataResolutionManager.getHourStreamProcessor()));
 		}
 		if (resultsReady.get(DataResolution.Day)) {
-			transferData(DataResolution.Day, dataResolutionManager.getDayStreamProcessor());
+			readyToPersist.addAll(transferData(DataResolution.Day, dataResolutionManager.getDayStreamProcessor()));
 		}
 		if (resultsReady.get(DataResolution.Month)) {
-			transferData(DataResolution.Month, dataResolutionManager.getMonthStreamProcessor());
+			readyToPersist.addAll(transferData(DataResolution.Month, dataResolutionManager.getMonthStreamProcessor()));
 		}
+
+		return readyToPersist;
 	}
 
 	/**
@@ -84,7 +82,7 @@ public class DataManager {
 	 * @param resolution
 	 * @param streamProcessor
 	 */
-	private void transferData(DataResolution resolution, StreamProcessor streamProcessor) {
+	private List<Point> transferData(DataResolution resolution, StreamProcessor streamProcessor) {
 
 		logger.debug("Transfering segmentated data of " + resolution + " resolution");
 		List<Point> rate = streamProcessor.getOutput().get(DataStream.RATE);
@@ -103,10 +101,10 @@ public class DataManager {
 			readyToPersist.add(curr);
 		}
 
-		persistenceManager.persist(readyToPersist);
-
 		rate.clear();
 		events.clear();
+
+		return readyToPersist;
 	}
 
 	public DataResolutionManager getDataResolutionManager() {

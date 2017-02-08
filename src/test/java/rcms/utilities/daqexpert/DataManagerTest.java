@@ -123,7 +123,7 @@ class PersistenceManagerMock extends PersistenceManager {
 class DataManagerMock extends DataManager {
 
 	public DataManagerMock() {
-		super(new PersistenceManager("history-test", new Properties()));
+		super();
 		rawDataByResolution = new HashMap<>();
 		initialize();
 	}

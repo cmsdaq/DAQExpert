@@ -43,6 +43,16 @@
 	font-family: monospace;
 }
 
+.vis-item.blue {
+	background-color: rgba(141, 180, 226, 0.1);
+	background-image: unset;
+}
+
+.vis-item.green {
+	background-color: rgba(146, 208, 80, 0.1);
+	background-image: unset;
+}
+
 .vis-item.experimental {
 	background-image: linear-gradient(to bottom,#5cb85c 0,#4cae4c 100%);
 	border-color: #4cae4c;

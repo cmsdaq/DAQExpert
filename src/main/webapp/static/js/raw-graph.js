@@ -19,7 +19,8 @@ var rawoptions = {
 			title : {
 				text : "<span class='glyphicon glyphicon-stop'></span> Avg. RU rate [kHz]",
 				style : "color: #4f81bd;"
-			}
+			},
+			range: {min:0, max:120}
 		},
 		right : {
 			format : function(value) {
@@ -28,7 +29,8 @@ var rawoptions = {
 			title : {
 				text : "<span class='glyphicon glyphicon-stop'></span> Sum events in BU",
 				style : "color: #f79646;"
-			}
+			},
+			range: {min:0, max:10000000000}
 		}
 	},
 	legend : {

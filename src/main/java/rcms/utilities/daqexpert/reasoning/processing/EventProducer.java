@@ -132,9 +132,21 @@ public class EventProducer {
 			leftResult = true;
 		}
 		result.setEventFinder(classificable);
+		
+		if(value){
+			if (classificable instanceof ActionLogicModule) {
+				logger.info("Putting message into context: " + classificable.getDescription());
+				result.setDescription(((ActionLogicModule) classificable).getContext()
+						.getMessageWithContext(classificable.getDescription()));
+			} else {
+				result.setDescription(classificable.getDescription());
+
+			}
+		}
 		return Pair.of(leftResult, result);
 	}
 
+	
 	protected Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
 			EventPriority eventClass, Context context) {
 
@@ -146,8 +158,8 @@ public class EventProducer {
 			toFinish.calculateDuration();
 			Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
 			toFinish.setFinishedContext(clone);
-			if (!toFinish.getStart().equals(toFinish.getEnd()) ){
-				logger.debug("Finishing entry " + toFinish.getContent() + " with id: " + toFinish.getId() );
+			if (!toFinish.getStart().equals(toFinish.getEnd())) {
+				logger.debug("Finishing entry " + toFinish.getTitle() + " with id: " + toFinish.getId());
 				finishedThisRound.add(toFinish);
 			}
 		}
@@ -155,10 +167,12 @@ public class EventProducer {
 		/* add new entry */
 		Entry entry = new Entry();
 		entry.setClassName(eventClass.getCode());
-		entry.setContent(content);
+		entry.setTitle(content);
 		entry.setShow(value);
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
+		
+		
 
 		// result.add(entry);
 

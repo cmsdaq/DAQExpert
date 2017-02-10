@@ -55,10 +55,10 @@ public class ForwardReaderJob implements ReaderJob {
 		try {
 			logger.debug("Exploring with " + last);
 			if (limit == null) {
-				logger.info("Exploring without upper limit");
+				logger.debug("Exploring without upper limit");
 				entry = persistenceExplorer.explore(last, sourceDirectory);
 			} else {
-				logger.info("Exploring with upper limit of " + new Date(limit));
+				logger.debug("Exploring with upper limit of " + new Date(limit));
 				entry = persistenceExplorer.explore(last, limit, sourceDirectory);
 			}
 			// remember last explored snapshot timestamp

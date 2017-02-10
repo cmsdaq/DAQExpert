@@ -342,7 +342,7 @@ function load(data, fakeEnd) {
 				countPerGroup[groupName] = currCount + 1;
 			}
 		} else {
-			console.log("Group " + groupName + " will be ignored");
+			//console.log("Group " + groupName + " will be ignored");
 
 		}
 	});

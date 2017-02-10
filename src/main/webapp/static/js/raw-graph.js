@@ -8,7 +8,9 @@ var rawoptions = {
 	orientation : 'bottom',
     zoomMin: 1000 * 60,                   // one minute in milliseconds
     zoomMax: 1000 * 60 * 60 * 24 * 31 * 12,// about 12 months in milliseconds
-
+	drawPoints: {
+        style: 'circle'
+    },
 	dataAxis : {
 		width : '50px',
 		icons : false,
@@ -30,7 +32,7 @@ var rawoptions = {
 				text : "<span class='glyphicon glyphicon-stop'></span> Sum events in BU",
 				style : "color: #f79646;"
 			},
-			range: {min:0, max:10000000000}
+			range: {min:0}
 		}
 	},
 	legend : {

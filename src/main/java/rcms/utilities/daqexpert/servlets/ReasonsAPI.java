@@ -72,7 +72,7 @@ public class ReasonsAPI extends HttpServlet {
 				try {
 
 					/** durations */
-					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getContent().equals("STABLE BEAMS"))
+					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getTitle().equals("STABLE BEAMS"))
 							|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
 							|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
 						long current = 0;

@@ -192,7 +192,7 @@ public class PersistenceManagerTest {
 	private static Entry getFinishedEntry(Date startDate, String name, int duration) {
 		Entry entry = new Entry();
 		entry.setClassName(name);
-		entry.setContent("Content of entry: " + name);
+		entry.setTitle("Content of entry: " + name);
 		entry.setStart(startDate);
 		entry.setGroup(EventGroup.LHC_BEAM.getCode());
 

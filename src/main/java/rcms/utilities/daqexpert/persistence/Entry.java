@@ -11,9 +11,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
@@ -25,11 +27,11 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  * 
- * TODO: index on dates
- *
  */
 @Entity
 public class Entry implements Comparable<Entry> {
+
+	private static final Logger logger = Logger.getLogger(Entry.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
@@ -57,17 +59,22 @@ public class Entry implements Comparable<Entry> {
 	/**
 	 * Short description of event. Displayed in main expert view
 	 */
-	@Column(columnDefinition = "varchar(4000)")
-	private String content;
+	@JsonProperty("content")
+	@Column(columnDefinition = "varchar(30)", name = "title")
+	private String title;
+
+	@JsonIgnore
+	@Column(columnDefinition = "varchar(4000)", name = "description")
+	private String description;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "start_date")
-    @Index(name = "idx_startdate")
+	@Index(name = "idx_startdate")
 	private Date start;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "end_date")
-    @Index(name = "idx_enddate")
+	@Index(name = "idx_enddate")
 	private Date end;
 
 	/**
@@ -127,12 +134,16 @@ public class Entry implements Comparable<Entry> {
 		this.id = id;
 	}
 
-	public String getContent() {
-		return content;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setTitle(String title) {
+		if (title.length() > 30) {
+			logger.info("Title too long: " + title + ", trimming to : " + title.substring(0, 30));
+			title = title.substring(0, 30);
+		}
+		this.title = title;
 	}
 
 	public Date getStart() {
@@ -179,7 +190,7 @@ public class Entry implements Comparable<Entry> {
 
 	@Override
 	public String toString() {
-		return "Entry [show=" + show + ", state=" + state + ", id=" + id + ", content=" + content + ", start=" + start
+		return "Entry [show=" + show + ", state=" + state + ", id=" + id + ", content=" + title + ", start=" + start
 				+ ", end=" + end + ", group=" + group + ", className=" + className + "]";
 	}
 
@@ -199,13 +210,12 @@ public class Entry implements Comparable<Entry> {
 		this.finishedContext = finishedContext;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((className == null) ? 0 : className.hashCode());
-		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		result = prime * result + (int) (duration ^ (duration >>> 32));
 		result = prime * result + ((end == null) ? 0 : end.hashCode());
 		result = prime * result + ((group == null) ? 0 : group.hashCode());
@@ -229,10 +239,10 @@ public class Entry implements Comparable<Entry> {
 				return false;
 		} else if (!className.equals(other.className))
 			return false;
-		if (content == null) {
-			if (other.content != null)
+		if (title == null) {
+			if (other.title != null)
 				return false;
-		} else if (!content.equals(other.content))
+		} else if (!title.equals(other.title))
 			return false;
 		if (duration != other.duration)
 			return false;
@@ -256,5 +266,13 @@ public class Entry implements Comparable<Entry> {
 		if (state != other.state)
 			return false;
 		return true;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

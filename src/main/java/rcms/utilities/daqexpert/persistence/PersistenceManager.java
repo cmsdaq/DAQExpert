@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.persistence;
 
-import java.io.FileInputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,7 +20,6 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
@@ -290,7 +288,7 @@ public class PersistenceManager {
 			Entry curr = new Entry();
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
-			curr.setContent(Long.toString(mapObject.getCount()));
+			curr.setTitle(Long.toString(mapObject.getCount()));
 			curr.setGroup(mapObject.getGroup());
 			curr.setClassName(EventPriority.FILTERED.getCode());
 			curr.calculateDuration();
@@ -392,7 +390,7 @@ public class PersistenceManager {
 		entityManager.getTransaction().begin();
 		List<Entry> result = entityManager.createQuery("from Entry", Entry.class).getResultList();
 		for (Entry event : result) {
-			System.out.println("Event (" + event.getStart() + ") : " + event.getContent());
+			System.out.println("Event (" + event.getStart() + ") : " + event.getTitle());
 		}
 		entityManager.getTransaction().commit();
 		entityManager.close();

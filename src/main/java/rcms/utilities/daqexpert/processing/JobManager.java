@@ -118,7 +118,7 @@ public class JobManager {
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
-		entry.setContent(version);
+		entry.setTitle(version);
 		this.persistenceManager.persist(entry);
 	}
 

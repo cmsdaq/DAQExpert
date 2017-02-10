@@ -40,35 +40,9 @@ public class RaportAPI extends HttpServlet {
 
 			Entry entry = Application.get().getPersistenceManager().getEntryById(id);
 
-			String description;
-			List<String> actionSteps;
-			LogicModule eventFinder = entry.getEventFinder();
 
-			/* Case of Extended condition */
-			if (eventFinder instanceof ActionLogicModule) {
-				ActionLogicModule extendedCondition = (ActionLogicModule) eventFinder;
-				Context context = entry.getFinishedContext();
-				if (context != null) {
-					description = context.getMessageWithContext(extendedCondition.getDescription());
-					actionSteps = context.getActionWithContext(extendedCondition.getAction());
-
-				} else {
-					description = extendedCondition.getDescription();
-					actionSteps = extendedCondition.getAction().getSteps();
-				}
-
-				result.put("description", description);
-				result.put("action", actionSteps);
-				result.put("elements", entry.getFinishedContext().getContext());
-			}
-
-			/* case of every other condition */
-			else {
-				description = eventFinder.getDescription();
-			}
-
-			result.put("description", description);
-			result.put("name", entry.getContent());
+			result.put("description", entry.getDescription());
+			result.put("name", entry.getTitle());
 			result.put("duration", entry.getDuration());
 
 			String json = objectMapper.writeValueAsString(result);

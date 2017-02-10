@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -381,6 +382,12 @@ public class PersistenceManager {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Entry entry = entityManager.find(Entry.class, id);
+		
+		/* Make sure to fetch all list - but dont want to annotate the main class to be EAGER always */
+		Iterator<String> it = entry.getActionSteps().iterator();
+		while(it.hasNext()){
+			it.next();
+		}
 		entityManager.close();
 		return entry;
 	}

@@ -1,12 +1,16 @@
 package rcms.utilities.daqexpert.persistence;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -55,6 +59,12 @@ public class Entry implements Comparable<Entry> {
 	@JsonIgnore
 	@Transient
 	private Context finishedContext;
+
+	@JsonIgnore
+	@ElementCollection
+	@CollectionTable(name = "Action", joinColumns = @JoinColumn(name = "entry_id"))
+	@Column(name = "action")
+	private List<String> actionSteps;
 
 	/**
 	 * Short description of event. Displayed in main expert view
@@ -274,5 +284,13 @@ public class Entry implements Comparable<Entry> {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<String> getActionSteps() {
+		return actionSteps;
+	}
+
+	public void setActionSteps(List<String> actionSteps) {
+		this.actionSteps = actionSteps;
 	}
 }

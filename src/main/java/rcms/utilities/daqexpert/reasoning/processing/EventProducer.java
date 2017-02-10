@@ -132,12 +132,19 @@ public class EventProducer {
 			leftResult = true;
 		}
 		result.setEventFinder(classificable);
-		
-		if(value){
+
+		if (value) {
 			if (classificable instanceof ActionLogicModule) {
+				ActionLogicModule alm = (ActionLogicModule) classificable;
 				logger.info("Putting message into context: " + classificable.getDescription());
-				result.setDescription(((ActionLogicModule) classificable).getContext()
-						.getMessageWithContext(classificable.getDescription()));
+				if (result.getDescription() == null) {
+					result.setDescription(alm.getContext().getMessageWithContext(classificable.getDescription()));
+				}
+				if (result.getActionSteps() == null) {
+					result.setActionSteps(
+							alm.getContext().getActionWithContext(((ActionLogicModule) classificable).getAction()));
+				}
+
 			} else {
 				result.setDescription(classificable.getDescription());
 
@@ -146,7 +153,6 @@ public class EventProducer {
 		return Pair.of(leftResult, result);
 	}
 
-	
 	protected Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
 			EventPriority eventClass, Context context) {
 
@@ -171,8 +177,6 @@ public class EventProducer {
 		entry.setShow(value);
 		entry.setStart(date);
 		entry.setGroup(level.getCode());
-		
-		
 
 		// result.add(entry);
 

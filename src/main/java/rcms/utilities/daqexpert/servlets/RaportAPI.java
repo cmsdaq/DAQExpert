@@ -1,8 +1,9 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -16,9 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -44,6 +42,8 @@ public class RaportAPI extends HttpServlet {
 			result.put("description", entry.getDescription());
 			result.put("name", entry.getTitle());
 			result.put("duration", entry.getDuration());
+			
+			result.put("action", entry.getActionSteps());
 
 			String json = objectMapper.writeValueAsString(result);
 			// TODO: externalize the Allow-Origin

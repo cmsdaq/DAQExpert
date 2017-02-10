@@ -53,6 +53,11 @@
 	background-image: unset;
 }
 
+.vis-item.red {
+	background-color: rgba(255, 0, 0, 0.1);
+	background-image: unset;
+}
+
 .vis-item.experimental {
 	background-image: linear-gradient(to bottom,#5cb85c 0,#4cae4c 100%);
 	border-color: #4cae4c;

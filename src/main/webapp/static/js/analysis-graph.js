@@ -388,6 +388,10 @@ function load(data, fakeEnd) {
 	items.add({id: 'bg-2016-ts2', start: '2016-09-12', end: '2016-09-16', content:'TS2', type: 'background', className: 'green'});
 	items.add({id: 'bg-2016-ts3', start: '2016-10-31', end: '2016-11-04', content:'TS3', type: 'background', className: 'green'});
 	items.add({id: 'bg-2016-eyets', start: '2016-12-05', end: '2017-04-23', content:'EYETS', type: 'background', className: 'green'});
+	
+	items.add({id: 'bg-2017-mwgr1', start: '2017-02-08', end: '2017-02-10', content:'MWGR1', type: 'background', className: 'red'});
+	items.add({id: 'bg-2017-mwgr2', start: '2017-03-01', end: '2017-03-03', content:'MWGR2', type: 'background', className: 'red'});
+	items.add({id: 'bg-2017-mwgr3', start: '2017-03-15', end: '2017-03-17', content:'MWGR3', type: 'background', className: 'red'});
 	items.add(visibleData);
 
 };

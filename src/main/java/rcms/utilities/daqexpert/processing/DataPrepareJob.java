@@ -57,31 +57,35 @@ public class DataPrepareJob implements Runnable {
 			if (!readerJob.finished()) {
 				snapshots = readerJob.read();
 
-				if (priority == Integer.MAX_VALUE)
-					priority = 0;
-				else
-					priority++;
+				if (snapshots.getRight().size() > 0) {
 
-				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager, snapshotProcessor);
-				Future<Pair<Set<Entry>, List<Point>>> future = executorService.submit(processJob);
+					if (priority == Integer.MAX_VALUE)
+						priority = 0;
+					else
+						priority++;
 
-				Pair<Set<Entry>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
-				try {
+					ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager,
+							snapshotProcessor);
+					Future<Pair<Set<Entry>, List<Point>>> future = executorService.submit(processJob);
 
-					long t1 = System.currentTimeMillis();
-					persistenceManager.persist(result.getLeft());
-					long t2 = System.currentTimeMillis();
-					persistenceManager.persist(result.getRight());
-					long t3 = System.currentTimeMillis();
+					Pair<Set<Entry>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
+					try {
 
-					logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
-							+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
-							+ (t3 - t2) + "ms");
+						long t1 = System.currentTimeMillis();
+						persistenceManager.persist(result.getLeft());
+						long t2 = System.currentTimeMillis();
+						persistenceManager.persist(result.getRight());
+						long t3 = System.currentTimeMillis();
 
-				} catch (RuntimeException e) {
-					logger.warn("Exception during result persistence - results will be forgotten");
-					logger.error(e);
-					e.printStackTrace();
+						logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
+								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
+								+ (t3 - t2) + "ms");
+
+					} catch (RuntimeException e) {
+						logger.warn("Exception during result persistence - results will be forgotten");
+						logger.error(e);
+						e.printStackTrace();
+					}
 				}
 
 			}

@@ -65,8 +65,8 @@ public class Context implements Serializable {
 		} else if (actionn instanceof SimpleAction) {
 			actionSteps = actionn.getSteps();
 		}
-		logger.info("Putting context into action: " + actionSteps);
-		logger.info("Context to be used: " + context);
+		logger.debug("Putting context into action: " + actionSteps);
+		logger.debug("Context to be used: " + context);
 
 		if (actionSteps != null) {
 			List<String> actionStepsWithContext = new ArrayList<>();
@@ -126,12 +126,12 @@ public class Context implements Serializable {
 
 	public String getMessageWithContext(String message) {
 
-		logger.info("Putting context into message: " + message);
-		logger.info("Context to be used: " + context);
+		logger.debug("Putting context into message: " + message);
+		logger.debug("Context to be used: " + context);
 
 		String newMessage = putContext(message);
 
-		logger.info("Message with context: " + newMessage);
+		logger.debug("Message with context: " + newMessage);
 
 		return newMessage;
 	}

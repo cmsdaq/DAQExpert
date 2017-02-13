@@ -136,7 +136,7 @@ public class EventProducer {
 		if (value) {
 			if (classificable instanceof ActionLogicModule) {
 				ActionLogicModule alm = (ActionLogicModule) classificable;
-				logger.info("Putting message into context: " + classificable.getDescription());
+				logger.debug("Putting message into context: " + classificable.getDescription());
 				if (result.getDescription() == null) {
 					result.setDescription(alm.getContext().getMessageWithContext(classificable.getDescription()));
 				}

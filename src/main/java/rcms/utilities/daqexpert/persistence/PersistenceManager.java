@@ -114,7 +114,7 @@ public class PersistenceManager {
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
 
-		logger.info("resolution of data to RAW API " + resolution);
+		logger.debug("resolution of data to RAW API " + resolution);
 
 		// extend slightly timespan so that few snapshots more on the left and
 		// right are loaded to the chart - avoid cutting the chart lines

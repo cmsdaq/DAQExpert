@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 
 public class ReasonsAPI extends HttpServlet {
@@ -50,11 +50,11 @@ public class ReasonsAPI extends HttpServlet {
 		logger.trace("Parsed range from : " + startDate + " to " + endDate);
 		Map<String, Object> result = new HashMap<>();
 
-		List<Entry> entryList = new ArrayList<>();
+		List<Condition> entryList = new ArrayList<>();
 
 		Map<String, Long> durations = new HashMap<>();
 
-		Collection<Entry> allElements = null;
+		Collection<Condition> allElements = null;
 		if (experimentalKey == null || experimentalKey.equals("standard")) {
 			logger.debug("API runs in standard mode");
 			allElements = Application.get().getPersistenceManager().getEntriesWithMask(startDate, endDate);
@@ -67,7 +67,7 @@ public class ReasonsAPI extends HttpServlet {
 
 			logger.debug("There are " + allElements + " in Database");
 
-			for (Entry entry : allElements) {
+			for (Condition entry : allElements) {
 
 				try {
 

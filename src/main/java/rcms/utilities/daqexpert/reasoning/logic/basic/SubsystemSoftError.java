@@ -4,17 +4,16 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
-public class SubsystemSoftError extends ActionLogicModule {
+public class SubsystemSoftError extends ContextLogicModule {
 
 	public SubsystemSoftError() {
 		this.name = "Subsystem soft error detected";
 		this.description = "{{SUBSYSTEM}} subsystem is in soft error detected";
-		this.action = new SimpleAction("");
 		this.group = EventGroup.SUBSYS_SOFT_ERR;
 		this.priority = EventPriority.DEFAULTT;
 		this.setNotificationPlay(true);

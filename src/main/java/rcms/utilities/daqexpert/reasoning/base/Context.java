@@ -25,6 +25,7 @@ public class Context implements Serializable {
 	private Map<String, Set<Object>> context;
 
 	private Set<String> actionKey;
+	
 
 	public Context() {
 		this.context = new HashMap<>();
@@ -39,8 +40,13 @@ public class Context implements Serializable {
 		if (!context.get(key).contains(object)) {
 			context.get(key).add(object);
 		}
+		
+		
 	}
 
+	/**
+	 * Called when Condition ends
+	 */
 	public void clearContext() {
 		this.context = new HashMap<>();
 		this.actionKey = new HashSet<>();

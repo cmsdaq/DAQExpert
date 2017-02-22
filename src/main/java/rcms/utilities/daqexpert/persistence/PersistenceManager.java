@@ -61,11 +61,11 @@ public class PersistenceManager {
 	 * 
 	 * @param entries
 	 */
-	public void persist(Set<Entry> entries) {
+	public void persist(Set<Condition> entries) {
 
 		EntityTransaction tx = entryEntityManager.getTransaction();
 		tx.begin();
-		for (Entry point : entries) {
+		for (Condition point : entries) {
 
 			if (point.isShow())
 				entryEntityManager.persist(point);
@@ -78,7 +78,7 @@ public class PersistenceManager {
 	 * 
 	 * @param entry
 	 */
-	public void persist(Entry entry) {
+	public void persist(Condition entry) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
@@ -153,13 +153,13 @@ public class PersistenceManager {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Entry> getEntries(Date startDate, Date endDate, long durationThreshold,
+	public List<Condition> getEntries(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
 		// TODO: close session?
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
-		Criteria elementsCriteria = session.createCriteria(Entry.class);
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
 		// elementsCriteria.addOrder(Order.desc("start"));
 
 		Disjunction disjunction = Restrictions.disjunction();
@@ -182,7 +182,7 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));
 
-		List<Entry> result = elementsCriteria.list();
+		List<Condition> result = elementsCriteria.list();
 		entityManager.close();
 
 		return result;
@@ -263,7 +263,7 @@ public class PersistenceManager {
 	 * @param endDate
 	 * @return
 	 */
-	public List<Entry> getEntriesWithMask(Date startDate, Date endDate) {
+	public List<Condition> getEntriesWithMask(Date startDate, Date endDate) {
 		DataResolution dr = RangeResolver.resolve(startDate, endDate);
 		/*
 		 * minimum width for filtering the blocks is calculated based on this.
@@ -277,7 +277,7 @@ public class PersistenceManager {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 
-		List<Entry> thresholdData = getEntriesThreshold(startDate, endDate, durationThreshold);
+		List<Condition> thresholdData = getEntriesThreshold(startDate, endDate, durationThreshold);
 		logger.debug("Data resolution: " + dr);
 		logger.debug("Retrieved " + thresholdData.size() + " thresholded entries");
 
@@ -286,7 +286,7 @@ public class PersistenceManager {
 		logger.debug("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
 
 		for (TinyEntryMapObject mapObject : tinyData) {
-			Entry curr = new Entry();
+			Condition curr = new Condition();
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
 			curr.setTitle(Long.toString(mapObject.getCount()));
@@ -311,18 +311,18 @@ public class PersistenceManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Entry> getEntries2(Date startDate, Date endDate, long durationThreshold,
+	public List<Condition> getEntries2(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Entry> cq = cb.createQuery(Entry.class);
-		Root<Entry> entry = cq.from(Entry.class);
+		CriteriaQuery<Condition> cq = cb.createQuery(Condition.class);
+		Root<Condition> entry = cq.from(Condition.class);
 		cq.groupBy(entry.get("group_name"));
 
-		Criteria elementsCriteria = session.createCriteria(Entry.class);
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
 		// elementsCriteria.addOrder(Order.desc("start"));
 
 		Disjunction disjunction = Restrictions.disjunction();
@@ -349,7 +349,7 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));
 
-		List<Entry> result = elementsCriteria.list();
+		List<Condition> result = elementsCriteria.list();
 		entityManager.close();
 		return result;
 	}
@@ -361,7 +361,7 @@ public class PersistenceManager {
 	 * @param endDate
 	 * @return
 	 */
-	public List<Entry> getEntriesPlain(Date startDate, Date endDate) {
+	public List<Condition> getEntriesPlain(Date startDate, Date endDate) {
 		return getEntries(startDate, endDate, 0, false);
 	}
 
@@ -373,15 +373,15 @@ public class PersistenceManager {
 	 * @param threshold
 	 * @return
 	 */
-	public List<Entry> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
+	public List<Condition> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
 		return getEntries(startDate, endDate, threshold, false);
 	}
 
-	public Entry getEntryById(Long id) {
+	public Condition getEntryById(Long id) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Entry entry = entityManager.find(Entry.class, id);
+		Condition entry = entityManager.find(Condition.class, id);
 		
 		/* Make sure to fetch all list - but dont want to annotate the main class to be EAGER always */
 		Iterator<String> it = entry.getActionSteps().iterator();
@@ -392,11 +392,11 @@ public class PersistenceManager {
 		return entry;
 	}
 
-	public List<Entry> getEntries2(Date start, Date end) {
+	public List<Condition> getEntries2(Date start, Date end) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
-		List<Entry> result = entityManager.createQuery("from Entry", Entry.class).getResultList();
-		for (Entry event : result) {
+		List<Condition> result = entityManager.createQuery("from Entry", Condition.class).getResultList();
+		for (Condition event : result) {
 			System.out.println("Event (" + event.getStart() + ") : " + event.getTitle());
 		}
 		entityManager.getTransaction().commit();

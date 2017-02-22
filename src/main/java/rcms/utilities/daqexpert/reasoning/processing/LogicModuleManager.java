@@ -15,7 +15,7 @@ import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
@@ -63,7 +63,7 @@ public class LogicModuleManager {
 
 	private final List<ComparatorLogicModule> comparators = new ArrayList<>();
 
-	private final EventProducer eventProducer;
+	private final ConditionProducer conditionProducer;
 
 	private ExperimentalProcessor experimentalProcessor;
 	private boolean artificialForced;
@@ -75,7 +75,7 @@ public class LogicModuleManager {
 	 * @param daq
 	 *            daq object to analyze
 	 */
-	public LogicModuleManager(EventProducer eventProducer) {
+	public LogicModuleManager(ConditionProducer conditionProducer) {
 
 		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
 		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
@@ -84,7 +84,7 @@ public class LogicModuleManager {
 				.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION));
 		int thresholdTotal = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL));
 
-		this.eventProducer = eventProducer;
+		this.conditionProducer = conditionProducer;
 		// Level 0 Independent
 		checkers.add(new RateOutOfRange(level0RateMin, level0RateMax));
 		checkers.add(new NoRate());
@@ -148,9 +148,9 @@ public class LogicModuleManager {
 	 *            current snapshot
 	 * @return results of logic modules analysis
 	 */
-	public List<Entry> runLogicModules(DAQ daq, boolean includeExperimental) {
+	public List<Condition> runLogicModules(DAQ daq, boolean includeExperimental) {
 
-		List<Entry> results = new ArrayList<>();
+		List<Condition> results = new ArrayList<>();
 
 		logger.debug("Running analysis modules for run " + daq.getSessionId());
 
@@ -166,10 +166,10 @@ public class LogicModuleManager {
 	 * @param daq
 	 *            current snapshot
 	 * @param includeExperimental
-	 * @return results of checkers analysis
+	 * @return results of checkers analysis including
 	 */
-	private List<Entry> runCheckers(DAQ daq, boolean includeExperimental) {
-		List<Entry> results = new ArrayList<>();
+	private List<Condition> runCheckers(DAQ daq, boolean includeExperimental) {
+		List<Condition> results = new ArrayList<>();
 		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
 
 		for (SimpleLogicModule checker : checkers) {
@@ -190,21 +190,29 @@ public class LogicModuleManager {
 			}
 
 		}
-		results.addAll(eventProducer.getFinishedThisRound());
-		eventProducer.clearFinishedThisRound();
+		results.addAll(conditionProducer.getFinishedThisRound());
+		conditionProducer.clearFinishedThisRound();
 
 		return results;
 	}
 
+	/**
+	 * 
+	 * @param checkerResultMap
+	 * @param checker
+	 * @param result
+	 * @param daq
+	 * @param results
+	 */
 	private void postprocess(Map<String, Boolean> checkerResultMap, LogicModule checker, boolean result, DAQ daq,
-			List<Entry> results) {
+			List<Condition> results) {
 		Date curr = null;
 		checkerResultMap.put(checker.getClass().getSimpleName(), result);
 		curr = new Date(daq.getLastUpdate());
 
 		if (checker instanceof SimpleLogicModule) {
 			SimpleLogicModule simpleChecker = (SimpleLogicModule) checker;
-			Pair<Boolean, Entry> produceResult = eventProducer.produce(simpleChecker, result, curr);
+			Pair<Boolean, Condition> produceResult = conditionProducer.produce(simpleChecker, result, curr);
 
 			/*
 			 * The event finishes (result = false), Context to be cleared for
@@ -231,8 +239,8 @@ public class LogicModuleManager {
 	 *            current snapshot
 	 * @return results of checkers analysis
 	 */
-	private List<Entry> runComparators(DAQ daq) {
-		List<Entry> results = new ArrayList<>();
+	private List<Condition> runComparators(DAQ daq) {
+		List<Condition> results = new ArrayList<>();
 		for (ComparatorLogicModule comparator : comparators) {
 			logger.trace("Running comparator " + comparator.getClass().getSimpleName());
 			Date last = null;
@@ -249,7 +257,7 @@ public class LogicModuleManager {
 			boolean result = comparator.compare(daq);
 			Date current = new Date(comparator.getLast().getLastUpdate());
 
-			Pair<Boolean, Entry> produced = eventProducer.produce(comparator, result, last, current);
+			Pair<Boolean, Condition> produced = conditionProducer.produce(comparator, result, last, current);
 			if (produced.getLeft()) {
 				logger.trace(produced.getRight());
 				results.add(produced.getRight());

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -65,7 +65,7 @@ public class NotificationSignalSender {
 	 * 
 	 * @param entry
 	 */
-	public void send(Entry entry) {
+	public void send(Condition entry) {
 
 		if (!isPastSnapshot(entry.getStart().getTime())) {
 			if (entry.getEventFinder().isNotificationDisplay() || entry.getEventFinder().isNotificationPlay()) {
@@ -112,7 +112,7 @@ public class NotificationSignalSender {
 	 * @param event
 	 * @return
 	 */
-	private int sendStartSignal(Entry event) {
+	private int sendStartSignal(Condition event) {
 
 		logger.debug("Sending start signal");
 
@@ -169,7 +169,7 @@ public class NotificationSignalSender {
 
 	}
 
-	private void sendEndSignal(Entry entry) {
+	private void sendEndSignal(Condition entry) {
 		FinishNotification finishNotification = new FinishNotification();
 		finishNotification.setId(entry.getId());
 		finishNotification.setDate(entry.getEnd());

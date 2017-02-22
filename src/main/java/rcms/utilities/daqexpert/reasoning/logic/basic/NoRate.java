@@ -4,20 +4,20 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
  * This logic module identifies no rate condition in DAQ
  */
-public class NoRate extends ActionLogicModule {
+public class NoRate extends SimpleLogicModule {
 
 	public NoRate() {
 		this.name = "No rate";
 		this.group = EventGroup.NO_RATE;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "Rate value is 0";
-		this.action = null;
 	}
 
 	/**

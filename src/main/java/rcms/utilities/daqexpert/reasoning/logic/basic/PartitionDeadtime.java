@@ -5,14 +5,14 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
  * This logic module identifies partition deadtime
  */
-public class PartitionDeadtime extends ActionLogicModule {
+public class PartitionDeadtime extends ContextLogicModule {
 
 	private final float threshold;
 

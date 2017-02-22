@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
@@ -27,24 +27,24 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class EventProducer {
+public class ConditionProducer {
 
-	public EventProducer() {
+	public ConditionProducer() {
 		unfinished = new HashMap<>();
 		states = new HashMap<>();
 		finishedThisRound = new ArrayList<>();
 	}
 
 	/** Logger */
-	private static final Logger logger = Logger.getLogger(EventProducer.class);
+	private static final Logger logger = Logger.getLogger(ConditionProducer.class);
 
 	/** All events without end date are kept here (unfinished) */
-	private final Map<String, Entry> unfinished;
+	private final Map<String, Condition> unfinished;
 
 	/** Current states are kept here */
 	private final Map<String, Boolean> states;
 
-	private final List<Entry> finishedThisRound;
+	private final List<Condition> finishedThisRound;
 
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
@@ -52,14 +52,14 @@ public class EventProducer {
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	public Set<Entry> finish(Date date) {
+	public Set<Condition> finish(Date date) {
 
 		logger.debug("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finishedTR: " + finishedThisRound);
 
-		Set<Entry> result = new HashSet<>();
+		Set<Condition> result = new HashSet<>();
 
-		for (Entry entry : unfinished.values()) {
+		for (Condition entry : unfinished.values()) {
 			entry.setEnd(date);
 			entry.calculateDuration();
 
@@ -75,7 +75,7 @@ public class EventProducer {
 	 * Produces events for value 111000111000 will produce 2 events
 	 * corresponding to 1 start and end time
 	 */
-	public Pair<Boolean, Entry> produce(SimpleLogicModule checker, boolean value, Date date) {
+	public Pair<Boolean, Condition> produce(SimpleLogicModule checker, boolean value, Date date) {
 		return produce(checker, value, date, checker.getGroup());
 	}
 
@@ -83,12 +83,12 @@ public class EventProducer {
 	 * 00000100000100000100 will produce 3 events corresponding to 1 start and
 	 * ending on next 1 start
 	 */
-	public Pair<Boolean, Entry> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
+	public Pair<Boolean, Condition> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
 			produce(comparator, !value, current, comparator.getGroup());
-			Pair<Boolean, Entry> b = produce(comparator, value, current, comparator.getGroup());
+			Pair<Boolean, Condition> b = produce(comparator, value, current, comparator.getGroup());
 			b.getRight().setShow(true);
 
 			logger.trace("Result for comparator LM: " + b.getLeft());
@@ -99,7 +99,7 @@ public class EventProducer {
 
 	}
 
-	private Pair<Boolean, Entry> produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
+	private Pair<Boolean, Condition> produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
 		// get current state
 		String className = classificable.getClass().getSimpleName();
 		String content = classificable.getName();
@@ -112,7 +112,7 @@ public class EventProducer {
 		}
 
 		Boolean leftResult = false;
-		Entry result = null;
+		Condition result = null;
 		if (states.containsKey(className)) {
 			boolean currentState = states.get(className);
 
@@ -153,12 +153,12 @@ public class EventProducer {
 		return Pair.of(leftResult, result);
 	}
 
-	protected Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
+	protected Condition finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
 			EventPriority eventClass, Context context) {
 
 		/* finish old entry */
 		if (unfinished.containsKey(className)) {
-			Entry toFinish = unfinished.get(className);
+			Condition toFinish = unfinished.get(className);
 			toFinish.setState(EntryState.FINISHED);
 			toFinish.setEnd(date);
 			toFinish.calculateDuration();
@@ -171,7 +171,7 @@ public class EventProducer {
 		}
 
 		/* add new entry */
-		Entry entry = new Entry();
+		Condition entry = new Condition();
 		entry.setClassName(eventClass.getCode());
 		entry.setTitle(content);
 		entry.setShow(value);
@@ -190,7 +190,7 @@ public class EventProducer {
 		return "EventProducer [states=" + states + ", unfinished=" + unfinished + "]";
 	}
 
-	public List<Entry> getFinishedThisRound() {
+	public List<Condition> getFinishedThisRound() {
 		return finishedThisRound;
 	}
 
@@ -208,7 +208,7 @@ public class EventProducer {
 		finishedThisRound.clear();
 	}
 
-	protected Map<String, Entry> getUnfinished() {
+	protected Map<String, Condition> getUnfinished() {
 		return unfinished;
 	}
 

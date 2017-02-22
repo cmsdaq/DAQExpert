@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.segmentation.DAQConverter;
@@ -27,13 +27,13 @@ public class DataManager {
 
 	private Date lastUpdate;
 
-	public Map<String, Set<Entry>> experimental;
+	public Map<String, Set<Condition>> experimental;
 
 	private final DataResolutionManager dataResolutionManager;
 
 	public DataManager() {
 		experimental = new HashMap<>();
-		experimental.put("test", new HashSet<Entry>());
+		experimental.put("test", new HashSet<Condition>());
 
 		StreamProcessor minuteStreamProcessor = new StreamProcessor(new LinearSegmentator(SegmentationSettings.Minute),
 				SegmentationSettings.Minute);

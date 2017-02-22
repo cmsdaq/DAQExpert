@@ -27,15 +27,17 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
  * 
- * Base object of analysis result.
+ * Base object of analysis result. Shows LM results in time
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  * 
  */
 @Entity
-public class Entry implements Comparable<Entry> {
+public class Condition implements Comparable<Condition> {
 
-	private static final Logger logger = Logger.getLogger(Entry.class);
+	private static final Logger logger = Logger.getLogger(Condition.class);
+	
+	private EventProducer eventProducer;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
@@ -62,7 +64,7 @@ public class Entry implements Comparable<Entry> {
 
 	@JsonIgnore
 	@ElementCollection
-	@CollectionTable(name = "Action", joinColumns = @JoinColumn(name = "entry_id"))
+	@CollectionTable(name = "Action", joinColumns = @JoinColumn(name = "condition_id"))
 	@Column(name = "action")
 	private List<String> actionSteps;
 
@@ -118,9 +120,10 @@ public class Entry implements Comparable<Entry> {
 		this.show = show;
 	}
 
-	public Entry() {
+	public Condition() {
 		show = true;
 		this.state = EntryState.NEW;
+		
 	}
 
 	/**
@@ -173,7 +176,7 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	@Override
-	public int compareTo(Entry arg0) {
+	public int compareTo(Condition arg0) {
 		return (int) (this.duration - arg0.duration);
 	}
 
@@ -243,7 +246,7 @@ public class Entry implements Comparable<Entry> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Entry other = (Entry) obj;
+		Condition other = (Condition) obj;
 		if (className == null) {
 			if (other.className != null)
 				return false;
@@ -292,5 +295,13 @@ public class Entry implements Comparable<Entry> {
 
 	public void setActionSteps(List<String> actionSteps) {
 		this.actionSteps = actionSteps;
+	}
+
+	public EventProducer getEventProducer() {
+		return eventProducer;
+	}
+
+	public void setEventProducer(EventProducer eventProducer) {
+		this.eventProducer = eventProducer;
 	}
 }

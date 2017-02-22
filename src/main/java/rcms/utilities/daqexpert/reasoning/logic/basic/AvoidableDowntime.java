@@ -4,20 +4,21 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
  * This logic module identifies no rate condition in DAQ
  */
-public class AvoidableDowntime extends ActionLogicModule {
+public class AvoidableDowntime extends SimpleLogicModule {
 
 	public AvoidableDowntime() {
 		this.name = "Avoidable Downtime";
 		this.group = EventGroup.AVOIDABLE_DOWNTIME;
 		this.priority = EventPriority.DEFAULTT;
 		this.description = "No rate and no recovery action is being executed during stable beams";
-		this.action = null;
 	}
 
 	/**

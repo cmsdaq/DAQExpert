@@ -5,14 +5,14 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
 
 /**
  * This logic module identifies individual FED deadtime
  */
-public class FEDDeadtime extends ActionLogicModule {
+public class FEDDeadtime extends ContextLogicModule {
 
 	private final float threshold;
 
@@ -28,7 +28,7 @@ public class FEDDeadtime extends ActionLogicModule {
 	/**
 	 * Dead time when greater than 5%
 	 */
-	@Override
+	@Override	
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean transition = false;

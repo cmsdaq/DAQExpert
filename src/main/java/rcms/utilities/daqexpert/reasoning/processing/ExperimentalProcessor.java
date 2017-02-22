@@ -71,7 +71,8 @@ public class ExperimentalProcessor {
 	 * 
 	 * @param daq
 	 * @param checkerResultMap
-	 * @return
+	 * @return returns results of all logic modules as list of pairs
+	 *         [LM;satisfied]
 	 */
 	public List<Pair<LogicModule, Boolean>> runLogicModules(DAQ daq, Map<String, Boolean> checkerResultMap) {
 
@@ -176,19 +177,19 @@ public class ExperimentalProcessor {
 				logger.info("Groovy returned non-boolean value: " + gresult + ", cannot add to results");
 			}
 		} catch (IllegalAccessException e) {
-      logger.error("caught exception while running experimental script:", e);
+			logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (IllegalArgumentException e) {
-      logger.error("caught exception while running experimental script:", e);
+			logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (InvocationTargetException e) {
-      logger.error("caught exception while running experimental script:", e);
+			logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (NoSuchMethodException e) {
-      logger.error("caught exception while running experimental script:", e);
+			logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		} catch (SecurityException e) {
-      logger.error("caught exception while running experimental script:", e);
+			logger.error("caught exception while running experimental script:", e);
 			throw new ExpertException(ExpertExceptionCode.ExperimentalReasoningProblem, e.getMessage());
 		}
 		return null;

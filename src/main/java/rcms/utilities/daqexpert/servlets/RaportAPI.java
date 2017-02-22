@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -36,7 +36,7 @@ public class RaportAPI extends HttpServlet {
 
 			Map<String, Object> result = new HashMap<>();
 
-			Entry entry = Application.get().getPersistenceManager().getEntryById(id);
+			Condition entry = Application.get().getPersistenceManager().getEntryById(id);
 
 
 			result.put("description", entry.getDescription());

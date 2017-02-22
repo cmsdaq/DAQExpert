@@ -65,7 +65,7 @@ public class PersistenceManagerTest {
 
 		int num = 0;//1000000;
 		Long start = System.currentTimeMillis();	
-		Set<Entry> testData = new HashSet<Entry>();
+		Set<Condition> testData = new HashSet<Condition>();
 		for(int i=0; i<num; i++){
 			cal.add(Calendar.MILLISECOND, 100 );
 			Date endDate = cal.getTime();
@@ -89,7 +89,7 @@ public class PersistenceManagerTest {
 
 		Date ts = DatatypeConverter.parseDateTime("2017-01-17T10:30:00Z").getTime();
 		Date te = DatatypeConverter.parseDateTime("2017-01-17T11:30:00Z").getTime();
-		List<Entry> result = pm.getEntriesPlain(ts, te);
+		List<Condition> result = pm.getEntriesPlain(ts, te);
 
 		Assert.assertEquals(3, result.size());
 
@@ -97,7 +97,7 @@ public class PersistenceManagerTest {
 		Date te2 = DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime();
 		result = pm.getEntriesPlain(ts2, te2);
 		Assert.assertEquals(1, result.size());
-		Entry retrievedEntry = result.iterator().next();
+		Condition retrievedEntry = result.iterator().next();
 		
 		Assert.assertEquals("test1", retrievedEntry.getClassName());
 		Assert.assertEquals(DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime(), retrievedEntry.getEnd());
@@ -112,10 +112,10 @@ public class PersistenceManagerTest {
 		Date ts = DatatypeConverter.parseDateTime("2017-01-17T10:30:00Z").getTime();
 		Date te = DatatypeConverter.parseDateTime("2017-01-17T13:30:00Z").getTime();
 
-		List<Entry> resultWithoutLimit = pm.getEntriesPlain(ts, te);
+		List<Condition> resultWithoutLimit = pm.getEntriesPlain(ts, te);
 		Assert.assertEquals(6, resultWithoutLimit.size());
 
-		List<Entry> resultWithLimit = pm.getEntriesThreshold(ts, te, 5000);
+		List<Condition> resultWithLimit = pm.getEntriesThreshold(ts, te, 5000);
 		Assert.assertEquals(2, resultWithLimit.size());
 
 	}
@@ -189,8 +189,8 @@ public class PersistenceManagerTest {
 		pm.persist(test);
 	}
 
-	private static Entry getFinishedEntry(Date startDate, String name, int duration) {
-		Entry entry = new Entry();
+	private static Condition getFinishedEntry(Date startDate, String name, int duration) {
+		Condition entry = new Condition();
 		entry.setClassName(name);
 		entry.setTitle("Content of entry: " + name);
 		entry.setStart(startDate);

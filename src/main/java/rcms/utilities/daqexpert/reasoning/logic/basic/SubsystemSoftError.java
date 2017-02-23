@@ -6,16 +6,15 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class SubsystemSoftError extends ContextLogicModule {
 
 	public SubsystemSoftError() {
 		this.name = "Subsystem soft error detected";
 		this.description = "{{SUBSYSTEM}} subsystem is in soft error detected";
-		this.group = EventGroup.SUBSYS_SOFT_ERR;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.setNotificationPlay(true);
 		this.setNotificationDisplay(true);
 	}

@@ -27,7 +27,8 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
@@ -180,7 +181,7 @@ public class PersistenceManager {
 		elementsCriteria.add(disjunction);
 
 		// Events not hidden
-		elementsCriteria.add(Restrictions.ne("group", "hidden"));
+		elementsCriteria.add(Restrictions.ne("group", ConditionGroup.HIDDEN));
 
 		List<Condition> result = elementsCriteria.list();
 		entityManager.close();
@@ -195,7 +196,7 @@ public class PersistenceManager {
 
 		List<TinyEntryMapObject> resultTiny = new ArrayList<TinyEntryMapObject>();
 		StringBuilder sb = new StringBuilder();
-		sb.append("select e.group, count(e.id), min(e.start), max(e.end) from Entry e ");
+		sb.append("select e.group, count(e.id), min(e.start), max(e.end) from Condition e ");
 		sb.append("where duration < :threshold ");
 		sb.append("and start_date < :endDate ");
 		sb.append("and end_date > :startDate ");
@@ -241,7 +242,9 @@ public class PersistenceManager {
 		for (Object[] row : result) {
 			// System.out.println(result);
 			TinyEntryMapObject curr = new TinyEntryMapObject();
-			curr.setGroup((String) row[0]);
+
+			ConditionGroup group = (ConditionGroup) row[0];
+			curr.setGroup(group);
 			curr.setCount((long) row[1]);
 
 			calendar.setTimeInMillis(((Timestamp) row[2]).getTime());
@@ -269,7 +272,7 @@ public class PersistenceManager {
 		 * minimum width for filtering the blocks is calculated based on this.
 		 * This amount of sequential blocks of the same width is the threshold
 		 */
-		int elementsInRow = 100;
+		int elementsInRow = 80;
 		/*
 		 * Filter entries based on the duration and requested range
 		 */
@@ -285,14 +288,17 @@ public class PersistenceManager {
 
 		logger.debug("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
 
+		long filterId =0;
 		for (TinyEntryMapObject mapObject : tinyData) {
 			Condition curr = new Condition();
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
 			curr.setTitle(Long.toString(mapObject.getCount()));
+			curr.setLogicModule(mapObject.getLogicModule());
 			curr.setGroup(mapObject.getGroup());
-			curr.setClassName(EventPriority.FILTERED.getCode());
+			curr.setClassName(ConditionPriority.FILTERED);
 			curr.calculateDuration();
+			curr.setId(-filterId++);
 
 			if (curr.getDuration() < durationThreshold) {
 				int append = (int) (durationThreshold - curr.getDuration());
@@ -311,7 +317,7 @@ public class PersistenceManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Condition> getEntries2(Date startDate, Date endDate, long durationThreshold,
+	public List<Condition> agetEntries2(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -382,20 +388,23 @@ public class PersistenceManager {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Condition entry = entityManager.find(Condition.class, id);
-		
-		/* Make sure to fetch all list - but dont want to annotate the main class to be EAGER always */
+
+		/*
+		 * Make sure to fetch all list - but dont want to annotate the main
+		 * class to be EAGER always
+		 */
 		Iterator<String> it = entry.getActionSteps().iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			it.next();
 		}
 		entityManager.close();
 		return entry;
 	}
 
-	public List<Condition> getEntries2(Date start, Date end) {
+	public List<Condition> agetEntries2(Date start, Date end) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
-		List<Condition> result = entityManager.createQuery("from Entry", Condition.class).getResultList();
+		List<Condition> result = entityManager.createQuery("from Conditions", Condition.class).getResultList();
 		for (Condition event : result) {
 			System.out.println("Event (" + event.getStart() + ") : " + event.getTitle());
 		}

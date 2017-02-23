@@ -2,23 +2,19 @@ package rcms.utilities.daqexpert.persistence;
 
 import java.util.Date;
 
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+
 public class TinyEntryMapObject {
 
-	private String group;
+	private LogicModuleRegistry logicModule;
+	private ConditionGroup group;
 
 	private long count;
 
 	private Date start;
 
 	private Date end;
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
 
 	public Date getStart() {
 		return start;
@@ -38,7 +34,8 @@ public class TinyEntryMapObject {
 
 	@Override
 	public String toString() {
-		return "TinyEntryMapObject [group=" + group + ", count=" + count + ", start=" + start + ", end=" + end + "]";
+		return "TinyEntryMapObject [logicModule=" + logicModule + ", count=" + count + ", start=" + start + ", end="
+				+ end + "]";
 	}
 
 	public long getCount() {
@@ -47,6 +44,22 @@ public class TinyEntryMapObject {
 
 	public void setCount(long count) {
 		this.count = count;
+	}
+
+	public LogicModuleRegistry getLogicModule() {
+		return logicModule;
+	}
+
+	public void setLogicModule(LogicModuleRegistry logicModule) {
+		this.logicModule = logicModule;
+	}
+
+	public ConditionGroup getGroup() {
+		return group;
+	}
+
+	public void setGroup(ConditionGroup group) {
+		this.group = group;
 	}
 
 }

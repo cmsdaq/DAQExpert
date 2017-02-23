@@ -6,8 +6,8 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies individual FED deadtime
@@ -18,8 +18,7 @@ public class FEDDeadtime extends ContextLogicModule {
 
 	public FEDDeadtime(final float threshold) {
 		this.name = "FED deadtime";
-		this.group = EventGroup.FED_DEADTIME;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Deadtime of fed(s) {{FED}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
 		this.setNotificationPlay(true);
 		this.threshold = threshold;

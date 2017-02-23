@@ -16,40 +16,11 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
-import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.LongTransition;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.PartitionDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
-import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemError;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
-import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 
 /**
  * Manager of checking process
@@ -77,58 +48,18 @@ public class LogicModuleManager {
 	 */
 	public LogicModuleManager(ConditionProducer conditionProducer) {
 
-		int level0RateMin = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN));
-		int level0RateMax = Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX));
-		int thresholdFED = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED));
-		int thresholdPartition = Integer
-				.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION));
-		int thresholdTotal = Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL));
-
 		this.conditionProducer = conditionProducer;
-		// Level 0 Independent
-		checkers.add(new RateOutOfRange(level0RateMin, level0RateMax));
-		checkers.add(new NoRate());
-		checkers.add(new BeamActive());
-		checkers.add(new RunOngoing());
-		checkers.add(new ExpectedRate());
-		checkers.add(new Transition());
-		checkers.add(new LongTransition());
-		checkers.add(new WarningInSubsystem());
-		checkers.add(new SubsystemRunningDegraded());
-		checkers.add(new SubsystemError());
-		checkers.add(new SubsystemSoftError());
-		checkers.add(new FEDDeadtime(thresholdFED));
-		checkers.add(new PartitionDeadtime(thresholdPartition));
-		checkers.add(new StableBeams());
 
-		// Level 1 (depends on L0)
-		checkers.add(new NoRateWhenExpected());
-		checkers.add(new Downtime());
-		checkers.add(new Deadtime(thresholdTotal));
-		checkers.add(new CriticalDeadtime());
-		// checkers.add(new AvoidableDowntime());
-
-		// Level 2 (depends on L1)
-		checkers.add(new FlowchartCase1());
-		checkers.add(new FlowchartCase2());
-		checkers.add(new FlowchartCase3());
-		checkers.add(new FlowchartCase4());
-		checkers.add(new FlowchartCase5());
-		// checkers.add(new FlowchartCase6());
-
-		/* START EXPERIMENTAL LMs */
-		// checkers.add(new YourNewLM());
-		/* END EXPERIMENTAL LMs */
-
-		// comparators
-		comparators.add(new SessionComparator());
-		comparators.add(new LHCBeamModeComparator());
-		comparators.add(new LHCMachineModeComparator());
-		comparators.add(new RunComparator());
-		comparators.add(new LevelZeroStateComparator());
-		comparators.add(new TCDSStateComparator());
-		comparators.add(new DAQStateComparator());
-		// comparators.add(new EVMComparator());
+		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
+			lm.getLogicModule().setLogicModuleRegistry(lm);
+			if (lm.getLogicModule() instanceof SimpleLogicModule) {
+				SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm.getLogicModule();
+				checkers.add(simpleLogicModule);
+			} else if (lm.getLogicModule() instanceof ComparatorLogicModule) {
+				ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
+				comparators.add(comparatorLogicModule);
+			}
+		}
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));

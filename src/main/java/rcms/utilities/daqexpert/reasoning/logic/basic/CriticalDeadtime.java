@@ -5,8 +5,8 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies deadtime
@@ -15,8 +15,7 @@ public class CriticalDeadtime extends SimpleLogicModule {
 
 	public CriticalDeadtime() {
 		this.name = "Critical deadtime";
-		this.group = EventGroup.CRITICAL_DEADTIME;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Deadtime is greater than 5% during running";
 		this.setNotificationPlay(true);
 		this.setSoundToPlay(Sound.DEADTIME);

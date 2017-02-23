@@ -7,6 +7,8 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
@@ -36,8 +40,6 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 public class Condition implements Comparable<Condition> {
 
 	private static final Logger logger = Logger.getLogger(Condition.class);
-	
-	private EventProducer eventProducer;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
@@ -55,8 +57,15 @@ public class Condition implements Comparable<Condition> {
 	private EntryState state;
 
 	@JsonIgnore
-	@Transient
-	private LogicModule eventFinder;
+	@Enumerated(EnumType.ORDINAL)
+	private LogicModuleRegistry logicModule;
+	
+
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name="group_name")
+	private ConditionGroup group;
+	
+	
 
 	@JsonIgnore
 	@Transient
@@ -69,7 +78,7 @@ public class Condition implements Comparable<Condition> {
 	private List<String> actionSteps;
 
 	/**
-	 * Short description of event. Displayed in main expert view
+	 * Short title of condition. Displayed in main expert view
 	 */
 	@JsonProperty("content")
 	@Column(columnDefinition = "varchar(30)", name = "title")
@@ -90,27 +99,11 @@ public class Condition implements Comparable<Condition> {
 	private Date end;
 
 	/**
-	 * Group in which will be displayed in main expert view
+	 * Priority of the condition, indicates if is important and should be
+	 * highlighted or not
 	 */
-	/** TODO: replace by enum/id */
-	@Column(columnDefinition = "varchar(20)", name = "group_name")
-	private String group;
-
-	/**
-	 * Class name of the event, indicates if event is important and should be
-	 * highlighted or not TODO: enum this
-	 */
-	/** TODO: replace by enum/id */
-	@Column(columnDefinition = "varchar(20)", name = "class_name")
-	private String className;
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
+	@Enumerated(EnumType.ORDINAL)
+	private ConditionPriority priority;
 
 	public boolean isShow() {
 		return show;
@@ -123,7 +116,7 @@ public class Condition implements Comparable<Condition> {
 	public Condition() {
 		show = true;
 		this.state = EntryState.NEW;
-		
+
 	}
 
 	/**
@@ -180,12 +173,12 @@ public class Condition implements Comparable<Condition> {
 		return (int) (this.duration - arg0.duration);
 	}
 
-	public String getClassName() {
-		return className;
+	public ConditionPriority getClassName() {
+		return priority;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setClassName(ConditionPriority className) {
+		this.priority = className;
 	}
 
 	public EntryState getState() {
@@ -204,15 +197,15 @@ public class Condition implements Comparable<Condition> {
 	@Override
 	public String toString() {
 		return "Entry [show=" + show + ", state=" + state + ", id=" + id + ", content=" + title + ", start=" + start
-				+ ", end=" + end + ", group=" + group + ", className=" + className + "]";
+				+ ", end=" + end + ", className=" + priority + "]";
 	}
 
-	public LogicModule getEventFinder() {
-		return eventFinder;
+	public LogicModuleRegistry getLogicModule() {
+		return logicModule;
 	}
 
-	public void setEventFinder(LogicModule eventFinder) {
-		this.eventFinder = eventFinder;
+	public void setLogicModule(LogicModuleRegistry eventFinder) {
+		this.logicModule = eventFinder;
 	}
 
 	public Context getFinishedContext() {
@@ -227,11 +220,10 @@ public class Condition implements Comparable<Condition> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((className == null) ? 0 : className.hashCode());
+		result = prime * result + ((priority == null) ? 0 : priority.hashCode());
 		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		result = prime * result + (int) (duration ^ (duration >>> 32));
 		result = prime * result + ((end == null) ? 0 : end.hashCode());
-		result = prime * result + ((group == null) ? 0 : group.hashCode());
 		result = prime * result + (show ? 1231 : 1237);
 		result = prime * result + ((start == null) ? 0 : start.hashCode());
 		result = prime * result + ((state == null) ? 0 : state.hashCode());
@@ -247,10 +239,10 @@ public class Condition implements Comparable<Condition> {
 		if (getClass() != obj.getClass())
 			return false;
 		Condition other = (Condition) obj;
-		if (className == null) {
-			if (other.className != null)
+		if (priority == null) {
+			if (other.priority != null)
 				return false;
-		} else if (!className.equals(other.className))
+		} else if (!priority.equals(other.priority))
 			return false;
 		if (title == null) {
 			if (other.title != null)
@@ -263,11 +255,6 @@ public class Condition implements Comparable<Condition> {
 			if (other.end != null)
 				return false;
 		} else if (!end.equals(other.end))
-			return false;
-		if (group == null) {
-			if (other.group != null)
-				return false;
-		} else if (!group.equals(other.group))
 			return false;
 		if (show != other.show)
 			return false;
@@ -297,11 +284,12 @@ public class Condition implements Comparable<Condition> {
 		this.actionSteps = actionSteps;
 	}
 
-	public EventProducer getEventProducer() {
-		return eventProducer;
+	public ConditionGroup getGroup() {
+		return group;
 	}
 
-	public void setEventProducer(EventProducer eventProducer) {
-		this.eventProducer = eventProducer;
+	public void setGroup(ConditionGroup group) {
+		this.group = group;
 	}
+
 }

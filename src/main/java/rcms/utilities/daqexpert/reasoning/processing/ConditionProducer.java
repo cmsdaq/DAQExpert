@@ -18,8 +18,7 @@ import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * From checker & comparator boolean results creates events
@@ -76,7 +75,7 @@ public class ConditionProducer {
 	 * corresponding to 1 start and end time
 	 */
 	public Pair<Boolean, Condition> produce(SimpleLogicModule checker, boolean value, Date date) {
-		return produce(checker, value, date, checker.getGroup());
+		return build(checker, value, date);
 	}
 
 	/**
@@ -87,8 +86,8 @@ public class ConditionProducer {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
-			produce(comparator, !value, current, comparator.getGroup());
-			Pair<Boolean, Condition> b = produce(comparator, value, current, comparator.getGroup());
+			build(comparator, !value, current);
+			Pair<Boolean, Condition> b = build(comparator, value, current);
 			b.getRight().setShow(true);
 
 			logger.trace("Result for comparator LM: " + b.getLeft());
@@ -99,66 +98,69 @@ public class ConditionProducer {
 
 	}
 
-	private Pair<Boolean, Condition> produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
+	private Pair<Boolean, Condition> build(LogicModule logicModule, boolean value, Date date) {
 		// get current state
-		String className = classificable.getClass().getSimpleName();
-		String content = classificable.getName();
-		EventPriority eventClass = classificable.getPriority();
+		String logicModuleName = logicModule.getClass().getSimpleName();
+		String content = logicModule.getName();
+		ConditionPriority eventClass = logicModule.getPriority();
 
 		Context context = null;
 
-		if (classificable instanceof ActionLogicModule) {
-			context = ((ActionLogicModule) classificable).getContext();
+		if (logicModule instanceof ActionLogicModule) {
+			context = ((ActionLogicModule) logicModule).getContext();
 		}
 
 		Boolean leftResult = false;
 		Condition result = null;
-		if (states.containsKey(className)) {
-			boolean currentState = states.get(className);
+		if (states.containsKey(logicModuleName)) {
+			boolean currentState = states.get(logicModuleName);
 
 			if (currentState != value) {
-				result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+				result = finishOldAddNew(logicModule, content, value, date, eventClass, context);
 				leftResult = true;
-				states.put(className, value);
+				states.put(logicModuleName, value);
 			} else {
-				result = unfinished.get(className);
+				result = unfinished.get(logicModuleName);
 			}
 		}
 
 		// no prior states
 		else {
-			states.put(className, value);
-			result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+			states.put(logicModuleName, value);
+			result = finishOldAddNew(logicModule, content, value, date, eventClass, context);
 			leftResult = true;
 		}
-		result.setEventFinder(classificable);
+		result.setLogicModule(logicModule.getLogicModuleRegistry());
+		result.setGroup(logicModule.getLogicModuleRegistry().getGroup());
 
 		if (value) {
-			if (classificable instanceof ActionLogicModule) {
-				ActionLogicModule alm = (ActionLogicModule) classificable;
-				logger.debug("Putting message into context: " + classificable.getDescription());
+			if (logicModule instanceof ActionLogicModule) {
+				ActionLogicModule alm = (ActionLogicModule) logicModule;
+				logger.debug("Putting message into context: " + logicModule.getDescription());
 				if (result.getDescription() == null) {
-					result.setDescription(alm.getContext().getMessageWithContext(classificable.getDescription()));
+					result.setDescription(alm.getContext().getMessageWithContext(logicModule.getDescription()));
 				}
 				if (result.getActionSteps() == null) {
 					result.setActionSteps(
-							alm.getContext().getActionWithContext(((ActionLogicModule) classificable).getAction()));
+							alm.getContext().getActionWithContext(((ActionLogicModule) logicModule).getAction()));
 				}
 
 			} else {
-				result.setDescription(classificable.getDescription());
+				result.setDescription(logicModule.getDescription());
 
 			}
 		}
 		return Pair.of(leftResult, result);
 	}
 
-	protected Condition finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
-			EventPriority eventClass, Context context) {
+	protected Condition finishOldAddNew(LogicModule logicModule, String content, Boolean value, Date date,
+			ConditionPriority eventClass, Context context) {
+
+		String logicModuleName = logicModule.getClass().getSimpleName();
 
 		/* finish old entry */
-		if (unfinished.containsKey(className)) {
-			Condition toFinish = unfinished.get(className);
+		if (unfinished.containsKey(logicModuleName)) {
+			Condition toFinish = unfinished.get(logicModuleName);
 			toFinish.setState(EntryState.FINISHED);
 			toFinish.setEnd(date);
 			toFinish.calculateDuration();
@@ -170,19 +172,15 @@ public class ConditionProducer {
 			}
 		}
 
-		/* add new entry */
-		Condition entry = new Condition();
-		entry.setClassName(eventClass.getCode());
-		entry.setTitle(content);
-		entry.setShow(value);
-		entry.setStart(date);
-		entry.setGroup(level.getCode());
+		/* add new condition */
+		Condition condition = new Condition();
+		condition.setClassName(eventClass);
+		condition.setTitle(content);
+		condition.setShow(value);
+		condition.setStart(date);
 
-		// result.add(entry);
-
-		// Application.get().getDataManager().getResult().add(entry);
-		unfinished.put(className, entry);
-		return entry;
+		unfinished.put(logicModuleName, condition);
+		return condition;
 	}
 
 	@Override

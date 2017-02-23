@@ -19,7 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.processing.DataStream;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 /**
@@ -191,10 +192,10 @@ public class PersistenceManagerTest {
 
 	private static Condition getFinishedEntry(Date startDate, String name, int duration) {
 		Condition entry = new Condition();
-		entry.setClassName(name);
+		entry.setClassName(ConditionPriority.DEFAULTT);
 		entry.setTitle("Content of entry: " + name);
 		entry.setStart(startDate);
-		entry.setGroup(EventGroup.LHC_BEAM.getCode());
+		//entry.setGroup(ConditionGroup.LHC_BEAM.getCode());
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.persistence.Condition;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 
 public class ReasonsAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -72,15 +72,15 @@ public class ReasonsAPI extends HttpServlet {
 				try {
 
 					/** durations */
-					if ((entry.getGroup() == EventGroup.LHC_BEAM.getCode() && entry.getTitle().equals("STABLE BEAMS"))
-							|| entry.getGroup() == EventGroup.DOWNTIME.getCode()
-							|| entry.getGroup() == EventGroup.AVOIDABLE_DOWNTIME.getCode()) {
+					/*if ((entry.getGroup() == ConditionGroup.LHC_BEAM.getCode() && entry.getTitle().equals("STABLE BEAMS"))
+							|| entry.getGroup() == ConditionGroup.DOWNTIME.getCode()
+							|| entry.getGroup() == ConditionGroup.AVOIDABLE_DOWNTIME.getCode()) {
 						long current = 0;
 						if (durations.containsKey(entry.getGroup())) {
 							current = durations.get(entry.getGroup());
 						}
 						durations.put(entry.getGroup(), current + entry.getDuration());
-					}
+					}*/
 
 					entryList.add(entry);
 

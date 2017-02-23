@@ -4,8 +4,8 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies no rate condition in DAQ
@@ -14,8 +14,7 @@ public class Transition extends SimpleLogicModule {
 
 	public Transition() {
 		this.name = "Transition";
-		this.group = EventGroup.TRANSITION;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Transition for new run";
 	}
 

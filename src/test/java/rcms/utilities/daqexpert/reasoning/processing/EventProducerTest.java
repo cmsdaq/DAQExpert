@@ -13,9 +13,10 @@ import org.mockito.Mockito;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
 
@@ -57,9 +58,9 @@ public class EventProducerTest {
 		Mockito.verify(eventProducer, Mockito.times(2)).produce(Mockito.any(SimpleLogicModule.class),
 				Mockito.anyBoolean(), Mockito.any(Date.class));
 
-		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.anyString(), Mockito.anyString(),
-				Mockito.anyBoolean(), Mockito.notNull(Date.class), Mockito.notNull(EventGroup.class),
-				Mockito.notNull(EventPriority.class), Mockito.notNull(Context.class));
+		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
+				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
+				Mockito.notNull(ConditionPriority.class), Mockito.notNull(Context.class));
 	}
 
 	@Test
@@ -108,9 +109,9 @@ public class EventProducerTest {
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
 
-		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.anyString(), Mockito.anyString(),
-				Mockito.anyBoolean(), Mockito.notNull(Date.class), Mockito.notNull(EventGroup.class),
-				Mockito.notNull(EventPriority.class), Mockito.any(Context.class));
+		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
+				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
+				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
 
 		// this should not change anything
 		Pair<Boolean, Condition> b = eventProducer.produce(checker, false, t2, t3);
@@ -124,9 +125,9 @@ public class EventProducerTest {
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
-		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.anyString(), Mockito.anyString(),
-				Mockito.anyBoolean(), Mockito.notNull(Date.class), Mockito.notNull(EventGroup.class),
-				Mockito.notNull(EventPriority.class), Mockito.any(Context.class));
+		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
+				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
+				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
 
 		// this should change
 		Pair<Boolean, Condition> c = eventProducer.produce(checker, true, t3, t4);
@@ -142,9 +143,9 @@ public class EventProducerTest {
 		Assert.assertEquals(1, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
 
-		Mockito.verify(eventProducer, Mockito.times(4)).finishOldAddNew(Mockito.anyString(), Mockito.anyString(),
-				Mockito.anyBoolean(), Mockito.notNull(Date.class), Mockito.notNull(EventGroup.class),
-				Mockito.notNull(EventPriority.class), Mockito.any(Context.class));
+		Mockito.verify(eventProducer, Mockito.times(4)).finishOldAddNew(Mockito.notNull(LogicModule.class),
+				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
+				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
 	}
 
 	@Test

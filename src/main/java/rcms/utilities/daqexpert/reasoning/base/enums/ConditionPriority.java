@@ -1,12 +1,14 @@
 package rcms.utilities.daqexpert.reasoning.base.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * Priority of the condition
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public enum EventPriority {
+public enum ConditionPriority {
 
 	DEFAULTT("default"),
 	IMPORTANT("important"),
@@ -16,10 +18,11 @@ public enum EventPriority {
 	EXPERIMENTAL("experimental"),
 	FILTERED_IMPORTANT("filtered-important");
 
-	private EventPriority(String code) {
+	private ConditionPriority(String code) {
 		this.code = code;
 	}
 
+	@JsonValue
 	public String getCode() {
 		return code;
 	}

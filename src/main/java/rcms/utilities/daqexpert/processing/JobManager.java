@@ -22,8 +22,8 @@ import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
@@ -104,22 +104,24 @@ public class JobManager {
 
 	private void persistVersion(Date startDate, Date endDate) {
 
-		Condition entry = new Condition();
-		entry.setStart(startDate);
-		entry.setEnd(endDate);
+		Condition condition = new Condition();
+		condition.setStart(startDate);
+		condition.setEnd(endDate);
 		if (endDate != null) {
-			entry.calculateDuration();
+			condition.calculateDuration();
 		}
 		// TODO: class name vs priority - decide on one convention
-		entry.setClassName(EventPriority.DEFAULTT.getCode());
-		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
+		condition.setClassName(ConditionPriority.DEFAULTT);
+		
+		
+		condition.setGroup(ConditionGroup.EXPERT_VERSION);
 		String version = this.getClass().getPackage().getImplementationVersion();
 		if(version == null){
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
-		entry.setTitle(version);
-		this.persistenceManager.persist(entry);
+		condition.setTitle(version);
+		this.persistenceManager.persist(condition);
 	}
 
 	public void startJobs() {

@@ -1,8 +1,9 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
 import rcms.utilities.daqexpert.notifications.Sound;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * Elementary part of expert knowledge. Logic Module (abbreviated LM) is a piece
@@ -36,20 +37,18 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  *
  */
 public abstract class LogicModule {
+
 	/**
-	 * Name of the event found
+	 * Name of the condition found
 	 */
 	protected String name;
 
 	/**
-	 * Group of the event found
+	 * Priority of the condition found
 	 */
-	protected EventGroup group;
+	protected ConditionPriority priority;
 
-	/**
-	 * Priority of the event found
-	 */
-	protected EventPriority priority;
+	protected LogicModuleRegistry logicModuleRegistry;
 
 	/**
 	 * Condition description
@@ -86,30 +85,11 @@ public abstract class LogicModule {
 	}
 
 	/**
-	 * Get the group of the condition
-	 * 
-	 * @return group of the condition
-	 */
-	public EventGroup getGroup() {
-		return group;
-	}
-
-	/**
-	 * Set the group of the condition
-	 * 
-	 * @param group
-	 *            group of the condition
-	 */
-	public void setGroup(EventGroup group) {
-		this.group = group;
-	}
-
-	/**
 	 * Get priority of the condition
 	 * 
 	 * @return priority of the condition
 	 */
-	public EventPriority getPriority() {
+	public ConditionPriority getPriority() {
 		return priority;
 	}
 
@@ -119,7 +99,7 @@ public abstract class LogicModule {
 	 * @param priority
 	 *            priority of the condition
 	 */
-	public void setPriority(EventPriority priority) {
+	public void setPriority(ConditionPriority priority) {
 		this.priority = priority;
 	}
 
@@ -185,6 +165,14 @@ public abstract class LogicModule {
 
 	public void setNotificationEndPlay(boolean notificationEndPlay) {
 		this.notificationEndPlay = notificationEndPlay;
+	}
+
+	public LogicModuleRegistry getLogicModuleRegistry() {
+		return logicModuleRegistry;
+	}
+
+	public void setLogicModuleRegistry(LogicModuleRegistry logicModuleRegistry) {
+		this.logicModuleRegistry = logicModuleRegistry;
 	}
 
 }

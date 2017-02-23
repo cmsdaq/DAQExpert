@@ -5,15 +5,14 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class DAQStateComparator extends ComparatorLogicModule {
 
 	public DAQStateComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.DAQ_STATE;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "New DAQ state identified";
 		this.setNotificationPlay(true);
 		this.setPrefixToPlay("DAQ " );

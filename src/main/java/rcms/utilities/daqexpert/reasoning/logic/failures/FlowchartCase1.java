@@ -9,7 +9,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
@@ -65,7 +65,7 @@ public class FlowchartCase1 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
+		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
 
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error' 

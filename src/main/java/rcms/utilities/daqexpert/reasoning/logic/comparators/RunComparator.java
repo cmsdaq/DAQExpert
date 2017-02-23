@@ -4,15 +4,14 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class RunComparator extends ComparatorLogicModule {
 
 	public RunComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.RUN_NUMBER;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "New run has been identified";
 	}
 

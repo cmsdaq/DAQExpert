@@ -15,7 +15,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
@@ -26,7 +26,7 @@ import rcms.utilities.daqexpert.servlets.DummyDAQ;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
+public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 	private final static StructureSerializer structureSerializer = new StructureSerializer();
 	private final SnapshotProcessor snapshotProcessor;
 	private final static Logger logger = Logger.getLogger(ProcessJob.class);
@@ -49,7 +49,7 @@ public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
 		}
 	}
 
-	public Pair<Set<Entry>, List<Point>> call() throws Exception {
+	public Pair<Set<Condition>, List<Point>> call() throws Exception {
 
 		Long start = System.currentTimeMillis();
 
@@ -57,7 +57,7 @@ public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
 		int processingTime = 0;
 		int segmentingTime = 0;
 
-		Set<Entry> result = new LinkedHashSet<>();
+		Set<Condition> result = new LinkedHashSet<>();
 		List<Point> points = new ArrayList<>();
 
 		DAQ daq = null;
@@ -94,7 +94,7 @@ public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
 					segmentingTime += (endSegmenting - startSegmenting);
 
 					Long startProcessing = System.currentTimeMillis();
-					Set<Entry> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
+					Set<Condition> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
 					Long endProcessing = System.currentTimeMillis();
 					processingTime += (endProcessing - startProcessing);
 
@@ -125,7 +125,7 @@ public class ProcessJob implements Callable<Pair<Set<Entry>, List<Point>>> {
 
 		if (daq != null) {
 			logger.debug("Temporarly finishing events");
-			Set<Entry> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
+			Set<Condition> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
 			// Application.get().getDataManager().getResult().addAll(finished);
 			logger.debug("Force finishing returned with results: " + finished);
 			result.addAll(finished);

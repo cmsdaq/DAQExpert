@@ -13,10 +13,11 @@ import org.mockito.Mockito;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * Tests if notification signals are generated correctly
@@ -37,7 +38,7 @@ public class NotificationSignalSenderTest {
 		NotificationSignalSender notificationSender = new NotificationSignalSender(connector, "", "",
 				applicationStartDate.getTime());
 
-		Entry entry = getTestEntry(eventDate);
+		Condition entry = getTestEntry(eventDate);
 
 		/* Verify the results - entry is new, no notification generated */
 		notificationSender.send(entry);
@@ -69,8 +70,8 @@ public class NotificationSignalSenderTest {
 		NotificationSignalSender notificationSender = new NotificationSignalSender(connector, "", "",
 				applicationStartDate.getTime());
 
-		Entry oldEntry = getTestEntry(oldEntryDate);
-		Entry newEntry = getTestEntry(newEntryDate);
+		Condition oldEntry = getTestEntry(oldEntryDate);
+		Condition newEntry = getTestEntry(newEntryDate);
 
 		/*
 		 * Verify the results - old entry is new, no notification generated
@@ -117,23 +118,23 @@ public class NotificationSignalSenderTest {
 
 	}
 
-	private Entry getTestEntry(Date date) {
+	private Condition getTestEntry(Date date) {
 		/* Build a test entry */
-		Entry entry = new Entry();
+		Condition entry = new Condition();
 		entry.setStart(date);
-		entry.setClassName("critical");
+		entry.setClassName(ConditionPriority.CRITICAL);
 
-		ActionLogicModule eventFinder = new ActionLogicModule() {
+		ActionLogicModule logicModule = new ActionLogicModule() {
 			@Override
 			public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 				return true;
 			}
 		};
-		eventFinder.setDescription("test no rate");
-		eventFinder.setGroup(EventGroup.NO_RATE);
+		logicModule.setDescription("test no rate");
 
-		ActionLogicModule eventFinderSpy = Mockito.spy(eventFinder);
-		entry.setEventFinder(eventFinderSpy);
+		ActionLogicModule eventFinderSpy = Mockito.spy(logicModule);
+		// TODO: this should not be commented out
+		// entry.setLogicModule(eventFinderSpy);
 		return entry;
 	}
 }

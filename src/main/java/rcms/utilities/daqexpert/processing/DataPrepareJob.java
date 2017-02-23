@@ -15,7 +15,7 @@ import rcms.utilities.daqaggregator.DAQExceptionCode;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -66,9 +66,9 @@ public class DataPrepareJob implements Runnable {
 
 					ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager,
 							snapshotProcessor);
-					Future<Pair<Set<Entry>, List<Point>>> future = executorService.submit(processJob);
+					Future<Pair<Set<Condition>, List<Point>>> future = executorService.submit(processJob);
 
-					Pair<Set<Entry>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
+					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
 					try {
 
 						long t1 = System.currentTimeMillis();

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqaggregator.DAQException;
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 
 /**
  * Api to request rerun of experimental logic modules on chosen time span
@@ -46,7 +46,7 @@ public class ExperimentApi extends HttpServlet {
 
 		logger.info("Experimental run of LM: " + experimentalLm);
 
-		Set<Entry> destination = new LinkedHashSet<Entry>();
+		Set<Condition> destination = new LinkedHashSet<Condition>();
 		Application.get().getDataManager().experimental.put(experimentalLm, destination);
 
 		String startRange = request.getParameter("start");

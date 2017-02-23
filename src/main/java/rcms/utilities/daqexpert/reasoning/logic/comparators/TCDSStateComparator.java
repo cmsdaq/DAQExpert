@@ -3,15 +3,14 @@ package rcms.utilities.daqexpert.reasoning.logic.comparators;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class TCDSStateComparator extends ComparatorLogicModule {
 
 	public TCDSStateComparator() {
 		this.name = "n/a";
-		this.group = EventGroup.TCDS_STATE;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "New TCDS state identified";
 	}
 

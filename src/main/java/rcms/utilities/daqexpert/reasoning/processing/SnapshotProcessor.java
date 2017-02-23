@@ -15,7 +15,7 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.notifications.NotificationSignalConnector;
 import rcms.utilities.daqexpert.notifications.NotificationSignalSender;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 
 /**
  * Processes snapshot in analysis
@@ -31,9 +31,9 @@ public class SnapshotProcessor {
 
 	private final NotificationSignalSender notificationSender;
 
-	private EventProducer eventProducer;
+	private ConditionProducer eventProducer;
 
-	public SnapshotProcessor(EventProducer eventProducer) {
+	public SnapshotProcessor(ConditionProducer eventProducer) {
 
 		this.eventProducer = eventProducer;
 		NotificationSignalConnector notificationConnector = new NotificationSignalConnector();
@@ -57,13 +57,13 @@ public class SnapshotProcessor {
 		this.checkManager = new LogicModuleManager(eventProducer);
 	}
 
-	public Set<Entry> process(DAQ daqSnapshot, boolean createNotifications, boolean includeExperimental) {
+	public Set<Condition> process(DAQ daqSnapshot, boolean createNotifications, boolean includeExperimental) {
 		logger.trace("Process snapshot " + new Date(daqSnapshot.getLastUpdate()));
-		Set<Entry> result = new LinkedHashSet<>();
+		Set<Condition> result = new LinkedHashSet<>();
 		try {
-			List<Entry> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
+			List<Condition> lmResults = checkManager.runLogicModules(daqSnapshot, includeExperimental);
 
-			for (Entry lmResult : lmResults) {
+			for (Condition lmResult : lmResults) {
 				result.add(lmResult);
 			}
 
@@ -74,7 +74,7 @@ public class SnapshotProcessor {
 			if (createNotifications) {
 				if (result.size() != 0) {
 					logger.debug("Creating notifications for " + result);
-					for (Entry entry : result)
+					for (Condition entry : result)
 						if (entry.isShow()) {
 							logger.debug("Send notification for " + entry);
 							notificationSender.send(entry);
@@ -92,7 +92,7 @@ public class SnapshotProcessor {
 		return result;
 	}
 
-	public EventProducer getEventProducer() {
+	public ConditionProducer getEventProducer() {
 		return eventProducer;
 	}
 

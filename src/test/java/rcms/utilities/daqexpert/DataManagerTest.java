@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;
@@ -101,7 +101,7 @@ class PersistenceManagerMock extends PersistenceManager {
 	}
 
 	@Override
-	public void persist(Entry entry) {
+	public void persist(Condition entry) {
 	}
 
 	@Override

@@ -4,19 +4,17 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
-public class SubsystemError extends ActionLogicModule {
+public class SubsystemError extends ContextLogicModule {
 
 	public SubsystemError() {
 		this.name = "Subsystem in error";
 		this.description = "{{SUBSYSTEM}} subsystem is in error";
-		this.action = new SimpleAction("");
-		this.group = EventGroup.SUBSYS_ERROR;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.setNotificationPlay(true);
 		this.setNotificationDisplay(true);
 	}

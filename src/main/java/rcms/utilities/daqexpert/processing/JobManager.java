@@ -20,11 +20,11 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
-import rcms.utilities.daqexpert.reasoning.processing.EventProducer;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 
 /**
@@ -93,7 +93,7 @@ public class JobManager {
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(),
 				endDate != null ? endDate.getTime() : null, sourceDirectory);
 
-		EventProducer eventProducer = new EventProducer();
+		ConditionProducer eventProducer = new ConditionProducer();
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,
@@ -104,31 +104,33 @@ public class JobManager {
 
 	private void persistVersion(Date startDate, Date endDate) {
 
-		Entry entry = new Entry();
-		entry.setStart(startDate);
-		entry.setEnd(endDate);
+		Condition condition = new Condition();
+		condition.setStart(startDate);
+		condition.setEnd(endDate);
 		if (endDate != null) {
-			entry.calculateDuration();
+			condition.calculateDuration();
 		}
 		// TODO: class name vs priority - decide on one convention
-		entry.setClassName(EventPriority.DEFAULTT.getCode());
-		entry.setGroup(EventGroup.EXPERT_VERSION.getCode());
+		condition.setClassName(ConditionPriority.DEFAULTT);
+		
+		
+		condition.setGroup(ConditionGroup.EXPERT_VERSION);
 		String version = this.getClass().getPackage().getImplementationVersion();
 		if(version == null){
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
-		entry.setTitle(version);
-		this.persistenceManager.persist(entry);
+		condition.setTitle(version);
+		this.persistenceManager.persist(condition);
 	}
 
 	public void startJobs() {
 		readerRaskController.fireRealTimeReaderTask();
 	}
 
-	public Future fireOnDemandJob(long startTime, long endTime, Set<Entry> destination, String scriptName) {
+	public Future fireOnDemandJob(long startTime, long endTime, Set<Condition> destination, String scriptName) {
 
-		EventProducer eventProducer = new EventProducer();
+		ConditionProducer eventProducer = new ConditionProducer();
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
 				persistenceManager);

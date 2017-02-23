@@ -2,8 +2,8 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public abstract class KnownFailure extends ActionLogicModule {
 
@@ -12,8 +12,7 @@ public abstract class KnownFailure extends ActionLogicModule {
 		this.setNotificationDisplay(true);
 		this.setPrefixToPlay("Known failure: ");
 		this.setSuffixToPlay(". Steps ready");
-		this.group = EventGroup.FLOWCHART;
-		this.priority = EventPriority.CRITICAL;
+		this.priority = ConditionPriority.CRITICAL;
 		this.setSoundToPlay(Sound.KNOWN);
 	}
 }

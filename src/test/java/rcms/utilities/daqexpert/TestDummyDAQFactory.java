@@ -8,7 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.DataStream;

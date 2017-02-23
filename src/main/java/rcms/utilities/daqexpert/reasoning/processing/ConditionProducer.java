@@ -11,15 +11,15 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * From checker & comparator boolean results creates events
@@ -27,24 +27,24 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class EventProducer {
+public class ConditionProducer {
 
-	public EventProducer() {
+	public ConditionProducer() {
 		unfinished = new HashMap<>();
 		states = new HashMap<>();
 		finishedThisRound = new ArrayList<>();
 	}
 
 	/** Logger */
-	private static final Logger logger = Logger.getLogger(EventProducer.class);
+	private static final Logger logger = Logger.getLogger(ConditionProducer.class);
 
 	/** All events without end date are kept here (unfinished) */
-	private final Map<String, Entry> unfinished;
+	private final Map<String, Condition> unfinished;
 
 	/** Current states are kept here */
 	private final Map<String, Boolean> states;
 
-	private final List<Entry> finishedThisRound;
+	private final List<Condition> finishedThisRound;
 
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
@@ -52,14 +52,14 @@ public class EventProducer {
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	public Set<Entry> finish(Date date) {
+	public Set<Condition> finish(Date date) {
 
 		logger.debug("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finishedTR: " + finishedThisRound);
 
-		Set<Entry> result = new HashSet<>();
+		Set<Condition> result = new HashSet<>();
 
-		for (Entry entry : unfinished.values()) {
+		for (Condition entry : unfinished.values()) {
 			entry.setEnd(date);
 			entry.calculateDuration();
 
@@ -75,20 +75,20 @@ public class EventProducer {
 	 * Produces events for value 111000111000 will produce 2 events
 	 * corresponding to 1 start and end time
 	 */
-	public Pair<Boolean, Entry> produce(SimpleLogicModule checker, boolean value, Date date) {
-		return produce(checker, value, date, checker.getGroup());
+	public Pair<Boolean, Condition> produce(SimpleLogicModule checker, boolean value, Date date) {
+		return build(checker, value, date);
 	}
 
 	/**
 	 * 00000100000100000100 will produce 3 events corresponding to 1 start and
 	 * ending on next 1 start
 	 */
-	public Pair<Boolean, Entry> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
+	public Pair<Boolean, Condition> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
-			produce(comparator, !value, current, comparator.getGroup());
-			Pair<Boolean, Entry> b = produce(comparator, value, current, comparator.getGroup());
+			build(comparator, !value, current);
+			Pair<Boolean, Condition> b = build(comparator, value, current);
 			b.getRight().setShow(true);
 
 			logger.trace("Result for comparator LM: " + b.getLeft());
@@ -99,66 +99,73 @@ public class EventProducer {
 
 	}
 
-	private Pair<Boolean, Entry> produce(LogicModule classificable, boolean value, Date date, EventGroup level) {
+	private Pair<Boolean, Condition> build(LogicModule logicModule, boolean value, Date date) {
 		// get current state
-		String className = classificable.getClass().getSimpleName();
-		String content = classificable.getName();
-		EventPriority eventClass = classificable.getPriority();
+		String logicModuleName = logicModule.getClass().getSimpleName();
+		String content = logicModule.getName();
+		ConditionPriority eventClass = logicModule.getPriority();
 
 		Context context = null;
 
-		if (classificable instanceof ActionLogicModule) {
-			context = ((ActionLogicModule) classificable).getContext();
+		if (logicModule instanceof ActionLogicModule) {
+			context = ((ActionLogicModule) logicModule).getContext();
 		}
 
 		Boolean leftResult = false;
-		Entry result = null;
-		if (states.containsKey(className)) {
-			boolean currentState = states.get(className);
+		Condition result = null;
+		if (states.containsKey(logicModuleName)) {
+			boolean currentState = states.get(logicModuleName);
 
 			if (currentState != value) {
-				result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+				result = finishOldAddNew(logicModule, content, value, date, eventClass, context);
 				leftResult = true;
-				states.put(className, value);
+				states.put(logicModuleName, value);
 			} else {
-				result = unfinished.get(className);
+				result = unfinished.get(logicModuleName);
 			}
 		}
 
 		// no prior states
 		else {
-			states.put(className, value);
-			result = finishOldAddNew(className, content, value, date, level, eventClass, context);
+			states.put(logicModuleName, value);
+			result = finishOldAddNew(logicModule, content, value, date, eventClass, context);
 			leftResult = true;
 		}
-		result.setEventFinder(classificable);
+		result.setLogicModule(logicModule.getLogicModuleRegistry());
+		if (logicModule.getLogicModuleRegistry() != null) {
+			result.setGroup(logicModule.getLogicModuleRegistry().getGroup());
+		}else{
+			result.setGroup(ConditionGroup.HIDDEN);
+		}
 
 		if (value) {
-			if (classificable instanceof ActionLogicModule) {
-				ActionLogicModule alm = (ActionLogicModule) classificable;
-				logger.debug("Putting message into context: " + classificable.getDescription());
+			if (logicModule instanceof ActionLogicModule) {
+				ActionLogicModule alm = (ActionLogicModule) logicModule;
+				logger.debug("Putting message into context: " + logicModule.getDescription());
 				if (result.getDescription() == null) {
-					result.setDescription(alm.getContext().getMessageWithContext(classificable.getDescription()));
+					result.setDescription(alm.getContext().getMessageWithContext(logicModule.getDescription()));
 				}
 				if (result.getActionSteps() == null) {
 					result.setActionSteps(
-							alm.getContext().getActionWithContext(((ActionLogicModule) classificable).getAction()));
+							alm.getContext().getActionWithContext(((ActionLogicModule) logicModule).getAction()));
 				}
 
 			} else {
-				result.setDescription(classificable.getDescription());
+				result.setDescription(logicModule.getDescription());
 
 			}
 		}
 		return Pair.of(leftResult, result);
 	}
 
-	protected Entry finishOldAddNew(String className, String content, Boolean value, Date date, EventGroup level,
-			EventPriority eventClass, Context context) {
+	protected Condition finishOldAddNew(LogicModule logicModule, String content, Boolean value, Date date,
+			ConditionPriority eventClass, Context context) {
+
+		String logicModuleName = logicModule.getClass().getSimpleName();
 
 		/* finish old entry */
-		if (unfinished.containsKey(className)) {
-			Entry toFinish = unfinished.get(className);
+		if (unfinished.containsKey(logicModuleName)) {
+			Condition toFinish = unfinished.get(logicModuleName);
 			toFinish.setState(EntryState.FINISHED);
 			toFinish.setEnd(date);
 			toFinish.calculateDuration();
@@ -170,19 +177,15 @@ public class EventProducer {
 			}
 		}
 
-		/* add new entry */
-		Entry entry = new Entry();
-		entry.setClassName(eventClass.getCode());
-		entry.setTitle(content);
-		entry.setShow(value);
-		entry.setStart(date);
-		entry.setGroup(level.getCode());
+		/* add new condition */
+		Condition condition = new Condition();
+		condition.setClassName(eventClass);
+		condition.setTitle(content);
+		condition.setShow(value);
+		condition.setStart(date);
 
-		// result.add(entry);
-
-		// Application.get().getDataManager().getResult().add(entry);
-		unfinished.put(className, entry);
-		return entry;
+		unfinished.put(logicModuleName, condition);
+		return condition;
 	}
 
 	@Override
@@ -190,7 +193,7 @@ public class EventProducer {
 		return "EventProducer [states=" + states + ", unfinished=" + unfinished + "]";
 	}
 
-	public List<Entry> getFinishedThisRound() {
+	public List<Condition> getFinishedThisRound() {
 		return finishedThisRound;
 	}
 
@@ -208,7 +211,7 @@ public class EventProducer {
 		finishedThisRound.clear();
 	}
 
-	protected Map<String, Entry> getUnfinished() {
+	protected Map<String, Condition> getUnfinished() {
 		return unfinished;
 	}
 

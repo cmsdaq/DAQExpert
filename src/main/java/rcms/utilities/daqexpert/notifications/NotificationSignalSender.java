@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
@@ -143,12 +144,16 @@ public class NotificationSignalSender {
 		logger.debug("Now working on: " + message);
 		logger.debug("Now working on: " + condition);
 
+		if (condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+			ContextLogicModule contextLogicModule = (ContextLogicModule) condition.getLogicModule().getLogicModule();
+			Context context = contextLogicModule.getContext();
+			message = context.getContentWithContext(message);
+		}
 		if (condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
 
-			ActionLogicModule finder = (ActionLogicModule) condition.getLogicModule().getLogicModule();
-			Context context = ((ActionLogicModule) finder).getContext();
-			message = context.getMessageWithContext(message);
-			notification.setAction(context.getActionWithContext(finder.getAction()));
+			ActionLogicModule actionLogicModule = (ActionLogicModule) condition.getLogicModule().getLogicModule();
+			Context context = actionLogicModule.getContext();
+			notification.setAction(context.getActionWithContext(actionLogicModule.getAction()));
 		}
 
 		notification.setMessage(message);

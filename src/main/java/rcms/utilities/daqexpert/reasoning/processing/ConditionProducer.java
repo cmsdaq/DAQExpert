@@ -15,6 +15,7 @@ import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -107,8 +108,8 @@ public class ConditionProducer {
 
 		Context context = null;
 
-		if (logicModule instanceof ActionLogicModule) {
-			context = ((ActionLogicModule) logicModule).getContext();
+		if (logicModule instanceof ContextLogicModule) {
+			context = ((ContextLogicModule) logicModule).getContext();
 		}
 
 		Boolean leftResult = false;
@@ -134,24 +135,38 @@ public class ConditionProducer {
 		result.setLogicModule(logicModule.getLogicModuleRegistry());
 		if (logicModule.getLogicModuleRegistry() != null) {
 			result.setGroup(logicModule.getLogicModuleRegistry().getGroup());
-		}else{
+		} else {
 			result.setGroup(ConditionGroup.HIDDEN);
 		}
 
 		if (value) {
+
+			/* put context into description */
+			if (logicModule instanceof ContextLogicModule) {
+				ContextLogicModule clm = (ContextLogicModule) logicModule;
+				logger.debug("Putting message into context: " + logicModule.getDescription());
+
+				/* Description never set */
+				if (result.getDescription() == null) {
+					result.setDescription(clm.getContext().getContentWithContext(logicModule.getDescription()));
+				}
+			} else {
+				result.setDescription(logicModule.getDescription());
+			}
+
+			/* put context into action */
 			if (logicModule instanceof ActionLogicModule) {
 				ActionLogicModule alm = (ActionLogicModule) logicModule;
-				logger.debug("Putting message into context: " + logicModule.getDescription());
-				if (result.getDescription() == null) {
-					result.setDescription(alm.getContext().getMessageWithContext(logicModule.getDescription()));
-				}
+				logger.debug("Putting action into context: " + alm.getAction());
+
 				if (result.getActionSteps() == null) {
 					result.setActionSteps(
 							alm.getContext().getActionWithContext(((ActionLogicModule) logicModule).getAction()));
 				}
 
 			} else {
-				result.setDescription(logicModule.getDescription());
+				// nothing to do here: no action if not instance of
+				// ActionLogicModule
 
 			}
 		}

@@ -130,7 +130,7 @@ public class Context implements Serializable {
 		return output;
 	}
 
-	public String getMessageWithContext(String message) {
+	public String getContentWithContext(String message) {
 
 		logger.debug("Putting context into message: " + message);
 		logger.debug("Context to be used: " + context);

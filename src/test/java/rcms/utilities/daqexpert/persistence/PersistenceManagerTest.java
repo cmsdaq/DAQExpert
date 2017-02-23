@@ -100,7 +100,7 @@ public class PersistenceManagerTest {
 		Assert.assertEquals(1, result.size());
 		Condition retrievedEntry = result.iterator().next();
 		
-		Assert.assertEquals("test1", retrievedEntry.getClassName());
+		Assert.assertEquals("test1", retrievedEntry.getTitle());
 		Assert.assertEquals(DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime(), retrievedEntry.getEnd());
 	}
 
@@ -193,9 +193,9 @@ public class PersistenceManagerTest {
 	private static Condition getFinishedEntry(Date startDate, String name, int duration) {
 		Condition entry = new Condition();
 		entry.setClassName(ConditionPriority.DEFAULTT);
-		entry.setTitle("Content of entry: " + name);
+		entry.setTitle(name);
 		entry.setStart(startDate);
-		//entry.setGroup(ConditionGroup.LHC_BEAM.getCode());
+		entry.setGroup(ConditionGroup.LHC_BEAM);
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -15,6 +16,7 @@ import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
+@Ignore
 public class ExperimentalProcessorTest {
 
 	public final static Logger logger = Logger.getLogger(ExperimentalProcessor.class);

@@ -43,7 +43,7 @@
 	<persistence-unit name="history-test"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.persistence.Entry</class>
+		<class>rcms.utilities.daqexpert.persistence.Condition</class>
 		<class>rcms.utilities.daqexpert.persistence.Point</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>

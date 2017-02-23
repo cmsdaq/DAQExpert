@@ -18,6 +18,7 @@ import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -131,7 +132,11 @@ public class ConditionProducer {
 			leftResult = true;
 		}
 		result.setLogicModule(logicModule.getLogicModuleRegistry());
-		result.setGroup(logicModule.getLogicModuleRegistry().getGroup());
+		if (logicModule.getLogicModuleRegistry() != null) {
+			result.setGroup(logicModule.getLogicModuleRegistry().getGroup());
+		}else{
+			result.setGroup(ConditionGroup.HIDDEN);
+		}
 
 		if (value) {
 			if (logicModule instanceof ActionLogicModule) {

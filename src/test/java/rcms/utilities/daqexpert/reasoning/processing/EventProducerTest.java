@@ -10,7 +10,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import rcms.utilities.daqaggregator.Application;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
@@ -32,9 +34,11 @@ public class EventProducerTest {
 	@Test
 	public void eventProducingTest() {
 
+		
 		ConditionProducer eventProducer = Mockito.spy(new ConditionProducer());
 
 		SimpleLogicModule checker = new NoRate();
+		//checker.setLogicModuleRegistry(LogicModuleRegistry.NoRate);
 		boolean value = false;
 		Pair<Boolean, Condition> a = eventProducer.produce(checker, value, t1);
 		Assert.assertTrue(a.getLeft());
@@ -60,7 +64,7 @@ public class EventProducerTest {
 
 		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
 				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
-				Mockito.notNull(ConditionPriority.class), Mockito.notNull(Context.class));
+				Mockito.notNull(ConditionPriority.class), Mockito.isNull(Context.class));
 	}
 
 	@Test

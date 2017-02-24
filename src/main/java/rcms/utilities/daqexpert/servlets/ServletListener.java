@@ -1,16 +1,10 @@
 package rcms.utilities.daqexpert.servlets;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.Properties;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -38,9 +32,7 @@ public class ServletListener implements ServletContextListener {
 						"No configuration file supplied with environment variable EXPERT_CONF");
 			}
 
-
 			Application.initialize(propertyFilePath);
-			
 
 			logger.info("Database mode: " + Application.get().getProp(Setting.DATABASE_MODE));
 			logger.info("Database url : " + Application.get().getProp(Setting.DATABASE_URL));

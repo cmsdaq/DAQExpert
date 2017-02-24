@@ -58,6 +58,7 @@ public class Condition implements Comparable<Condition> {
 
 	@JsonIgnore
 	@Enumerated(EnumType.ORDINAL)
+	@Column(name="logic_module")
 	private LogicModuleRegistry logicModule;
 	
 

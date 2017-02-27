@@ -32,53 +32,22 @@ public class EventSender {
 
 	}
 
-	public void send(EventToSend event) {
+	public boolean send(EventToSend event) {
 		try {
 
 			String input = objectMapper.writeValueAsString(event);
 
-			logger.info("Request: " + input);
-			sendEvent(input);
+			logger.debug("Request: " + input);
+			return sendEvent(input);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 
 	}
 
-	private int sendEvent2(String content) {
-		try {
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			HttpPost postRequest = new HttpPost(address);
-
-			logger.debug("sending content: " + content);
-			StringEntity input = new StringEntity(content);
-
-			input.setContentType("application/json");
-			postRequest.setEntity(input);
-
-			HttpResponse response = httpClient.execute(postRequest);
-			// TODO:should be either 201 or 200
-			int statusCode = response.getStatusLine().getStatusCode();
-			/*
-			 * if (statusCode != 201) { return statusCode; }
-			 */
-			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
-			String output;
-			logger.debug("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				logger.info(output);
-			}
-
-			httpClient.getConnectionManager().shutdown();
-			return statusCode;
-		} catch (IOException e) {
-			return 0;
-		}
-	}
-
-	private void sendEvent(String input) {
+	private boolean sendEvent(String input) {
 		try {
 
 			URL url = new URL(address);
@@ -101,12 +70,14 @@ public class EventSender {
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
 			String output;
-			System.out.println("Output from Server .... \n");
+			logger.trace("Output from Server .... \n");
 			while ((output = br.readLine()) != null) {
-				System.out.println(output);
+				logger.trace(output);
 			}
 
 			conn.disconnect();
+
+			return true;
 
 		} catch (MalformedURLException e) {
 
@@ -117,5 +88,6 @@ public class EventSender {
 			e.printStackTrace();
 
 		}
+		return false;
 	}
 }

@@ -19,7 +19,7 @@ public class EventCollector implements EventRegister {
 	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow())
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("+ " + logicModule);
+				logger.debug("+ " + logicModule);
 
 				Event event = new Event();
 				event.setCondition(condition);
@@ -34,7 +34,7 @@ public class EventCollector implements EventRegister {
 	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow())
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("- " + logicModule);
+				logger.debug("- " + logicModule);
 
 				Event event = new Event();
 				event.setCondition(condition);
@@ -51,7 +51,7 @@ public class EventCollector implements EventRegister {
 		if (condition.isShow())
 
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("| " + logicModule);
+				logger.debug("| " + logicModule);
 			}
 
 	}

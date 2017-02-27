@@ -92,9 +92,22 @@ public class DataPrepareJob implements Runnable {
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
+						int success = 0;
+						int failed = 0;
 						for (Event event : eventRegister.getEvents()) {
-							logger.info(event.generateEventToSend().toString());
-							eventSender.send(event.generateEventToSend());
+							boolean successful = eventSender.send(event.generateEventToSend());
+							if (!successful) {
+								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());
+								failed++;
+							} else {
+								success++;
+							}
+						}
+						eventRegister.getEvents().clear();
+						if (failed != 0) {
+							logger.warn(failed + " events failed to send, " + success + " successful");
+						} else if (success != 0) {
+							logger.info("All " + success + " events successfully sent to nm");
 						}
 
 					} catch (RuntimeException e) {

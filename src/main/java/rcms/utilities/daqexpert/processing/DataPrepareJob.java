@@ -10,11 +10,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DAQException;
-import rcms.utilities.daqaggregator.DAQExceptionCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.events.Event;
+import rcms.utilities.daqexpert.events.EventRegister;
+import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
@@ -36,14 +39,20 @@ public class DataPrepareJob implements Runnable {
 
 	private final SnapshotProcessor snapshotProcessor;
 
+	private final EventRegister eventRegister;
+	private final EventSender eventSender;
+
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
-			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager) {
+			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
+			EventSender eventSender) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
 		this.persistenceManager = persistenceManager;
+		this.eventRegister = eventRegister;
+		this.eventSender = eventSender;
 	}
 
 	private static int priority = 0;
@@ -64,11 +73,13 @@ public class DataPrepareJob implements Runnable {
 					else
 						priority++;
 
-					ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager,
-							snapshotProcessor);
-					Future<Pair<Set<Condition>, List<Point>>> future = executorService.submit(processJob);
+					ProcessJob snapshotRetrieveAndAnalyzeJob = new ProcessJob(priority, snapshots.getRight(),
+							dataManager, snapshotProcessor);
+					Future<Pair<Set<Condition>, List<Point>>> future = executorService
+							.submit(snapshotRetrieveAndAnalyzeJob);
 
 					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
+
 					try {
 
 						long t1 = System.currentTimeMillis();
@@ -80,6 +91,11 @@ public class DataPrepareJob implements Runnable {
 						logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
+
+						for (Event event : eventRegister.getEvents()) {
+							logger.info(event.generateEventToSend().toString());
+							eventSender.send(event.generateEventToSend());
+						}
 
 					} catch (RuntimeException e) {
 						logger.warn("Exception during result persistence - results will be forgotten");

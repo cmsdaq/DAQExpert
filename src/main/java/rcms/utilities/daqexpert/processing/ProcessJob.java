@@ -94,7 +94,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 					segmentingTime += (endSegmenting - startSegmenting);
 
 					Long startProcessing = System.currentTimeMillis();
-					Set<Condition> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
+					Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
 					Long endProcessing = System.currentTimeMillis();
 					processingTime += (endProcessing - startProcessing);
 

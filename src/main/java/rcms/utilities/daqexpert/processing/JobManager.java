@@ -1,7 +1,9 @@
 package rcms.utilities.daqexpert.processing;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
@@ -20,6 +23,10 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.events.EventCollector;
+import rcms.utilities.daqexpert.events.EventPrinter;
+import rcms.utilities.daqexpert.events.EventRegister;
+import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
@@ -94,10 +101,31 @@ public class JobManager {
 				endDate != null ? endDate.getTime() : null, sourceDirectory);
 
 		ConditionProducer eventProducer = new ConditionProducer();
+
+		EventRegister eventRegister = new EventCollector();
+		eventProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
-		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor,
-				persistenceManager);
+		long offset = 0;
+		try {
+			offset = Long.parseLong(Application.get().getProp(Setting.NM_OFFSET));
+		} catch (NumberFormatException e) {
+			logger.error("Problem parsing offset");
+		}
+		Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		long startTime = utcCalendar.getTimeInMillis() - offset;
+		utcCalendar.setTimeInMillis(startTime);
+		Date nmStartDate = utcCalendar.getTime();
+		String offsetString = DurationFormatUtils.formatDuration(offset, "d 'days', HH:mm:ss", true);
+		logger.info(
+				"Notifications will generated from: " + nmStartDate + " (now minus offset of " + offsetString + ")");
+
+		EventSender eventSender = new EventSender(Application.get().getProp(Setting.NM_API_CREATE));
+
+		Long startTimestampToGenerateNotifications = System.currentTimeMillis() - offset;
+
+		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
+				eventRegister, eventSender);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 	}
@@ -112,11 +140,10 @@ public class JobManager {
 		}
 		// TODO: class name vs priority - decide on one convention
 		condition.setClassName(ConditionPriority.DEFAULTT);
-		
-		
+
 		condition.setGroup(ConditionGroup.EXPERT_VERSION);
 		String version = this.getClass().getPackage().getImplementationVersion();
-		if(version == null){
+		if (version == null) {
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
@@ -130,10 +157,12 @@ public class JobManager {
 
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Condition> destination, String scriptName) {
 
-		ConditionProducer eventProducer = new ConditionProducer();
-		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(eventProducer);
+		ConditionProducer conditionProducer = new ConditionProducer();
+		EventRegister eventRegister = new EventPrinter();
+		conditionProducer.setEventRegister(eventRegister);
+		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(conditionProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
-				persistenceManager);
+				persistenceManager, eventRegister, null);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);

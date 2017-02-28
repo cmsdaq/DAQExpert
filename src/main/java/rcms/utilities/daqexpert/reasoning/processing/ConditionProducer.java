@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
@@ -29,6 +30,8 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
  *
  */
 public class ConditionProducer {
+
+	public EventRegister eventRegister;
 
 	public ConditionProducer() {
 		unfinished = new HashMap<>();
@@ -53,10 +56,10 @@ public class ConditionProducer {
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	public Set<Condition> finish(Date date) {
+	private Set<Condition> finish(Date date) {
 
 		logger.debug("Artificial finishing with unfinished events: " + unfinished);
-		logger.trace("finishedTR: " + finishedThisRound);
+		logger.trace("finished This Round: " + finishedThisRound);
 
 		Set<Condition> result = new HashSet<>();
 
@@ -190,6 +193,8 @@ public class ConditionProducer {
 				logger.debug("Finishing entry " + toFinish.getTitle() + " with id: " + toFinish.getId());
 				finishedThisRound.add(toFinish);
 			}
+
+			eventRegister.registerEnd(logicModule.getLogicModuleRegistry(), toFinish);
 		}
 
 		/* add new condition */
@@ -198,6 +203,7 @@ public class ConditionProducer {
 		condition.setTitle(content);
 		condition.setShow(value);
 		condition.setStart(date);
+		eventRegister.registerBegin(logicModule.getLogicModuleRegistry(), condition);
 
 		unfinished.put(logicModuleName, condition);
 		return condition;
@@ -228,6 +234,14 @@ public class ConditionProducer {
 
 	protected Map<String, Condition> getUnfinished() {
 		return unfinished;
+	}
+
+	public EventRegister getEventRegister() {
+		return eventRegister;
+	}
+
+	public void setEventRegister(EventRegister eventRegister) {
+		this.eventRegister = eventRegister;
 	}
 
 }

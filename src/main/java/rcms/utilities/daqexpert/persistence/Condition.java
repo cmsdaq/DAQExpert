@@ -58,15 +58,12 @@ public class Condition implements Comparable<Condition> {
 
 	@JsonIgnore
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name="logic_module")
+	@Column(name = "logic_module")
 	private LogicModuleRegistry logicModule;
-	
 
 	@Enumerated(EnumType.ORDINAL)
-	@Column(name="group_name")
+	@Column(name = "group_name")
 	private ConditionGroup group;
-	
-	
 
 	@JsonIgnore
 	@Transient
@@ -195,12 +192,6 @@ public class Condition implements Comparable<Condition> {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return "Entry [show=" + show + ", state=" + state + ", id=" + id + ", content=" + title + ", start=" + start
-				+ ", end=" + end + ", className=" + priority + "]";
-	}
-
 	public LogicModuleRegistry getLogicModule() {
 		return logicModule;
 	}
@@ -291,6 +282,22 @@ public class Condition implements Comparable<Condition> {
 
 	public void setGroup(ConditionGroup group) {
 		this.group = group;
+	}
+
+	@Override
+	public String toString() {
+		return "Condition [id=" + id + ", duration=" + duration + ", show=" + show + ", state=" + state
+				+ ", logicModule=" + logicModule + ", group=" + group + ", finishedContext=" + finishedContext
+				+ ", title=" + title + ", description=" + description + ", start=" + start + ", end=" + end
+				+ ", priority=" + priority + "]";
+	}
+
+	public ConditionPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(ConditionPriority priority) {
+		this.priority = priority;
 	}
 
 }

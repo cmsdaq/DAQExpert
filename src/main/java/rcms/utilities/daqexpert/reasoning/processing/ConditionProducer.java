@@ -56,7 +56,7 @@ public class ConditionProducer {
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	public Set<Condition> finish(Date date) {
+	private Set<Condition> finish(Date date) {
 
 		logger.debug("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finished This Round: " + finishedThisRound);

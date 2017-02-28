@@ -21,7 +21,10 @@ import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
+import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
  * This job manages reading and processing the snapshots
@@ -92,9 +95,37 @@ public class DataPrepareJob implements Runnable {
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
+						Condition newestUnfinished = null;
+						for (Condition condition : result.getLeft()) {
+							if (condition.isShow() && condition.getPriority() == ConditionPriority.CRITICAL
+									&& condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
+								ConditionWebSocketServer.sessionHandler.addCondition(condition);
+
+								// exists some unfinished
+								// TODO: add some threshold
+								if (condition.getEnd() == null) {
+									if (newestUnfinished == null)
+										newestUnfinished = condition;
+									else {
+										if (condition.getStart().after(newestUnfinished.getStart())) {
+											newestUnfinished = condition;
+										}
+									}
+								}
+							}
+						}
+
+						ConditionWebSocketServer.sessionHandler.removeCurrent();
+						if (newestUnfinished != null) {
+							logger.info("Exists unfinished action condition after this round: " + newestUnfinished);
+							ConditionWebSocketServer.sessionHandler.updateCurrent(newestUnfinished);
+						}
+						
+
 						int success = 0;
 						int failed = 0;
 						for (Event event : eventRegister.getEvents()) {
+							
 							boolean successful = eventSender.send(event.generateEventToSend());
 							if (!successful) {
 								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());

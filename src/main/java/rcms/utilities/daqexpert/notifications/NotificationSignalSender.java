@@ -10,13 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
- * Sends signals to Notificatin Manager via RESTFull API
+ * Sends signals to Notification Manager via RESTFull API
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
@@ -25,7 +26,7 @@ public class NotificationSignalSender {
 
 	private static final Logger logger = Logger.getLogger(NotificationSignalSender.class);
 
-	private NotificationSignalConnector notificationConnector;
+	private EventSender notificationConnector;
 
 	private ObjectMapper objectMapper;
 
@@ -51,7 +52,7 @@ public class NotificationSignalSender {
 	 *            notifications based on older snapshots than this timestamp
 	 *            will not generate notifications
 	 */
-	public NotificationSignalSender(NotificationSignalConnector notificationConnector, String createAPIAddress,
+	private NotificationSignalSender(EventSender notificationConnector, String createAPIAddress,
 			String finishAPIAddress, long appStartTime) {
 		this.notificationConnector = notificationConnector;
 		this.appStartTime = appStartTime;
@@ -167,7 +168,7 @@ public class NotificationSignalSender {
 		String notificationString;
 		try {
 			notificationString = objectMapper.writeValueAsString(notification);
-			return notificationConnector.sendSignal(createAPIAddress, notificationString);
+			//return notificationConnector.sendSignal(createAPIAddress, notificationString);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (RuntimeException e) {
@@ -185,7 +186,7 @@ public class NotificationSignalSender {
 		finishNotification.setPlay(entry.getLogicModule().getLogicModule().isNotificationEndPlay());
 		try {
 			String notificationAsString = objectMapper.writeValueAsString(finishNotification);
-			notificationConnector.sendSignal(finishAPIAddress, notificationAsString);
+			//notificationConnector.sendSignal(finishAPIAddress, notificationAsString);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

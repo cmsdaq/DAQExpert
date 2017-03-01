@@ -94,7 +94,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 					segmentingTime += (endSegmenting - startSegmenting);
 
 					Long startProcessing = System.currentTimeMillis();
-					Set<Condition> logicResults = snapshotProcessor.process(daq, true, includeExperimental);
+					Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
 					Long endProcessing = System.currentTimeMillis();
 					processingTime += (endProcessing - startProcessing);
 
@@ -124,11 +124,11 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		}
 
 		if (daq != null) {
-			logger.debug("Temporarly finishing events");
+			/*logger.debug("Temporarly finishing events");
 			Set<Condition> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
 			// Application.get().getDataManager().getResult().addAll(finished);
 			logger.debug("Force finishing returned with results: " + finished);
-			result.addAll(finished);
+			result.addAll(finished);*/
 		}
 
 		return Pair.of(result, points);

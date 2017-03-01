@@ -6,15 +6,14 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class RunOngoing extends SimpleLogicModule {
 
 	public RunOngoing() {
 		this.name = "Run ongoing";
-		this.group = EventGroup.RUN_ONGOING;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Run is ongoing according to TCDS state";
 		this.setNotificationPlay(true);
 		this.setSoundToPlay(Sound.NEW_RUN);

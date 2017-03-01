@@ -5,21 +5,20 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies partition deadtime
  */
-public class PartitionDeadtime extends ActionLogicModule {
+public class PartitionDeadtime extends ContextLogicModule {
 
 	private final float threshold;
 
 	public PartitionDeadtime(final float threshold) {
 		this.name = "Partition deadtime";
-		this.group = EventGroup.PARTITION_DEADTIME;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
 		this.setNotificationPlay(true);
 		this.threshold = threshold;

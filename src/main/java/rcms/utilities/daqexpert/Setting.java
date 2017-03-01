@@ -4,8 +4,7 @@ public enum Setting {
 
 	NM_DASHBOARD("nm.dashboard"),
 	NM_NOTIFICATIONS("nm.notifications"),
-	NM_API_CREATE("nm.api.create"),
-	NM_API_CLOSE("nm.api.close"),
+	NM_API_CREATE("nm.api"),
 	NM_OFFSET("nm.offset"),
 
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),

@@ -4,15 +4,14 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class NoRateWhenExpected extends SimpleLogicModule {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
-		this.group = EventGroup.NO_RATE_WHEN_EXPECTED;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "No rate when expected";
 		this.setNotificationDisplay(true);
 		this.setNotificationPlay(true);
@@ -32,9 +31,9 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		transition = results.get(Transition.class.getSimpleName());
 
 		if (stableBeams)
-			this.priority = EventPriority.CRITICAL;
+			this.priority = ConditionPriority.CRITICAL;
 		else
-			this.priority = EventPriority.DEFAULTT;
+			this.priority = ConditionPriority.DEFAULTT;
 
 		if (expectedRate && noRate && !transition)
 			return true;

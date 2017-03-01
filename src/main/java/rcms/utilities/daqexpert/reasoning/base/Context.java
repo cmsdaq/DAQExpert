@@ -25,6 +25,7 @@ public class Context implements Serializable {
 	private Map<String, Set<Object>> context;
 
 	private Set<String> actionKey;
+	
 
 	public Context() {
 		this.context = new HashMap<>();
@@ -39,8 +40,13 @@ public class Context implements Serializable {
 		if (!context.get(key).contains(object)) {
 			context.get(key).add(object);
 		}
+		
+		
 	}
 
+	/**
+	 * Called when Condition ends
+	 */
 	public void clearContext() {
 		this.context = new HashMap<>();
 		this.actionKey = new HashSet<>();
@@ -65,8 +71,8 @@ public class Context implements Serializable {
 		} else if (actionn instanceof SimpleAction) {
 			actionSteps = actionn.getSteps();
 		}
-		logger.info("Putting context into action: " + actionSteps);
-		logger.info("Context to be used: " + context);
+		logger.debug("Putting context into action: " + actionSteps);
+		logger.debug("Context to be used: " + context);
 
 		if (actionSteps != null) {
 			List<String> actionStepsWithContext = new ArrayList<>();
@@ -124,14 +130,14 @@ public class Context implements Serializable {
 		return output;
 	}
 
-	public String getMessageWithContext(String message) {
+	public String getContentWithContext(String message) {
 
-		logger.info("Putting context into message: " + message);
-		logger.info("Context to be used: " + context);
+		logger.debug("Putting context into message: " + message);
+		logger.debug("Context to be used: " + context);
 
 		String newMessage = putContext(message);
 
-		logger.info("Message with context: " + newMessage);
+		logger.debug("Message with context: " + newMessage);
 
 		return newMessage;
 	}

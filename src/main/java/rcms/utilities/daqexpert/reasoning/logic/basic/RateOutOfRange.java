@@ -4,8 +4,8 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class RateOutOfRange extends SimpleLogicModule {
 
@@ -14,8 +14,7 @@ public class RateOutOfRange extends SimpleLogicModule {
 
 	public RateOutOfRange(float min, float max) {
 		this.name = "Rate out of range";
-		this.group = EventGroup.RATE_OUT_OF_RANGE;
-		this.priority = EventPriority.DEFAULTT;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "L1 rate out of expected range [" + min + "; " + max + "]";
 		this.min = min;
 		this.max = max;

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * Demo Logic Module: Identifies even minutes
@@ -19,8 +19,7 @@ public class EvenMinutesExample extends SimpleLogicModule {
 		this.name = "even";
 		this.description = "identifies even minutes";
 
-		this.group = EventGroup.EXPERIMENTAL;
-		this.priority = EventPriority.EXPERIMENTAL;
+		this.priority = ConditionPriority.EXPERIMENTAL;
 	}
 
 	@Override

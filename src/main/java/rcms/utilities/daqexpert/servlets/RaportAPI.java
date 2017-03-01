@@ -1,8 +1,9 @@
 package rcms.utilities.daqexpert.servlets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -15,10 +16,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.persistence.Entry;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.persistence.Condition;
 
 public class RaportAPI extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -38,38 +36,14 @@ public class RaportAPI extends HttpServlet {
 
 			Map<String, Object> result = new HashMap<>();
 
-			Entry entry = Application.get().getPersistenceManager().getEntryById(id);
+			Condition entry = Application.get().getPersistenceManager().getEntryById(id);
 
-			String description;
-			List<String> actionSteps;
-			LogicModule eventFinder = entry.getEventFinder();
 
-			/* Case of Extended condition */
-			if (eventFinder instanceof ActionLogicModule) {
-				ActionLogicModule extendedCondition = (ActionLogicModule) eventFinder;
-				Context context = entry.getFinishedContext();
-				if (context != null) {
-					description = context.getMessageWithContext(extendedCondition.getDescription());
-					actionSteps = context.getActionWithContext(extendedCondition.getAction());
-
-				} else {
-					description = extendedCondition.getDescription();
-					actionSteps = extendedCondition.getAction().getSteps();
-				}
-
-				result.put("description", description);
-				result.put("action", actionSteps);
-				result.put("elements", entry.getFinishedContext().getContext());
-			}
-
-			/* case of every other condition */
-			else {
-				description = eventFinder.getDescription();
-			}
-
-			result.put("description", description);
-			result.put("name", entry.getContent());
+			result.put("description", entry.getDescription());
+			result.put("name", entry.getTitle());
 			result.put("duration", entry.getDuration());
+			
+			result.put("action", entry.getActionSteps());
 
 			String json = objectMapper.writeValueAsString(result);
 			// TODO: externalize the Allow-Origin

@@ -64,19 +64,21 @@
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 
-				<!-- EXPERT BROWSER -->
-				<li class="active"><a href="#"><i
-						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
 
 				<!-- NM DASHBOARD -->
 				<li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_DASHBOARD));%>"><i
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
+						
+				<!-- EXPERT BROWSER -->
+				<li class="active"><a href="#"><i
+						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
+
 
 				<!-- NM NOTIFICATIONS -->
-				<li><a
+				<%-- <li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_NOTIFICATIONS));%>"><i
-						class="glyphicon glyphicon-calendar"></i> Notifications</a></li>
+						class="glyphicon glyphicon-calendar"></i> Notifications</a></li> --%>
 
 			</ul>
 		</div>

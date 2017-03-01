@@ -4,8 +4,8 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This is an sketch of Logic Module (LM)
@@ -18,8 +18,7 @@ public class SketchLogicModule extends SimpleLogicModule {
 		/* TODO: 1. set following fields: name, description */
 		this.name = "experimental";
 		this.description = "quick start LM";
-		this.group = EventGroup.EXPERIMENTAL;
-		this.priority = EventPriority.EXPERIMENTAL;
+		this.priority = ConditionPriority.EXPERIMENTAL;
 	}
 
 	/**

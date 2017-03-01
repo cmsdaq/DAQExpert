@@ -157,17 +157,17 @@ var groupsList = [ {
 	title : 'Warnings',
 	primary : false
 }, {
-	id : 'ver',
-	content : 'Ver. (0)',
-	name : 'Ver.',
-	title : 'Software version',
-	primary : false
-}, {
 	id : 'experimental',
 	content : 'Exp. (0)',
 	name : 'Exp.',
 	title : 'Experimental LM',
 	primary : false
+}, {
+	id : 'ver',
+	content : 'Ver. (0)',
+	name : 'Ver.',
+	title : 'Software version',
+	primary : true
 } ];
 
 var options = {
@@ -342,7 +342,7 @@ function load(data, fakeEnd) {
 				countPerGroup[groupName] = currCount + 1;
 			}
 		} else {
-			console.log("Group " + groupName + " will be ignored");
+			//console.log("Group " + groupName + " will be ignored");
 
 		}
 	});
@@ -359,9 +359,9 @@ function load(data, fakeEnd) {
 
 	/* Update groups content */
 	$.each(countPerGroup, function(index, value) {
-		//console.log("Current: " + JSON.stringify(index));
+		// console.log("Current: " + JSON.stringify(index));
 		var current = groups.get(index);
-		//console.log("Current: " + JSON.stringify(current));
+		// console.log("Current: " + JSON.stringify(current));
 
 		var newContent = "";
 
@@ -378,8 +378,20 @@ function load(data, fakeEnd) {
 		});
 
 	});
+	
 
 	items.clear();
+	
+	items.add({id: 'bg-2016-md4', start: '2016-10-03', end: '2016-10-07', content:'MD4', type: 'background', className: 'blue'});
+	items.add({id: 'bg-2016-md5', start: '2016-10-27', end: '2016-10-30', content:'MD5', type: 'background', className: 'blue'});
+	
+	items.add({id: 'bg-2016-ts2', start: '2016-09-12', end: '2016-09-16', content:'TS2', type: 'background', className: 'green'});
+	items.add({id: 'bg-2016-ts3', start: '2016-10-31', end: '2016-11-04', content:'TS3', type: 'background', className: 'green'});
+	items.add({id: 'bg-2016-eyets', start: '2016-12-05', end: '2017-04-23', content:'EYETS', type: 'background', className: 'green'});
+	
+	items.add({id: 'bg-2017-mwgr1', start: '2017-02-08', end: '2017-02-10', content:'MWGR1', type: 'background', className: 'red'});
+	items.add({id: 'bg-2017-mwgr2', start: '2017-03-01', end: '2017-03-03', content:'MWGR2', type: 'background', className: 'red'});
+	items.add({id: 'bg-2017-mwgr3', start: '2017-03-15', end: '2017-03-17', content:'MWGR3', type: 'background', className: 'red'});
 	items.add(visibleData);
 
 };

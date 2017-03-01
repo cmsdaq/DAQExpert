@@ -10,7 +10,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -48,7 +48,7 @@ public class FlowchartCase6 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? EventPriority.CRITICAL : EventPriority.DEFAULTT;
+		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
 
 		boolean result = false;
 

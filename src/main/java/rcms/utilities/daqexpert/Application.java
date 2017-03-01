@@ -48,7 +48,7 @@ public class Application {
 		String v = instance.getClass().getPackage().getImplementationVersion();
 		logger.info("DAQExpert version: " + v);
 		instance.persistenceManager = new PersistenceManager("history", instance.getProp());
-		instance.setDataManager(new DataManager(instance.persistenceManager));
+		instance.setDataManager(new DataManager());
 	}
 
 	private Application(String propertiesFile) {

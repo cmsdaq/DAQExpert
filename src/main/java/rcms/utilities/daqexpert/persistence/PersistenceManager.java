@@ -1,16 +1,17 @@
 package rcms.utilities.daqexpert.persistence;
 
-import java.io.FileInputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,14 +21,14 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import rcms.utilities.daqexpert.reasoning.base.enums.EventPriority;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 
@@ -37,7 +38,7 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
  * 
  * 
  * Performance test: Time to insert 10000 Entries individually was 55315 ms
- * Performance test: Time to insert 10000 Entries at once      was   456 ms
+ * Performance test: Time to insert 10000 Entries at once was 456 ms
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
@@ -45,27 +46,32 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
-	private final EntityManager entityManager;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
-	public PersistenceManager(String persistenceUnitName,Properties props) {
+	private final EntityManager entryEntityManager;
 
-		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName,props);
-		entityManager = entityManagerFactory.createEntityManager();
+	public PersistenceManager(String persistenceUnitName, Properties props) {
+
+		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
+		entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public void persist(Set<Entry> entries) {
+	/**
+	 * Persiste multipe entries in one transaction
+	 * 
+	 * @param entries
+	 */
+	public void persist(Set<Condition> entries) {
 
-		Session session = entityManager.unwrap(Session.class);
-		Transaction tx = session.beginTransaction();
-		for (Entry point : entries) {
+		EntityTransaction tx = entryEntityManager.getTransaction();
+		tx.begin();
+		for (Condition point : entries) {
 
 			if (point.isShow())
-				session.save(point);
+				entryEntityManager.persist(point);
 		}
 		tx.commit();
-		// session.close();
 	}
 
 	/**
@@ -73,28 +79,35 @@ public class PersistenceManager {
 	 * 
 	 * @param entry
 	 */
-	public void persist(Entry entry) {
-		entityManager.getTransaction().begin();
+	public void persist(Condition entry) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		entityManager.persist(entry);
-		entityManager.getTransaction().commit();
+		tx.commit();
+		entityManager.close();
 	}
 
 	public void persist(Point test) {
-		entityManager.getTransaction().begin();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		entityManager.persist(test);
-		entityManager.getTransaction().commit();
+		tx.commit();
+		entityManager.close();
 	}
 
 	public void persist(List<Point> points) {
 
-		Session session = entityManager.unwrap(Session.class);
-		Transaction tx = session.beginTransaction();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 		for (Point point : points) {
 
-			session.save(point);
+			entityManager.persist(point);
 		}
 		tx.commit();
-		// session.close();
+		entityManager.close();
 	}
 
 	public List<Point> getRawData(Date startDate, Date endDate) {
@@ -102,7 +115,7 @@ public class PersistenceManager {
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
 
-		logger.info("resolution of data to RAW API " + resolution);
+		logger.debug("resolution of data to RAW API " + resolution);
 
 		// extend slightly timespan so that few snapshots more on the left and
 		// right are loaded to the chart - avoid cutting the chart lines
@@ -114,7 +127,7 @@ public class PersistenceManager {
 		c.add(Calendar.SECOND, 10);
 		endDate = c.getTime();
 
-		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		Criteria elementsCriteria = session.createCriteria(Point.class);
@@ -126,6 +139,7 @@ public class PersistenceManager {
 		logger.debug(
 				result.size() + " points of resolution " + resolution.ordinal() + "(" + resolution + ") retrieved");
 
+		entityManager.close();
 		return result;
 	}
 
@@ -140,12 +154,13 @@ public class PersistenceManager {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Entry> getEntries(Date startDate, Date endDate, long durationThreshold,
+	public List<Condition> getEntries(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
 		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
-		Criteria elementsCriteria = session.createCriteria(Entry.class);
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
 		// elementsCriteria.addOrder(Order.desc("start"));
 
 		Disjunction disjunction = Restrictions.disjunction();
@@ -166,18 +181,22 @@ public class PersistenceManager {
 		elementsCriteria.add(disjunction);
 
 		// Events not hidden
-		elementsCriteria.add(Restrictions.ne("group", "hidden"));
+		elementsCriteria.add(Restrictions.ne("group", ConditionGroup.HIDDEN));
 
-		return elementsCriteria.list();
+		List<Condition> result = elementsCriteria.list();
+		entityManager.close();
+
+		return result;
 	}
 
 	public List<TinyEntryMapObject> getTinyEntriesMask(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask, DataResolution resolution) {
 		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		List<TinyEntryMapObject> resultTiny = new ArrayList<TinyEntryMapObject>();
 		StringBuilder sb = new StringBuilder();
-		sb.append("select e.group, count(e.id), min(e.start), max(e.end) from Entry e ");
+		sb.append("select e.group, count(e.id), min(e.start), max(e.end) from Condition e ");
 		sb.append("where duration < :threshold ");
 		sb.append("and start_date < :endDate ");
 		sb.append("and end_date > :startDate ");
@@ -223,7 +242,9 @@ public class PersistenceManager {
 		for (Object[] row : result) {
 			// System.out.println(result);
 			TinyEntryMapObject curr = new TinyEntryMapObject();
-			curr.setGroup((String) row[0]);
+
+			ConditionGroup group = (ConditionGroup) row[0];
+			curr.setGroup(group);
 			curr.setCount((long) row[1]);
 
 			calendar.setTimeInMillis(((Timestamp) row[2]).getTime());
@@ -232,6 +253,7 @@ public class PersistenceManager {
 			curr.setEnd(calendar.getTime());
 			resultTiny.add(curr);
 		}
+		entityManager.close();
 		return resultTiny;
 
 	}
@@ -244,13 +266,13 @@ public class PersistenceManager {
 	 * @param endDate
 	 * @return
 	 */
-	public List<Entry> getEntriesWithMask(Date startDate, Date endDate) {
+	public List<Condition> getEntriesWithMask(Date startDate, Date endDate) {
 		DataResolution dr = RangeResolver.resolve(startDate, endDate);
 		/*
 		 * minimum width for filtering the blocks is calculated based on this.
 		 * This amount of sequential blocks of the same width is the threshold
 		 */
-		int elementsInRow = 100;
+		int elementsInRow = 80;
 		/*
 		 * Filter entries based on the duration and requested range
 		 */
@@ -258,7 +280,7 @@ public class PersistenceManager {
 		long durationThreshold = rangeInMs / elementsInRow;
 		logger.debug("Duration thresshold: " + durationThreshold);
 
-		List<Entry> thresholdData = getEntriesThreshold(startDate, endDate, durationThreshold);
+		List<Condition> thresholdData = getEntriesThreshold(startDate, endDate, durationThreshold);
 		logger.debug("Data resolution: " + dr);
 		logger.debug("Retrieved " + thresholdData.size() + " thresholded entries");
 
@@ -266,14 +288,17 @@ public class PersistenceManager {
 
 		logger.debug("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
 
+		long filterId =0;
 		for (TinyEntryMapObject mapObject : tinyData) {
-			Entry curr = new Entry();
+			Condition curr = new Condition();
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
-			curr.setContent(Long.toString(mapObject.getCount()));
+			curr.setTitle(Long.toString(mapObject.getCount()));
+			curr.setLogicModule(mapObject.getLogicModule());
 			curr.setGroup(mapObject.getGroup());
-			curr.setClassName(EventPriority.FILTERED.getCode());
+			curr.setClassName(ConditionPriority.FILTERED);
 			curr.calculateDuration();
+			curr.setId(-filterId++);
 
 			if (curr.getDuration() < durationThreshold) {
 				int append = (int) (durationThreshold - curr.getDuration());
@@ -292,17 +317,18 @@ public class PersistenceManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Entry> getEntries2(Date startDate, Date endDate, long durationThreshold,
+	public List<Condition> agetEntries2(Date startDate, Date endDate, long durationThreshold,
 			boolean includeTinyEntriesMask) {
-		// TODO: close session?
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Entry> cq = cb.createQuery(Entry.class);
-		Root<Entry> entry = cq.from(Entry.class);
+		CriteriaQuery<Condition> cq = cb.createQuery(Condition.class);
+		Root<Condition> entry = cq.from(Condition.class);
 		cq.groupBy(entry.get("group_name"));
 
-		Criteria elementsCriteria = session.createCriteria(Entry.class);
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
 		// elementsCriteria.addOrder(Order.desc("start"));
 
 		Disjunction disjunction = Restrictions.disjunction();
@@ -329,7 +355,9 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", "hidden"));
 
-		return elementsCriteria.list();
+		List<Condition> result = elementsCriteria.list();
+		entityManager.close();
+		return result;
 	}
 
 	/**
@@ -339,7 +367,7 @@ public class PersistenceManager {
 	 * @param endDate
 	 * @return
 	 */
-	public List<Entry> getEntriesPlain(Date startDate, Date endDate) {
+	public List<Condition> getEntriesPlain(Date startDate, Date endDate) {
 		return getEntries(startDate, endDate, 0, false);
 	}
 
@@ -351,21 +379,34 @@ public class PersistenceManager {
 	 * @param threshold
 	 * @return
 	 */
-	public List<Entry> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
+	public List<Condition> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
 		return getEntries(startDate, endDate, threshold, false);
 	}
 
-	public Entry getEntryById(Long id) {
+	public Condition getEntryById(Long id) {
 
-		Entry entry = entityManager.find(Entry.class, id);
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Condition entry = entityManager.find(Condition.class, id);
+
+		/*
+		 * Make sure to fetch all list - but dont want to annotate the main
+		 * class to be EAGER always
+		 */
+		Iterator<String> it = entry.getActionSteps().iterator();
+		while (it.hasNext()) {
+			it.next();
+		}
+		entityManager.close();
 		return entry;
 	}
 
-	public List<Entry> getEntries2(Date start, Date end) {
+	public List<Condition> agetEntries2(Date start, Date end) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		entityManager.getTransaction().begin();
-		List<Entry> result = entityManager.createQuery("from Entry", Entry.class).getResultList();
-		for (Entry event : result) {
-			System.out.println("Event (" + event.getStart() + ") : " + event.getContent());
+		List<Condition> result = entityManager.createQuery("from Conditions", Condition.class).getResultList();
+		for (Condition event : result) {
+			System.out.println("Event (" + event.getStart() + ") : " + event.getTitle());
 		}
 		entityManager.getTransaction().commit();
 		entityManager.close();

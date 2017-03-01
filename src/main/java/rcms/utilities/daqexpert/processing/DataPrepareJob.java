@@ -10,14 +10,21 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.DAQException;
-import rcms.utilities.daqaggregator.DAQExceptionCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.events.Event;
+import rcms.utilities.daqexpert.events.EventRegister;
+import rcms.utilities.daqexpert.events.EventSender;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
+import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
+import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
  * This job manages reading and processing the snapshots
@@ -35,14 +42,20 @@ public class DataPrepareJob implements Runnable {
 
 	private final SnapshotProcessor snapshotProcessor;
 
+	private final EventRegister eventRegister;
+	private final EventSender eventSender;
+
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
-			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager ) {
+			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
+			EventSender eventSender) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
 		this.persistenceManager = persistenceManager;
+		this.eventRegister = eventRegister;
+		this.eventSender = eventSender;
 	}
 
 	private static int priority = 0;
@@ -56,23 +69,83 @@ public class DataPrepareJob implements Runnable {
 			if (!readerJob.finished()) {
 				snapshots = readerJob.read();
 
-				if (priority == Integer.MAX_VALUE)
-					priority = 0;
-				else
-					priority++;
+				if (snapshots.getRight().size() > 0) {
 
-				ProcessJob processJob = new ProcessJob(priority, snapshots.getRight(), dataManager, snapshotProcessor);
-				Future<Set<Entry>> future = executorService.submit(processJob);
+					if (priority == Integer.MAX_VALUE)
+						priority = 0;
+					else
+						priority++;
 
-				Set<Entry> result = future.get(10, TimeUnit.SECONDS);
-				try {
+					ProcessJob snapshotRetrieveAndAnalyzeJob = new ProcessJob(priority, snapshots.getRight(),
+							dataManager, snapshotProcessor);
+					Future<Pair<Set<Condition>, List<Point>>> future = executorService
+							.submit(snapshotRetrieveAndAnalyzeJob);
 
-					persistenceManager.persist(result);
-					// TODO: batch persistence here
+					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
 
-				} catch (RuntimeException e) {
-					logger.warn("Exception during result persistence - results will be forgotten");
-					logger.error(e);
+					try {
+
+						long t1 = System.currentTimeMillis();
+						persistenceManager.persist(result.getLeft());
+						long t2 = System.currentTimeMillis();
+						persistenceManager.persist(result.getRight());
+						long t3 = System.currentTimeMillis();
+
+						logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
+								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
+								+ (t3 - t2) + "ms");
+
+						Condition newestUnfinished = null;
+						for (Condition condition : result.getLeft()) {
+							if (condition.isShow() && condition.getPriority() == ConditionPriority.CRITICAL
+									&& condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
+								ConditionWebSocketServer.sessionHandler.addCondition(condition);
+
+								// exists some unfinished
+								// TODO: add some threshold
+								if (condition.getEnd() == null) {
+									if (newestUnfinished == null)
+										newestUnfinished = condition;
+									else {
+										if (condition.getStart().after(newestUnfinished.getStart())) {
+											newestUnfinished = condition;
+										}
+									}
+								}
+							}
+						}
+
+						ConditionWebSocketServer.sessionHandler.removeCurrent();
+						if (newestUnfinished != null) {
+							logger.info("Exists unfinished action condition after this round: " + newestUnfinished);
+							ConditionWebSocketServer.sessionHandler.updateCurrent(newestUnfinished);
+						}
+						
+
+						int success = 0;
+						int failed = 0;
+						for (Event event : eventRegister.getEvents()) {
+							
+							boolean successful = eventSender.send(event.generateEventToSend());
+							if (!successful) {
+								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());
+								failed++;
+							} else {
+								success++;
+							}
+						}
+						eventRegister.getEvents().clear();
+						if (failed != 0) {
+							logger.warn(failed + " events failed to send, " + success + " successful");
+						} else if (success != 0) {
+							logger.info("All " + success + " events successfully sent to nm");
+						}
+
+					} catch (RuntimeException e) {
+						logger.warn("Exception during result persistence - results will be forgotten");
+						logger.error(e);
+						e.printStackTrace();
+					}
 				}
 
 			}

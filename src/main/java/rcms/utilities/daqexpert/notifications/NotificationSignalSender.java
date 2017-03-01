@@ -9,13 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.persistence.Entry;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.events.EventSender;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 /**
- * Sends signals to Notificatin Manager via RESTFull API
+ * Sends signals to Notification Manager via RESTFull API
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
@@ -24,7 +26,7 @@ public class NotificationSignalSender {
 
 	private static final Logger logger = Logger.getLogger(NotificationSignalSender.class);
 
-	private NotificationSignalConnector notificationConnector;
+	private EventSender notificationConnector;
 
 	private ObjectMapper objectMapper;
 
@@ -50,7 +52,7 @@ public class NotificationSignalSender {
 	 *            notifications based on older snapshots than this timestamp
 	 *            will not generate notifications
 	 */
-	public NotificationSignalSender(NotificationSignalConnector notificationConnector, String createAPIAddress,
+	private NotificationSignalSender(EventSender notificationConnector, String createAPIAddress,
 			String finishAPIAddress, long appStartTime) {
 		this.notificationConnector = notificationConnector;
 		this.appStartTime = appStartTime;
@@ -65,10 +67,11 @@ public class NotificationSignalSender {
 	 * 
 	 * @param entry
 	 */
-	public void send(Entry entry) {
+	public void send(Condition entry) {
 
 		if (!isPastSnapshot(entry.getStart().getTime())) {
-			if (entry.getEventFinder().isNotificationDisplay() || entry.getEventFinder().isNotificationPlay()) {
+			if (entry.getLogicModule().getLogicModule().isNotificationDisplay()
+					|| entry.getLogicModule().getLogicModule().isNotificationPlay()) {
 				EntryState state = entry.getState();
 				switch (state) {
 				case NEW:
@@ -109,57 +112,63 @@ public class NotificationSignalSender {
 	/**
 	 * Sends start signal to
 	 * 
-	 * @param event
+	 * @param condition
 	 * @return
 	 */
-	private int sendStartSignal(Entry event) {
+	private int sendStartSignal(Condition condition) {
 
 		logger.debug("Sending start signal");
 
 		Notification notification = new Notification();
-		notification.setDisplay(event.getEventFinder().isNotificationDisplay());
-		notification.setPlay(event.getEventFinder().isNotificationPlay());
-		notification.setDate(event.getStart());
+		notification.setDisplay(condition.getLogicModule().getLogicModule().isNotificationDisplay());
+		notification.setPlay(condition.getLogicModule().getLogicModule().isNotificationPlay());
+		notification.setDate(condition.getStart());
 
-		String message = event.getEventFinder().getName();
-		if (event.getEventFinder().getPrefixToPlay() != null) {
-			message = event.getEventFinder().getPrefixToPlay() + message;
+		String message = condition.getLogicModule().getLogicModule().getName();
+		if (condition.getLogicModule().getLogicModule().getPrefixToPlay() != null) {
+			message = condition.getLogicModule().getLogicModule().getPrefixToPlay() + message;
 		}
-		if (event.getEventFinder().getSuffixToPlay() != null) {
-			message = message + event.getEventFinder().getSuffixToPlay();
+		if (condition.getLogicModule().getLogicModule().getSuffixToPlay() != null) {
+			message = message + condition.getLogicModule().getLogicModule().getSuffixToPlay();
 		}
-		if (event.getEventFinder().getSoundToPlay() != null) {
-			notification.setSoundId(event.getEventFinder().getSoundToPlay().ordinal());
+		if (condition.getLogicModule().getLogicModule().getSoundToPlay() != null) {
+			notification.setSoundId(condition.getLogicModule().getLogicModule().getSoundToPlay().ordinal());
 		}
-		if (event.getEventFinder().isSkipText()) {
+		if (condition.getLogicModule().getLogicModule().isSkipText()) {
 			message = "";
 		}
-		if (event.getEventFinder() instanceof ComparatorLogicModule) {
+		if (condition.getLogicModule().getLogicModule() instanceof ComparatorLogicModule) {
 			notification.setCloseable(false);
 		} else {
 			notification.setCloseable(true);
 		}
 		logger.debug("Now working on: " + message);
-		logger.debug("Now working on: " + event);
+		logger.debug("Now working on: " + condition);
 
-		if (event.getEventFinder() instanceof ActionLogicModule) {
+		if (condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+			ContextLogicModule contextLogicModule = (ContextLogicModule) condition.getLogicModule().getLogicModule();
+			Context context = contextLogicModule.getContext();
+			message = context.getContentWithContext(message);
+		}
+		if (condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
 
-			ActionLogicModule finder = (ActionLogicModule) event.getEventFinder();
-			Context context = ((ActionLogicModule) finder).getContext();
-			message = context.getMessageWithContext(message);
-			notification.setAction(context.getActionWithContext(finder.getAction()));
+			ActionLogicModule actionLogicModule = (ActionLogicModule) condition.getLogicModule().getLogicModule();
+			Context context = actionLogicModule.getContext();
+			notification.setAction(context.getActionWithContext(actionLogicModule.getAction()));
 		}
 
 		notification.setMessage(message);
-		notification.setType_id(event.getEventFinder().getGroup().getNmId());
-		notification.setId(event.getId());
+
+		// TODO: type id should indicate expert system
+		notification.setType_id(0);
+		notification.setId(condition.getId());
 
 		logger.info("To be sent: " + notification.getMessage());
 
 		String notificationString;
 		try {
 			notificationString = objectMapper.writeValueAsString(notification);
-			return notificationConnector.sendSignal(createAPIAddress, notificationString);
+			//return notificationConnector.sendSignal(createAPIAddress, notificationString);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (RuntimeException e) {
@@ -169,15 +178,15 @@ public class NotificationSignalSender {
 
 	}
 
-	private void sendEndSignal(Entry entry) {
+	private void sendEndSignal(Condition entry) {
 		FinishNotification finishNotification = new FinishNotification();
 		finishNotification.setId(entry.getId());
 		finishNotification.setDate(entry.getEnd());
 		finishNotification.setDisplay(true);
-		finishNotification.setPlay(entry.getEventFinder().isNotificationEndPlay());
+		finishNotification.setPlay(entry.getLogicModule().getLogicModule().isNotificationEndPlay());
 		try {
 			String notificationAsString = objectMapper.writeValueAsString(finishNotification);
-			notificationConnector.sendSignal(finishAPIAddress, notificationAsString);
+			//notificationConnector.sendSignal(finishAPIAddress, notificationAsString);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

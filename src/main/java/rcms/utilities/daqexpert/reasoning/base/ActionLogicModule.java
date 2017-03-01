@@ -9,34 +9,20 @@ import rcms.utilities.daqexpert.reasoning.base.action.Action;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public abstract class ActionLogicModule extends SimpleLogicModule {
+public abstract class ActionLogicModule extends ContextLogicModule {
 
 	/**
 	 * What should be done when LM's condition is satisfied
 	 */
 	protected Action action;
-
-	/**
-	 * Context is used to parameterize action and description fields with
-	 * specific context information. Variables will be replaced with values from
-	 * this context
-	 */
-	protected final Context context;
-
-	public ActionLogicModule() {
-		this.context = new Context();
+	
+	public void setAction(Action action) {
+		this.action = action;
 	}
 
 	public Action getAction() {
 		return action;
 	}
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
-
-	public Context getContext() {
-		return context;
-	}
 
 }

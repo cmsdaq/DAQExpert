@@ -3,7 +3,9 @@ package rcms.utilities.daqexpert.servlets;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -16,6 +18,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
@@ -75,7 +78,7 @@ public class ServletListener implements ServletContextListener {
 
 	public void contextDestroyed(ServletContextEvent e) {
 		logger.info("Expert will go down now, starting shutdown sequence");
-
+		
 		jobManager.stop();
 
 		Enumeration<Driver> drivers = DriverManager.getDrivers();

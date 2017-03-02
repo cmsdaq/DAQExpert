@@ -61,6 +61,8 @@ public class JobManager {
 	private final DataPrepareJob futureDataPrepareJob;
 
 	private final JobScheduler readerRaskController;
+	
+	private final ConditionProducer eventProducer ;
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
@@ -100,7 +102,7 @@ public class JobManager {
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(),
 				endDate != null ? endDate.getTime() : null, sourceDirectory);
 
-		ConditionProducer eventProducer = new ConditionProducer();
+		eventProducer = new ConditionProducer();
 
 		EventRegister eventRegister = new EventCollector();
 		eventProducer.setEventRegister(eventRegister);
@@ -172,7 +174,8 @@ public class JobManager {
 	}
 
 	public void stop() {
-
+		
+		
 		readerRaskController.stopExecutors();
 		mainExecutor.shutdown();
 
@@ -185,5 +188,12 @@ public class JobManager {
 			logger.error("Could not gracefully terminate jobs");
 			logger.error(e);
 		}
+		
+
+		logger.info("Temporarly finishing events");
+		Set<Condition> finished = eventProducer.finish();
+		persistenceManager.persist(finished);
+		logger.info("Finished "+ finished.size()+" conditions.");
+		
 	}
 }

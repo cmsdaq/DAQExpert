@@ -63,6 +63,8 @@ public class JobManager {
 	private final JobScheduler readerRaskController;
 	
 	private final ConditionProducer eventProducer ;
+	
+	private Condition versionCondition ;
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
@@ -134,23 +136,23 @@ public class JobManager {
 
 	private void persistVersion(Date startDate, Date endDate) {
 
-		Condition condition = new Condition();
-		condition.setStart(startDate);
-		condition.setEnd(endDate);
+		versionCondition = new Condition();
+		versionCondition.setStart(startDate);
+		versionCondition.setEnd(endDate);
 		if (endDate != null) {
-			condition.calculateDuration();
+			versionCondition.calculateDuration();
 		}
 		// TODO: class name vs priority - decide on one convention
-		condition.setClassName(ConditionPriority.DEFAULTT);
+		versionCondition.setClassName(ConditionPriority.DEFAULTT);
 
-		condition.setGroup(ConditionGroup.EXPERT_VERSION);
+		versionCondition.setGroup(ConditionGroup.EXPERT_VERSION);
 		String version = this.getClass().getPackage().getImplementationVersion();
 		if (version == null) {
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
-		condition.setTitle(version);
-		this.persistenceManager.persist(condition);
+		versionCondition.setTitle(version);
+		this.persistenceManager.persist(versionCondition);
 	}
 
 	public void startJobs() {
@@ -188,6 +190,10 @@ public class JobManager {
 			logger.error("Could not gracefully terminate jobs");
 			logger.error(e);
 		}
+		
+		versionCondition.setEnd(new Date());
+		versionCondition.calculateDuration();
+		persistenceManager.persist(versionCondition);
 		
 
 		logger.info("Temporarly finishing events");

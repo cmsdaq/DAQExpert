@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -74,33 +75,38 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 
 			try {
 
-				Long startDeserializing = System.currentTimeMillis();
-				daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
-				if (firstSnapshot == null) {
-					firstSnapshot = daq.getLastUpdate();
-				}
-				Long endDeserializing = System.currentTimeMillis();
-				deserializingTime += (endDeserializing - startDeserializing);
-
-				if (daq != null) {
-
-					Long startSegmenting = System.currentTimeMillis();
-					if (dataManager != null) {
-						// this is not done in on-demand requests
-						points.addAll(dataManager.addSnapshot(new DummyDAQ(daq)));
-						dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
+				try {
+					Long startDeserializing = System.currentTimeMillis();
+					daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+					if (firstSnapshot == null) {
+						firstSnapshot = daq.getLastUpdate();
 					}
-					Long endSegmenting = System.currentTimeMillis();
-					segmentingTime += (endSegmenting - startSegmenting);
+					Long endDeserializing = System.currentTimeMillis();
+					deserializingTime += (endDeserializing - startDeserializing);
 
-					Long startProcessing = System.currentTimeMillis();
-					Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
-					Long endProcessing = System.currentTimeMillis();
-					processingTime += (endProcessing - startProcessing);
+					if (daq != null) {
 
-					result.addAll(logicResults);
-				} else {
-					logger.error("Snapshot not deserialized " + file.getAbsolutePath());
+						Long startSegmenting = System.currentTimeMillis();
+						if (dataManager != null) {
+							// this is not done in on-demand requests
+							points.addAll(dataManager.addSnapshot(new DummyDAQ(daq)));
+							dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
+						}
+						Long endSegmenting = System.currentTimeMillis();
+						segmentingTime += (endSegmenting - startSegmenting);
+
+						Long startProcessing = System.currentTimeMillis();
+						Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
+						Long endProcessing = System.currentTimeMillis();
+						processingTime += (endProcessing - startProcessing);
+
+						result.addAll(logicResults);
+					} else {
+						logger.error("Snapshot not deserialized " + file.getAbsolutePath());
+					}
+				} catch (Exception e) {
+					logger.error("Snapshot not desierialized: " + e);
+
 				}
 
 			} catch (RuntimeException e) {
@@ -124,11 +130,14 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		}
 
 		if (daq != null) {
-			/*logger.debug("Temporarly finishing events");
-			Set<Condition> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
-			// Application.get().getDataManager().getResult().addAll(finished);
-			logger.debug("Force finishing returned with results: " + finished);
-			result.addAll(finished);*/
+			/*
+			 * logger.debug("Temporarly finishing events"); Set<Condition>
+			 * finished = snapshotProcessor.getEventProducer().finish(new
+			 * Date(daq.getLastUpdate())); //
+			 * Application.get().getDataManager().getResult().addAll(finished);
+			 * logger.debug("Force finishing returned with results: " +
+			 * finished); result.addAll(finished);
+			 */
 		}
 
 		return Pair.of(result, points);

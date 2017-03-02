@@ -80,12 +80,13 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		EntityTransaction tx = entityManager.getTransaction();
+		
+		//EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entryEntityManager.getTransaction();
 		tx.begin();
-		entityManager.persist(entry);
+		entryEntityManager.persist(entry);
 		tx.commit();
-		entityManager.close();
+		//entityManager.close();
 	}
 
 	public void persist(Point test) {

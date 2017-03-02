@@ -190,16 +190,16 @@ public class JobManager {
 			logger.error("Could not gracefully terminate jobs");
 			logger.error(e);
 		}
-		
-		versionCondition.setEnd(new Date());
-		versionCondition.calculateDuration();
-		persistenceManager.persist(versionCondition);
-		
 
 		logger.info("Temporarly finishing events");
 		Set<Condition> finished = eventProducer.finish();
 		persistenceManager.persist(finished);
 		logger.info("Finished "+ finished.size()+" conditions.");
+		
+		
+		versionCondition.setEnd(new Date());
+		versionCondition.calculateDuration();
+		persistenceManager.persist(versionCondition);
 		
 	}
 }

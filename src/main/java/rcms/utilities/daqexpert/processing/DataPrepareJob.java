@@ -80,9 +80,14 @@ public class DataPrepareJob implements Runnable {
 							dataManager, snapshotProcessor);
 					Future<Pair<Set<Condition>, List<Point>>> future = executorService
 							.submit(snapshotRetrieveAndAnalyzeJob);
-
+					
 					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
-
+					
+					if(result == null){
+						logger.info("No result this round");
+						return;
+					}
+					
 					try {
 
 						long t1 = System.currentTimeMillis();

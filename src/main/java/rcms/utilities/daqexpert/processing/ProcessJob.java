@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -78,13 +77,15 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 				try {
 					Long startDeserializing = System.currentTimeMillis();
 					daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
-					if (firstSnapshot == null) {
-						firstSnapshot = daq.getLastUpdate();
-					}
+
 					Long endDeserializing = System.currentTimeMillis();
 					deserializingTime += (endDeserializing - startDeserializing);
 
 					if (daq != null) {
+
+						if (firstSnapshot == null) {
+							firstSnapshot = daq.getLastUpdate();
+						}
 
 						Long startSegmenting = System.currentTimeMillis();
 						if (dataManager != null) {
@@ -110,11 +111,14 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 				}
 
 			} catch (RuntimeException e) {
-				// logger.error("Error processing files " + file);
-				// logger.error(e);
-				// e.printStackTrace();
+				logger.error("Error processing files " + file);
 			}
 
+		}
+
+		if (daq == null) {
+			logger.info("This round there was only one snapshot and there was problem with it, aborting..");
+			return null;
 		}
 
 		lastSnapshot = daq.getLastUpdate();

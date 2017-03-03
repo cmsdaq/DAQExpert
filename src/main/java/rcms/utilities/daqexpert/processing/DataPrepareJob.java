@@ -10,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
@@ -21,8 +19,7 @@ import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
@@ -102,8 +99,8 @@ public class DataPrepareJob implements Runnable {
 
 						Condition newestUnfinished = null;
 						for (Condition condition : result.getLeft()) {
-							if (condition.isShow() && condition.getPriority() == ConditionPriority.CRITICAL
-									&& condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
+							if (condition.isShow()  /*&& condition.getPriority() == ConditionPriority.CRITICAL */
+									&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
 								ConditionWebSocketServer.sessionHandler.addCondition(condition);
 
 								// exists some unfinished

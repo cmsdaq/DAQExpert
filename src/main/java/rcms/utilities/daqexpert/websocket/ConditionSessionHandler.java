@@ -40,7 +40,7 @@ public class ConditionSessionHandler {
 			logger.info("New session will have info about current condition");
 			JsonObject addMessage = createCurrentMessage(currentCondition);
 			sendToSession(session, addMessage);
-		} else{
+		} else {
 			JsonProvider provider = JsonProvider.provider();
 			JsonObject removeMessage = provider.createObjectBuilder().add("action", "removeCurrent").build();
 			sendToAllConnectedSessions(removeMessage);
@@ -103,11 +103,13 @@ public class ConditionSessionHandler {
 
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String description = condition.getDescription() != null ? condition.getDescription() : "";
-		String title = condition.getTitle() != null ? condition.getTitle() + "#" + condition.getId() : "";
+		String title = condition.getTitle() != null ? condition.getTitle() + " #" + condition.getId() : "";
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 		JsonArrayBuilder actionArrayBuilder = provider.createArrayBuilder();
-		for (String step : condition.getActionSteps()) {
-			actionArrayBuilder.add(step);
+		if (condition.getActionSteps() != null) {
+			for (String step : condition.getActionSteps()) {
+				actionArrayBuilder.add(step);
+			}
 		}
 		JsonArray actionArray = actionArrayBuilder.build();
 

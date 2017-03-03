@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
@@ -21,7 +22,7 @@ public class EventCollector implements EventRegister {
 	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow()) {
 			if (condition.getPriority() == ConditionPriority.CRITICAL
-					|| logicModule.getLogicModule() instanceof KnownFailure) {
+					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("+ " + logicModule);
 
 				Event event = new Event();
@@ -49,7 +50,7 @@ public class EventCollector implements EventRegister {
 	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow())
 			if (condition.getPriority() == ConditionPriority.CRITICAL
-					|| logicModule.getLogicModule() instanceof KnownFailure) {
+					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("- " + logicModule);
 
 				Event event = new Event();
@@ -67,7 +68,7 @@ public class EventCollector implements EventRegister {
 		if (condition.isShow())
 
 			if (condition.getPriority() == ConditionPriority.CRITICAL
-					|| logicModule.getLogicModule() instanceof KnownFailure) {
+					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("| " + logicModule);
 			}
 

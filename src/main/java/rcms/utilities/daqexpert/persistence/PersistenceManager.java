@@ -441,4 +441,22 @@ public class PersistenceManager {
 		return endDate;
 	}
 
+	public List<Condition> getLastActionConditions() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+
+		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.FLOWCHART));
+		elementsCriteria.addOrder(Order.asc("end"));
+		elementsCriteria.setMaxResults(3);
+
+		List<Condition> result = elementsCriteria.list();
+
+		entityManager.close();
+
+		return result;
+	}
+
 }

@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.processing;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -11,8 +12,6 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
@@ -20,8 +19,6 @@ import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventCollector;
 import rcms.utilities.daqexpert.events.EventPrinter;
@@ -33,6 +30,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
+import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
  * Manages the jobs of retrieving and processing the data (snapshots)
@@ -121,6 +119,8 @@ public class JobManager {
 				eventRegister, eventSender);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
+
+		getRecentSuggestions();
 	}
 
 	private void persistVersion(Date startDate, Date endDate) {
@@ -142,6 +142,16 @@ public class JobManager {
 		}
 		versionCondition.setTitle(version);
 		this.persistenceManager.persist(versionCondition);
+	}
+
+	private void getRecentSuggestions() {
+		List<Condition> last = persistenceManager.getLastActionConditions();
+		if (last != null) {
+			logger.info("Getting some conditions from last expert run: " + last.size());
+			for (Condition condition : last) {
+				ConditionWebSocketServer.sessionHandler.addCondition(condition);
+			}
+		}
 	}
 
 	public void startJobs() {
@@ -186,7 +196,7 @@ public class JobManager {
 
 		RunConfigurator runConfigurator = new RunConfigurator(persistenceManager);
 		Date endDate = runConfigurator.getEndDate();
-		if(endDate == null)
+		if (endDate == null)
 			endDate = new Date();
 		versionCondition.setEnd(endDate);
 		versionCondition.calculateDuration();

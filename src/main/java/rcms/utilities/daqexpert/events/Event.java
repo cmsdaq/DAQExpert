@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.events;
 import java.util.Date;
 
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 
 public class Event {
 
@@ -45,7 +46,12 @@ public class Event {
 		EventToSend eventToSend = new EventToSend();
 
 		eventToSend.setMessage(condition.getDescription());
-		eventToSend.setTitle(type.getName() + " " + condition.getLogicModule().getLogicModule().getName());
+		if (condition.getLogicModule().getLogicModule() instanceof ComparatorLogicModule) {
+			eventToSend.setTitle(condition.getLogicModule().getDescription() + ": "
+					+ condition.getLogicModule().getLogicModule().getName());
+		} else {
+			eventToSend.setTitle(type.getName() + " " + condition.getLogicModule().getLogicModule().getName());
+		}
 		eventToSend.setConditionId(condition.getId());
 		eventToSend.setEventType(type);
 		eventToSend.setSender(this.getClass().getPackage().getImplementationVersion());

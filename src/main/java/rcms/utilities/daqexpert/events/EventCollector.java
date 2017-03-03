@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
@@ -18,7 +19,7 @@ public class EventCollector implements EventRegister {
 
 	@Override
 	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
-		if (condition.isShow())
+		if (condition.isShow()) {
 			if (condition.getPriority() == ConditionPriority.CRITICAL
 					|| logicModule.getLogicModule() instanceof KnownFailure) {
 				logger.debug("+ " + logicModule);
@@ -30,6 +31,18 @@ public class EventCollector implements EventRegister {
 
 				events.add(event);
 			}
+
+			if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
+				logger.debug("# " + logicModule);
+
+				Event event = new Event();
+				event.setCondition(condition);
+				event.setDate(condition.getStart());
+				event.setType(EventType.Single);
+
+				events.add(event);
+			}
+		}
 	}
 
 	@Override

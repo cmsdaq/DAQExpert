@@ -35,6 +35,11 @@ public class EventSender {
 	public boolean send(EventToSend event) {
 		try {
 
+			if (event.getMessage() == null) {
+				logger.warn("Message empty for event: " + event.getTitle() + ", replacing with empty string");
+				event.setMessage("");
+			}
+
 			String input = objectMapper.writeValueAsString(event);
 
 			logger.debug("Request: " + input);

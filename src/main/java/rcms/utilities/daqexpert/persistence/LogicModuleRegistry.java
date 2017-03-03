@@ -76,13 +76,13 @@ public enum LogicModuleRegistry {
 	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, ""),
 	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, ""),
 	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, ""),
-	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, ""),
-	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, ""),
-	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, ""),
-	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, ""),
-	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, ""),
-	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, ""),
-	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "");
+	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session"),
+	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode"),
+	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode"),
+	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run"),
+	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State"),
+	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State"),
+	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state");
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
 		this.logicModule = logicModule;

@@ -61,30 +61,19 @@ public class JobManager {
 	private final DataPrepareJob futureDataPrepareJob;
 
 	private final JobScheduler readerRaskController;
-	
-	private final ConditionProducer eventProducer ;
-	
-	private Condition versionCondition ;
+
+	private final ConditionProducer eventProducer;
+
+	private Condition versionCondition;
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
 		this.persistenceManager = Application.get().getPersistenceManager();
 
-		Date startDate = DatatypeConverter.parseDateTime(Application.get().getProp(Setting.PROCESSING_START_DATETIME))
-				.getTime();
+		RunConfigurator runConfigurator = new RunConfigurator(persistenceManager);
 
-		Date endDate = null;
-		String endDateString = Application.get().getProp(Setting.PROCESSING_END_DATETIME);
-		if (endDateString.equalsIgnoreCase("unlimited")) {
-			logger.info("Expert run unlimited, will process as long as there are new snapshots");
-		} else {
-			try {
-				endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
-			} catch (IllegalArgumentException e) {
-				throw new ExpertException(ExpertExceptionCode.CannotParseProcessingEndDate,
-						"Cannot parse end date " + endDateString + ", (special key possible 'unlimited')");
-			}
-		}
+		Date startDate = runConfigurator.getStartDate();
+		Date endDate = runConfigurator.getEndDate();
 
 		logger.info("Data will be processed from: " + startDate + (endDate != null ? ", to: " + endDate : ""));
 		Application.get().getDataManager().setLastUpdate(startDate);
@@ -176,8 +165,7 @@ public class JobManager {
 	}
 
 	public void stop() {
-		
-		
+
 		readerRaskController.stopExecutors();
 		mainExecutor.shutdown();
 
@@ -194,12 +182,15 @@ public class JobManager {
 		logger.info("Temporarly finishing events");
 		Set<Condition> finished = eventProducer.finish();
 		persistenceManager.persist(finished);
-		logger.info("Finished "+ finished.size()+" conditions.");
-		
-		
-		versionCondition.setEnd(new Date());
+		logger.info("Finished " + finished.size() + " conditions.");
+
+		RunConfigurator runConfigurator = new RunConfigurator(persistenceManager);
+		Date endDate = runConfigurator.getEndDate();
+		if(endDate == null)
+			endDate = new Date();
+		versionCondition.setEnd(endDate);
 		versionCondition.calculateDuration();
 		persistenceManager.persist(versionCondition);
-		
+
 	}
 }

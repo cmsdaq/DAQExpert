@@ -449,13 +449,16 @@ public class PersistenceManager {
 		Criteria elementsCriteria = session.createCriteria(Condition.class);
 
 		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.FLOWCHART));
-		elementsCriteria.addOrder(Order.asc("end"));
+		elementsCriteria.addOrder(Order.desc("end"));
 		elementsCriteria.setMaxResults(3);
 
 		List<Condition> result = elementsCriteria.list();
+		for(Condition c: result){
+			c.getActionSteps().size();
+		}
 
 		entityManager.close();
-
+		
 		return result;
 	}
 

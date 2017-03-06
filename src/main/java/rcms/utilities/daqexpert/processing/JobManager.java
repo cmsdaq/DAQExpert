@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -146,8 +147,11 @@ public class JobManager {
 
 	private void getRecentSuggestions() {
 		List<Condition> last = persistenceManager.getLastActionConditions();
+
 		if (last != null) {
 			logger.info("Getting some conditions from last expert run: " + last.size());
+
+			Collections.reverse(last);
 			for (Condition condition : last) {
 				ConditionWebSocketServer.sessionHandler.addCondition(condition);
 			}

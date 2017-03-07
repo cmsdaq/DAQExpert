@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
@@ -77,14 +78,15 @@ public class DataPrepareJob implements Runnable {
 							dataManager, snapshotProcessor);
 					Future<Pair<Set<Condition>, List<Point>>> future = executorService
 							.submit(snapshotRetrieveAndAnalyzeJob);
-					
+
 					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
 					
-					if(result == null){
+
+					if (result == null) {
 						logger.info("No result this round");
 						return;
 					}
-					
+
 					try {
 
 						long t1 = System.currentTimeMillis();
@@ -99,18 +101,42 @@ public class DataPrepareJob implements Runnable {
 
 						Condition newestUnfinished = null;
 						for (Condition condition : result.getLeft()) {
-							if (condition.isShow()  /*&& condition.getPriority() == ConditionPriority.CRITICAL */
+							if (condition
+									.isShow() /*
+												 * && condition.getPriority() ==
+												 * ConditionPriority.CRITICAL
+												 */
 									&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
 								ConditionWebSocketServer.sessionHandler.addCondition(condition);
 
 								// exists some unfinished
 								// TODO: add some threshold
 								if (condition.getEnd() == null) {
+
+									// no condition at the moment
 									if (newestUnfinished == null)
 										newestUnfinished = condition;
+
+									// exists other condition at the moemnt
 									else {
-										if (condition.getStart().after(newestUnfinished.getStart())) {
+
+										// current is more important than old
+										if (condition.getPriority().ordinal() > newestUnfinished.getPriority()
+												.ordinal()) {
 											newestUnfinished = condition;
+										}
+
+										// current is less important than old
+										else if (condition.getPriority().ordinal() < newestUnfinished.getPriority()
+												.ordinal()) {
+
+										}
+										// both are equally important
+										else {
+											// newes will be displayed
+											if (condition.getStart().after(newestUnfinished.getStart())) {
+												newestUnfinished = condition;
+											}
 										}
 									}
 								}
@@ -122,12 +148,11 @@ public class DataPrepareJob implements Runnable {
 							logger.info("Exists unfinished action condition after this round: " + newestUnfinished);
 							ConditionWebSocketServer.sessionHandler.updateCurrent(newestUnfinished);
 						}
-						
 
 						int success = 0;
 						int failed = 0;
 						for (Event event : eventRegister.getEvents()) {
-							
+
 							boolean successful = eventSender.send(event.generateEventToSend());
 							if (!successful) {
 								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());

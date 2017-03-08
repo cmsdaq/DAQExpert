@@ -1,12 +1,11 @@
 package rcms.utilities.daqexpert.websocket;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Set;
 
 import javax.json.JsonArray;
@@ -22,6 +21,9 @@ import rcms.utilities.daqexpert.persistence.Condition;
 public class ConditionSessionHandler {
 
 	private static final Logger logger = Logger.getLogger(ConditionSessionHandler.class);
+	
+
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
 	private final Set<Session> sessions = new HashSet<>();
 	private final HashMap<Long, Condition> conditions = new LinkedHashMap<>();
@@ -100,7 +102,8 @@ public class ConditionSessionHandler {
 	private JsonObject createCurrentMessage(Condition condition) {
 		JsonProvider provider = JsonProvider.provider();
 		logger.info("Creating current condition message for : " + condition);
-
+		
+		
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String description = condition.getDescription() != null ? condition.getDescription() : "";
 		String title = condition.getTitle() != null ? condition.getTitle() + " #" + condition.getId() : "";
@@ -132,7 +135,7 @@ public class ConditionSessionHandler {
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 
 		JsonObject addMessage = provider.createObjectBuilder().add("action", "add").add("id", condition.getId())
-				.add("name", title).add("type", condition.getStart().toString()).add("status", tts)
+				.add("name", title).add("type", dateFormat.format(condition.getStart())).add("status", tts)
 				.add("description", message).add("duration", duration).build();
 
 		logger.debug("Created message for event: " + addMessage);

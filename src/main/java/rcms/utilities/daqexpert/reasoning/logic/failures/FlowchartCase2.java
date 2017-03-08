@@ -65,21 +65,24 @@ public class FlowchartCase2 extends KnownFailure {
 				}
 
 				for (FED fed : daq.getFeds()) {
-					if (fed.getRuFedDataCorruption() > 0) {
 
-						TTCPartition ttcp = fed.getTtcp();
-						String ttcpName = "-";
-						String subsystemName = "-";
+					if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+						if (fed.getRuFedDataCorruption() > 0) {
 
-						if (ttcp != null) {
-							ttcpName = ttcp.getName();
-							if (ttcp.getSubsystem() != null)
-								subsystemName = ttcp.getSubsystem().getName();
+							TTCPartition ttcp = fed.getTtcp();
+							String ttcpName = "-";
+							String subsystemName = "-";
+
+							if (ttcp != null) {
+								ttcpName = ttcp.getName();
+								if (ttcp.getSubsystem() != null)
+									subsystemName = ttcp.getSubsystem().getName();
+							}
+							context.register("FED", fed.getSrcIdExpected());
+							context.register("TTCP", ttcpName);
+							context.register("SUBSYSTEM", subsystemName);
+							i++;
 						}
-						context.register("FED", fed.getSrcIdExpected());
-						context.register("TTCP", ttcpName);
-						context.register("SUBSYSTEM", subsystemName);
-						i++;
 					}
 				}
 

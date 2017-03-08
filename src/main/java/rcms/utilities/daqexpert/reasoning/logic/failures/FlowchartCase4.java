@@ -45,13 +45,15 @@ public class FlowchartCase4 extends KnownFailure {
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+					if (ttcp.isMasked()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.DISCONNECTED) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.DISCONNECTED) {
 
-						context.register("SUBSYSTEM", subSystem.getName());
-						context.register("TTCP", ttcp.getName());
-						result = true;
+							context.register("SUBSYSTEM", subSystem.getName());
+							context.register("TTCP", ttcp.getName());
+							result = true;
+						}
 					}
 				}
 			}

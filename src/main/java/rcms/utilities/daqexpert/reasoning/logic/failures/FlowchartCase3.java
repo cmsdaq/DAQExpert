@@ -48,14 +48,16 @@ public class FlowchartCase3 extends KnownFailure {
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+					if (ttcp.isMasked()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
-						context.register("SUBSYSTEM", subSystem.getName());
-						context.register("TTCP", ttcp.getName());
-						context.register("STATE", currentState.name());
-						result = true;
+							context.register("SUBSYSTEM", subSystem.getName());
+							context.register("TTCP", ttcp.getName());
+							context.register("STATE", currentState.name());
+							result = true;
+						}
 					}
 				}
 			}

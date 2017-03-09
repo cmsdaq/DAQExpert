@@ -22,6 +22,8 @@ import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
+import rcms.utilities.daqexpert.websocket.ConditionDashboard;
+import rcms.utilities.daqexpert.websocket.ConditionDashboardTest;
 import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
@@ -43,9 +45,11 @@ public class DataPrepareJob implements Runnable {
 	private final EventRegister eventRegister;
 	private final EventSender eventSender;
 
+	private final ConditionDashboard conditionDashboard;
+
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
-			EventSender eventSender) {
+			EventSender eventSender, ConditionDashboard conditionDashboard) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -54,9 +58,13 @@ public class DataPrepareJob implements Runnable {
 		this.persistenceManager = persistenceManager;
 		this.eventRegister = eventRegister;
 		this.eventSender = eventSender;
+		this.conditionDashboard = conditionDashboard;
 	}
 
 	private static int priority = 0;
+
+	// TODO: Delememe
+	private static Long id = 0L;
 
 	@Override
 	public void run() {
@@ -80,7 +88,6 @@ public class DataPrepareJob implements Runnable {
 							.submit(snapshotRetrieveAndAnalyzeJob);
 
 					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
-					
 
 					if (result == null) {
 						logger.info("No result this round");
@@ -95,59 +102,19 @@ public class DataPrepareJob implements Runnable {
 						persistenceManager.persist(result.getRight());
 						long t3 = System.currentTimeMillis();
 
-						logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
+						logger.debug("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
-						Condition newestUnfinished = null;
-						for (Condition condition : result.getLeft()) {
-							if (condition
-									.isShow() /*
-												 * && condition.getPriority() ==
-												 * ConditionPriority.CRITICAL
-												 */
-									&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
-								ConditionWebSocketServer.sessionHandler.addCondition(condition);
+						conditionDashboard.update(result.getLeft());
 
-								// exists some unfinished
-								// TODO: add some threshold
-								if (condition.getEnd() == null) {
-
-									// no condition at the moment
-									if (newestUnfinished == null)
-										newestUnfinished = condition;
-
-									// exists other condition at the moemnt
-									else {
-
-										// current is more important than old
-										if (condition.getPriority().ordinal() > newestUnfinished.getPriority()
-												.ordinal()) {
-											newestUnfinished = condition;
-										}
-
-										// current is less important than old
-										else if (condition.getPriority().ordinal() < newestUnfinished.getPriority()
-												.ordinal()) {
-
-										}
-										// both are equally important
-										else {
-											// newes will be displayed
-											if (condition.getStart().after(newestUnfinished.getStart())) {
-												newestUnfinished = condition;
-											}
-										}
-									}
-								}
-							}
+						if (conditionDashboard.getCurrentCondition() != null
+								&& id != conditionDashboard.getCurrentCondition().getId()) {
+							Thread.sleep(5000);
+							id = conditionDashboard.getCurrentCondition().getId();
 						}
 
-						ConditionWebSocketServer.sessionHandler.removeCurrent();
-						if (newestUnfinished != null) {
-							logger.info("Exists unfinished action condition after this round: " + newestUnfinished);
-							ConditionWebSocketServer.sessionHandler.updateCurrent(newestUnfinished);
-						}
+						logger.info(conditionDashboard.toString());
 
 						int success = 0;
 						int failed = 0;

@@ -31,6 +31,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
+import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
@@ -116,8 +117,10 @@ public class JobManager {
 
 		Long startTimestampToGenerateNotifications = System.currentTimeMillis() - offset;
 
+		ConditionDashboard conditionDashboard = Application.get().getDashboard();
+
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
-				eventRegister, eventSender);
+				eventRegister, eventSender, conditionDashboard);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob);
 
@@ -153,7 +156,7 @@ public class JobManager {
 
 			Collections.reverse(last);
 			for (Condition condition : last) {
-				ConditionWebSocketServer.sessionHandler.addCondition(condition);
+				//ConditionWebSocketServer.sessionHandler.addRecent(condition);
 			}
 		}
 	}
@@ -164,12 +167,13 @@ public class JobManager {
 
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Condition> destination, String scriptName) {
 
+		ConditionDashboard conditionDashboard = Application.get().getDashboard();
 		ConditionProducer conditionProducer = new ConditionProducer();
 		EventRegister eventRegister = new EventPrinter();
 		conditionProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(conditionProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
-				persistenceManager, eventRegister, null);
+				persistenceManager, eventRegister, null, conditionDashboard);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);

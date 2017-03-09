@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 public class Application {
 
@@ -21,6 +22,8 @@ public class Application {
 	private JobManager jobManager;
 
 	private final Properties prop;
+
+	private final ConditionDashboard conditionDashboard;
 
 	public static Application get() {
 		if (instance == null) {
@@ -53,6 +56,7 @@ public class Application {
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
+		conditionDashboard = new ConditionDashboard(5);
 	}
 
 	private static Application instance;
@@ -109,5 +113,9 @@ public class Application {
 
 	public PersistenceManager getPersistenceManager() {
 		return persistenceManager;
+	}
+
+	public ConditionDashboard getDashboard() {
+		return conditionDashboard;
 	}
 }

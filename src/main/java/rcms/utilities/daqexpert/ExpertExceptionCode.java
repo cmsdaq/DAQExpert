@@ -10,7 +10,9 @@ public enum ExpertExceptionCode {
 
 	/* Reasoning errors */
 	ReasoningProblem(200, "Reasoning problem"),
-	ExperimentalReasoningProblem(201, "Experimental reasoning problem");
+	ExperimentalReasoningProblem(201, "Experimental reasoning problem"),
+
+	LogicModuleUpdateException(301, "Problem updating logic module parameters"),;
 
 	ExpertExceptionCode(int code, String name) {
 		this.code = code;

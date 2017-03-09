@@ -21,6 +21,7 @@ import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 
 /**
  * Manager of checking process
@@ -58,6 +59,13 @@ public class LogicModuleManager {
 			} else if (lm.getLogicModule() instanceof ComparatorLogicModule) {
 				ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
 				comparators.add(comparatorLogicModule);
+			}
+
+			if (lm.getLogicModule() instanceof Parameterizable) {
+				Parameterizable updatable = (Parameterizable) lm.getLogicModule();
+
+				updatable.parametrize(Application.get().getProp());
+				logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
 			}
 		}
 

@@ -1,7 +1,5 @@
 package rcms.utilities.daqexpert.persistence;
 
-import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
@@ -39,11 +37,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
 public enum LogicModuleRegistry {
 
 	NoRate(new NoRate(), ConditionGroup.NO_RATE, "Satisfied when no rate in DAQ fed builder summary"),
-	RateOutOfRange(
-			new RateOutOfRange(Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MIN)),
-					Integer.parseInt(Application.get().getProp(Setting.EXPERT_L1_RATE_MAX))),
-			ConditionGroup.RATE_OUT_OF_RANGE,
-			""),
+	RateOutOfRange(new RateOutOfRange(), ConditionGroup.RATE_OUT_OF_RANGE, ""),
 	BeamActive(new BeamActive(), ConditionGroup.BEAM_ACTIVE, ""),
 	RunOngoing(new RunOngoing(), ConditionGroup.RUN_ONGOING, ""),
 	ExpectedRate(new ExpectedRate(), ConditionGroup.EXPECTED_RATE, ""),
@@ -53,22 +47,12 @@ public enum LogicModuleRegistry {
 	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, ""),
 	SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, ""),
 	SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, ""),
-	FEDDeadtime(
-			new FEDDeadtime(Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED))),
-			ConditionGroup.FED_DEADTIME,
-			""),
-	PartitionDeadtime(
-			new PartitionDeadtime(
-					Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION))),
-			ConditionGroup.PARTITION_DEADTIME,
-			""),
+	FEDDeadtime(new FEDDeadtime(), ConditionGroup.FED_DEADTIME, ""),
+	PartitionDeadtime(new PartitionDeadtime(), ConditionGroup.PARTITION_DEADTIME, ""),
 	StableBeams(new StableBeams(), ConditionGroup.HIDDEN, ""),
 	NoRateWhenExpected(new NoRateWhenExpected(), ConditionGroup.NO_RATE_WHEN_EXPECTED, ""),
 	Downtime(new Downtime(), ConditionGroup.DOWNTIME, ""),
-	Deadtime(
-			new Deadtime(Integer.parseInt(Application.get().getProp(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL))),
-			ConditionGroup.DEADTIME,
-			""),
+	Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
 	CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, ""),
 	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, ""),
 	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, ""),

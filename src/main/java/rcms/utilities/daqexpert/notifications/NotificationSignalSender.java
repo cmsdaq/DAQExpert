@@ -21,6 +21,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
+ * TODO: check if not deprecated
  */
 public class NotificationSignalSender {
 

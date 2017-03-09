@@ -5,7 +5,6 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -16,13 +15,13 @@ public class CriticalDeadtime extends SimpleLogicModule {
 	public CriticalDeadtime() {
 		this.name = "Critical deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.description = "Deadtime is greater than 5% during running";
+		this.description = "There is deadtime during running";
 		this.setNotificationPlay(true);
 		this.setSoundToPlay(Sound.DEADTIME);
 	}
 
 	/**
-	 * Dead time when greater than 5%
+	 * Dead time during running
 	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {

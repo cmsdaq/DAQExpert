@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -20,7 +21,7 @@ public class JobScheduler {
 	/**
 	 * Period in which real time data will be accessed
 	 */
-	private static final int REAL_TIME_TASK_PERION_IN_SECONDS = 2;
+	private static final int REAL_TIME_TASK_PERION_IN_MILLISECONDS = 2000;
 
 	/** Executor of on demand reader task */
 	private final ExecutorService onDemandScheduler;
@@ -56,8 +57,8 @@ public class JobScheduler {
 	}
 
 	public void fireRealTimeReaderTask() {
-		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_SECONDS + " seconds");
-		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_SECONDS, SECONDS);
+		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_MILLISECONDS + " seconds");
+		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_MILLISECONDS , TimeUnit.MILLISECONDS);
 	}
 
 	public void stopExecutors() {

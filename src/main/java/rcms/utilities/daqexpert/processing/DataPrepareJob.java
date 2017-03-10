@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
@@ -20,11 +19,8 @@ import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
-import rcms.utilities.daqexpert.websocket.ConditionDashboardTest;
-import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
  * This job manages reading and processing the snapshots
@@ -114,7 +110,7 @@ public class DataPrepareJob implements Runnable {
 							id = conditionDashboard.getCurrentCondition().getId();
 						}
 
-						logger.info(conditionDashboard.toString());
+						logger.debug(conditionDashboard.toString());
 
 						int success = 0;
 						int failed = 0;

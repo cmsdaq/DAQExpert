@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.processing;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -32,7 +33,6 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
-import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
 
 /**
  * Manages the jobs of retrieving and processing the data (snapshots)
@@ -149,14 +149,16 @@ public class JobManager {
 	}
 
 	private void getRecentSuggestions() {
-		List<Condition> last = persistenceManager.getLastActionConditions();
+		List<Condition> briefHistory = persistenceManager.getLastActionConditions();
 
-		if (last != null) {
-			logger.info("Getting some conditions from last expert run: " + last.size());
+		if (briefHistory != null) {
+			logger.info("Getting some conditions from last expert run: " + briefHistory.size());
 
-			Collections.reverse(last);
-			for (Condition condition : last) {
-				//ConditionWebSocketServer.sessionHandler.addRecent(condition);
+			Collections.reverse(briefHistory);
+			for (Condition condition : briefHistory) {
+				Set<Condition> fakeGroup = new HashSet<>();
+				fakeGroup.add(condition);
+				Application.get().getDashboard().update(fakeGroup);
 			}
 		}
 	}

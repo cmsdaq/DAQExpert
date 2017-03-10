@@ -17,7 +17,6 @@ import rcms.utilities.daqexpert.events.Event;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
-import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -110,7 +109,7 @@ public class DataPrepareJob implements Runnable {
 
 						if (demo  && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {
-							Thread.sleep(5000);
+							Thread.sleep(2000);
 							id = conditionDashboard.getCurrentCondition().getId();
 						}
 

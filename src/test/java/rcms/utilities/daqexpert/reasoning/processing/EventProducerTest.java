@@ -34,11 +34,10 @@ public class EventProducerTest {
 	@Test
 	public void eventProducingTest() {
 
-		
 		ConditionProducer eventProducer = Mockito.spy(new ConditionProducer());
 
 		SimpleLogicModule checker = new NoRate();
-		//checker.setLogicModuleRegistry(LogicModuleRegistry.NoRate);
+		// checker.setLogicModuleRegistry(LogicModuleRegistry.NoRate);
 		boolean value = false;
 		Pair<Boolean, Condition> a = eventProducer.produce(checker, value, t1);
 		Assert.assertTrue(a.getLeft());
@@ -102,7 +101,7 @@ public class EventProducerTest {
 		ConditionProducer eventProducer = Mockito.spy(new ConditionProducer());
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
-		Pair<Boolean, Condition> a = eventProducer.produce(checker, true, t1, t2);
+		Pair<Boolean, Condition> a = eventProducer.produce(checker, true, t2);
 
 		Assert.assertTrue(a.getLeft());
 		Assert.assertNotNull(a);
@@ -118,7 +117,7 @@ public class EventProducerTest {
 				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
 
 		// this should not change anything
-		Pair<Boolean, Condition> b = eventProducer.produce(checker, false, t2, t3);
+		Pair<Boolean, Condition> b = eventProducer.produce(checker, false, t3);
 		Assert.assertFalse(b.getLeft());
 		Assert.assertNull(b.getRight());
 		Assert.assertTrue(a.getLeft());
@@ -134,7 +133,7 @@ public class EventProducerTest {
 				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
 
 		// this should change
-		Pair<Boolean, Condition> c = eventProducer.produce(checker, true, t3, t4);
+		Pair<Boolean, Condition> c = eventProducer.produce(checker, true, t4);
 		Assert.assertEquals(t2, a.getRight().getStart());
 		Assert.assertEquals(t4, a.getRight().getEnd()); // FIXME why t2-t4
 		Assert.assertEquals(120000, a.getRight().getDuration());
@@ -158,13 +157,13 @@ public class EventProducerTest {
 		ConditionProducer eventProducer = Mockito.spy(new ConditionProducer());
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
-		Pair<Boolean, Condition> a = eventProducer.produce(checker, true, t1, t2);
+		Pair<Boolean, Condition> a = eventProducer.produce(checker, true, t2);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
 		Assert.assertEquals(null, a.getRight().getEnd());
 
-		//eventProducer.finish(t3);
+		// eventProducer.finish(t3);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
@@ -177,7 +176,7 @@ public class EventProducerTest {
 		ConditionProducer eventProducer = Mockito.spy(new ConditionProducer());
 
 		ComparatorLogicModule checker = new LHCBeamModeComparator();
-		Pair<Boolean, Condition> a = eventProducer.produce(checker, false, t1, t2);
+		Pair<Boolean, Condition> a = eventProducer.produce(checker, false, t2);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 
@@ -185,7 +184,7 @@ public class EventProducerTest {
 		// Assert.assertEquals(1, eventProducer.getUnfinished().size());
 		// Assert.assertNull(a.getRight());
 
-		//eventProducer.finish(t3);
+		// eventProducer.finish(t3);
 
 		Assert.assertEquals(0, eventProducer.getFinishedThisRound().size());
 		Assert.assertEquals(0, eventProducer.getUnfinished().size());

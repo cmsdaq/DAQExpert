@@ -179,7 +179,6 @@ public class JobManager {
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);
-		onDemandDataJob.getSnapshotProcessor().getCheckManager().setArtificialForced(true);
 		onDemandDataJob.getSnapshotProcessor().clearProducer();
 		return readerRaskController.scheduleOnDemandReaderTask(onDemandDataJob);
 	}

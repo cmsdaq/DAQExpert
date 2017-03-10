@@ -3,7 +3,6 @@ package rcms.utilities.daqexpert.reasoning.logic.comparators;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class TCDSStateComparator extends ComparatorLogicModule {
@@ -26,10 +25,10 @@ public class TCDSStateComparator extends ComparatorLogicModule {
 	}
 
 	private String getTCDSState(DAQ daq) {
-		if (daq.getSubFEDBuilders() != null) {
+		if (daq.getSubSystems() != null) {
 			for (SubSystem curr : daq.getSubSystems()) {
 				/* check tcds subsystem state */
-				if (curr.getName().equals("TCDS")) {
+				if (curr.getName().equalsIgnoreCase("TCDS")) {
 					return curr.getStatus();
 				}
 			}

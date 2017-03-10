@@ -17,6 +17,7 @@ import rcms.utilities.daqexpert.events.Event;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -42,6 +43,9 @@ public class DataPrepareJob implements Runnable {
 	private final EventSender eventSender;
 
 	private final ConditionDashboard conditionDashboard;
+	
+	/** flag to do demo run*/
+	private boolean demo = false;
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
@@ -89,7 +93,7 @@ public class DataPrepareJob implements Runnable {
 						logger.info("No result this round");
 						return;
 					}
-
+					
 					try {
 
 						long t1 = System.currentTimeMillis();
@@ -104,7 +108,7 @@ public class DataPrepareJob implements Runnable {
 
 						conditionDashboard.update(result.getLeft());
 
-						if (conditionDashboard.getCurrentCondition() != null
+						if (demo  && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {
 							Thread.sleep(5000);
 							id = conditionDashboard.getCurrentCondition().getId();

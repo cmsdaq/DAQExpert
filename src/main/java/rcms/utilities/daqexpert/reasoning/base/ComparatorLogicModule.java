@@ -13,18 +13,25 @@ import rcms.utilities.daqaggregator.data.DAQ;
 public abstract class ComparatorLogicModule extends LogicModule {
 
 	private DAQ last;
-	
+
 	private static Logger logger = Logger.getLogger(ComparatorLogicModule.class);
 
 	public boolean compare(DAQ daq) {
 		boolean result = false;
+		
+		if(last == null && daq == null){
+			return result;
+		}
 
-		if (last != null) {
-			try {
-				result = compare(last, daq);
-			} catch (RuntimeException e) {
-				logger.error("Error comparing snapshots", e);
-			}
+		if (last == null) {
+			last = new DAQ();
+		}
+		try {
+			result = compare(last, daq);
+		} catch (RuntimeException e) {
+			//logger.error("Error comparing snapshots", e);
+			result = true;
+			name = "undefined";
 		}
 
 		last = daq;

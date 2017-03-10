@@ -189,12 +189,12 @@ public class ConditionDashboard implements Observer {
 		StringBuilder sb = new StringBuilder();
 		sb.append("ConditionDashboard [currentCondition="
 				+ (currentCondition != null ? currentCondition.getId() : "<none>") + ", recentConditions=[");
-		logger.info("recent size: " + recentConditions.size());
+		logger.trace("recent size: " + recentConditions.size());
 		for (Condition condition : recentConditions.values()) {
 			sb.append(condition.getId());
 			sb.append(",");
 		}
-		logger.info("filtered size: " + getFilteredCurrentConditions().size());
+		logger.trace("filtered size: " + getFilteredCurrentConditions().size());
 		sb.append("], filteredConditions=[");
 		for (Condition condition : getFilteredCurrentConditions()) {
 			sb.append(condition.getId());

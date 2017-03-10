@@ -127,7 +127,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		int time = (int) (end - start);
 
 		if (entries.size() > 0) {
-			logger.debug(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
+			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
 			logger.debug("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));

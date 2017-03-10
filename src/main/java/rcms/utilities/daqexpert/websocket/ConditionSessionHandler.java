@@ -94,6 +94,12 @@ public class ConditionSessionHandler {
 		sendToAllConnectedSessions(addMessage);
 	}
 
+	public void update(Condition condition) {
+		logger.info("Updating");
+		JsonObject addMessage = createUpdateMessage(condition);
+		sendToAllConnectedSessions(addMessage);
+	}
+
 	/**
 	 * Action to add new recent condition
 	 * 
@@ -162,15 +168,21 @@ public class ConditionSessionHandler {
 	private JsonObject createUpdateMessage(Condition condition) {
 		JsonProvider provider = JsonProvider.provider();
 		logger.debug("Creating update for condition: " + condition);
-		/*
-		 * JsonObject updateMessage =
-		 * provider.createObjectBuilder().add("action", "update").add("id",
-		 * condition.getId()) .add("status", condition.getEnd()).build();
-		 */
 
-		// logger.debug("Created message for event: " + updateMessage);
-		// return updateMessage;
-		return null;
+		String status;
+		if (condition.getEnd() != null) {
+			status = "finished";
+		} else {
+			// this should never happend - for potential future improvements
+			// (e.g. context changed)
+			status = "updated";
+		}
+
+		JsonObject updateMessage = provider.createObjectBuilder().add("action", "update").add("id", condition.getId())
+				.add("status", status).build();
+
+		logger.debug("Created message for event: " + updateMessage);
+		return updateMessage;
 	}
 
 	/**

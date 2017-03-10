@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.persistence;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -37,7 +37,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
  * 
  */
 @Entity
-public class Condition implements Comparable<Condition> {
+public class Condition extends Observable implements Comparable<Condition> {
 
 	private static final Logger logger = Logger.getLogger(Condition.class);
 
@@ -164,6 +164,8 @@ public class Condition implements Comparable<Condition> {
 
 	public void setEnd(Date end) {
 		this.end = end;
+		setChanged();
+		notifyObservers();
 	}
 
 	@Override

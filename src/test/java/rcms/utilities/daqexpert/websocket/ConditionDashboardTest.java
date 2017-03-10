@@ -18,7 +18,7 @@ public class ConditionDashboardTest {
 	@Test
 	public void simpleTest() {
 
-		ConditionDashboard conditionSelector = new ConditionDashboard(5);
+		ConditionDashboard conditionDashboard = new ConditionDashboard(5);
 
 		Date d1 = DatatypeConverter.parseDateTime("2017-03-09T10:00:00Z").getTime();
 		Date d2 = DatatypeConverter.parseDateTime("2017-03-09T10:00:01Z").getTime();
@@ -39,59 +39,59 @@ public class ConditionDashboardTest {
 		conditions.add(c1);
 		conditions.add(c2);
 		conditions.add(c3);
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 1 Result */
-		Assert.assertEquals("Conditions same priority and date -> first", c1, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(3, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(2, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals("Conditions same priority and date -> first", c1, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(3, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(2, conditionDashboard.getFilteredCurrentConditions().size());
 
 		/* 2 Change */
 		conditions.add(c4);
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 2 Result */
-		Assert.assertEquals("Conditions same priority -> last start date", c4, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(4, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(3, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals("Conditions same priority -> last start date", c4, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(3, conditionDashboard.getFilteredCurrentConditions().size());
 
 		/* 3 Change */
 		conditions.add(c5);
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 3 Result */
-		Assert.assertEquals("Priority", c5, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(5, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals("Priority", c5, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
 
 		/* 4 Change */
 		c5.setEnd(d3);
 		conditions.remove(c5);
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 4 Result */
-		Assert.assertEquals("Return to last", c4, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(5, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals("Return to last", c4, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
 
 		/* 5 Change */
 		conditions.add(c6);
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 5 Result */
-		Assert.assertEquals(c6, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(5, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals(c6, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
 
 		/* 6 no more conditions */
 		c6.setEnd(d4);
 		conditions.clear();
-		conditionSelector.update(conditions);
+		conditionDashboard.update(conditions);
 
 		/* 6 Only recent conditions */
-		Assert.assertEquals(null, conditionSelector.getCurrentCondition());
-		Assert.assertEquals(5, conditionSelector.getCurrentConditions().size());
-		Assert.assertEquals(5, conditionSelector.getFilteredCurrentConditions().size());
+		Assert.assertEquals(null, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(5, conditionDashboard.getFilteredCurrentConditions().size());
 
 	}
 

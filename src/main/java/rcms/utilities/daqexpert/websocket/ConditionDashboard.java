@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -24,7 +26,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class ConditionDashboard {
+public class ConditionDashboard implements Observer {
 
 	private final static Logger logger = Logger.getLogger(ConditionDashboard.class);
 
@@ -65,18 +67,26 @@ public class ConditionDashboard {
 		// remove (fire add recent) + set current
 	}
 
-	private void handleRemoveRecent(Long id) {
-		recentConditions.remove(id);
+	private void handleRemoveRecent(Condition condition) {
+		recentConditions.remove(condition.getId());
+		condition.deleteObserver(this);
 
 		if (sessionHander != null) {
-			sessionHander.removeRecent(id);
+			sessionHander.removeRecent(condition.getId());
 		}
 	}
 
 	private void handleAddRecent(Condition condition) {
 		recentConditions.put(condition.getId(), condition);
+		condition.addObserver(this);
 		if (sessionHander != null) {
 			sessionHander.addRecent();
+		}
+	}
+
+	private void handleUpdate(Condition condition) {
+		if (sessionHander != null) {
+			sessionHander.update(condition);
 		}
 	}
 
@@ -126,7 +136,7 @@ public class ConditionDashboard {
 
 				if (!recentConditions.containsKey(condition.getId())) {
 					if (recentConditions.size() >= max) {
-						Long oldest = recentConditions.values().iterator().next().getId();
+						Condition oldest = recentConditions.values().iterator().next();
 						handleRemoveRecent(oldest);
 					}
 
@@ -192,6 +202,16 @@ public class ConditionDashboard {
 		}
 		sb.append("]");
 		return sb.toString();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+
+		if (o instanceof Condition) {
+			Condition condition = (Condition) o;
+			handleUpdate(condition);
+		}
+
 	}
 
 }

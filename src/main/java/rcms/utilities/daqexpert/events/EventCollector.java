@@ -10,7 +10,6 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
-import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 public class EventCollector implements EventRegister {
 

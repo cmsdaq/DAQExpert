@@ -3,7 +3,7 @@ package rcms.utilities.daqexpert;
 public enum Setting {
 
 	NM_DASHBOARD("nm.dashboard"),
-	NM_NOTIFICATIONS("nm.notifications"),
+	NM_ARCHIVE("nm.archive"),
 	NM_API_CREATE("nm.api"),
 	NM_OFFSET("nm.offset"),
 

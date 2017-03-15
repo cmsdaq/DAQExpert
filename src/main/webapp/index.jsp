@@ -76,9 +76,9 @@
 
 
 				<!-- NM NOTIFICATIONS -->
-				<%-- <li><a
-					href="<%out.println(Application.get().getProp(Setting.NM_NOTIFICATIONS));%>"><i
-						class="glyphicon glyphicon-calendar"></i> Notifications</a></li> --%>
+				<li><a
+					href="<%out.println(Application.get().getProp(Setting.NM_ARCHIVE));%>"><i
+						class="glyphicon glyphicon-calendar"></i> Archive</a></li>
 
 			</ul>
 		</div>

@@ -11,7 +11,7 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 
 	public NoRateWhenExpected() {
 		this.name = "No rate when expected";
-		this.priority = ConditionPriority.DEFAULTT;
+		this.priority = ConditionPriority.WARNING;
 		this.description = "No rate when expected";
 		this.setNotificationDisplay(true);
 		this.setNotificationPlay(true);
@@ -33,7 +33,7 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		if (stableBeams)
 			this.priority = ConditionPriority.CRITICAL;
 		else
-			this.priority = ConditionPriority.DEFAULTT;
+			this.priority = ConditionPriority.WARNING;
 
 		if (expectedRate && noRate && !transition)
 			return true;

@@ -20,7 +20,7 @@ public class EventCollector implements EventRegister {
 	@Override
 	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow()) {
-			if (condition.getPriority() == ConditionPriority.CRITICAL
+			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("+ " + logicModule);
 
@@ -48,7 +48,7 @@ public class EventCollector implements EventRegister {
 	@Override
 	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow())
-			if (condition.getPriority() == ConditionPriority.CRITICAL
+			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("- " + logicModule);
 
@@ -66,7 +66,7 @@ public class EventCollector implements EventRegister {
 	public void registerUpdate(LogicModuleRegistry logicModule, Condition condition) {
 		if (condition.isShow())
 
-			if (condition.getPriority() == ConditionPriority.CRITICAL
+			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("| " + logicModule);
 			}

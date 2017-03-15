@@ -3,10 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -27,10 +24,9 @@ public class AvoidableDowntime extends SimpleLogicModule {
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.WARNING : ConditionPriority.DEFAULTT;
-		
-
-		return results.get(NoRateWhenExpected.class.getSimpleName());
+		if (stableBeams)
+			return results.get(NoRateWhenExpected.class.getSimpleName());
+		return false;
 
 	}
 

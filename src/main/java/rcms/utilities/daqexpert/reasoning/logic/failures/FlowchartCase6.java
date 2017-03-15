@@ -48,7 +48,7 @@ public class FlowchartCase6 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.WARNING;
 
 		boolean result = false;
 

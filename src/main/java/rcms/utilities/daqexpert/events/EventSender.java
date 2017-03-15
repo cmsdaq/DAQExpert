@@ -32,7 +32,7 @@ public class EventSender {
 
 	}
 
-	public boolean send(EventToSend event) {
+	public boolean send(ConditionEventResource event) {
 		try {
 
 			if (event.getMessage() == null) {

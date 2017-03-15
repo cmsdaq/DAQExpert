@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
-import rcms.utilities.daqexpert.events.Event;
+import rcms.utilities.daqexpert.events.ConditionEvent;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
@@ -117,7 +117,7 @@ public class DataPrepareJob implements Runnable {
 
 						int success = 0;
 						int failed = 0;
-						for (Event event : eventRegister.getEvents()) {
+						for (ConditionEvent event : eventRegister.getEvents()) {
 
 							boolean successful = eventSender.send(event.generateEventToSend());
 							if (!successful) {

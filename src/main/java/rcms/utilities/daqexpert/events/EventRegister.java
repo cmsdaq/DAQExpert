@@ -13,5 +13,5 @@ public interface EventRegister {
 
 	public void registerUpdate(LogicModuleRegistry logicModule, Condition condition);
 
-	public List<Event> getEvents();
+	public List<ConditionEvent> getEvents();
 }

@@ -4,7 +4,9 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class EventToSend {
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+
+public class ConditionEventResource {
 
 	private String message;
 
@@ -19,6 +21,8 @@ public class EventToSend {
 	private EventSenderType eventSenderType;
 
 	private EventType eventType;
+	
+	private LogicModuleRegistry logicModule;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "CET")
 	private Date date;
@@ -124,6 +128,14 @@ public class EventToSend {
 
 	public EventType getEventType() {
 		return eventType;
+	}
+
+	public LogicModuleRegistry getLogicModule() {
+		return logicModule;
+	}
+
+	public void setLogicModule(LogicModuleRegistry logicModule) {
+		this.logicModule = logicModule;
 	}
 
 }

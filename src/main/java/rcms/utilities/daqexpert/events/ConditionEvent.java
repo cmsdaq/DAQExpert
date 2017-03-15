@@ -3,15 +3,20 @@ package rcms.utilities.daqexpert.events;
 import java.util.Date;
 
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 
-public class Event {
+public class ConditionEvent {
 
 	private Condition condition;
 
 	private EventType type;
 
 	private Date date;
+
+	private String title;
+
+	private LogicModuleRegistry logicModule;
 
 	public Condition getCondition() {
 		return condition;
@@ -42,23 +47,35 @@ public class Event {
 		return "Event [condition=" + condition + ", type=" + type + ", date=" + date + "]";
 	}
 
-	public EventToSend generateEventToSend() {
-		EventToSend eventToSend = new EventToSend();
+	public ConditionEventResource generateEventToSend() {
+		ConditionEventResource eventToSend = new ConditionEventResource();
 
 		eventToSend.setMessage(condition.getDescription());
-		if (condition.getLogicModule().getLogicModule() instanceof ComparatorLogicModule) {
-			eventToSend.setTitle(condition.getLogicModule().getDescription() + ": "
-					+ condition.getLogicModule().getLogicModule().getName());
-		} else {
-			eventToSend.setTitle(type.getName() + " " + condition.getLogicModule().getLogicModule().getName());
-		}
+		eventToSend.setTitle(title);
 		eventToSend.setConditionId(condition.getId());
 		eventToSend.setEventType(type);
 		eventToSend.setSender(this.getClass().getPackage().getImplementationVersion());
 		eventToSend.setEventSenderType(EventSenderType.Expert);
 		eventToSend.setDate(date);
+		eventToSend.setLogicModule(logicModule);
 
 		return eventToSend;
 
+	}
+
+	public LogicModuleRegistry getLogicModule() {
+		return logicModule;
+	}
+
+	public void setLogicModule(LogicModuleRegistry logicModule) {
+		this.logicModule = logicModule;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }

@@ -15,7 +15,7 @@ public class EventCollector implements EventRegister {
 
 	private static final Logger logger = Logger.getLogger(EventCollector.class);
 
-	private final List<Event> events = new ArrayList<>();
+	private final List<ConditionEvent> events = new ArrayList<>();
 
 	@Override
 	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
@@ -24,21 +24,25 @@ public class EventCollector implements EventRegister {
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("+ " + logicModule);
 
-				Event event = new Event();
+				ConditionEvent event = new ConditionEvent();
+				event.setTitle("Start " + condition.getTitle());
 				event.setCondition(condition);
 				event.setDate(condition.getStart());
 				event.setType(EventType.ConditionStart);
+				event.setLogicModule(logicModule);
 
 				events.add(event);
 			}
-
 			if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
 				logger.debug("# " + logicModule);
 
-				Event event = new Event();
+				ConditionEvent event = new ConditionEvent();
+				event.setTitle(
+						logicModule.getDescription() + ": " + condition.getTitle());
 				event.setCondition(condition);
 				event.setDate(condition.getStart());
 				event.setType(EventType.Single);
+				event.setLogicModule(logicModule);
 
 				events.add(event);
 			}
@@ -52,10 +56,12 @@ public class EventCollector implements EventRegister {
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
 				logger.debug("- " + logicModule);
 
-				Event event = new Event();
+				ConditionEvent event = new ConditionEvent();
+				event.setTitle("End " + condition.getTitle());
 				event.setCondition(condition);
 				event.setDate(condition.getEnd());
 				event.setType(EventType.ConditionEnd);
+				event.setLogicModule(logicModule);
 
 				events.add(event);
 			}
@@ -73,7 +79,7 @@ public class EventCollector implements EventRegister {
 
 	}
 
-	public List<Event> getEvents() {
+	public List<ConditionEvent> getEvents() {
 		return events;
 	}
 

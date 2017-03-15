@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqexpert.events.Event;
+import rcms.utilities.daqexpert.events.ConditionEvent;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
@@ -137,7 +137,7 @@ class EventRegisterStub implements EventRegister {
 	}
 
 	@Override
-	public List<Event> getEvents() {
+	public List<ConditionEvent> getEvents() {
 		return null;
 	}
 

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class ConditionEventResource {
 
@@ -21,19 +22,13 @@ public class ConditionEventResource {
 	private EventSenderType eventSenderType;
 
 	private EventType eventType;
-	
+
 	private LogicModuleRegistry logicModule;
+
+	private ConditionPriority priority;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "CET")
 	private Date date;
-
-	/** Flag indicating if this notification should be displayed */
-	private boolean display;
-
-	/** Flag indicating if this notification should be played */
-	private boolean play;
-
-	private int soundId;
 
 	public String getMessage() {
 		return message;
@@ -90,30 +85,6 @@ public class ConditionEventResource {
 		this.date = date;
 	}
 
-	public boolean isDisplay() {
-		return display;
-	}
-
-	public void setDisplay(boolean display) {
-		this.display = display;
-	}
-
-	public boolean isPlay() {
-		return play;
-	}
-
-	public void setPlay(boolean play) {
-		this.play = play;
-	}
-
-	public int getSoundId() {
-		return soundId;
-	}
-
-	public void setSoundId(int soundId) {
-		this.soundId = soundId;
-	}
-
 	public void setEventSenderType(EventSenderType eventSenderType) {
 		this.eventSenderType = eventSenderType;
 	}
@@ -136,6 +107,14 @@ public class ConditionEventResource {
 
 	public void setLogicModule(LogicModuleRegistry logicModule) {
 		this.logicModule = logicModule;
+	}
+
+	public ConditionPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(ConditionPriority priority) {
+		this.priority = priority;
 	}
 
 }

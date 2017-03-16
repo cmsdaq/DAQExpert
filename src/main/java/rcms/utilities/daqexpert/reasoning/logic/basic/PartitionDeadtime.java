@@ -22,7 +22,6 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
 	public PartitionDeadtime() {
 		this.name = "Partition deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.setNotificationPlay(true);
 		this.threshold = 0;
 	}
 

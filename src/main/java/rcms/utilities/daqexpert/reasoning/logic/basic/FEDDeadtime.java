@@ -22,7 +22,6 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 	public FEDDeadtime() {
 		this.name = "FED deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.setNotificationPlay(true);
 		this.threshold = 0;
 	}
 

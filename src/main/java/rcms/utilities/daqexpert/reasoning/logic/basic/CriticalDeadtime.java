@@ -16,8 +16,6 @@ public class CriticalDeadtime extends SimpleLogicModule {
 		this.name = "Critical deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "There is deadtime during running";
-		this.setNotificationPlay(true);
-		this.setSoundToPlay(Sound.DEADTIME);
 	}
 
 	/**

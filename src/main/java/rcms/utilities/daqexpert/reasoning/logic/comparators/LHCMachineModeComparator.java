@@ -5,9 +5,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.notifications.Sound;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class LHCMachineModeComparator extends ComparatorLogicModule {
@@ -16,10 +14,6 @@ public class LHCMachineModeComparator extends ComparatorLogicModule {
 		this.name = "n/a";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "New LHC Machine mode identified";
-		this.setNotificationPlay(true);
-		this.setNotificationDisplay(false);
-		this.setPrefixToPlay("Machine: ");
-		this.setSoundToPlay(Sound.STATE_CHANGE_LHC_MACHINE_MODE);
 	}
 
 	private static Logger logger = Logger.getLogger(LHCMachineModeComparator.class);

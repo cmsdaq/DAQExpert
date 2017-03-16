@@ -20,7 +20,6 @@ public class Deadtime extends SimpleLogicModule implements Parameterizable {
 	public Deadtime() {
 		this.name = "Deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.setNotificationPlay(false);
 		this.threshold = 0;
 	}
 

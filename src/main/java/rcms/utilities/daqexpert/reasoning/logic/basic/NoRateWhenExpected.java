@@ -4,7 +4,6 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class NoRateWhenExpected extends SimpleLogicModule {
@@ -13,9 +12,6 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		this.name = "No rate when expected";
 		this.priority = ConditionPriority.WARNING;
 		this.description = "No rate when expected";
-		this.setNotificationDisplay(true);
-		this.setNotificationPlay(true);
-		this.setNotificationEndPlay(true);
 	}
 
 	@Override

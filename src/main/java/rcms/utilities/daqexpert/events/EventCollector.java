@@ -27,6 +27,7 @@ public class EventCollector implements EventRegister {
 				ConditionEvent event = new ConditionEvent();
 				event.setTitle("Start " + condition.getTitle());
 				event.setCondition(condition);
+				event.setPriority(condition.getPriority());
 				event.setDate(condition.getStart());
 				event.setType(EventType.ConditionStart);
 				event.setLogicModule(logicModule);
@@ -37,9 +38,9 @@ public class EventCollector implements EventRegister {
 				logger.debug("# " + logicModule);
 
 				ConditionEvent event = new ConditionEvent();
-				event.setTitle(
-						logicModule.getDescription() + ": " + condition.getTitle());
+				event.setTitle(logicModule.getDescription() + ": " + condition.getTitle());
 				event.setCondition(condition);
+				event.setPriority(condition.getPriority());
 				event.setDate(condition.getStart());
 				event.setType(EventType.Single);
 				event.setLogicModule(logicModule);
@@ -58,6 +59,7 @@ public class EventCollector implements EventRegister {
 
 				ConditionEvent event = new ConditionEvent();
 				event.setTitle("End " + condition.getTitle());
+				event.setPriority(condition.getPriority());
 				event.setCondition(condition);
 				event.setDate(condition.getEnd());
 				event.setType(EventType.ConditionEnd);

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
-import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class ConditionEvent {
 
@@ -15,6 +15,8 @@ public class ConditionEvent {
 	private Date date;
 
 	private String title;
+
+	private ConditionPriority priority;
 
 	private LogicModuleRegistry logicModule;
 
@@ -58,6 +60,7 @@ public class ConditionEvent {
 		eventToSend.setEventSenderType(EventSenderType.Expert);
 		eventToSend.setDate(date);
 		eventToSend.setLogicModule(logicModule);
+		eventToSend.setPriority(priority);
 
 		return eventToSend;
 
@@ -77,5 +80,13 @@ public class ConditionEvent {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public ConditionPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(ConditionPriority priority) {
+		this.priority = priority;
 	}
 }

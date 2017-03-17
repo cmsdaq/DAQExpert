@@ -39,13 +39,17 @@ public class ForwardReaderJob implements ReaderJob {
 
 	private boolean finished;
 
-	public ForwardReaderJob(PersistenceExplorer persistenceExplorer, Long last, Long limit, String sourceDirectory) {
+	private final int batchSnapshotRead;
+
+	public ForwardReaderJob(PersistenceExplorer persistenceExplorer, Long last, Long limit, String sourceDirectory,
+			int batchSnapshotLimit) {
 		super();
 		this.persistenceExplorer = persistenceExplorer;
 		this.last = last;
 		this.sourceDirectory = sourceDirectory;
 		this.limit = limit;
 		this.finished = false;
+		this.batchSnapshotRead = batchSnapshotLimit;
 	}
 
 	@Override
@@ -59,7 +63,7 @@ public class ForwardReaderJob implements ReaderJob {
 				entry = persistenceExplorer.explore(last, sourceDirectory);
 			} else {
 				logger.debug("Exploring with upper limit of " + new Date(limit));
-				entry = persistenceExplorer.explore(last, limit, sourceDirectory);
+				entry = persistenceExplorer.explore(last, limit, sourceDirectory, batchSnapshotRead);
 			}
 			// remember last explored snapshot timestamp
 			if (entry != null && entry.getLeft() != null && entry.getLeft() != 0) {

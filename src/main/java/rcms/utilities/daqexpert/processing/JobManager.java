@@ -68,6 +68,25 @@ public class JobManager {
 
 	public JobManager(String sourceDirectory, DataManager dataManager) {
 
+		int realTimeReaderPeriod = 2000;
+		int batchSnapshotRead = 2000;
+
+		boolean demo = false;
+		System.out.println(Application.get().getProp());
+		if (Application.get().getProp().containsKey("demo")) {
+			try {
+				Object a = Application.get().getProp().get("demo");
+				demo = Boolean.parseBoolean((String) a);
+			} catch (NumberFormatException e) {
+				logger.warn("Demo configuration could not be parsed");
+			}
+		}
+
+		if (demo) {
+			realTimeReaderPeriod = 200;
+			batchSnapshotRead = 1;
+		}
+
 		this.persistenceManager = Application.get().getPersistenceManager();
 
 		RunConfigurator runConfigurator = new RunConfigurator(persistenceManager);
@@ -91,7 +110,7 @@ public class JobManager {
 		PersistenceExplorer persistenceExplorer = new PersistenceExplorer(new FileSystemConnector());
 		onDemandReader = new OnDemandReaderJob(persistenceExplorer, sourceDirectory);
 		ForwardReaderJob frj = new ForwardReaderJob(persistenceExplorer, startDate.getTime(),
-				endDate != null ? endDate.getTime() : null, sourceDirectory);
+				endDate != null ? endDate.getTime() : null, sourceDirectory, batchSnapshotRead);
 
 		eventProducer = new ConditionProducer();
 
@@ -120,9 +139,9 @@ public class JobManager {
 		ConditionDashboard conditionDashboard = Application.get().getDashboard();
 
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
-				eventRegister, eventSender, conditionDashboard);
+				eventRegister, eventSender, conditionDashboard, demo);
 
-		readerRaskController = new JobScheduler(futureDataPrepareJob);
+		readerRaskController = new JobScheduler(futureDataPrepareJob, realTimeReaderPeriod);
 
 		getRecentSuggestions();
 	}
@@ -175,7 +194,7 @@ public class JobManager {
 		conditionProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(conditionProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
-				persistenceManager, eventRegister, null, conditionDashboard);
+				persistenceManager, eventRegister, null, conditionDashboard, false);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);

@@ -21,7 +21,7 @@ public class JobScheduler {
 	/**
 	 * Period in which real time data will be accessed
 	 */
-	private static final int REAL_TIME_TASK_PERION_IN_MILLISECONDS = 2000;
+	private final int REAL_TIME_TASK_PERION_IN_MILLISECONDS;
 
 	/** Executor of on demand reader task */
 	private final ExecutorService onDemandScheduler;
@@ -33,17 +33,18 @@ public class JobScheduler {
 
 	private static final Logger logger = Logger.getLogger(JobScheduler.class);
 
-	public JobScheduler(Runnable realTimeTask) {
-		this(realTimeTask, Executors.newScheduledThreadPool(1), Executors.newFixedThreadPool(1));
+	public JobScheduler(Runnable realTimeTask, int period) {
+		this(realTimeTask, Executors.newScheduledThreadPool(1), Executors.newFixedThreadPool(1), period);
 	}
 
 	public JobScheduler(Runnable realTimeTask, ScheduledExecutorService realTimeScheduler,
-			ExecutorService onDemandScheduler) {
+			ExecutorService onDemandScheduler, int period) {
 
 		this.onDemandScheduler = onDemandScheduler;
 		this.realTimeScheduler = realTimeScheduler;
 
 		this.realTimeTask = realTimeTask;
+		REAL_TIME_TASK_PERION_IN_MILLISECONDS = period;
 
 	}
 
@@ -58,7 +59,8 @@ public class JobScheduler {
 
 	public void fireRealTimeReaderTask() {
 		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_MILLISECONDS + " seconds");
-		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_MILLISECONDS , TimeUnit.MILLISECONDS);
+		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_MILLISECONDS,
+				TimeUnit.MILLISECONDS);
 	}
 
 	public void stopExecutors() {

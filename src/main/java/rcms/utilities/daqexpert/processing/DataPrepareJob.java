@@ -42,13 +42,13 @@ public class DataPrepareJob implements Runnable {
 	private final EventSender eventSender;
 
 	private final ConditionDashboard conditionDashboard;
-	
-	/** flag to do demo run*/
-	private boolean demo = false;
+
+	/** flag to do demo run */
+	private final boolean demoRun;
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
-			EventSender eventSender, ConditionDashboard conditionDashboard) {
+			EventSender eventSender, ConditionDashboard conditionDashboard, boolean demoRun) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -58,6 +58,7 @@ public class DataPrepareJob implements Runnable {
 		this.eventRegister = eventRegister;
 		this.eventSender = eventSender;
 		this.conditionDashboard = conditionDashboard;
+		this.demoRun = demoRun;
 	}
 
 	private static int priority = 0;
@@ -92,7 +93,7 @@ public class DataPrepareJob implements Runnable {
 						logger.info("No result this round");
 						return;
 					}
-					
+
 					try {
 
 						long t1 = System.currentTimeMillis();
@@ -107,7 +108,7 @@ public class DataPrepareJob implements Runnable {
 
 						conditionDashboard.update(result.getLeft());
 
-						if (demo  && conditionDashboard.getCurrentCondition() != null
+						if (demoRun && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {
 							Thread.sleep(2000);
 							id = conditionDashboard.getCurrentCondition().getId();

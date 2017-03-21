@@ -15,6 +15,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
@@ -132,7 +134,8 @@ public class JobManager {
 		logger.info(
 				"Notifications will generated from: " + nmStartDate + " (now minus offset of " + offsetString + ")");
 
-		EventSender eventSender = new EventSender(Application.get().getProp(Setting.NM_API_CREATE));
+		HttpClient client = HttpClientBuilder.create().build();
+		EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
 
 		Long startTimestampToGenerateNotifications = System.currentTimeMillis() - offset;
 

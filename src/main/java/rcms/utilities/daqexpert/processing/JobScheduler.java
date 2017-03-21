@@ -58,7 +58,7 @@ public class JobScheduler {
 	}
 
 	public void fireRealTimeReaderTask() {
-		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_MILLISECONDS + " seconds");
+		logger.info("Starting RT reader task with period of " + REAL_TIME_TASK_PERION_IN_MILLISECONDS + " milliseconds");
 		realTimeScheduler.scheduleAtFixedRate(realTimeTask, 1, REAL_TIME_TASK_PERION_IN_MILLISECONDS,
 				TimeUnit.MILLISECONDS);
 	}

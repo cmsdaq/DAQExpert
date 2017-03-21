@@ -2,11 +2,15 @@ package rcms.utilities.daqexpert.events;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class ConditionEvent {
+
+	private final static Logger logger = Logger.getLogger(ConditionEvent.class);
 
 	private Condition condition;
 
@@ -53,6 +57,10 @@ public class ConditionEvent {
 		ConditionEventResource eventToSend = new ConditionEventResource();
 
 		eventToSend.setMessage(condition.getDescription());
+		if (eventToSend.getMessage() == null) {
+			logger.warn("Message empty for event: " + title + ", replacing with empty string");
+			eventToSend.setMessage("");
+		}
 		eventToSend.setTitle(title);
 		eventToSend.setConditionId(condition.getId());
 		eventToSend.setEventType(type);

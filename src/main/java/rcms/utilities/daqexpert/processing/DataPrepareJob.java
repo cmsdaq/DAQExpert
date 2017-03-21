@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +15,7 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.events.ConditionEvent;
+import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
@@ -116,23 +118,14 @@ public class DataPrepareJob implements Runnable {
 
 						logger.debug(conditionDashboard.toString());
 
-						int success = 0;
-						int failed = 0;
-						for (ConditionEvent event : eventRegister.getEvents()) {
-
-							boolean successful = eventSender.send(event.generateEventToSend());
-							if (!successful) {
-								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());
-								failed++;
-							} else {
-								success++;
+						if (eventRegister.getEvents().size() > 0) {
+							List<ConditionEventResource> eventsToSend = new ArrayList<>();
+							for (ConditionEvent conditionEvent : eventRegister.getEvents()) {
+								eventsToSend.add(conditionEvent.generateEventToSend());
 							}
-						}
-						eventRegister.getEvents().clear();
-						if (failed != 0) {
-							logger.warn(failed + " events failed to send, " + success + " successful");
-						} else if (success != 0) {
-							logger.info("All " + success + " events successfully sent to nm");
+							int sent = eventSender.sendBatchEvents(eventsToSend);
+							logger.info(sent + " events sucessfully sent to NotificationManager");
+							eventRegister.getEvents().clear();
 						}
 
 					} catch (RuntimeException e) {

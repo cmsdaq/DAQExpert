@@ -15,23 +15,93 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class ConditionDashboardTest {
 
+	Date d1 = DatatypeConverter.parseDateTime("2017-03-09T10:00:00Z").getTime();
+	Date d2 = DatatypeConverter.parseDateTime("2017-03-09T10:00:01Z").getTime();
+	Date d3 = DatatypeConverter.parseDateTime("2017-03-09T10:00:02Z").getTime();
+	Date d4 = DatatypeConverter.parseDateTime("2017-03-09T10:00:03Z").getTime();
+	Date d5 = DatatypeConverter.parseDateTime("2017-03-09T10:00:04Z").getTime();
+
+	Condition c1 = generateCondition("c1", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
+	Condition c2 = generateCondition("c2", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
+	Condition c3 = generateCondition("c3", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
+	Condition c4 = generateCondition("c4", ConditionPriority.DEFAULTT, LogicModuleRegistry.FlowchartCase1, d1);
+	Condition c5 = generateCondition("c5", ConditionPriority.IMPORTANT, LogicModuleRegistry.FEDDeadtime, d1);
+	Condition c6 = generateCondition("c6", ConditionPriority.CRITICAL, LogicModuleRegistry.FEDDeadtime, d2);
+	Condition c7 = generateCondition("c6", ConditionPriority.CRITICAL, LogicModuleRegistry.FEDDeadtime, d3);
+
 	@Test
-	public void simpleTest() {
+	public void dominantBasedOnPriorityTest() {
 
 		ConditionDashboard conditionDashboard = new ConditionDashboard(5);
+		Set<Condition> conditions = new LinkedHashSet<Condition>();
 
-		Date d1 = DatatypeConverter.parseDateTime("2017-03-09T10:00:00Z").getTime();
-		Date d2 = DatatypeConverter.parseDateTime("2017-03-09T10:00:01Z").getTime();
-		Date d3 = DatatypeConverter.parseDateTime("2017-03-09T10:00:02Z").getTime();
-		Date d4 = DatatypeConverter.parseDateTime("2017-03-09T10:00:03Z").getTime();
-		Date d5 = DatatypeConverter.parseDateTime("2017-03-09T10:00:04Z").getTime();
+		conditions.add(c1);
+		conditions.add(c5);
+		conditionDashboard.update(conditions);
 
-		Condition c1 = generateCondition("c1", ConditionPriority.DEFAULTT, d1);
-		Condition c2 = generateCondition("c2", ConditionPriority.DEFAULTT, d1);
-		Condition c3 = generateCondition("c3", ConditionPriority.DEFAULTT, d1);
-		Condition c4 = generateCondition("c4", ConditionPriority.DEFAULTT, d2);
-		Condition c5 = generateCondition("c5", ConditionPriority.IMPORTANT, d1);
-		Condition c6 = generateCondition("c6", ConditionPriority.CRITICAL, d2);
+		Assert.assertEquals(c5, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+		conditions.clear();
+		conditions.add(c5);
+		conditions.add(c1);
+		conditionDashboard.update(conditions);
+
+		Assert.assertEquals(c5, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+	}
+
+	@Test
+	public void dominantBasedOnUsefulnessTest() {
+
+		ConditionDashboard conditionDashboard = new ConditionDashboard(5);
+		Set<Condition> conditions = new LinkedHashSet<Condition>();
+
+		conditions.add(c6);
+		conditions.add(c7);
+		conditionDashboard.update(conditions);
+
+		Assert.assertEquals(c7, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+		conditions.clear();
+		conditions.add(c7);
+		conditions.add(c6);
+		conditionDashboard.update(conditions);
+
+		Assert.assertEquals(c7, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+	}
+
+	@Test
+	public void dominantBasedOnStartDateTest() {
+
+		ConditionDashboard conditionDashboard = new ConditionDashboard(5);
+		Set<Condition> conditions = new LinkedHashSet<Condition>();
+
+		conditions.add(c3);
+		conditions.add(c4);
+		conditionDashboard.update(conditions);
+
+		Assert.assertEquals(c4, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+		conditions.clear();
+		conditions.add(c4);
+		conditions.add(c3);
+		conditionDashboard.update(conditions);
+
+		Assert.assertEquals(c4, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+
+	}
+
+	@Test
+	public void simpleScenarioTest() {
+
+		ConditionDashboard conditionDashboard = new ConditionDashboard(5);
 
 		Set<Condition> conditions = new LinkedHashSet<Condition>();
 
@@ -51,7 +121,8 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		/* 2 Result */
-		Assert.assertEquals("Conditions same priority -> last start date", c4, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals("Conditions same priority -> higher usefulness date", c4,
+				conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
 		Assert.assertEquals(3, conditionDashboard.getFilteredCurrentConditions().size());
 
@@ -93,14 +164,16 @@ public class ConditionDashboardTest {
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
 		Assert.assertEquals(5, conditionDashboard.getFilteredCurrentConditions().size());
 
+		Assert.assertNotNull(conditionDashboard.toString());
+
 	}
 
-	public Condition generateCondition(String title, ConditionPriority priority, Date start) {
+	public Condition generateCondition(String title, ConditionPriority priority, LogicModuleRegistry lm, Date start) {
 		Condition condition = new Condition();
 		condition.setId(id++);
 		condition.setTitle(title);
 		condition.setPriority(priority);
-		condition.setLogicModule(LogicModuleRegistry.FEDDeadtime);
+		condition.setLogicModule(lm);
 		condition.setShow(true);
 		condition.setStart(start);
 		return condition;

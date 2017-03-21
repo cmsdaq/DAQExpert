@@ -124,12 +124,29 @@ public class ConditionDashboard implements Observer {
 						else if (condition.getPriority().ordinal() < currentCondition.getPriority().ordinal()) {
 							// nothing to do
 						}
+
 						// both are equally important
 						else {
-							// newest will be displayed
-							if (condition.getStart().after(currentCondition.getStart())) {
+
+							// current is more useful than old
+							if (condition.getLogicModule().getUsefulness() > currentCondition.getLogicModule()
+									.getUsefulness()) {
 								handleReplaceCurrent(condition);
+
 							}
+							// current is less useful than old
+							else if (condition.getLogicModule().getUsefulness() < currentCondition.getLogicModule()
+									.getUsefulness()) {
+								// nothing to do
+							}
+							// both are equally useful
+							else {
+								// newest will be displayed
+								if (condition.getStart().after(currentCondition.getStart())) {
+									handleReplaceCurrent(condition);
+								}
+							}
+
 						}
 					}
 				}
@@ -149,10 +166,6 @@ public class ConditionDashboard implements Observer {
 
 	public Condition getCurrentCondition() {
 		return currentCondition;
-	}
-
-	public void setCurrentCondition(Condition currentCondition) {
-		this.currentCondition = currentCondition;
 	}
 
 	protected Collection<Condition> getCurrentConditions() {

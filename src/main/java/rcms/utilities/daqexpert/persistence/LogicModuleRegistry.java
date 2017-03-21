@@ -36,42 +36,47 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
 
 public enum LogicModuleRegistry {
 
-	NoRate(new NoRate(), ConditionGroup.NO_RATE, "Satisfied when no rate in DAQ fed builder summary"),
-	RateOutOfRange(new RateOutOfRange(), ConditionGroup.RATE_OUT_OF_RANGE, ""),
+	NoRate(new NoRate(), ConditionGroup.NO_RATE, "Satisfied when no rate in DAQ fed builder summary", 10),
+	RateOutOfRange(new RateOutOfRange(), ConditionGroup.RATE_OUT_OF_RANGE, "", 9),
 	BeamActive(new BeamActive(), ConditionGroup.BEAM_ACTIVE, ""),
-	RunOngoing(new RunOngoing(), ConditionGroup.RUN_ONGOING, ""),
+	RunOngoing(new RunOngoing(), ConditionGroup.RUN_ONGOING, "", 100),
 	ExpectedRate(new ExpectedRate(), ConditionGroup.EXPECTED_RATE, ""),
 	Transition(new Transition(), ConditionGroup.TRANSITION, ""),
 	LongTransition(new LongTransition(), ConditionGroup.HIDDEN, ""),
-	WarningInSubsystem(new WarningInSubsystem(), ConditionGroup.Warning, ""),
-	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, ""),
-	SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, ""),
-	SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, ""),
-	FEDDeadtime(new FEDDeadtime(), ConditionGroup.FED_DEADTIME, ""),
-	PartitionDeadtime(new PartitionDeadtime(), ConditionGroup.PARTITION_DEADTIME, ""),
+	WarningInSubsystem(new WarningInSubsystem(), ConditionGroup.Warning, "", 1004),
+	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, "", 1006),
+	SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, "", 1007),
+	SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, "", 1005),
+	FEDDeadtime(new FEDDeadtime(), ConditionGroup.FED_DEADTIME, "", 1005),
+	PartitionDeadtime(new PartitionDeadtime(), ConditionGroup.PARTITION_DEADTIME, "", 1008),
 	StableBeams(new StableBeams(), ConditionGroup.HIDDEN, ""),
-	NoRateWhenExpected(new NoRateWhenExpected(), ConditionGroup.NO_RATE_WHEN_EXPECTED, ""),
+	NoRateWhenExpected(new NoRateWhenExpected(), ConditionGroup.NO_RATE_WHEN_EXPECTED, "", 104),
 	Downtime(new Downtime(), ConditionGroup.DOWNTIME, ""),
 	Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
-	CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, ""),
-	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, ""),
-	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, ""),
-	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, ""),
-	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, ""),
-	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, ""),
-	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, ""),
-	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session"),
-	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode"),
-	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode"),
-	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run"),
-	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State"),
-	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State"),
-	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state");
+	CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, "", 105),
+	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, "", 10004),
+	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, "", 10005),
+	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
+	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, "", 10007),
+	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
+	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, "", 10009),
+	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
+	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
+	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),
+	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run", 14),
+	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State", 13),
+	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State", 12),
+	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11);
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
+		this(logicModule, group, description, 1);
+	}
+
+	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int usefulness) {
 		this.logicModule = logicModule;
 		this.description = description;
 		this.group = group;
+		this.usefulness = usefulness;
 	}
 
 	public LogicModule getLogicModule() {
@@ -85,9 +90,14 @@ public enum LogicModuleRegistry {
 	private final LogicModule logicModule;
 	private final String description;
 	private final ConditionGroup group;
+	private final int usefulness;
 
 	public ConditionGroup getGroup() {
 		return group;
+	}
+
+	public int getUsefulness() {
+		return usefulness;
 	}
 
 }

@@ -1,13 +1,4 @@
-unittest:
-  stage: test
-  environment: staging
-  only:
-  - dev
-  tags:
-  - dev
-  script: "mvn test -B -U"
-
-integrationtest:
+test for staging:
   stage: test
   environment: staging
   only:
@@ -15,8 +6,7 @@ integrationtest:
   tags:
   - dev
   script: "mvn integration-test -B -U"
-  dependencies:
-  - unittest
+
 
 build for staging:
   stage: build

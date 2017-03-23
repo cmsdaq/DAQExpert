@@ -18,6 +18,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.processing.DataStream;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -28,7 +29,7 @@ import rcms.utilities.daqexpert.segmentation.DataResolution;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class PersistenceManagerTest {
+public class PersistenceManagerIT {
 	private static PersistenceManager pm;
 
 	private static Date entry1Start = DatatypeConverter.parseDateTime("2017-01-17T10:35:00Z").getTime();
@@ -51,7 +52,9 @@ public class PersistenceManagerTest {
 	 */
 	@BeforeClass
 	public static void initializeObjects() {
-		pm = new PersistenceManager("history-test", new Properties());
+
+		Application.initialize("src/test/resources/integration.properties");
+		pm = Application.get().getPersistenceManager();
 
 		pm.persist(getFinishedEntry(entry1Start, "test1", 10000));
 		pm.persist(getFinishedEntry(entry2Start, "test2", 10000));
@@ -64,19 +67,19 @@ public class PersistenceManagerTest {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(entry6Start);
 
-		int num = 0;//1000000;
-		Long start = System.currentTimeMillis();	
+		int num = 0;// 1000000;
+		Long start = System.currentTimeMillis();
 		Set<Condition> testData = new HashSet<Condition>();
-		for(int i=0; i<num; i++){
-			cal.add(Calendar.MILLISECOND, 100 );
+		for (int i = 0; i < num; i++) {
+			cal.add(Calendar.MILLISECOND, 100);
 			Date endDate = cal.getTime();
 			testData.add(getFinishedEntry(endDate, "generated " + i, i));
-			//pm.persist(getFinishedEntry(endDate, "generated " + i, i));
+			// pm.persist(getFinishedEntry(endDate, "generated " + i, i));
 		}
 		pm.persist(testData);
-		Long end = System.currentTimeMillis();	
-		System.out.print("Time to insert " + num + " was " + (end-start) + " ms");
-		
+		Long end = System.currentTimeMillis();
+		System.out.print("Time to insert " + num + " was " + (end - start) + " ms");
+
 	}
 
 	/**
@@ -99,7 +102,7 @@ public class PersistenceManagerTest {
 		result = pm.getEntriesPlain(ts2, te2);
 		Assert.assertEquals(1, result.size());
 		Condition retrievedEntry = result.iterator().next();
-		
+
 		Assert.assertEquals("test1", retrievedEntry.getTitle());
 		Assert.assertEquals(DatatypeConverter.parseDateTime("2017-01-17T10:35:10Z").getTime(), retrievedEntry.getEnd());
 	}

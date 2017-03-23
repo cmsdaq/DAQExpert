@@ -1,3 +1,23 @@
+unittest:
+  stage: test
+  environment: staging
+  only:
+  - dev
+  tags:
+  - dev
+  script: "mvn test -B -U"
+
+integrationtest:
+  stage: test
+  environment: staging
+  only:
+  - dev
+  tags:
+  - dev
+  script: "mvn integration-test -B -U"
+  dependencies:
+  - unittest
+
 build for staging:
   stage: build
   environment: staging
@@ -5,7 +25,7 @@ build for staging:
   - dev
   tags:
   - dev
-  script: "mvn install -B -U"
+  script: "mvn -Dmaven.test.skip=true install -B -U"
   artifacts:
     expire_in: 1 week
     paths:

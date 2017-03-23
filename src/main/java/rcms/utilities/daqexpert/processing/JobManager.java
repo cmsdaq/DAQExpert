@@ -60,21 +60,24 @@ public class JobManager {
 
 	private final OnDemandReaderJob onDemandReader;
 
-	private final DataPrepareJob futureDataPrepareJob;
+	protected final DataPrepareJob futureDataPrepareJob;
 
 	private final JobScheduler readerRaskController;
 
 	private final ConditionProducer eventProducer;
 
 	private Condition versionCondition;
+	
+	protected final EventSender eventSender;
 
-	public JobManager(String sourceDirectory, DataManager dataManager) {
+	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender) {
+		
+		this.eventSender = eventSender;
 
 		int realTimeReaderPeriod = 2000;
 		int batchSnapshotRead = 2000;
 
 		boolean demo = false;
-		System.out.println(Application.get().getProp());
 		if (Application.get().getProp().containsKey("demo")) {
 			try {
 				Object a = Application.get().getProp().get("demo");
@@ -134,8 +137,6 @@ public class JobManager {
 		logger.info(
 				"Notifications will generated from: " + nmStartDate + " (now minus offset of " + offsetString + ")");
 
-		HttpClient client = HttpClientBuilder.create().build();
-		EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
 
 		Long startTimestampToGenerateNotifications = System.currentTimeMillis() - offset;
 

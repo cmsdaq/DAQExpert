@@ -117,6 +117,10 @@ public class PersistenceManager {
 
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
+		return getRawData(startDate, endDate, resolution);
+	}
+
+	public List<Point> getRawData(Date startDate, Date endDate, DataResolution resolution) {
 
 		logger.debug("resolution of data to RAW API " + resolution);
 
@@ -453,12 +457,12 @@ public class PersistenceManager {
 		elementsCriteria.setMaxResults(3);
 
 		List<Condition> result = elementsCriteria.list();
-		for(Condition c: result){
+		for (Condition c : result) {
 			c.getActionSteps().size();
 		}
 
 		entityManager.close();
-		
+
 		return result;
 	}
 

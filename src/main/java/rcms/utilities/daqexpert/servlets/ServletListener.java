@@ -10,6 +10,8 @@ import java.util.Set;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.Application;
@@ -18,6 +20,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
@@ -70,7 +73,10 @@ public class ServletListener implements ServletContextListener {
 
 		DataManager dataManager = Application.get().getDataManager();
 
-		jobManager = new JobManager(sourceDirectory, dataManager);
+		HttpClient client = HttpClientBuilder.create().build();
+		EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
+
+		jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
 		jobManager.startJobs();
 
 		Application.get().setJobManager(jobManager);
@@ -78,7 +84,7 @@ public class ServletListener implements ServletContextListener {
 
 	public void contextDestroyed(ServletContextEvent e) {
 		logger.info("Expert will go down now, starting shutdown sequence");
-		
+
 		jobManager.stop();
 
 		Enumeration<Driver> drivers = DriverManager.getDrivers();

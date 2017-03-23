@@ -41,7 +41,7 @@ public class DataPrepareJob implements Runnable {
 	private final SnapshotProcessor snapshotProcessor;
 
 	private final EventRegister eventRegister;
-	private final EventSender eventSender;
+	protected final EventSender eventSender;
 
 	private final ConditionDashboard conditionDashboard;
 

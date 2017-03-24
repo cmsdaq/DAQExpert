@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
@@ -50,7 +53,9 @@ public class Application {
 		checkRequiredSettings();
 		String v = instance.getClass().getPackage().getImplementationVersion();
 		logger.info("DAQExpert version: " + v);
-		instance.persistenceManager = new PersistenceManager("history", instance.getProp());
+
+		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("history", instance.getProp());
+		instance.persistenceManager = new PersistenceManager(entityManagerFactory);
 		instance.setDataManager(new DataManager());
 	}
 

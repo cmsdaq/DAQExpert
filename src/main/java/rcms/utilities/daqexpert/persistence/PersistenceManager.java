@@ -52,10 +52,9 @@ public class PersistenceManager {
 
 	private final EntityManager entryEntityManager;
 
-	public PersistenceManager(String persistenceUnitName, Properties props) {
-
-		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
-		entryEntityManager = entityManagerFactory.createEntityManager();
+	public PersistenceManager(EntityManagerFactory entityManagerFactory) {
+		this.entityManagerFactory = entityManagerFactory;
+		this.entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
 	/**

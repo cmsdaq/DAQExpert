@@ -22,7 +22,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase4 extends KnownFailure {
 
 	public FlowchartCase4() {
-		this.name = "FC4";
+		this.name = "Partition disconnected";
 		this.description = "TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
 				+ "The PI of the subsystem may be suffering from a firmware problem";
 		this.action = new SimpleAction("Stop the run", "red & green recycle the subsystem {{SUBSYSTEM}}",

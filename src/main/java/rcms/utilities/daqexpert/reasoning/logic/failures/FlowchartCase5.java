@@ -23,7 +23,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase5 extends KnownFailure {
 
 	public FlowchartCase5() {
-		this.name = "FC5";
+		this.name = "Fed stuck";
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 

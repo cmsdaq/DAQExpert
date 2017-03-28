@@ -27,7 +27,7 @@ public class FlowchartCase1 extends KnownFailure {
 	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
 
 	public FlowchartCase1() {
-		this.name = "FC1";
+		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
 				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";

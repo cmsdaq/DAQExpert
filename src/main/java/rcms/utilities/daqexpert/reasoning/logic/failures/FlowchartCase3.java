@@ -21,7 +21,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase3 extends KnownFailure {
 
 	public FlowchartCase3() {
-		this.name = "FC3";
+		this.name = "Partition problem";
 		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking trigger.";
 		this.action = new SimpleAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",

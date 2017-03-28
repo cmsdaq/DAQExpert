@@ -78,14 +78,14 @@ public class JobManagerIT {
 
 		Assert.assertEquals(52, result.size());
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("No rate when expected"))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("FC1")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("FC2")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("FC3")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("FC4")))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FC5"))));
+		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
+		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Corrupted data received")))));
+		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition problem")))));
+		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition disconnected")))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Fed stuck"))));
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
 				"TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING"))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("FC6")))));
+		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
 
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,

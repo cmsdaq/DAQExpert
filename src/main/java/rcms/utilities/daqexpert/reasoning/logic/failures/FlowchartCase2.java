@@ -42,8 +42,8 @@ public class FlowchartCase2 extends KnownFailure {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.WARNING;
+
+		assignPriority(results);
 
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();

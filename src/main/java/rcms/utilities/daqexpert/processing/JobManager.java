@@ -15,8 +15,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;

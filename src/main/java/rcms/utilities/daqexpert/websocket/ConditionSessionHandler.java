@@ -140,7 +140,7 @@ public class ConditionSessionHandler {
 
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String description = condition.getDescription() != null ? condition.getDescription() : "";
-		String title = condition.getTitle() != null ? condition.getTitle() + " #" + condition.getId() : "";
+		String title = condition.getTitle() != null ? condition.getTitle() : "#" + condition.getId();
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 		JsonArrayBuilder actionArrayBuilder = provider.createArrayBuilder();
 		if (condition.getActionSteps() != null) {
@@ -197,7 +197,7 @@ public class ConditionSessionHandler {
 
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String tts = condition.getDescription() != null ? condition.getDescription() : "";
-		String title = condition.getTitle() != null ? condition.getTitle() + "#" + condition.getId() : "";
+		String title = condition.getTitle() != null ? condition.getTitle() : "#" + condition.getId();
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 
 		JsonObject addMessage = provider.createObjectBuilder().add("action", "add").add("id", condition.getId())

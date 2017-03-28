@@ -7,10 +7,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 5 flowchart case.
@@ -23,7 +21,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase5 extends KnownFailure {
 
 	public FlowchartCase5() {
-		this.name = "Fed stuck";
+		this.name = "FED stuck";
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 
@@ -41,8 +39,6 @@ public class FlowchartCase5 extends KnownFailure {
 		this.action = action;
 	}
 
-	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
-
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
@@ -53,7 +49,6 @@ public class FlowchartCase5 extends KnownFailure {
 
 		boolean result = false;
 
-		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
 		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {

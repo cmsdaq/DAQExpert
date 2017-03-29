@@ -4,14 +4,27 @@
 
 $(document).ready(
 		function() {
-
-			var shareLinkBase = $('#browser-link').data('url');
+			
+			var shareLinkBase = null;
 			var startKey = "?start=";
 			var endKey = "&end=";
 			var startValue = null;
 			var endValue = null;
 
 			var getLink = function() {
+				
+				var oldURL = $(location).attr('href');
+				var index = 0;
+				var newURL = oldURL;
+				index = oldURL.indexOf('?');
+				if(index == -1){
+				    index = oldURL.indexOf('#');
+				}
+				if(index != -1){
+				    newURL = oldURL.substring(0, index);
+				}
+				shareLinkBase = newURL;
+				
 				p = getWindowInformationForAPI();
 				startValue = new Date(p['start']).toISOString();
 				endValue = new Date(p['end']).toISOString();

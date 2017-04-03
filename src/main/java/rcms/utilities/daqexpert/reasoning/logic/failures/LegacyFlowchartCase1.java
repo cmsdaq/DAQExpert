@@ -19,12 +19,12 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase1 extends KnownFailure {
+public class LegacyFlowchartCase1 extends KnownFailure {
 
 	/** regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message */
 	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
 
-	public FlowchartCase1() {
+	public LegacyFlowchartCase1() {
 		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "

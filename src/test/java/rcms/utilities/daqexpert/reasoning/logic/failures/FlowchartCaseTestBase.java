@@ -21,16 +21,17 @@ public class FlowchartCaseTestBase {
 
 		StructureSerializer serializer = new StructureSerializer();
 
-		URL url = FlowchartCase1.class.getResource(fname);
+		URL url = OutOfSequenceData.class.getResource(fname);
 
 		File file = new File(url.toURI());
 
 		return serializer.deserialize(file.getAbsolutePath(), PersistenceFormat.SMILE);
 	}
 
-	protected final KnownFailure fc1 = new FlowchartCase1();
+	protected final KnownFailure fc1 = new OutOfSequenceData();
+	protected final KnownFailure lfc1 = new LegacyFlowchartCase1();
 
-	protected final KnownFailure fc2 = new FlowchartCase2();
+	protected final KnownFailure fc2 = new CorruptedData();
 
 	protected final KnownFailure fc3 = new FlowchartCase3();
 
@@ -38,5 +39,5 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
 
-	protected final KnownFailure fc6 = new FlowchartCase6();
+	
 }

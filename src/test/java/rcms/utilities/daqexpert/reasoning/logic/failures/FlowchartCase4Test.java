@@ -35,7 +35,6 @@ public class FlowchartCase4Test extends FlowchartCaseTestBase {
 		System.out.println("FC4 context: " + fc4.getContext().getContext());
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		System.out.println("FC5 context: " + fc5.getContext().getContext());
-		assertEquals(false, fc6.satisfied(snapshot, results));
 
 	}
 

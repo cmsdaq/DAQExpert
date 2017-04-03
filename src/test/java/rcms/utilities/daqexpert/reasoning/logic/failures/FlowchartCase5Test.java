@@ -29,7 +29,6 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(false, fc3.satisfied(snapshot, results));
 		assertEquals(false, fc4.satisfied(snapshot, results));
 		assertEquals(true, fc5.satisfied(snapshot, results));
-		assertEquals(false, fc6.satisfied(snapshot, results));
 
 	}
 

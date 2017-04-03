@@ -38,6 +38,8 @@ public class FlowchartCaseTestBase {
 	protected final KnownFailure fc4 = new FlowchartCase4();
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
+	
+	protected final KnownFailure ruStuckWaiting = new RuStuckWaiting();
 
 	
 }

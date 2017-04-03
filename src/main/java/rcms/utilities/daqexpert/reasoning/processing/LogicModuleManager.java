@@ -51,20 +51,24 @@ public class LogicModuleManager {
 		this.conditionProducer = conditionProducer;
 
 		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
-			lm.getLogicModule().setLogicModuleRegistry(lm);
-			if (lm.getLogicModule() instanceof SimpleLogicModule) {
-				SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm.getLogicModule();
-				checkers.add(simpleLogicModule);
-			} else if (lm.getLogicModule() instanceof ComparatorLogicModule) {
-				ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
-				comparators.add(comparatorLogicModule);
-			}
+			if (lm.getLogicModule() != null) {
+				lm.getLogicModule().setLogicModuleRegistry(lm);
+				if (lm.getLogicModule() instanceof SimpleLogicModule) {
+					SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm.getLogicModule();
+					checkers.add(simpleLogicModule);
+				} else if (lm.getLogicModule() instanceof ComparatorLogicModule) {
+					ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
+					comparators.add(comparatorLogicModule);
+				}
 
-			if (lm.getLogicModule() instanceof Parameterizable) {
-				Parameterizable updatable = (Parameterizable) lm.getLogicModule();
+				if (lm.getLogicModule() instanceof Parameterizable) {
+					Parameterizable updatable = (Parameterizable) lm.getLogicModule();
 
-				updatable.parametrize(Application.get().getProp());
-				logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
+					updatable.parametrize(Application.get().getProp());
+					logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
+				}
+			} else {
+				logger.info("This is not used: " + lm);
 			}
 		}
 

@@ -32,7 +32,7 @@ public class Context implements Serializable {
 		this.actionKey = new HashSet<>();
 	}
 
-	public void register(String key, Object object) {
+	public void register(String key, Serializable object) {
 		if (!context.containsKey(key)) {
 			context.put(key, new HashSet<Object>());
 		}

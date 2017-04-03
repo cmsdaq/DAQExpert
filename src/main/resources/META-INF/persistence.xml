@@ -4,8 +4,6 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
 	version="1.0">
 
-
-
 	<persistence-unit name="history" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>rcms.utilities.daqexpert.persistence.Condition</class>
@@ -20,7 +18,7 @@
 			<!-- Configuring Connection Pool with C3P0 - is the project good choice? -->
 			<property name="hibernate.c3p0.min_size" value="5" />
 			<property name="hibernate.c3p0.max_size" value="20" />
-			
+
 			<property name="hibernate.c3p0.max_statements" value="50" />
 
 			<!-- When an idle connection is removed from the pool (in second) -->
@@ -39,30 +37,5 @@
 
 
 	</persistence-unit>
-
-	<persistence-unit name="history-test"
-		transaction-type="RESOURCE_LOCAL">
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>rcms.utilities.daqexpert.persistence.Condition</class>
-		<class>rcms.utilities.daqexpert.persistence.Point</class>
-
-		<exclude-unlisted-classes>true</exclude-unlisted-classes>
-		<properties>
-			<property name="hibernate.archive.autodetection" value="class" />
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-			<property name="hibernate.connection.driver_class" value="org.h2.Driver" />
-			<property name="hibernate.connection.url" value="jdbc:h2:target/h2-1" />
-			<property name="hibernate.connection.user" value="sa" />
-			<!-- <property name="hibernate.show_sql" value="true"/> -->
-			<property name="hibernate.flushMode" value="FLUSH_AUTO" />
-			<property name="hibernate.hbm2ddl.auto" value="create" />
-
-			<property name="hibernate.show_sql" value="true" />
-			<property name="hibernate.format_sql" value="true" />
-		</properties>
-
-
-	</persistence-unit>
-
 
 </persistence>

@@ -5,8 +5,6 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class SubsystemError extends ContextLogicModule {
@@ -15,8 +13,6 @@ public class SubsystemError extends ContextLogicModule {
 		this.name = "Subsystem in error";
 		this.description = "{{SUBSYSTEM}} subsystem is in error";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.setNotificationPlay(true);
-		this.setNotificationDisplay(true);
 	}
 
 	@Override

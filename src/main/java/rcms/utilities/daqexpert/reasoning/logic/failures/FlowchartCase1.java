@@ -1,17 +1,15 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 1 flowchart case.
@@ -27,7 +25,7 @@ public class FlowchartCase1 extends KnownFailure {
 	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
 
 	public FlowchartCase1() {
-		this.name = "FC1";
+		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
 				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";
@@ -64,8 +62,8 @@ public class FlowchartCase1 extends KnownFailure {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+
+		assignPriority(results);
 
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error' 

@@ -315,6 +315,10 @@ function load(data, fakeEnd) {
 		if(value['end'] == null){
 			value['end'] = fakeEnd;
 		}
+		
+		if(value['content'] == null){
+			value['content'] = "no title (event: "+value['id']+")";
+		}
 
 		var current = groups.get(groupName);
 

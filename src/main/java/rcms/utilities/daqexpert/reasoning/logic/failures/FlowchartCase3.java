@@ -6,10 +6,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 3 flowchart case.
@@ -21,7 +19,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase3 extends KnownFailure {
 
 	public FlowchartCase3() {
-		this.name = "FC3";
+		this.name = "Partition problem";
 		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking trigger.";
 		this.action = new SimpleAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
@@ -37,9 +35,8 @@ public class FlowchartCase3 extends KnownFailure {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
-
+		assignPriority(results);
+		
 		boolean result = false;
 
 		String daqstate = daq.getDaqState();
@@ -48,18 +45,21 @@ public class FlowchartCase3 extends KnownFailure {
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+					if (!ttcp.isMasked()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
-						context.register("SUBSYSTEM", subSystem.getName());
-						context.register("TTCP", ttcp.getName());
-						context.register("STATE", currentState.name());
-						result = true;
+							context.register("SUBSYSTEM", subSystem.getName());
+							context.register("TTCP", ttcp.getName());
+							context.register("STATE", currentState.name());
+							result = true;
+						}
 					}
 				}
 			}
 		}
+
 		return result;
 	}
 

@@ -50,27 +50,31 @@ public class ConditionProducer {
 
 	private final List<Condition> finishedThisRound;
 
+	private Date lastUpdate = null;
+
 	/**
 	 * Get all unfinished reasons and force finish them (so can be displayed)
 	 * 
 	 * @param date
 	 *            date on which unfinished reasons will be finished
 	 */
-	private Set<Condition> finish(Date date) {
+	public Set<Condition> finish() {
 
 		logger.debug("Artificial finishing with unfinished events: " + unfinished);
 		logger.trace("finished This Round: " + finishedThisRound);
 
 		Set<Condition> result = new HashSet<>();
+		if (lastUpdate != null) {
 
-		for (Condition entry : unfinished.values()) {
-			entry.setEnd(date);
-			entry.calculateDuration();
+			for (Condition entry : unfinished.values()) {
+				entry.setEnd(lastUpdate);
+				entry.calculateDuration();
 
-			if (entry.isShow()) {
-				result.add(entry);
+				if (entry.isShow()) {
+					result.add(entry);
+				}
+
 			}
-
 		}
 		return result;
 	}
@@ -87,7 +91,7 @@ public class ConditionProducer {
 	 * 00000100000100000100 will produce 3 events corresponding to 1 start and
 	 * ending on next 1 start
 	 */
-	public Pair<Boolean, Condition> produce(ComparatorLogicModule comparator, boolean value, Date last, Date current) {
+	public Pair<Boolean, Condition> produce(ComparatorLogicModule comparator, boolean value, Date current) {
 
 		if (value) {
 			logger.debug("New lazy event " + current);
@@ -104,6 +108,7 @@ public class ConditionProducer {
 	}
 
 	private Pair<Boolean, Condition> build(LogicModule logicModule, boolean value, Date date) {
+		lastUpdate = date;
 		// get current state
 		String logicModuleName = logicModule.getClass().getSimpleName();
 		String content = logicModule.getName();

@@ -14,7 +14,7 @@ public class Downtime extends SimpleLogicModule {
 
 	public Downtime() {
 		this.name = "Downtime";
-		this.priority = ConditionPriority.WARNING;
+		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "No rate during stable beams";
 	}
 
@@ -26,7 +26,6 @@ public class Downtime extends SimpleLogicModule {
 
 		boolean noRate = results.get(NoRate.class.getSimpleName());
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.WARNING : ConditionPriority.DEFAULTT;
 
 		if (stableBeams && noRate)
 			return true;

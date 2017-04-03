@@ -2,26 +2,27 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies partition deadtime
  */
-public class PartitionDeadtime extends ContextLogicModule {
+public class PartitionDeadtime extends ContextLogicModule implements Parameterizable {
 
-	private final float threshold;
+	private float threshold;
 
-	public PartitionDeadtime(final float threshold) {
+	public PartitionDeadtime() {
 		this.name = "Partition deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
-		this.setNotificationPlay(true);
-		this.threshold = threshold;
+		this.threshold = 0;
 	}
 
 	/**
@@ -59,6 +60,25 @@ public class PartitionDeadtime extends ContextLogicModule {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void parametrize(Properties properties) {
+
+		try {
+			this.threshold = Integer
+					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION.getKey()));
+
+			this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is greater than "
+					+ threshold + "%";
+		} catch (NumberFormatException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
+					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
+		} catch (NullPointerException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
+					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
+		}
+
 	}
 
 }

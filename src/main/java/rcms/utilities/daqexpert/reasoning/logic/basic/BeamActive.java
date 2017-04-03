@@ -4,7 +4,6 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
@@ -18,10 +17,8 @@ public class BeamActive extends SimpleLogicModule {
 	public BeamActive() {
 		this.name = "Beams active";
 		this.description = "Beam active identified";
-
 		this.priority = ConditionPriority.DEFAULTT;
 
-		this.setNotificationPlay(false);
 	}
 
 	@Override

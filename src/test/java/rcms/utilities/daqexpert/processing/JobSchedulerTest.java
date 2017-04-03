@@ -37,7 +37,7 @@ public class JobSchedulerTest {
 
 		counter = 0;
 		DeterministicScheduler s1 = new DeterministicScheduler();
-		JobScheduler dpc = new JobScheduler(simpleRTTask, s1, null);
+		JobScheduler dpc = new JobScheduler(simpleRTTask, s1, null, 2000);
 
 		dpc.fireRealTimeReaderTask();
 
@@ -67,7 +67,7 @@ public class JobSchedulerTest {
 
 		counter = 0;
 		DeterministicScheduler s1 = new DeterministicScheduler();
-		JobScheduler dpc = new JobScheduler(simpleRTTask, null, s1);
+		JobScheduler dpc = new JobScheduler(simpleRTTask, null, s1, 2000);
 
 		dpc.scheduleOnDemandReaderTask(simplePastTask);
 

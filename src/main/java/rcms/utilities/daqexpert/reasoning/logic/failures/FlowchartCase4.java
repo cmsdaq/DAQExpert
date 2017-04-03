@@ -6,10 +6,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 4 flowchart case.
@@ -22,7 +20,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase4 extends KnownFailure {
 
 	public FlowchartCase4() {
-		this.name = "FC4";
+		this.name = "Partition disconnected";
 		this.description = "TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem is in disconnected TTS state. It's blocking trigger."
 				+ "The PI of the subsystem may be suffering from a firmware problem";
 		this.action = new SimpleAction("Stop the run", "red & green recycle the subsystem {{SUBSYSTEM}}",
@@ -34,8 +32,8 @@ public class FlowchartCase4 extends KnownFailure {
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+
+		assignPriority(results);
 
 		boolean result = false;
 
@@ -45,13 +43,15 @@ public class FlowchartCase4 extends KnownFailure {
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+					if (!ttcp.isMasked()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.DISCONNECTED) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.DISCONNECTED) {
 
-						context.register("SUBSYSTEM", subSystem.getName());
-						context.register("TTCP", ttcp.getName());
-						result = true;
+							context.register("SUBSYSTEM", subSystem.getName());
+							context.register("TTCP", ttcp.getName());
+							result = true;
+						}
 					}
 				}
 			}

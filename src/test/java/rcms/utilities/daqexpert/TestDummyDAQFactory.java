@@ -24,28 +24,9 @@ public class TestDummyDAQFactory {
 		return daq;
 	}
 
-	public static void print(DataManagerMock dm) {
-		System.out.println("RAW:" + dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE).size());
-		System.out.println("MIN:" + dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE).size());
-		System.out.println("HOR:" + dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE).size());
-		System.out.println("DAY:" + dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE).size());
-		System.out.println("MON:" + dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE).size());
-
-		try {
-			print(dm.getRawDataByResolution().get(DataResolution.Full).get(DataStream.RATE), "raw");
-			print(dm.getRawDataByResolution().get(DataResolution.Minute).get(DataStream.RATE), "minute");
-			print(dm.getRawDataByResolution().get(DataResolution.Hour).get(DataStream.RATE), "hour");
-			print(dm.getRawDataByResolution().get(DataResolution.Day).get(DataStream.RATE), "day");
-			print(dm.getRawDataByResolution().get(DataResolution.Month).get(DataStream.RATE), "month");
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-	}
-
 	private static void print(List<Point> list, String name) throws JsonProcessingException {
 		ObjectMapper om = new ObjectMapper();
 		System.out.println(
 				"var " + name + " = " + om.writeValueAsString(list.subList(0, Math.min(list.size(), 400))) + ";");
 	}
 }
-

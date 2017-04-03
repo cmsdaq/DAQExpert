@@ -10,13 +10,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum ConditionPriority {
 
+	FILTERED("filtered"),
+	FILTERED_IMPORTANT("filtered-important"),
+	EXPERIMENTAL("experimental"),
 	DEFAULTT("default"),
 	IMPORTANT("important"),
 	WARNING("warning"),
 	CRITICAL("critical"),
-	FILTERED("filtered"),
-	EXPERIMENTAL("experimental"),
-	FILTERED_IMPORTANT("filtered-important");
+	;
 
 	private ConditionPriority(String code) {
 		this.code = code;

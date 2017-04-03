@@ -1,93 +1,140 @@
 package rcms.utilities.daqexpert.events;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
+
+/**
+ * Sends events to Notification Manager
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class EventSender {
 
 	private static Logger logger = Logger.getLogger(EventSender.class);
 	private final ObjectMapper objectMapper;
 
 	private final String address;
+	private final HttpClient client;
 
-	public EventSender(String address) {
+	public EventSender(HttpClient httpClient, String address) {
+
+		client = httpClient;
 		this.address = address;
-
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 	}
 
-	public boolean send(EventToSend event) {
+	public int sendBatchEvents(List<ConditionEventResource> events) {
+
+		try {
+			sendEvents(events);
+			return events.size();
+		} catch (ExpertException e) {
+			return 0;
+		}
+	}
+
+	public int sendEventsIndividually(List<ConditionEventResource> events) {
+
+		int success = 0;
+		int failed = 0;
+		String exceptionSample = null;
+		for (ConditionEventResource event : events) {
+
+			try {
+				sendEvent(event);
+				success++;
+			} catch (ExpertException e) {
+				failed++;
+				exceptionSample = e.getMessage();
+			}
+		}
+		if (failed != 0) {
+			logger.warn(failed + " events failed to send, " + success + " successful, one of the failures: "
+					+ exceptionSample);
+		} else if (success != 0) {
+			logger.info("All " + success + " events successfully sent to nm");
+		}
+		return success;
+	}
+
+	private void sendEvents(List<ConditionEventResource> events) {
+		try {
+
+			String input = objectMapper.writeValueAsString(events);
+
+			logger.debug("Request: " + input);
+			sendJson(input);
+		} catch (JsonProcessingException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception converting event to json: " + e.getMessage());
+		} catch (UnsupportedEncodingException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception converting event to json, endcoding: " + e.getMessage());
+		} catch (ClientProtocolException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception sending event to NM, protocol: " + e.getMessage());
+		} catch (IOException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception sending event to NM, IO: " + e.getMessage());
+		}
+
+	}
+
+	private void sendEvent(ConditionEventResource event) {
 		try {
 
 			String input = objectMapper.writeValueAsString(event);
 
 			logger.debug("Request: " + input);
-			return sendEvent(input);
+			sendJson(input);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return false;
-
-	}
-
-	private boolean sendEvent(String input) {
-		try {
-
-			URL url = new URL(address);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-
-			OutputStream os = conn.getOutputStream();
-			os.write(input.getBytes());
-			os.flush();
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				logger.error("Failed: HTTP error code : " + conn.getResponseCode());
-				logger.error(conn.getResponseMessage());
-				// throw new RuntimeException("Failed : HTTP error code : " +
-				// conn.getResponseCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-			String output;
-			logger.trace("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				logger.trace(output);
-			}
-
-			conn.disconnect();
-
-			return true;
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception converting event to json: " + e.getMessage());
+		} catch (UnsupportedEncodingException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception converting event to json, endcoding: " + e.getMessage());
+		} catch (ClientProtocolException e) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception sending event to NM, protocol: " + e.getMessage());
 		} catch (IOException e) {
-
-			e.printStackTrace();
-
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception sending event to NM, IO: " + e.getMessage());
 		}
-		return false;
+
 	}
+
+	private void sendJson(String event) throws ClientProtocolException, IOException {
+		HttpPost post = new HttpPost(address);
+		post.addHeader("content-type", "application/json");
+
+		StringEntity entity = new StringEntity(event);
+		post.setEntity(entity);
+		HttpResponse response = client.execute(post);
+
+		if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
+			logger.info(response);
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
+					"Exception sending event to NM, status differend than 201: "
+							+ response.getStatusLine().getStatusCode());
+		}
+	}
+
 }

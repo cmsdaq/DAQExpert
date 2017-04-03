@@ -29,6 +29,7 @@
 <script src="static/js/experimental.js"></script>
 <script src="static/js/run-info-link.js"></script>
 <script src="static/js/wbm-link.js"></script>
+<script src="static/js/daqview-link.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -76,9 +77,9 @@
 
 
 				<!-- NM NOTIFICATIONS -->
-				<%-- <li><a
-					href="<%out.println(Application.get().getProp(Setting.NM_NOTIFICATIONS));%>"><i
-						class="glyphicon glyphicon-calendar"></i> Notifications</a></li> --%>
+				<li><a
+					href="<%out.println(Application.get().getProp(Setting.NM_ARCHIVE));%>"><i
+						class="glyphicon glyphicon-calendar"></i> Archive</a></li>
 
 			</ul>
 		</div>
@@ -123,6 +124,9 @@
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 						<li><a id="wbm-button" target="_blank"> WBM run summary <span
+								class="glyphicon glyphicon-chevron-right"></span>
+						</a></li>
+						<li><a id="daqview-button" target="_blank"> DAQView <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 					</ul>

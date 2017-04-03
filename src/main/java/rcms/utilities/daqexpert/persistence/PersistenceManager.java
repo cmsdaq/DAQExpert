@@ -23,6 +23,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,10 +52,9 @@ public class PersistenceManager {
 
 	private final EntityManager entryEntityManager;
 
-	public PersistenceManager(String persistenceUnitName, Properties props) {
-
-		entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
-		entryEntityManager = entityManagerFactory.createEntityManager();
+	public PersistenceManager(EntityManagerFactory entityManagerFactory) {
+		this.entityManagerFactory = entityManagerFactory;
+		this.entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
 	/**
@@ -80,12 +80,14 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		EntityTransaction tx = entityManager.getTransaction();
+
+		// EntityManager entityManager =
+		// entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entryEntityManager.getTransaction();
 		tx.begin();
-		entityManager.persist(entry);
+		entryEntityManager.persist(entry);
 		tx.commit();
-		entityManager.close();
+		// entityManager.close();
 	}
 
 	public void persist(Point test) {
@@ -114,6 +116,10 @@ public class PersistenceManager {
 
 		RangeResolver rangeResolver = new RangeResolver();
 		DataResolution resolution = rangeResolver.resolve(startDate, endDate);
+		return getRawData(startDate, endDate, resolution);
+	}
+
+	public List<Point> getRawData(Date startDate, Date endDate, DataResolution resolution) {
 
 		logger.debug("resolution of data to RAW API " + resolution);
 
@@ -288,7 +294,7 @@ public class PersistenceManager {
 
 		logger.debug("Retrieved " + tinyData.size() + " masked entries: " + tinyData);
 
-		long filterId =0;
+		long filterId = 0;
 		for (TinyEntryMapObject mapObject : tinyData) {
 			Condition curr = new Condition();
 			curr.setStart(mapObject.getStart());
@@ -410,6 +416,52 @@ public class PersistenceManager {
 		}
 		entityManager.getTransaction().commit();
 		entityManager.close();
+		return result;
+	}
+
+	public Date getLastFinish() {
+		Date endDate = null;
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+
+		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.EXPERT_VERSION));
+		elementsCriteria.addOrder(Order.desc("end"));
+		elementsCriteria.setMaxResults(1);
+
+		List<Condition> result = elementsCriteria.list();
+
+		entityManager.close();
+
+		if (result.size() >= 1) {
+			Condition lastVersion = result.iterator().next();
+			logger.info("Last version: " + lastVersion.getTitle() + " finished on " + lastVersion.getEnd());
+			endDate = lastVersion.getEnd();
+		}
+
+		return endDate;
+	}
+
+	public List<Condition> getLastActionConditions() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+
+		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.FLOWCHART));
+		elementsCriteria.addOrder(Order.desc("end"));
+		elementsCriteria.setMaxResults(3);
+
+		List<Condition> result = elementsCriteria.list();
+		for (Condition c : result) {
+			c.getActionSteps().size();
+		}
+
+		entityManager.close();
+
 		return result;
 	}
 

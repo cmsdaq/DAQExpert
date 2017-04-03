@@ -7,10 +7,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 5 flowchart case.
@@ -23,7 +21,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase5 extends KnownFailure {
 
 	public FlowchartCase5() {
-		this.name = "FC5";
+		this.name = "FED stuck";
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 
@@ -41,19 +39,16 @@ public class FlowchartCase5 extends KnownFailure {
 		this.action = action;
 	}
 
-	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
-
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+
+		assignPriority(results);
 
 		boolean result = false;
 
-		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
 
 		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
@@ -62,21 +57,24 @@ public class FlowchartCase5 extends KnownFailure {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+					if (!ttcp.isMasked()) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+							for (FED fed : ttcp.getFeds()) {
+								if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+									TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+									if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+											&& fed.getPercentBackpressure() == 0F) {
 
-						for (FED fed : ttcp.getFeds()) {
-							TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-							if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-									&& fed.getPercentBackpressure() == 0F) {
-
-								context.register("TTCP", ttcp.getName());
-								context.register("TTCPSTATE", currentState.name());
-								context.register("SUBSYSTEM", subSystem.getName());
-								context.register("FED", fed.getSrcIdExpected());
-								context.register("FEDSTATE", currentFedState.name());
-								context.setActionKey(subSystem.getName());
-								result = true;
+										context.register("TTCP", ttcp.getName());
+										context.register("TTCPSTATE", currentState.name());
+										context.register("SUBSYSTEM", subSystem.getName());
+										context.register("FED", fed.getSrcIdExpected());
+										context.register("FEDSTATE", currentFedState.name());
+										context.setActionKey(subSystem.getName());
+										result = true;
+									}
+								}
 							}
 						}
 					}

@@ -15,7 +15,7 @@ public class ForwardReaderJobTest extends ReaderJobTestBase {
 	@Test
 	public void simpleTest() throws Exception {
 		PersistenceExplorer explorer = new PersistenceExplorerStub(new FileSystemConnector());
-		ForwardReaderJob forwardReaderJob = new ForwardReaderJob(explorer, 1473858463000L,null, null);
+		ForwardReaderJob forwardReaderJob = new ForwardReaderJob(explorer, 1473858463000L, null, null, 2000);
 		Pair<Long, List<File>> result = forwardReaderJob.read();
 		Assert.assertEquals(1473858469000L, (long) result.getLeft());
 		Assert.assertEquals(6, (long) result.getRight().size());

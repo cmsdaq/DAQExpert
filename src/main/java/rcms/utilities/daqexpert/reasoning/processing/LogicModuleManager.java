@@ -21,6 +21,7 @@ import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 
 /**
  * Manager of checking process
@@ -37,7 +38,6 @@ public class LogicModuleManager {
 	private final ConditionProducer conditionProducer;
 
 	private ExperimentalProcessor experimentalProcessor;
-	private boolean artificialForced;
 
 	/**
 	 * Constructor, order of checker matters. Checkers may use results of
@@ -59,6 +59,13 @@ public class LogicModuleManager {
 				ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
 				comparators.add(comparatorLogicModule);
 			}
+
+			if (lm.getLogicModule() instanceof Parameterizable) {
+				Parameterizable updatable = (Parameterizable) lm.getLogicModule();
+
+				updatable.parametrize(Application.get().getProp());
+				logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
+			}
 		}
 
 		try {
@@ -69,7 +76,6 @@ public class LogicModuleManager {
 			e.printStackTrace();
 		}
 
-		artificialForced = true;
 	}
 
 	/**
@@ -174,28 +180,17 @@ public class LogicModuleManager {
 		List<Condition> results = new ArrayList<>();
 		for (ComparatorLogicModule comparator : comparators) {
 			logger.trace("Running comparator " + comparator.getClass().getSimpleName());
-			Date last = null;
-
-			/* add artificial event starting point */
-			if (artificialForced || comparator.getLast() == null) {
-				DAQ fake = new DAQ();
-				last = new Date(daq.getLastUpdate());
-				fake.setLastUpdate(daq.getLastUpdate());
-				comparator.setLast(fake);
-			} else
-				last = new Date(comparator.getLast().getLastUpdate());
 
 			boolean result = comparator.compare(daq);
 			Date current = new Date(comparator.getLast().getLastUpdate());
 
-			Pair<Boolean, Condition> produced = conditionProducer.produce(comparator, result, last, current);
+			Pair<Boolean, Condition> produced = conditionProducer.produce(comparator, result, current);
 			if (produced.getLeft()) {
 				logger.trace(produced.getRight());
 				results.add(produced.getRight());
 			}
 
 		}
-		artificialForced = false;
 		return results;
 	}
 
@@ -203,7 +198,4 @@ public class LogicModuleManager {
 		return experimentalProcessor;
 	}
 
-	public void setArtificialForced(boolean artificialForced) {
-		this.artificialForced = artificialForced;
-	}
 }

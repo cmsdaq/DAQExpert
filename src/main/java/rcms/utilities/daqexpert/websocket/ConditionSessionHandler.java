@@ -1,12 +1,8 @@
 package rcms.utilities.daqexpert.websocket;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Set;
 
 import javax.json.JsonArray;
@@ -23,91 +19,134 @@ public class ConditionSessionHandler {
 
 	private static final Logger logger = Logger.getLogger(ConditionSessionHandler.class);
 
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
+	private final ConditionDashboard conditionDashboard;
+
+	private final Set<Long> createdIds = new HashSet<>();
+
+	public ConditionSessionHandler(ConditionDashboard conditionDashboard) {
+		this.conditionDashboard = conditionDashboard;
+		conditionDashboard.setSessionHander(this);
+	}
+
 	private final Set<Session> sessions = new HashSet<>();
-	private final HashMap<Long, Condition> conditions = new LinkedHashMap<>();
 
-	private Condition currentCondition = null;
-
+	/**
+	 * Add new session - called on page load
+	 * 
+	 * @param session
+	 */
 	public void addSession(Session session) {
 		sessions.add(session);
 		logger.info("New session connected: " + session);
-		for (Condition event : conditions.values()) {
-			JsonObject addMessage = createAddMessage(event);
+		for (Condition condition : conditionDashboard.getFilteredCurrentConditions()) {
+			createdIds.add(condition.getId());
+			JsonObject addMessage = createAddRecentMessage(condition);
 			sendToSession(session, addMessage);
 		}
 
-		if (currentCondition != null) {
+		if (conditionDashboard.getCurrentCondition() != null) {
 			logger.info("New session will have info about current condition");
-			JsonObject addMessage = createCurrentMessage(currentCondition);
+			JsonObject addMessage = createCurrentMessage(conditionDashboard.getCurrentCondition());
 			sendToSession(session, addMessage);
-		} else{
+		} else {
 			JsonProvider provider = JsonProvider.provider();
 			JsonObject removeMessage = provider.createObjectBuilder().add("action", "removeCurrent").build();
 			sendToAllConnectedSessions(removeMessage);
 		}
 	}
 
+	/**
+	 * Remove ression - called when the browser is turned off
+	 * 
+	 * @param session
+	 */
 	public void removeSession(Session session) {
 		sessions.remove(session);
 	}
 
-	public Collection<Condition> getEvents() {
-		return conditions.values();
-	}
-
+	/**
+	 * Action to remove current suggestion
+	 */
 	public void removeCurrent() {
-		if (currentCondition != null && currentCondition.getEnd() != null) {
-			JsonProvider provider = JsonProvider.provider();
-			JsonObject removeMessage = provider.createObjectBuilder().add("action", "removeCurrent").build();
-			sendToAllConnectedSessions(removeMessage);
-			currentCondition = null;
-		}
+		logger.info("Removing current");
+		JsonProvider provider = JsonProvider.provider();
+		JsonObject removeMessage = provider.createObjectBuilder().add("action", "removeCurrent").build();
+		sendToAllConnectedSessions(removeMessage);
+
+		addRecent();
+
 	}
 
-	public void updateCurrent(Condition condition) {
+	/*
+	 * public void updateCurrent(Condition condition) {
+	 * 
+	 * if (currentCondition == null) { currentCondition = condition; JsonObject
+	 * addMessage = createCurrentMessage(condition);
+	 * sendToAllConnectedSessions(addMessage); } else { logger.info(
+	 * "Exists some suggestion, TODO: update it condition changed"); } }
+	 */
 
-		if (currentCondition == null) {
-			currentCondition = condition;
-			JsonObject addMessage = createCurrentMessage(condition);
-			sendToAllConnectedSessions(addMessage);
-		} else {
-			logger.info("Exists some suggestion, TODO: update it condition changed");
-		}
+	public void setCurrent(Condition condition) {
+		logger.info("Setting current");
+		JsonObject addMessage = createCurrentMessage(condition);
+		sendToAllConnectedSessions(addMessage);
 	}
 
-	public void addCondition(Condition condition) {
-		if (!conditions.containsKey(condition.getId())) {
+	public void update(Condition condition) {
+		logger.info("Updating");
+		JsonObject addMessage = createUpdateMessage(condition);
+		sendToAllConnectedSessions(addMessage);
+	}
 
-			if (conditions.size() >= 4) {
-				removeEvent(conditions.values().iterator().next());
+	/**
+	 * Action to add new recent condition
+	 * 
+	 * @param condition
+	 */
+	public void addRecent() {
+
+		logger.info("Adding recents");
+		// Note that it may result in empty. condition may be current
+
+		for (Condition condition : conditionDashboard.getFilteredCurrentConditions()) {
+			if (!createdIds.contains(condition.getId())) {
+				logger.info("-> adding recent " + condition.getId());
+				JsonObject addMessage = createAddRecentMessage(condition);
+				sendToAllConnectedSessions(addMessage);
+				createdIds.add(condition.getId());
 			}
-			conditions.put(condition.getId(), condition);
-			JsonObject addMessage = createAddMessage(condition);
-			sendToAllConnectedSessions(addMessage);
 		}
 	}
 
-	public void removeEvent(Condition event) {
-		if (event != null) {
-			conditions.remove(event.getId());
-			JsonProvider provider = JsonProvider.provider();
-			JsonObject removeMessage = provider.createObjectBuilder().add("action", "remove").add("id", event.getId())
-					.build();
-			sendToAllConnectedSessions(removeMessage);
-		}
+	public void removeRecent(Long id) {
+		logger.info("Removing recent " + id);
+		createdIds.remove(id);
+		JsonProvider provider = JsonProvider.provider();
+		JsonObject removeMessage = provider.createObjectBuilder().add("action", "remove").add("id", id).build();
+		sendToAllConnectedSessions(removeMessage);
 	}
 
+	/**
+	 * Create message
+	 * 
+	 * @param condition
+	 * @return
+	 */
 	private JsonObject createCurrentMessage(Condition condition) {
 		JsonProvider provider = JsonProvider.provider();
 		logger.info("Creating current condition message for : " + condition);
 
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String description = condition.getDescription() != null ? condition.getDescription() : "";
-		String title = condition.getTitle() != null ? condition.getTitle() + "#" + condition.getId() : "";
+		String title = condition.getTitle() != null ? condition.getTitle() : "#" + condition.getId();
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 		JsonArrayBuilder actionArrayBuilder = provider.createArrayBuilder();
-		for (String step : condition.getActionSteps()) {
-			actionArrayBuilder.add(step);
+		if (condition.getActionSteps() != null) {
+			for (String step : condition.getActionSteps()) {
+				actionArrayBuilder.add(step);
+			}
 		}
 		JsonArray actionArray = actionArrayBuilder.build();
 
@@ -120,29 +159,72 @@ public class ConditionSessionHandler {
 		return addMessage;
 	}
 
-	private JsonObject createAddMessage(Condition condition) {
+	/**
+	 * Create message
+	 * 
+	 * @param condition
+	 * @return
+	 */
+	private JsonObject createUpdateMessage(Condition condition) {
+		JsonProvider provider = JsonProvider.provider();
+		logger.debug("Creating update for condition: " + condition);
+
+		String status;
+		if (condition.getEnd() != null) {
+			status = "finished";
+		} else {
+			// this should never happend - for potential future improvements
+			// (e.g. context changed)
+			status = "updated";
+		}
+
+		JsonObject updateMessage = provider.createObjectBuilder().add("action", "update").add("id", condition.getId())
+				.add("status", status).build();
+
+		logger.debug("Created message for event: " + updateMessage);
+		return updateMessage;
+	}
+
+	/**
+	 * Create message
+	 * 
+	 * @param condition
+	 * @return
+	 */
+	private JsonObject createAddRecentMessage(Condition condition) {
 		JsonProvider provider = JsonProvider.provider();
 		logger.debug("Creating message for event: " + condition);
 
 		String message = condition.getActionSteps() != null ? condition.getActionSteps().toString() : "";
 		String tts = condition.getDescription() != null ? condition.getDescription() : "";
-		String title = condition.getTitle() != null ? condition.getTitle() + "#" + condition.getId() : "";
+		String title = condition.getTitle() != null ? condition.getTitle() : "#" + condition.getId();
 		String duration = condition.getEnd() == null ? "Ongoing" : "finished";
 
 		JsonObject addMessage = provider.createObjectBuilder().add("action", "add").add("id", condition.getId())
-				.add("name", title).add("type", condition.getStart().toString()).add("status", tts)
+				.add("name", title).add("type", dateFormat.format(condition.getStart())).add("status", tts)
 				.add("description", message).add("duration", duration).build();
 
 		logger.debug("Created message for event: " + addMessage);
 		return addMessage;
 	}
 
+	/**
+	 * Send message to all connected sessions
+	 * 
+	 * @param message
+	 */
 	private void sendToAllConnectedSessions(JsonObject message) {
 		for (Session session : sessions) {
 			sendToSession(session, message);
 		}
 	}
 
+	/**
+	 * Send message to session
+	 * 
+	 * @param session
+	 * @param message
+	 */
 	private void sendToSession(Session session, JsonObject message) {
 		try {
 			session.getBasicRemote().sendText(message.toString());

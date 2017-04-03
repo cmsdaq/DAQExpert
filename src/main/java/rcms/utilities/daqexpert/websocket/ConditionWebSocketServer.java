@@ -10,13 +10,16 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.Application;
+
 @ApplicationScoped
 @ServerEndpoint("/actions")
 public class ConditionWebSocketServer {
 
 	private static final Logger logger = Logger.getLogger(ConditionWebSocketServer.class);
 
-	public static ConditionSessionHandler sessionHandler = new ConditionSessionHandler();
+	public static ConditionSessionHandler sessionHandler = new ConditionSessionHandler(
+			Application.get().getDashboard());
 
 	@OnOpen
 	public void open(Session session) {
@@ -33,7 +36,7 @@ public class ConditionWebSocketServer {
 	@OnError
 	public void onError(Throwable error) {
 		logger.error(error);
-		//error.printStackTrace();
+		// error.printStackTrace();
 	}
 
 	@OnMessage

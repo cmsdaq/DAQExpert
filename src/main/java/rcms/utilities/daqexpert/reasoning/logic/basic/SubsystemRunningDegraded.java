@@ -5,8 +5,6 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class SubsystemRunningDegraded extends ContextLogicModule {
@@ -15,8 +13,6 @@ public class SubsystemRunningDegraded extends ContextLogicModule {
 		this.name = "Subsystem running degraded";
 		this.description = "{{SUBSYSTEM}} subsystem is in running degraded";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.setNotificationPlay(true);
-		this.setNotificationDisplay(true);
 	}
 
 	@Override

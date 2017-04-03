@@ -2,32 +2,33 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies individual FED deadtime
  */
-public class FEDDeadtime extends ContextLogicModule {
+public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 
-	private final float threshold;
+	private float threshold;
 
-	public FEDDeadtime(final float threshold) {
+	public FEDDeadtime() {
 		this.name = "FED deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
-		this.description = "Deadtime of fed(s) {{FED}} in subsystem(s) {{SUBSYSTEM}} is greater than 5%";
-		this.setNotificationPlay(true);
-		this.threshold = threshold;
+		this.threshold = 0;
 	}
 
 	/**
 	 * Dead time when greater than 5%
 	 */
-	@Override	
+	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		boolean transition = false;
@@ -60,6 +61,24 @@ public class FEDDeadtime extends ContextLogicModule {
 		}
 
 		return result;
+	}
+
+	@Override
+	public void parametrize(Properties properties) {
+		try {
+			this.threshold = Integer
+					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey()));
+
+			this.description = "Deadtime of fed(s) {{FED}} in subsystem(s) {{SUBSYSTEM}} is greater than " + threshold
+					+ "%";
+		} catch (NumberFormatException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
+					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
+		} catch (NullPointerException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
+					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
+		}
+
 	}
 
 }

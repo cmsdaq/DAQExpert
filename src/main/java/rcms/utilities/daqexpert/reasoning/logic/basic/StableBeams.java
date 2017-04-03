@@ -4,7 +4,6 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
@@ -18,10 +17,7 @@ public class StableBeams extends SimpleLogicModule {
 	public StableBeams() {
 		this.name = "Stable beams";
 		this.description = "Stable beams identified";
-
 		this.priority = ConditionPriority.DEFAULTT;
-		
-		this.setNotificationPlay(false);
 	}
 
 	@Override

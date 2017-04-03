@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -10,21 +11,18 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
-import rcms.utilities.daqexpert.events.Event;
+import rcms.utilities.daqexpert.events.ConditionEvent;
+import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
-import rcms.utilities.daqexpert.websocket.ConditionWebSocketServer;
+import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 /**
  * This job manages reading and processing the snapshots
@@ -43,11 +41,16 @@ public class DataPrepareJob implements Runnable {
 	private final SnapshotProcessor snapshotProcessor;
 
 	private final EventRegister eventRegister;
-	private final EventSender eventSender;
+	protected final EventSender eventSender;
+
+	private final ConditionDashboard conditionDashboard;
+
+	/** flag to do demo run */
+	private final boolean demoRun;
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
-			EventSender eventSender) {
+			EventSender eventSender, ConditionDashboard conditionDashboard, boolean demoRun) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -56,9 +59,14 @@ public class DataPrepareJob implements Runnable {
 		this.persistenceManager = persistenceManager;
 		this.eventRegister = eventRegister;
 		this.eventSender = eventSender;
+		this.conditionDashboard = conditionDashboard;
+		this.demoRun = demoRun;
 	}
 
 	private static int priority = 0;
+
+	// TODO: Delememe
+	private static Long id = 0L;
 
 	@Override
 	public void run() {
@@ -83,6 +91,11 @@ public class DataPrepareJob implements Runnable {
 
 					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
 
+					if (result == null) {
+						logger.info("No result this round");
+						return;
+					}
+
 					try {
 
 						long t1 = System.currentTimeMillis();
@@ -91,54 +104,28 @@ public class DataPrepareJob implements Runnable {
 						persistenceManager.persist(result.getRight());
 						long t3 = System.currentTimeMillis();
 
-						logger.info("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
+						logger.debug("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
-						Condition newestUnfinished = null;
-						for (Condition condition : result.getLeft()) {
-							if (condition.isShow() && condition.getPriority() == ConditionPriority.CRITICAL
-									&& condition.getLogicModule().getLogicModule() instanceof ActionLogicModule) {
-								ConditionWebSocketServer.sessionHandler.addCondition(condition);
+						conditionDashboard.update(result.getLeft());
 
-								// exists some unfinished
-								// TODO: add some threshold
-								if (condition.getEnd() == null) {
-									if (newestUnfinished == null)
-										newestUnfinished = condition;
-									else {
-										if (condition.getStart().after(newestUnfinished.getStart())) {
-											newestUnfinished = condition;
-										}
-									}
-								}
+						if (demoRun && conditionDashboard.getCurrentCondition() != null
+								&& id != conditionDashboard.getCurrentCondition().getId()) {
+							Thread.sleep(2000);
+							id = conditionDashboard.getCurrentCondition().getId();
+						}
+
+						logger.debug(conditionDashboard.toString());
+
+						if (eventRegister.getEvents().size() > 0) {
+							List<ConditionEventResource> eventsToSend = new ArrayList<>();
+							for (ConditionEvent conditionEvent : eventRegister.getEvents()) {
+								eventsToSend.add(conditionEvent.generateEventToSend());
 							}
-						}
-
-						ConditionWebSocketServer.sessionHandler.removeCurrent();
-						if (newestUnfinished != null) {
-							logger.info("Exists unfinished action condition after this round: " + newestUnfinished);
-							ConditionWebSocketServer.sessionHandler.updateCurrent(newestUnfinished);
-						}
-						
-
-						int success = 0;
-						int failed = 0;
-						for (Event event : eventRegister.getEvents()) {
-							
-							boolean successful = eventSender.send(event.generateEventToSend());
-							if (!successful) {
-								logger.error("Problem sending to nm : " + event.generateEventToSend().toString());
-								failed++;
-							} else {
-								success++;
-							}
-						}
-						eventRegister.getEvents().clear();
-						if (failed != 0) {
-							logger.warn(failed + " events failed to send, " + success + " successful");
-						} else if (success != 0) {
-							logger.info("All " + success + " events successfully sent to nm");
+							int sent = eventSender.sendBatchEvents(eventsToSend);
+							logger.info(sent + " events sucessfully sent to NotificationManager");
+							eventRegister.getEvents().clear();
 						}
 
 					} catch (RuntimeException e) {

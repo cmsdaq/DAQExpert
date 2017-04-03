@@ -74,41 +74,51 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 
 			try {
 
-				Long startDeserializing = System.currentTimeMillis();
-				daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
-				if (firstSnapshot == null) {
-					firstSnapshot = daq.getLastUpdate();
-				}
-				Long endDeserializing = System.currentTimeMillis();
-				deserializingTime += (endDeserializing - startDeserializing);
+				try {
+					Long startDeserializing = System.currentTimeMillis();
+					daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
 
-				if (daq != null) {
+					Long endDeserializing = System.currentTimeMillis();
+					deserializingTime += (endDeserializing - startDeserializing);
 
-					Long startSegmenting = System.currentTimeMillis();
-					if (dataManager != null) {
-						// this is not done in on-demand requests
-						points.addAll(dataManager.addSnapshot(new DummyDAQ(daq)));
-						dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
+					if (daq != null) {
+
+						if (firstSnapshot == null) {
+							firstSnapshot = daq.getLastUpdate();
+						}
+
+						Long startSegmenting = System.currentTimeMillis();
+						if (dataManager != null) {
+							// this is not done in on-demand requests
+							points.addAll(dataManager.addSnapshot(new DummyDAQ(daq)));
+							dataManager.setLastUpdate(new Date(daq.getLastUpdate()));
+						}
+						Long endSegmenting = System.currentTimeMillis();
+						segmentingTime += (endSegmenting - startSegmenting);
+
+						Long startProcessing = System.currentTimeMillis();
+						Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
+						Long endProcessing = System.currentTimeMillis();
+						processingTime += (endProcessing - startProcessing);
+
+						result.addAll(logicResults);
+					} else {
+						logger.error("Snapshot not deserialized " + file.getAbsolutePath());
 					}
-					Long endSegmenting = System.currentTimeMillis();
-					segmentingTime += (endSegmenting - startSegmenting);
+				} catch (Exception e) {
+					logger.error("Snapshot not desierialized: " + e);
 
-					Long startProcessing = System.currentTimeMillis();
-					Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
-					Long endProcessing = System.currentTimeMillis();
-					processingTime += (endProcessing - startProcessing);
-
-					result.addAll(logicResults);
-				} else {
-					logger.error("Snapshot not deserialized " + file.getAbsolutePath());
 				}
 
 			} catch (RuntimeException e) {
-				// logger.error("Error processing files " + file);
-				// logger.error(e);
-				// e.printStackTrace();
+				logger.error("Error processing files " + file);
 			}
 
+		}
+
+		if (daq == null) {
+			logger.info("This round there was only one snapshot and there was problem with it, aborting..");
+			return null;
 		}
 
 		lastSnapshot = daq.getLastUpdate();
@@ -120,15 +130,18 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
-			logger.info("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));
+			logger.debug("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));
 		}
 
 		if (daq != null) {
-			/*logger.debug("Temporarly finishing events");
-			Set<Condition> finished = snapshotProcessor.getEventProducer().finish(new Date(daq.getLastUpdate()));
-			// Application.get().getDataManager().getResult().addAll(finished);
-			logger.debug("Force finishing returned with results: " + finished);
-			result.addAll(finished);*/
+			/*
+			 * logger.debug("Temporarly finishing events"); Set<Condition>
+			 * finished = snapshotProcessor.getEventProducer().finish(new
+			 * Date(daq.getLastUpdate())); //
+			 * Application.get().getDataManager().getResult().addAll(finished);
+			 * logger.debug("Force finishing returned with results: " +
+			 * finished); result.addAll(finished);
+			 */
 		}
 
 		return Pair.of(result, points);

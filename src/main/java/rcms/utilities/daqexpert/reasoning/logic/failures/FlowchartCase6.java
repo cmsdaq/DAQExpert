@@ -10,10 +10,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * Logic module identifying 6 flowchart case.
@@ -26,7 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase6 extends KnownFailure {
 
 	public FlowchartCase6() {
-		this.name = "FC6";
+		this.name = "Backpressure detected";
 
 		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
 				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
@@ -47,8 +45,8 @@ public class FlowchartCase6 extends KnownFailure {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+
+		assignPriority(results);
 
 		boolean result = false;
 
@@ -58,24 +56,29 @@ public class FlowchartCase6 extends KnownFailure {
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
+					if (!ttcp.isMasked()) {
 
-					TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-					if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
+						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-						for (FED fed : ttcp.getFeds()) {
-							TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-							if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-									&& fed.getPercentBackpressure() > 0F) {
+							for (FED fed : ttcp.getFeds()) {
 
-								context.register("TTCP", ttcp.getName());
-								context.register("TTCPSTATE", currentState.name());
-								context.register("SUBSYSTEM", subSystem.getName());
-								context.register("FED", fed.getSrcIdExpected());
-								context.register("FEDSTATE", currentFedState.name());
+								if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+									TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+									if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
+											&& fed.getPercentBackpressure() > 0F) {
 
-								logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
-										+ new Date(daq.getLastUpdate()));
-								result = true;
+										context.register("TTCP", ttcp.getName());
+										context.register("TTCPSTATE", currentState.name());
+										context.register("SUBSYSTEM", subSystem.getName());
+										context.register("FED", fed.getSrcIdExpected());
+										context.register("FEDSTATE", currentFedState.name());
+
+										logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
+												+ new Date(daq.getLastUpdate()));
+										result = true;
+									}
+								}
 							}
 						}
 					}

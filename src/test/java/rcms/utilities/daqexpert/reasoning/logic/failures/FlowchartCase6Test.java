@@ -15,12 +15,12 @@ import rcms.utilities.daqaggregator.data.DAQ;
  *
  * @author Maciej Gladki
  */
-@Ignore // no case yet
 public class FlowchartCase6Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void case1Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("?.smile");
+		// GMT: Sat, 26 Nov 2016 06:21:35 GMT
+		DAQ snapshot = getSnapshot("1480141295312.smile");
 		Map<String, Boolean> results = new HashMap<String, Boolean>();
 
 		results.put("StableBeams", true);

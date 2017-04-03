@@ -40,7 +40,7 @@ public class EventPrinter implements EventRegister {
 	}
 
 	@Override
-	public List<Event> getEvents() {
+	public List<ConditionEvent> getEvents() {
 		return null;
 	}
 

@@ -5,10 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 public class Application {
 
@@ -21,6 +25,8 @@ public class Application {
 	private JobManager jobManager;
 
 	private final Properties prop;
+
+	private final ConditionDashboard conditionDashboard;
 
 	public static Application get() {
 		if (instance == null) {
@@ -47,12 +53,15 @@ public class Application {
 		checkRequiredSettings();
 		String v = instance.getClass().getPackage().getImplementationVersion();
 		logger.info("DAQExpert version: " + v);
-		instance.persistenceManager = new PersistenceManager("history", instance.getProp());
+
+		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("history", instance.getProp());
+		instance.persistenceManager = new PersistenceManager(entityManagerFactory);
 		instance.setDataManager(new DataManager());
 	}
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
+		conditionDashboard = new ConditionDashboard(5);
 	}
 
 	private static Application instance;
@@ -109,5 +118,9 @@ public class Application {
 
 	public PersistenceManager getPersistenceManager() {
 		return persistenceManager;
+	}
+
+	public ConditionDashboard getDashboard() {
+		return conditionDashboard;
 	}
 }

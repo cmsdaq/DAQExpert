@@ -10,12 +10,10 @@ import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
- * Logic module identifying 1st flowchart case.
+ * Logic module identifying flowchart case.
  * 
  * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
@@ -24,9 +22,9 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 public class FlowchartCase2 extends KnownFailure {
 
 	public FlowchartCase2() {
-		this.name = "FC2";
-		this.description = "DAQ and level 0 in error state</br>"
-				+ "A RU {{RU}} is in Failded state. A FED {{FED}} has sent corrupted data to the DAQ. "
+		this.name = "Corrupted data received";
+		this.description = "DAQ and level 0 in error state. "
+				+ "A RU {{RU}} is in Failed state. A FED {{FED}} has sent corrupted data to the DAQ. "
 				+ "Problem FED belongs to subsystem {{SUBSYSTEM}}";
 		this.action = new SimpleAction(
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
@@ -42,8 +40,8 @@ public class FlowchartCase2 extends KnownFailure {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
-		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.DEFAULTT;
+
+		assignPriority(results);
 
 		String l0state = daq.getLevelZeroState();
 		String daqstate = daq.getDaqState();
@@ -65,21 +63,24 @@ public class FlowchartCase2 extends KnownFailure {
 				}
 
 				for (FED fed : daq.getFeds()) {
-					if (fed.getRuFedDataCorruption() > 0) {
 
-						TTCPartition ttcp = fed.getTtcp();
-						String ttcpName = "-";
-						String subsystemName = "-";
+					if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+						if (fed.getRuFedDataCorruption() > 0) {
 
-						if (ttcp != null) {
-							ttcpName = ttcp.getName();
-							if (ttcp.getSubsystem() != null)
-								subsystemName = ttcp.getSubsystem().getName();
+							TTCPartition ttcp = fed.getTtcp();
+							String ttcpName = "-";
+							String subsystemName = "-";
+
+							if (ttcp != null) {
+								ttcpName = ttcp.getName();
+								if (ttcp.getSubsystem() != null)
+									subsystemName = ttcp.getSubsystem().getName();
+							}
+							context.register("FED", fed.getSrcIdExpected());
+							context.register("TTCP", ttcpName);
+							context.register("SUBSYSTEM", subsystemName);
+							i++;
 						}
-						context.register("FED", fed.getSrcIdExpected());
-						context.register("TTCP", ttcpName);
-						context.register("SUBSYSTEM", subsystemName);
-						i++;
 					}
 				}
 

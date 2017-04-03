@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
@@ -25,7 +25,6 @@ public class Context implements Serializable {
 	private Map<String, Set<Object>> context;
 
 	private Set<String> actionKey;
-	
 
 	public Context() {
 		this.context = new HashMap<>();
@@ -40,8 +39,7 @@ public class Context implements Serializable {
 		if (!context.get(key).contains(object)) {
 			context.get(key).add(object);
 		}
-		
-		
+
 	}
 
 	/**
@@ -99,34 +97,32 @@ public class Context implements Serializable {
 		String output = new String(input);
 
 		for (java.util.Map.Entry<String, Set<Object>> entry : this.getContext().entrySet()) {
-			
+
 			String variableKeyNoRgx = "{{" + entry.getKey() + "}}";
 			String variableKeyRegex = "\\{\\{" + entry.getKey() + "\\}\\}";
 
 			if (output.contains(variableKeyNoRgx)) {
 
 				String replacement;
-				try {
-					if (entry.getValue().size() == 1)
-						replacement = entry.getValue().iterator().next().toString();
-					else {
-						if (entry.getValue().size() > 3) {
-							replacement = "[" + entry.getValue().iterator().next().toString() + " and "
-									+ (entry.getValue().size() - 1) + " more]";
-						} else {
-							replacement = mapper.writeValueAsString(entry.getValue());
-						}
+				if (entry.getValue().size() == 1)
+					replacement = entry.getValue().iterator().next().toString();
+				else {
+					if (entry.getValue().size() > 8) {
+						replacement = "(" + entry.getValue().stream().limit(7).map(i -> i.toString())
+								.collect(Collectors.joining(", "));
+						replacement += " and " + (entry.getValue().size() - 7) + " more)";
+					} else {
+						replacement = entry.getValue().stream().map(i -> i.toString())
+								.collect(Collectors.joining(", "));
 					}
-					output = output.replaceAll(variableKeyRegex, replacement);
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
 				}
+				output = output.replaceAll(variableKeyRegex, replacement);
 
-			} else{
+			} else {
 				logger.debug("No key " + variableKeyNoRgx + " in " + output);
 			}
 		}
-		
+
 		return output;
 	}
 

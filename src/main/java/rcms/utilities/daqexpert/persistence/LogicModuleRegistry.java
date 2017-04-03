@@ -27,12 +27,17 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
+import rcms.utilities.daqexpert.reasoning.logic.failures.BugInFilterfarm;
+import rcms.utilities.daqexpert.reasoning.logic.failures.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.HLTProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.LinkProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.OnlyFedStoppedSendingData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.OutOfSequenceData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuck;
+import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuckWaiting;
 
 public enum LogicModuleRegistry {
 
@@ -54,19 +59,25 @@ public enum LogicModuleRegistry {
 	Downtime(new Downtime(), ConditionGroup.DOWNTIME, ""),
 	Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
 	CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, "", 105),
-	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, "", 10004),
-	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, "", 10005),
+	FlowchartCase1(new OutOfSequenceData(), ConditionGroup.FLOWCHART, "", 10004),
+	FlowchartCase2(new CorruptedData(), ConditionGroup.FLOWCHART, "", 10005),
 	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
 	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, "", 10007),
 	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
-	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, "", 10009),
+	FlowchartCase6(null, ConditionGroup.FLOWCHART, "", 10009),
 	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
 	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
 	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),
 	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run", 14),
 	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State", 13),
 	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State", 12),
-	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11);
+	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11),
+	LinkProblem(new LinkProblem(), ConditionGroup.FLOWCHART, "", 10010),
+	RuStuckWaiting(new RuStuckWaiting(), ConditionGroup.FLOWCHART, "", 10011),
+	RuStuck(new RuStuck(), ConditionGroup.FLOWCHART, "", 10012),
+	HLTProblem(new HLTProblem(), ConditionGroup.FLOWCHART, "", 10013),
+	BugInFilterfarm(new BugInFilterfarm(), ConditionGroup.FLOWCHART, "", 10013),
+	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(), ConditionGroup.FLOWCHART, "", 10013),;
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
 		this(logicModule, group, description, 1);

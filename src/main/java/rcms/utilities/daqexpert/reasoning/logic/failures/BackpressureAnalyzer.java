@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.BU;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.FRL;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.SubFEDBuilder;
@@ -66,8 +67,6 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 						logger.trace("Found partition in B/W: TTCP " + ttcp.getName() + " of " + subSystem.getName());
 						for (FED fed : ttcp.getFeds()) {
 
-							
-
 							if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
 								// TODO: removed check B or W due to some has
 								// null
@@ -79,14 +78,15 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 											+ fed.getPercentBackpressure());
 
 									saveAffectedElementsContext(subSystem, ttcp, fed);
-									
-									// MODIFICATION for OOS: helps with OOS OutOfSequenceTest:trgFedCase
+
+									// MODIFICATION for OOS: helps with OOS
+									// OutOfSequenceTest:trgFedCase
 									try {
 
 										RU relatedRu = fed.getFrl().getSubFedbuilder().getFedBuilder().getRu();
-										logger.trace(
-												"  Checking state of " + relatedRu.getHostname() + " for OOS or corrupted from "
-														+ fed.getSrcIdExpected() + " because of partition " + ttcp.getName());
+										logger.trace("  Checking state of " + relatedRu.getHostname()
+												+ " for OOS or corrupted from " + fed.getSrcIdExpected()
+												+ " because of partition " + ttcp.getName());
 										Subcase problemWithRu = checkProblemWithDataReceivedByRu(relatedRu);
 										if (problemWithRu != null) {
 											return problemWithRu;
@@ -98,7 +98,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 
 									if (subcase != null) {
 										switch (subcase) {
-									
+
 										case UnknownFilterfarmProblem:
 											// this.description += "Caused by
 											// unknown problem with
@@ -174,14 +174,38 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			logger.debug("#2 check: RU waiting for other FEDs in same FB?");
 			boolean waitingForOtherFedsInFB = false;
 			List<FED> notMaskedFedsOfRelatedRU = notMaskedFedsFromRU(relatedRu);
+			Long maxTrigger = null, minTrigger = null;
+			SubFEDBuilder minSFB = null, maxSFB = null;
 			for (FED fed : notMaskedFedsOfRelatedRU) {
 				if (fed.isRuFedWithoutFragments()) {
-					context.register("PROBLEM-FED", fed.getSrcIdExpected());
 					waitingForOtherFedsInFB = true;
+					context.register("PROBLEM-FED", fed.getSrcIdExpected());
+					context.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+					context.register("PROBLEM-TTCP", fed.getTtcp().getName());
 				}
 			}
+
+			for (SubFEDBuilder subFedBuilder : relatedRu.getFedBuilder().getSubFedbuilders()) {
+				if (minTrigger == null || minTrigger > subFedBuilder.getMinTrig()) {
+					minTrigger = subFedBuilder.getMinTrig();
+					minSFB = subFedBuilder;
+				}
+				if (maxTrigger == null || maxTrigger < subFedBuilder.getMaxTrig()) {
+					maxTrigger = subFedBuilder.getMaxTrig();
+					maxSFB = subFedBuilder;
+				}
+			}
+
 			if (waitingForOtherFedsInFB) {
 				logger.debug("#FOUND: ru is waiting for other feds in same fb");
+				context.register("PROBLEM-FED-BUILDER",
+						relatedRu.getFedBuilder() != null ? relatedRu.getFedBuilder().getName() : "not found");
+				context.register("MIN-FRAGMENT-COUNT", minTrigger);
+				context.register("MIN-FRAGMENT-PARTITION",
+						minSFB != null ? minSFB.getTtcPartition().getName() : "not found");
+				context.register("MAX-FRAGMENT-COUNT", maxTrigger);
+				context.register("MAX-FRAGMENT-PARTITION",
+						maxSFB != null ? maxSFB.getTtcPartition().getName() : "not found");
 				return Subcase.WaitingForOtherFedsInFB;
 			}
 
@@ -356,9 +380,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				int fedId = Integer.parseInt(mo.group(1));
 				context.register("PROBLEM-FED", fedId);
 				fed = findFEDinRUByFEDId(ru, fedId);
-			}else{
-				for(FED f: notMaskedFedsFromRU(ru)){
-					if(f.getRuFedOutOfSync() > 0){
+			} else {
+				for (FED f : notMaskedFedsFromRU(ru)) {
+					if (f.getRuFedOutOfSync() > 0) {
 						fed = f;
 						context.register("PROBLEM-FED", f.getSrcIdExpected());
 						break;

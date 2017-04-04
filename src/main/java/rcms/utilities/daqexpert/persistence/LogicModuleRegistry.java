@@ -30,7 +30,6 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.BugInFilterfarm;
 import rcms.utilities.daqexpert.reasoning.logic.failures.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.HLTProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.LinkProblem;
@@ -38,6 +37,10 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.OnlyFedStoppedSendingDa
 import rcms.utilities.daqexpert.reasoning.logic.failures.OutOfSequenceData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuckWaiting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 
 public enum LogicModuleRegistry {
 
@@ -62,9 +65,9 @@ public enum LogicModuleRegistry {
 	FlowchartCase1(new OutOfSequenceData(), ConditionGroup.FLOWCHART, "", 10004),
 	FlowchartCase2(new CorruptedData(), ConditionGroup.FLOWCHART, "", 10005),
 	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
-	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, "", 10007),
+	FlowchartCase4(null, ConditionGroup.FLOWCHART, "Partition disconnected: extended to other LMs", 0),
 	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
-	FlowchartCase6(null, ConditionGroup.FLOWCHART, "", 10009),
+	FlowchartCase6(null, ConditionGroup.FLOWCHART, "Backpressure detected: extended to other LMs", 0),
 	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
 	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
 	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),
@@ -77,7 +80,11 @@ public enum LogicModuleRegistry {
 	RuStuck(new RuStuck(), ConditionGroup.FLOWCHART, "", 10012),
 	HLTProblem(new HLTProblem(), ConditionGroup.FLOWCHART, "", 10013),
 	BugInFilterfarm(new BugInFilterfarm(), ConditionGroup.FLOWCHART, "", 10013),
-	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(), ConditionGroup.FLOWCHART, "", 10013),;
+	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(), ConditionGroup.FLOWCHART, "", 10013),
+	PiDisconnected(new PiDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
+	PiProblem(new ProblemWithPi(), ConditionGroup.FLOWCHART, "", 10014),
+	FEDDisconnected(new FEDDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
+	FMMProblem(new FMMProblem(), ConditionGroup.FLOWCHART, "", 10014),;
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
 		this(logicModule, group, description, 1);

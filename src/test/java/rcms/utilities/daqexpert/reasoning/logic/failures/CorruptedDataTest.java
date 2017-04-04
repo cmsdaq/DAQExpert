@@ -45,7 +45,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		assertEquals(1360, fc2.getContext().getContext().get("AFFECTED-FED").iterator().next());
 
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		// assertEquals(false, fc6.satisfied(snapshot, results));
 

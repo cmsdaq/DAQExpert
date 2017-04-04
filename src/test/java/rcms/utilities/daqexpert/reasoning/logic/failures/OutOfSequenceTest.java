@@ -59,7 +59,7 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
 	}
 
@@ -93,7 +93,7 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		// assertEquals(false, fc6.satisfied(snapshot, results));
 	}
@@ -119,7 +119,7 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getDescriptionWithContext());
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
 
 	}

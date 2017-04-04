@@ -7,6 +7,10 @@ import java.net.URL;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
 
 /**
  * @author holzner
@@ -35,11 +39,13 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc3 = new FlowchartCase3();
 
-	protected final KnownFailure fc4 = new FlowchartCase4();
+	protected final KnownFailure piDisconnected = new PiDisconnected();
+	protected final KnownFailure piProblem = new ProblemWithPi();
+	protected final KnownFailure fedDisconnected = new FEDDisconnected();
+	protected final KnownFailure fmmProblem = new FMMProblem();
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
-	
+
 	protected final KnownFailure ruStuckWaiting = new RuStuckWaiting();
 
-	
 }

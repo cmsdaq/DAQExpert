@@ -27,7 +27,7 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertEquals(false, fc1.satisfied(snapshot, results));
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		assertEquals(true, ruStuckWaiting.satisfied(snapshot, results));
 

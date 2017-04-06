@@ -114,12 +114,15 @@
 
 			<div class="btn-group" role="group" aria-label="...">
 				<div class="btn-group" role="group">
+					<button class="btn btn-info btn-sm" id="daqview-button" target="_blank"> DAQView <span
+								class="glyphicon glyphicon-list"></span>
+						</button>
 					<button class="btn btn-default btn-sm btn-copy" id="share-button"> Share <span class="glyphicon glyphicon-share"></span>
 					</button>
 					<button type="button"
 						class="btn btn-default btn-sm dropdown-toggle"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						External Tools <span class="caret"></span>
+						External Links <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
 						
@@ -127,9 +130,6 @@
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 						<li><a id="wbm-button" target="_blank"> WBM run summary <span
-								class="glyphicon glyphicon-chevron-right"></span>
-						</a></li>
-						<li><a id="daqview-button" target="_blank"> DAQView <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 					</ul>

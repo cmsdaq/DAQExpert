@@ -33,12 +33,11 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 					if (!ttcp.isMasked()) {
+						TTSState pmTTSState = TTSState.getByCode(ttcp.getTcds_pm_ttsState());
+						if (pmTTSState == TTSState.DISCONNECTED) {
 
-						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
-						if (currentState == TTSState.DISCONNECTED) {
-
-							context.register("SUBSYSTEM", subSystem.getName());
-							context.register("TTCP", ttcp.getName());
+							context.register("PROBLEM-SUBSYSTEM", subSystem.getName());
+							context.register("PROBLEM-PARTITION", ttcp.getName());
 							return detectSubcase(daq, ttcp);
 
 						}
@@ -55,9 +54,13 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 
 		// LEGACY partition (99% it's true)
 		if (disconnectedTtcp.getFmm() != null) {
-			TTSState fmmState = TTSState.getByCode(disconnectedTtcp.getFmm().getStateName());
+			TTSState fmmState = TTSState.getByCode(disconnectedTtcp.getTtsState());
 			if (fmmState == TTSState.DISCONNECTED) {
 				FMM disconnectedFMM = disconnectedTtcp.getFmm();
+
+				context.register("PROBLEM-FMM-GEOSLOT", disconnectedFMM.getGeoslot());
+				context.register("PROBLEM-FMM-URL", disconnectedFMM.getUrl());
+				context.register("PROBLEM-FMM-SERVICE", disconnectedFMM.getServiceName());
 				Set<FED> disconnectedFEDs = new HashSet<>();
 				for (FED fed : disconnectedFMM.getFeds()) {
 					if (isMasked(fed)) {

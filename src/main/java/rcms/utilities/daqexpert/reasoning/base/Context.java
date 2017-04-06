@@ -25,7 +25,6 @@ public class Context implements Serializable {
 	private Map<String, Set<Object>> context;
 
 	private Set<String> actionKey;
-	
 
 	public Context() {
 		this.context = new HashMap<>();
@@ -40,8 +39,7 @@ public class Context implements Serializable {
 		if (!context.get(key).contains(object)) {
 			context.get(key).add(object);
 		}
-		
-		
+
 	}
 
 	/**
@@ -99,17 +97,19 @@ public class Context implements Serializable {
 		String output = new String(input);
 
 		for (java.util.Map.Entry<String, Set<Object>> entry : this.getContext().entrySet()) {
-			
+
 			String variableKeyNoRgx = "{{" + entry.getKey() + "}}";
 			String variableKeyRegex = "\\{\\{" + entry.getKey() + "\\}\\}";
 
 			if (output.contains(variableKeyNoRgx)) {
 
-				String replacement;
+				String replacement = "";
 				try {
-					if (entry.getValue().size() == 1)
-						replacement = entry.getValue().iterator().next().toString();
-					else {
+					if (entry.getValue().size() == 1) {
+						if (entry.getValue().iterator().next() != null)
+							replacement = entry.getValue().iterator().next().toString();
+						else replacement = "[empty]";
+					} else {
 						if (entry.getValue().size() > 3) {
 							replacement = "[" + entry.getValue().iterator().next().toString() + " and "
 									+ (entry.getValue().size() - 1) + " more]";
@@ -122,11 +122,11 @@ public class Context implements Serializable {
 					e.printStackTrace();
 				}
 
-			} else{
+			} else {
 				logger.debug("No key " + variableKeyNoRgx + " in " + output);
 			}
 		}
-		
+
 		return output;
 	}
 

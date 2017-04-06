@@ -35,6 +35,22 @@ public class FMMProblemTest extends FlowchartCaseTestBase {
 		
 		
 		assertEquals(false, fc5.satisfied(snapshot, results));
+
+		System.out.println("New message:");
+		System.out.println(fmmProblem.getDescriptionWithContext());
+
+		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
+		assertEquals("TRACKER", fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
+
+		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-PARTITION").size());
+		assertEquals("TEC-", fmmProblem.getContext().getContext().get("PROBLEM-PARTITION").iterator().next());
+
+		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-FMM-URL").size());
+		assertEquals("http://fmmpc-s1d12-07-01.cms:11100",
+				fmmProblem.getContext().getContext().get("PROBLEM-FMM-URL").iterator().next());
+
+		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-FMM-GEOSLOT").size());
+		assertEquals(3, fmmProblem.getContext().getContext().get("PROBLEM-FMM-GEOSLOT").iterator().next());
 	}
 
 }

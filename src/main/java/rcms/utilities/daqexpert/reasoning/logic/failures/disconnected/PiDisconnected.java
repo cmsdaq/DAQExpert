@@ -14,7 +14,8 @@ public class PiDisconnected extends DisconnectedAnalyzer {
 
 	public PiDisconnected() {
 		this.name = "PI disconnected";
-		this.description = "Problem with PI or its input in partition {{TTCP}} in {{SUBSYSTEM}} subsystem. ";
+		this.description = "Problem with PI or its input in partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
+				+ "Cannot investigate more - no PI input";
 	}
 
 	@Override

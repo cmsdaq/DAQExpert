@@ -50,11 +50,8 @@ public class PersistenceManager {
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
-	private final EntityManager entryEntityManager;
-
 	public PersistenceManager(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
-		this.entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
 	/**
@@ -63,15 +60,16 @@ public class PersistenceManager {
 	 * @param entries
 	 */
 	public void persist(Set<Condition> entries) {
-
-		EntityTransaction tx = entryEntityManager.getTransaction();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
 		for (Condition point : entries) {
 
 			if (point.isShow())
-				entryEntityManager.persist(point);
+				entityManager.persist(point);
 		}
 		tx.commit();
+		entityManager.close();
 	}
 
 	/**
@@ -80,14 +78,12 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-
-		// EntityManager entityManager =
-		// entityManagerFactory.createEntityManager();
-		EntityTransaction tx = entryEntityManager.getTransaction();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
-		entryEntityManager.persist(entry);
+		entityManager.persist(entry);
 		tx.commit();
-		// entityManager.close();
+		entityManager.close();
 	}
 
 	public void persist(Point test) {

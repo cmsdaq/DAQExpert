@@ -3,7 +3,7 @@
  */
 
 $(document).ready(function() {
-	var daqViewBase = "http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq";
+	var daqViewBase = "http://daq-expert.cms/daq2view-react/index.html?setup=cdaq";
 	var timeKey = "&time=";
 	var time = "";
 

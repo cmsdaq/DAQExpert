@@ -45,8 +45,8 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
 	}
 
-	/** test case with a different error message, originally
-	 *  did not identify FED and TTC partition correctly.
+	/** test parsing of the FED number from the RU error message
+	 *  for a few cases.
 	 */
 	@Test
 	public void testFEDparsing() throws URISyntaxException {

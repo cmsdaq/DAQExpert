@@ -22,7 +22,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 public class FlowchartCase1 extends KnownFailure {
 
 	/** regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message */
-	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
+	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
 	public FlowchartCase1() {
 		this.name = "Out of sequence data received";

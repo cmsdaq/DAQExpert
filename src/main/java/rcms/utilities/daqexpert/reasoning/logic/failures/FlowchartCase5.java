@@ -33,8 +33,8 @@ public class FlowchartCase5 extends KnownFailure {
 
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "Stop the run", "Start new run (try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
-				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
+				"Problem fixed: Make an e-log entry.",
+				"Problem not fixed: Red recycle ECAL","Call the DOC for the ECAL");
 
 		this.action = action;
 	}

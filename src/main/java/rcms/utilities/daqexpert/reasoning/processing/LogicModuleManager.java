@@ -17,8 +17,8 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
@@ -161,8 +161,8 @@ public class LogicModuleManager {
 			 * EventProducer.produce so that context can be used to close the
 			 * event
 			 */
-			if (!result && checker instanceof ActionLogicModule) {
-				((ActionLogicModule) checker).getContext().clearContext();
+			if (!result && checker instanceof ContextLogicModule) {
+				((ContextLogicModule) checker).getContext().clearContext();
 			}
 
 			if (produceResult.getLeft()) {

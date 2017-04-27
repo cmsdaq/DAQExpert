@@ -67,8 +67,23 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")),  context.getContext().get("TTCP"));
 		
+		fc1.getContext().clearContext();
+		results.clear();
+		
+		//-----
+		// another case with a different error message
 		//-----
 		
+		snapshot = getSnapshot("1480809948643.smile");
+
+		results.put("StableBeams", false);
+		results.put("NoRateWhenExpected", true);
+		
+		assertEquals(true, fc1.satisfied(snapshot, results));
+
+		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("FED"));
+		assertEquals(new HashSet(Arrays.asList("ES")),  context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("TTCP"));
 		
 	}
 }

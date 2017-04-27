@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.disconnected;
 
 import static org.junit.Assert.*;
 
@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class FMMProblemTest extends FlowchartCaseTestBase {
 

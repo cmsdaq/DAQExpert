@@ -35,7 +35,14 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertEquals(false, fc1.satisfied(snapshot, results));
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(true, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+
+
+		// new subcases of old flowchart case 4
+		assertEquals(false, piDisconnected.satisfied(snapshot, results));
+		assertEquals(false, piProblem.satisfied(snapshot, results));
+		assertEquals(false, fedDisconnected.satisfied(snapshot, results));
+		assertEquals(false, fmmProblem.satisfied(snapshot, results));
+		
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		assertEquals(false, fc6.satisfied(snapshot, results));
 	}

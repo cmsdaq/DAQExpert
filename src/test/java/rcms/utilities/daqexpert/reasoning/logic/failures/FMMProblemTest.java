@@ -1,24 +1,23 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 
-/**
- *
- * @author Maciej Gladki
- */
-public class FlowchartCase5Test extends FlowchartCaseTestBase {
+public class FMMProblemTest extends FlowchartCaseTestBase {
 
 	@Test
-	public void case1Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1479614378467.smile");
+	public void test() throws URISyntaxException {
+
+		DAQ snapshot = getSnapshot("1491011351248.smile");
 		Map<String, Boolean> results = new HashMap<String, Boolean>();
 
 		results.put("StableBeams", true);
@@ -32,11 +31,10 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(false, piDisconnected.satisfied(snapshot, results));
 		assertEquals(false, piProblem.satisfied(snapshot, results));
 		assertEquals(false, fedDisconnected.satisfied(snapshot, results));
-		assertEquals(false, fmmProblem.satisfied(snapshot, results));
-
-		assertEquals(true, fc5.satisfied(snapshot, results));
-		assertEquals(false, fc6.satisfied(snapshot, results));
-
+		assertEquals(true, fmmProblem.satisfied(snapshot, results));
+		
+		
+		assertEquals(false, fc5.satisfied(snapshot, results));
 	}
 
 }

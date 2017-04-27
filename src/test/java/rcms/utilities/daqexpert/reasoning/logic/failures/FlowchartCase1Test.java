@@ -67,11 +67,8 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")),  context.getContext().get("TTCP"));
 		
-		assertEquals(false, fc2.satisfied(snapshot, results));
-		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
-		assertEquals(false, fc5.satisfied(snapshot, results));
-		assertEquals(false, fc6.satisfied(snapshot, results));
-
+		//-----
+		
+		
 	}
 }

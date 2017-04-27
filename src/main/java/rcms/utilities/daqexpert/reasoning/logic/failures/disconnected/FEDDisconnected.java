@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.disconnected;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -14,7 +15,10 @@ public class FEDDisconnected extends DisconnectedAnalyzer {
 
 	public FEDDisconnected() {
 		this.name = "FED disconnected";
-		this.description = "FED(s) disconnected {{PROBLEM-FED}} ";
+		this.description = "FED(s) of {{PROBLEM-PARTITION}} partition of {{PROBLEM-SUBSYSTEM}} subsystem in disconnected: {{PROBLEM-FED}}";
+		this.action = new SimpleAction(
+				"Check with the {{PROBLEM-SUBSYSTEM}} subsystem DOC");
+		
 	}
 
 	@Override

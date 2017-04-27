@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.disconnected;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -14,8 +15,10 @@ public class PiDisconnected extends DisconnectedAnalyzer {
 
 	public PiDisconnected() {
 		this.name = "PI disconnected";
-		this.description = "Problem with PI or its input in partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
-				+ "Cannot investigate more - no PI input";
+		this.description = "PI is disconnected. Pi of {{PROBLEM-PARTITION}} partition in {{PROBLEM-SUBSYSTEM}} subsystem is disconnected. This PI contains mTCA inputs for which no monitoring information is available. Cannot investigate further.";
+
+		this.action = new SimpleAction(
+				"Check the PI controller webpage to determine if this is the FED problem or a problem with the PI itself");
 	}
 
 	@Override

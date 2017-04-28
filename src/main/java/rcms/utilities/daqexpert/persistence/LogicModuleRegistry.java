@@ -33,6 +33,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
 public enum LogicModuleRegistry {
 
@@ -60,6 +61,12 @@ public enum LogicModuleRegistry {
 	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, "", 10007),
 	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
 	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, "", 10009),
+	
+	// note that this must be declared after all other logic modules
+	// identifying an error condition in order to have UnidentifiedFailure
+	// run after the others
+	UnidentifiedFailure(new UnidentifiedFailure(), ConditionGroup.OTHER, "", 19999),
+	
 	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
 	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
 	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),

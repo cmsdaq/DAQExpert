@@ -30,10 +30,12 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
-
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 public enum LogicModuleRegistry {
 
 	NoRate(new NoRate(), ConditionGroup.NO_RATE, "Satisfied when no rate in DAQ fed builder summary", 10),
@@ -57,16 +59,23 @@ public enum LogicModuleRegistry {
 	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, "", 10004),
 	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, "", 10005),
 	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
-	FlowchartCase4(new FlowchartCase4(), ConditionGroup.FLOWCHART, "", 10007),
+	FlowchartCase4(null, ConditionGroup.FLOWCHART, "Partition disconnected: extended to other LMs", 0),
 	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
 	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, "", 10009),
+
 	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
 	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
 	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),
 	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run", 14),
 	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State", 13),
 	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State", 12),
-	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11);
+
+	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11),
+
+	PiDisconnected(new PiDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
+	PiProblem(new ProblemWithPi(), ConditionGroup.FLOWCHART, "", 10014),
+	FEDDisconnected(new FEDDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
+	FMMProblem(new FMMProblem(), ConditionGroup.FLOWCHART, "", 10014),;
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
 		this(logicModule, group, description, 1);

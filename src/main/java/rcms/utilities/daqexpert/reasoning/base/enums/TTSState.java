@@ -5,6 +5,7 @@ package rcms.utilities.daqexpert.reasoning.base.enums;
  */
 public enum TTSState {
 
+	// D_f also possible - check also getByCode
 	DISCONNECTED("D_0"), WARNING("W_1"), OUT_OF_SYNC("S_2"), BUSY("B_4"), TTS_READY("R_8"), ERROR("E_c"), UNKNOWN("");
 
 	private TTSState(String code) {
@@ -26,8 +27,6 @@ public enum TTSState {
 			return TTSState.UNKNOWN;
 		if (code.equalsIgnoreCase(TTS_READY.getCode())) {
 			return TTSState.TTS_READY;
-		} else if (code.equalsIgnoreCase(DISCONNECTED.getCode())) {
-			return TTSState.DISCONNECTED;
 		} else if (code.equalsIgnoreCase(WARNING.getCode())) {
 			return TTSState.WARNING;
 		} else if (code.equalsIgnoreCase(OUT_OF_SYNC.getCode())) {
@@ -36,6 +35,10 @@ public enum TTSState {
 			return TTSState.BUSY;
 		} else if (code.equalsIgnoreCase(ERROR.getCode())) {
 			return TTSState.ERROR;
+		} else if (code.equalsIgnoreCase(DISCONNECTED.getCode())) {
+			return TTSState.DISCONNECTED;
+		} else if (code.equalsIgnoreCase("D_f")) {
+			return TTSState.DISCONNECTED;
 		}
 		return TTSState.UNKNOWN;
 	}

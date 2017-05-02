@@ -54,18 +54,24 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 
 		// LEGACY partition (99% it's true)
 		if (disconnectedTtcp.getFmm() != null) {
+			
+			logger.trace("Disconnected TTCP: " + disconnectedTtcp.getName());
+			
 			TTSState fmmState = TTSState.getByCode(disconnectedTtcp.getTtsState());
 			if (fmmState == TTSState.DISCONNECTED) {
 				FMM disconnectedFMM = disconnectedTtcp.getFmm();
+				logger.trace("Disconnected fmm: " + disconnectedFMM.getUrl() + " geoslot " + disconnectedFMM.getGeoslot()+ " has feds: " + disconnectedFMM.getFeds().size());
 
 				context.register("PROBLEM-FMM-GEOSLOT", disconnectedFMM.getGeoslot());
 				context.register("PROBLEM-FMM-URL", disconnectedFMM.getUrl());
 				context.register("PROBLEM-FMM-SERVICE", disconnectedFMM.getServiceName());
 				Set<FED> disconnectedFEDs = new HashSet<>();
-				for (FED fed : disconnectedFMM.getFeds()) {
-					if (isMasked(fed)) {
+				for (FED fed : disconnectedTtcp.getFeds()) {
+					logger.trace("Checkign FED " + fed.getSrcIdExpected() + ": " + fed.getTtsState());
+					if (!isMasked(fed)) {
 						TTSState fedState = TTSState.getByCode(fed.getTtsState());
 						if (fedState == TTSState.DISCONNECTED) {
+							logger.info("Found disconnected fed: " + fed.getSrcIdExpected());
 							disconnectedFEDs.add(fed);
 						}
 					}

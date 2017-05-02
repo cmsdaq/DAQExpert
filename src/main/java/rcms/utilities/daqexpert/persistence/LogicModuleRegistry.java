@@ -1,5 +1,9 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
@@ -116,6 +120,29 @@ public enum LogicModuleRegistry {
 
 	public int getUsefulness() {
 		return usefulness;
+	}
+
+	/** @return the registered logic modules order in by increasing runOrder.
+	 *  Throws Error if there is more than one module with the same run order.
+	 */ 
+	public static List<LogicModuleRegistry> getModulesInRunOrder() {
+
+		SortedMap<Integer, LogicModuleRegistry> orderedModules = new TreeMap<Integer, LogicModuleRegistry>();
+		
+		for (LogicModuleRegistry lmr : LogicModuleRegistry.values()) {
+			
+			if (orderedModules.containsKey(lmr.runOrder)) {
+				throw new Error("runOrder " + lmr.runOrder + " found more than once: in " +
+								orderedModules.get(lmr.runOrder).logicModule.getName() + " and in " +
+								lmr.logicModule.getName()
+				        );
+			}
+			
+			orderedModules.put(lmr.runOrder, lmr);
+			
+		} // loop over logic modules
+		
+		return new ArrayList<LogicModuleRegistry>(orderedModules.values());
 	}
 
 }

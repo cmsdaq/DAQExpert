@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
@@ -132,10 +135,10 @@ public enum LogicModuleRegistry {
 		for (LogicModuleRegistry lmr : LogicModuleRegistry.values()) {
 			
 			if (orderedModules.containsKey(lmr.runOrder)) {
-				throw new Error("runOrder " + lmr.runOrder + " found more than once: in " +
-								orderedModules.get(lmr.runOrder).logicModule.getName() + " and in " +
-								lmr.logicModule.getName()
-				        );
+				throw new ExpertException(ExpertExceptionCode.LogicModuleMisconfiguration, "runOrder " + lmr.runOrder + " found more than once: in " +
+						orderedModules.get(lmr.runOrder).logicModule.getName() + " and in " +
+						lmr.logicModule.getName()
+		        );
 			}
 			
 			orderedModules.put(lmr.runOrder, lmr);

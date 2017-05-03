@@ -50,7 +50,7 @@ public class LogicModuleManager {
 
 		this.conditionProducer = conditionProducer;
 
-		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
+		for (LogicModuleRegistry lm : LogicModuleRegistry.getModulesInRunOrder()) {
 			if (lm.getLogicModule() != null) {
 				lm.getLogicModule().setLogicModuleRegistry(lm);
 				if (lm.getLogicModule() instanceof SimpleLogicModule) {

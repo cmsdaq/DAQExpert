@@ -69,17 +69,23 @@ public class ServletListener implements ServletContextListener {
 	JobManager jobManager;
 
 	public void contextInitialized(ServletContextEvent e) {
-		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
+		try {
+			String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
 
-		DataManager dataManager = Application.get().getDataManager();
+			DataManager dataManager = Application.get().getDataManager();
 
-		HttpClient client = HttpClientBuilder.create().build();
-		EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
+			HttpClient client = HttpClientBuilder.create().build();
+			EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
 
-		jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
-		jobManager.startJobs();
+			jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+			jobManager.startJobs();
 
-		Application.get().setJobManager(jobManager);
+			Application.get().setJobManager(jobManager);
+		} catch (ExpertException ex) {
+			logger.fatal("Failed to start expert: " + ex.getCode().getName());
+			logger.error(ex);
+			throw ex;
+		}
 	}
 
 	public void contextDestroyed(ServletContextEvent e) {

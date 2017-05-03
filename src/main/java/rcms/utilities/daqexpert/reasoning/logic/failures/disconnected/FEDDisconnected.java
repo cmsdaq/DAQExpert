@@ -15,7 +15,7 @@ public class FEDDisconnected extends DisconnectedAnalyzer {
 
 	public FEDDisconnected() {
 		this.name = "FED disconnected";
-		this.description = "FED(s) of {{PROBLEM-PARTITION}} partition of {{PROBLEM-SUBSYSTEM}} subsystem in disconnected: {{PROBLEM-FED}}";
+		this.description = "FED(s) {{PROBLEM-FED}} of {{PROBLEM-PARTITION}} partition of {{PROBLEM-SUBSYSTEM}} subsystem in disconnected state.";
 		this.action = new SimpleAction(
 				"Check with the {{PROBLEM-SUBSYSTEM}} subsystem DOC");
 		

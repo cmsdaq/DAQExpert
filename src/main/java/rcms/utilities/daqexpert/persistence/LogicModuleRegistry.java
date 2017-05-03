@@ -1,5 +1,9 @@
 package rcms.utilities.daqexpert.persistence;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
@@ -38,54 +42,60 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWit
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 public enum LogicModuleRegistry {
 
-	NoRate(new NoRate(), ConditionGroup.NO_RATE, "Satisfied when no rate in DAQ fed builder summary", 10),
-	RateOutOfRange(new RateOutOfRange(), ConditionGroup.RATE_OUT_OF_RANGE, "", 9),
-	BeamActive(new BeamActive(), ConditionGroup.BEAM_ACTIVE, ""),
-	RunOngoing(new RunOngoing(), ConditionGroup.RUN_ONGOING, "", 100),
-	ExpectedRate(new ExpectedRate(), ConditionGroup.EXPECTED_RATE, ""),
-	Transition(new Transition(), ConditionGroup.TRANSITION, ""),
-	LongTransition(new LongTransition(), ConditionGroup.HIDDEN, ""),
-	WarningInSubsystem(new WarningInSubsystem(), ConditionGroup.Warning, "", 1004),
-	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, "", 1006),
-	SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, "", 1007),
-	SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, "", 1005),
-	FEDDeadtime(new FEDDeadtime(), ConditionGroup.FED_DEADTIME, "", 1005),
-	PartitionDeadtime(new PartitionDeadtime(), ConditionGroup.PARTITION_DEADTIME, "", 1008),
-	StableBeams(new StableBeams(), ConditionGroup.HIDDEN, ""),
-	NoRateWhenExpected(new NoRateWhenExpected(), ConditionGroup.NO_RATE_WHEN_EXPECTED, "", 104),
-	Downtime(new Downtime(), ConditionGroup.DOWNTIME, ""),
-	Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
-	CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, "", 105),
-	FlowchartCase1(new FlowchartCase1(), ConditionGroup.FLOWCHART, "", 10004),
-	FlowchartCase2(new FlowchartCase2(), ConditionGroup.FLOWCHART, "", 10005),
-	FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
-	FlowchartCase4(null, ConditionGroup.FLOWCHART, "Partition disconnected: extended to other LMs", 0),
-	FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
-	FlowchartCase6(new FlowchartCase6(), ConditionGroup.FLOWCHART, "", 10009),
+	NoRate                  (new NoRate(),                   ConditionGroup.NO_RATE,               "Satisfied when no rate in DAQ fed builder summary",   1,    10),
+	RateOutOfRange          (new RateOutOfRange(),           ConditionGroup.RATE_OUT_OF_RANGE,     "",                                                    2,     9),
+	BeamActive              (new BeamActive(),               ConditionGroup.BEAM_ACTIVE,           "",                                                    3),
+	RunOngoing              (new RunOngoing(),               ConditionGroup.RUN_ONGOING,           "",                                                    4,   100),
+	ExpectedRate            (new ExpectedRate(),             ConditionGroup.EXPECTED_RATE,         "",                                                    5),
+	Transition              (new Transition(),               ConditionGroup.TRANSITION,            "",                                                    6),
+	LongTransition          (new LongTransition(),           ConditionGroup.HIDDEN,                "",                                                    7),
+	WarningInSubsystem      (new WarningInSubsystem(),       ConditionGroup.Warning,               "",                                                    8,  1004),
+	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED,       "",                                                    9,  1006),
+	SubsystemError          (new SubsystemError(),           ConditionGroup.SUBSYS_ERROR,          "",                                                   10,  1007),
+	SubsystemSoftError      (new SubsystemSoftError(),       ConditionGroup.SUBSYS_SOFT_ERR,       "",                                                   11,  1005),
+	FEDDeadtime             (new FEDDeadtime(),              ConditionGroup.FED_DEADTIME,          "",                                                   12,  1005),
+	PartitionDeadtime       (new PartitionDeadtime(),        ConditionGroup.PARTITION_DEADTIME,    "",                                                   13,  1008),
+	StableBeams             (new StableBeams(),              ConditionGroup.HIDDEN,                "",                                                   14),
+	NoRateWhenExpected      (new NoRateWhenExpected(),       ConditionGroup.NO_RATE_WHEN_EXPECTED, "",                                                   15,   104),
+	Downtime                (new Downtime(),                 ConditionGroup.DOWNTIME,              "",                                                   16),
+	Deadtime                (new Deadtime(),                 ConditionGroup.DEADTIME,              "",                                                   17),
+	CriticalDeadtime        (new CriticalDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   18,   105),
+	FlowchartCase1          (new FlowchartCase1(),           ConditionGroup.FLOWCHART,             "",                                                   19, 10004),
+	FlowchartCase2          (new FlowchartCase2(),           ConditionGroup.FLOWCHART,             "",                                                   20, 10005),
+	FlowchartCase3          (new FlowchartCase3(),           ConditionGroup.FLOWCHART,             "",                                                   21, 10006),
+	FlowchartCase4          (null,                           ConditionGroup.FLOWCHART,             "Partition disconnected: extended to other LMs",      22,     0),
+	FlowchartCase5          (new FlowchartCase5(),           ConditionGroup.FLOWCHART,             "",                                                   23, 10008),
+	FlowchartCase6          (new FlowchartCase6(),           ConditionGroup.FLOWCHART,             "",                                                   24, 10009),
 
-	SessionComparator(new SessionComparator(), ConditionGroup.SESSION_NUMBER, "Session", 15),
-	LHCBeamModeComparator(new LHCBeamModeComparator(), ConditionGroup.LHC_BEAM, "LHC Beam Mode", 20),
-	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE, "LHC Machine Mode", 21),
-	RunComparator(new RunComparator(), ConditionGroup.RUN_NUMBER, "Run", 14),
-	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State", 13),
-	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State", 12),
+	SessionComparator       (new SessionComparator(),        ConditionGroup.SESSION_NUMBER,        "Session",                                            25,    15),
+	LHCBeamModeComparator   (new LHCBeamModeComparator(),    ConditionGroup.LHC_BEAM,              "LHC Beam Mode",                                      26,    20),
+	LHCMachineModeComparator(new LHCMachineModeComparator(), ConditionGroup.LHC_MACHINE,           "LHC Machine Mode",                                   27,    21),
+	RunComparator           (new RunComparator(),            ConditionGroup.RUN_NUMBER,            "Run",                                                28,    14),
+	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO,            "Level Zero State",                                   29,    13),
+	TCDSStateComparator     (new TCDSStateComparator(),      ConditionGroup.TCDS_STATE,            "TCDS State",                                         30,    12),
 
-	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11),
+	DAQStateComparator      (new DAQStateComparator(),       ConditionGroup.DAQ_STATE,             "DAQ state",                                          31,    11),
 
-	PiDisconnected(new PiDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
-	PiProblem(new ProblemWithPi(), ConditionGroup.FLOWCHART, "", 10014),
-	FEDDisconnected(new FEDDisconnected(), ConditionGroup.FLOWCHART, "", 10014),
-	FMMProblem(new FMMProblem(), ConditionGroup.FLOWCHART, "", 10014),;
+	PiDisconnected          (new PiDisconnected(),           ConditionGroup.FLOWCHART,             "",                                                   32, 10014),
+	PiProblem               (new ProblemWithPi(),            ConditionGroup.FLOWCHART,             "",                                                   33, 10014),
+	FEDDisconnected         (new FEDDisconnected(),          ConditionGroup.FLOWCHART,             "",                                                   34, 10014),
+	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),;
 
-	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description) {
-		this(logicModule, group, description, 1);
+	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
+		this(logicModule, group, description, runOrder, 1);
 	}
 
-	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int usefulness) {
+	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder, int usefulness) {
 		this.logicModule = logicModule;
 		this.description = description;
 		this.group = group;
 		this.usefulness = usefulness;
+		
+		// in principle we would like to keep a static map of run order -> logic module
+		// here to check for duplicate runOrder values. But we can't access 
+		// static fields which need initialization from this initializer, 
+		// see http://stackoverflow.com/questions/9098862
+		this.runOrder = runOrder;
 	}
 
 	public LogicModule getLogicModule() {
@@ -101,12 +111,38 @@ public enum LogicModuleRegistry {
 	private final ConditionGroup group;
 	private final int usefulness;
 
+	/** order for running the logic modules. */
+	private final int runOrder;
+	
 	public ConditionGroup getGroup() {
 		return group;
 	}
 
 	public int getUsefulness() {
 		return usefulness;
+	}
+
+	/** @return the registered logic modules order in by increasing runOrder.
+	 *  Throws Error if there is more than one module with the same run order.
+	 */ 
+	public static List<LogicModuleRegistry> getModulesInRunOrder() {
+
+		SortedMap<Integer, LogicModuleRegistry> orderedModules = new TreeMap<Integer, LogicModuleRegistry>();
+		
+		for (LogicModuleRegistry lmr : LogicModuleRegistry.values()) {
+			
+			if (orderedModules.containsKey(lmr.runOrder)) {
+				throw new Error("runOrder " + lmr.runOrder + " found more than once: in " +
+								orderedModules.get(lmr.runOrder).logicModule.getName() + " and in " +
+								lmr.logicModule.getName()
+				        );
+			}
+			
+			orderedModules.put(lmr.runOrder, lmr);
+			
+		} // loop over logic modules
+		
+		return new ArrayList<LogicModuleRegistry>(orderedModules.values());
 	}
 
 }

@@ -84,7 +84,7 @@ public enum LogicModuleRegistry {
 	PiProblem               (new ProblemWithPi(),            ConditionGroup.FLOWCHART,             "",                                                   33, 10014),
 	FEDDisconnected         (new FEDDisconnected(),          ConditionGroup.FLOWCHART,             "",                                                   34, 10014),
 	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),
-	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999,     1),
+	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 10000),
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

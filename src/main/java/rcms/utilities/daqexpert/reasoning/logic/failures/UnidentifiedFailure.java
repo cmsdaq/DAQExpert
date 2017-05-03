@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +44,8 @@ public class UnidentifiedFailure extends ActionLogicModule {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
+		assignPriority(results);
+		
 		// look for any module inheriting from KnownFailure which identified
 		// a problem. We treat a non-existing result as 'not identified'
 		for (String moduleName : knownFailureClasses) {

@@ -47,6 +47,8 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
+	
+	private EntityManager entityManager;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
@@ -60,7 +62,7 @@ public class PersistenceManager {
 	 * @param entries
 	 */
 	public void persist(Set<Condition> entries) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
 		for (Condition point : entries) {
@@ -69,7 +71,13 @@ public class PersistenceManager {
 				entityManager.persist(point);
 		}
 		tx.commit();
-		entityManager.close();
+		//entityManager.close();
+	}
+	
+	private void ensureConditionEntityManagerOpen(){
+		if(entityManager == null || ! entityManager.isOpen()){
+			entityManager = entityManagerFactory.createEntityManager();
+		}
 	}
 
 	/**
@@ -78,12 +86,12 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
 		entityManager.persist(entry);
 		tx.commit();
-		entityManager.close();
+		//entityManager.close();
 	}
 
 	public void persist(Point test) {

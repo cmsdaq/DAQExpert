@@ -47,7 +47,7 @@ public class FlowchartCase3 extends KnownFailure {
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 					if (!ttcp.isMasked()) {
 
-						TTSState currentState = TTSState.getByCode(ttcp.getTtsState());
+						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
 							context.register("SUBSYSTEM", subSystem.getName());

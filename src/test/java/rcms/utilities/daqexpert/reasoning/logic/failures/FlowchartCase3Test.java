@@ -25,6 +25,13 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	public void case2Test() throws URISyntaxException {
 		test("1480813540739.smile");
 	}
+	
+	@Test
+	public void ttsAtTopFMMNullButPmOutOfSyncTest() throws URISyntaxException {
+		test("1491576714151.smile");
+	}
+	
+	
 
 	private void test(String snapshotFile) throws URISyntaxException {
 

@@ -19,7 +19,7 @@
 <link href="external/bootstrap-tour.min.css" rel="stylesheet">
 <script src="external/bootstrap-tour.min.js"></script>
 <script src="external/moment-duration-format.min.js"></script>
-
+<script src="external/clipboard.min.js"></script>
 
 <!--  internal scripts -->
 <script src="static/js/basic.js"></script>
@@ -30,6 +30,7 @@
 <script src="static/js/run-info-link.js"></script>
 <script src="static/js/wbm-link.js"></script>
 <script src="static/js/daqview-link.js"></script>
+<script src="static/js/share.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -57,8 +58,7 @@
 				href="<%out.println(Application.get().getProp(Setting.LANDING));%>"><b>DAQ</b>
 				Expert</a>
 		</div>
-
-
+		
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse"
@@ -72,7 +72,7 @@
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
 						
 				<!-- EXPERT BROWSER -->
-				<li class="active"><a href="#"><i
+				<li class="active"><a id="browser-link" href="" data-url="${pageContext.request.requestURL}"><i
 						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
 
 
@@ -114,19 +114,22 @@
 
 			<div class="btn-group" role="group" aria-label="...">
 				<div class="btn-group" role="group">
+					<button class="btn btn-info btn-sm" id="daqview-button" target="_blank"> DAQView <span
+								class="glyphicon glyphicon-list"></span>
+						</button>
+					<button class="btn btn-default btn-sm btn-copy" id="share-button"> Share <span class="glyphicon glyphicon-share"></span>
+					</button>
 					<button type="button"
 						class="btn btn-default btn-sm dropdown-toggle"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						External Tools <span class="caret"></span>
+						External Links <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
+						
 						<li><a id="run-info-button" target="_blank"> RunInfo <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 						<li><a id="wbm-button" target="_blank"> WBM run summary <span
-								class="glyphicon glyphicon-chevron-right"></span>
-						</a></li>
-						<li><a id="daqview-button" target="_blank"> DAQView <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 					</ul>

@@ -24,7 +24,7 @@ public class UnidentifiedFailure extends ActionLogicModule {
 	 * LogicModuleRegistry (otherwise we would have to ensure that
 	 * UnidentifiedFailure is registered after all others)
 	 */
-	private Set<String> knownFailureClasses;
+	protected Set<String> knownFailureClasses;
 
 	public UnidentifiedFailure() {
 

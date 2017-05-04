@@ -3,10 +3,12 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -45,4 +47,21 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
 	protected final KnownFailure fc6 = new FlowchartCase6();
+	protected final UnidentifiedFailure unidentified = new UnidentifiedFailure();
+	
+	public FlowchartCaseTestBase(){
+		HashSet<String> logicModules = new HashSet<>();
+		logicModules.add(fc1.getClass().getSimpleName());
+		logicModules.add(fc2.getClass().getSimpleName());
+		logicModules.add(fc3.getClass().getSimpleName());
+
+		logicModules.add(piDisconnected.getClass().getSimpleName());
+		logicModules.add(piProblem.getClass().getSimpleName());
+		logicModules.add(fedDisconnected.getClass().getSimpleName());
+		logicModules.add(fmmProblem.getClass().getSimpleName());
+
+		logicModules.add(fc5.getClass().getSimpleName());
+		logicModules.add(fc6.getClass().getSimpleName());
+		unidentified.setKnownFailureClasses(logicModules);
+	}
 }

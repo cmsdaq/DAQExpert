@@ -39,10 +39,11 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
-import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 public enum LogicModuleRegistry {
 
 	NoRate                  (new NoRate(),                   ConditionGroup.NO_RATE,               "Satisfied when no rate in DAQ fed builder summary",   1,    10),
@@ -82,10 +83,20 @@ public enum LogicModuleRegistry {
 	PiDisconnected          (new PiDisconnected(),           ConditionGroup.FLOWCHART,             "",                                                   32, 10014),
 	PiProblem               (new ProblemWithPi(),            ConditionGroup.FLOWCHART,             "",                                                   33, 10014),
 	FEDDisconnected         (new FEDDisconnected(),          ConditionGroup.FLOWCHART,             "",                                                   34, 10014),
-	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),;
-
+	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),
+	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 10000),
+	;
+	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
 		this(logicModule, group, description, runOrder, 1);
+
+	
+	// note that this must be declared after all other logic modules
+	// identifying an error condition in order to have UnidentifiedFailure
+	// run after the others
+	
+	
+
 	}
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder, int usefulness) {

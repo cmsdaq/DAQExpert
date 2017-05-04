@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
 /**
  * Manager of checking process
@@ -50,7 +53,9 @@ public class LogicModuleManager {
 
 		this.conditionProducer = conditionProducer;
 
-		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
+		HashSet<String> knownFailureClasses = new HashSet<String>();
+
+		for (LogicModuleRegistry lm : LogicModuleRegistry.getModulesInRunOrder()) {
 			if (lm.getLogicModule() != null) {
 				lm.getLogicModule().setLogicModuleRegistry(lm);
 				if (lm.getLogicModule() instanceof SimpleLogicModule) {
@@ -67,10 +72,19 @@ public class LogicModuleManager {
 					updatable.parametrize(Application.get().getProp());
 					logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
 				}
+
+				if (lm.getLogicModule() instanceof KnownFailure) {
+					knownFailureClasses.add(lm.getLogicModule().getClass().getSimpleName());
+				}
 			} else {
 				logger.info("This is not used: " + lm);
 			}
 		}
+
+		logger.info("Registering " + knownFailureClasses.size()
+				+ " known-failure logic modules to covering unidentified-failure logic module");
+		UnidentifiedFailure unidentifiedFailure = (UnidentifiedFailure) LogicModuleRegistry.UnidentifiedFailure.getLogicModule();
+		unidentifiedFailure.setKnownFailureClasses(knownFailureClasses);
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));

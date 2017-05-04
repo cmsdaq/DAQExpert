@@ -1,20 +1,21 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
 
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 
-/**
- *
- * @author Maciej Gladki
- */
-public class FlowchartCase5Test extends FlowchartCaseTestBase {
+public class UnidentifiedFailureTest extends FlowchartCaseTestBase {
 
+	/**
+	 * Test of unidentified failure
+	 */
 	@Test
-	public void case1Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1479614378467.smile");
+	public void testSatisfied() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1493872903036.smile");
 
 		assertEqualsAndUpdateResults(false, fc1, snapshot);
 		assertEqualsAndUpdateResults(false, fc2, snapshot);
@@ -26,9 +27,10 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 
-		assertEqualsAndUpdateResults(true, fc5, snapshot);
+		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		assertEqualsAndUpdateResults(false, fc6, snapshot);
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
+
+		assertEquals(true, unidentified.satisfied(snapshot, results));
 
 	}
 

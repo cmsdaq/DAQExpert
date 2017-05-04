@@ -1,6 +1,10 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import java.util.Map;
+
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  * The Action Logic Module has additional field - <code>action</code>. It is to be
@@ -22,6 +26,11 @@ public abstract class ActionLogicModule extends ContextLogicModule {
 
 	public Action getAction() {
 		return action;
+	}
+	
+	protected void assignPriority(Map<String, Boolean> results) {
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
+		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.WARNING;
 	}
 
 

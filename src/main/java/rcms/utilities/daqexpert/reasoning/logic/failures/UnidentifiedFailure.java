@@ -30,9 +30,10 @@ public class UnidentifiedFailure extends ActionLogicModule {
 
 		this.name = "Unidentified problem";
 
-		this.description = "Reason for no trigger rate could not be identified";
+		this.description = "Trigger rate is zero. The problem could not be identified.";
 
-		this.action = new SimpleAction("Make an ELOG entry");
+		this.action = new SimpleAction("Recover the system according to instructions from shifter bulletin board",
+				"Make an ELOG entry");
 
 	}
 
@@ -45,7 +46,7 @@ public class UnidentifiedFailure extends ActionLogicModule {
 			return false;
 
 		assignPriority(results);
-		
+
 		// look for any module inheriting from KnownFailure which identified
 		// a problem. We treat a non-existing result as 'not identified'
 		for (String moduleName : knownFailureClasses) {

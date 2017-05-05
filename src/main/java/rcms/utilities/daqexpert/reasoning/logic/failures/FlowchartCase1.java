@@ -22,13 +22,14 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 public class FlowchartCase1 extends KnownFailure {
 
 	/** regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message */
-	private final Pattern syncLossPattern = Pattern.compile("Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
+	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
 	public FlowchartCase1() {
 		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
-				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem";
+				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem. "
+				+ "Original error message: {{ORIGERRMSG}}";
 
 		/* Default action */
 		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
@@ -82,13 +83,17 @@ public class FlowchartCase1 extends KnownFailure {
 
 			// subsystem not yet known
 			context.setActionKey("(unknown subsystem)");
+			context.register("ORIGERRMSG", "-");
 
 			if (syncLossRU == null) {
 				// no RU in syncloss found, we don't know FED, TTCP and SUBSYSTEM
 				setContextValues("(RU not found)");
+
 				
 			} else {
  	    
+				context.register("ORIGERRMSG", syncLossRU.getErrorMsg());
+				
 				// find the FED from the exception message
 				//
 				// example message:

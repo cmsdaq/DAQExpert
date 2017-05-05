@@ -22,7 +22,10 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  */
 public class FlowchartCase1 extends KnownFailure {
 
-	/** regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message */
+	/**
+	 * regex for getting ttc partition and FED source id which caused the sync
+	 * loss from the RU exception message
+	 */
 	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
 	public FlowchartCase1() {
@@ -50,15 +53,16 @@ public class FlowchartCase1 extends KnownFailure {
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
 
-	/** sets keys FED, TTCP and SUBSYSTEM to the given string */ 
+	/** sets keys FED, TTCP and SUBSYSTEM to the given string */
 	private void setContextValues(String text) {
-		
+
 		context.register("FED", text);
 		context.register("TTCP", text);
 		context.register("SUBSYSTEM", text);
-		
+		context.register("ORIGERRMSG", "-");
+
 	}
-	
+
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
@@ -68,7 +72,7 @@ public class FlowchartCase1 extends KnownFailure {
 		assignPriority(results);
 
 		String daqstate = daq.getDaqState();
-		// note that the l0state may e.g. be 'Error' 
+		// note that the l0state may e.g. be 'Error'
 		if (RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
 
 			// for the moment, just find the first RU in SyncLoss
@@ -82,41 +86,39 @@ public class FlowchartCase1 extends KnownFailure {
 				}
 			}
 
-			// subsystem not yet known
-			context.setActionKey("(unknown subsystem)");
-			context.register("ORIGERRMSG", "-");
-
 			if (syncLossRU == null) {
-				// no RU in syncloss found, we don't know FED, TTCP and SUBSYSTEM
+				// no RU in syncloss found, we don't know FED, TTCP and
+				// SUBSYSTEM
 				setContextValues("(RU not found)");
 
-				
 			} else {
- 	    
+
 				context.register("ORIGERRMSG", syncLossRU.getErrorMsg());
-				
+
 				// find the FED from the exception message
 				//
 				// example message:
-				// Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id runNumber=286488 lumiSection=301 resyncCount=4 eventNumber=1247256 bxId=1459, but found evb id runNumber=286488 *resyncCount=5 eventNumber=1 bxId=2206 in data block from FED 548 (ES)' raised at append(/usr/local/src/xdaq/baseline13/trunk/daq/evb/src/common/readoutunit/SuperFragment.cc:32)
+				// Caught exception: exception::MismatchDetected 'Mismatch
+				// detected: expected evb id runNumber=286488 lumiSection=301
+				// resyncCount=4 eventNumber=1247256 bxId=1459, but found evb id
+				// runNumber=286488 *resyncCount=5 eventNumber=1 bxId=2206 in
+				// data block from FED 548 (ES)' raised at
+				// append(/usr/local/src/xdaq/baseline13/trunk/daq/evb/src/common/readoutunit/SuperFragment.cc:32)
 
 				Matcher mo = syncLossPattern.matcher(syncLossRU.getErrorMsg());
-				if (mo.find())
-				{
+				if (mo.find()) {
 					int fedId = Integer.parseInt(mo.group(1));
 					context.register("FED", mo.group(1));
 
 					// get the FED object
 					FED problematicFED = daq.getFEDbySrcId(fedId);
-					
-					if (problematicFED != null)
-					{
+
+					if (problematicFED != null) {
 						TTCPartition ttcp = problematicFED.getTtcp();
 						String ttcpName = "-";
 						String subsystemName = "-";
 
-						if (ttcp != null)
-						{
+						if (ttcp != null) {
 							ttcpName = ttcp.getName();
 							if (ttcp.getSubsystem() != null) {
 								subsystemName = ttcp.getSubsystem().getName();
@@ -130,7 +132,8 @@ public class FlowchartCase1 extends KnownFailure {
 					}
 
 				} else {
-					// regex did not match, probably the format of the exception message
+					// regex did not match, probably the format of the exception
+					// message
 					// in the event build has changed, need to change the regex
 					// pattern above
 					setContextValues("(regex mismatch)");

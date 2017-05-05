@@ -17,6 +17,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ * @author holzner
  *
  */
 public class FlowchartCase1 extends KnownFailure {

@@ -240,6 +240,8 @@ var initAnalysisGraph = function() {
 								$("#curr-action").append($("<li>").text(value))
 							});
 						}
+						
+						$("#maturity").html(data['mature']);
 
 					}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
@@ -319,6 +321,10 @@ function load(data, fakeEnd) {
 		if(value['content'] == null){
 			value['content'] = "no title (event: "+value['id']+")";
 		}
+		
+		if(value['mature'] !== null && value['mature'] == false){
+			value['className'] = 'immature';
+		}
 
 		var current = groups.get(groupName);
 
@@ -343,7 +349,9 @@ function load(data, fakeEnd) {
 						+ parseInt(value['content']);
 				value['type'] = 'background';
 			} else {
+				if(value['mature'] == true){
 				countPerGroup[groupName] = currCount + 1;
+				}
 			}
 		} else {
 			//console.log("Group " + groupName + " will be ignored");

@@ -180,7 +180,7 @@ var options = {
 	},
 	zoomMin : 1000 * 60, // one minute in milliseconds
 	zoomMax : 1000 * 60 * 60 * 24 * 31 * 12// about 12 months in
-											// milliseconds
+// milliseconds
 };
 
 var initAnalysisGraph = function() {
@@ -240,8 +240,12 @@ var initAnalysisGraph = function() {
 								$("#curr-action").append($("<li>").text(value))
 							});
 						}
-						
-						$("#maturity").html(data['mature']);
+
+						if (data['mature'] == true) {
+							$(".immature-information").hide();
+						} else {
+							$(".immature-information").show();
+						}
 
 					}).error(function(jqXHR, textStatus, errorThrown) {
 				console.log("error " + textStatus);
@@ -274,7 +278,7 @@ function getDatap(parameters) {
 			"reasons",
 			parameters,
 			function(data) {
-				load(data['entries'],data['fake-end']);
+				load(data['entries'], data['fake-end']);
 				$.each(data['durations'], function(key, value) {
 					console.log(key + ": " + moment.duration(value).format()
 							+ ", humanized: "
@@ -313,16 +317,16 @@ function load(data, fakeEnd) {
 		// for (prop in timeline) {
 		// console.log("groups: " + prop);
 		// }
-		
-		if(value['end'] == null){
+
+		if (value['end'] == null) {
 			value['end'] = fakeEnd;
 		}
-		
-		if(value['content'] == null){
-			value['content'] = "no title (event: "+value['id']+")";
+
+		if (value['content'] == null) {
+			value['content'] = "no title (event: " + value['id'] + ")";
 		}
-		
-		if(value['mature'] !== null && value['mature'] == false){
+
+		if (value['mature'] !== null && value['mature'] == false) {
 			value['className'] = 'immature';
 		}
 
@@ -349,12 +353,12 @@ function load(data, fakeEnd) {
 						+ parseInt(value['content']);
 				value['type'] = 'background';
 			} else {
-				if(value['mature'] == true){
-				countPerGroup[groupName] = currCount + 1;
+				if (value['mature'] == true) {
+					countPerGroup[groupName] = currCount + 1;
 				}
 			}
 		} else {
-			//console.log("Group " + groupName + " will be ignored");
+			// console.log("Group " + groupName + " will be ignored");
 
 		}
 	});
@@ -390,20 +394,75 @@ function load(data, fakeEnd) {
 		});
 
 	});
-	
 
 	items.clear();
-	
-	items.add({id: 'bg-2016-md4', start: '2016-10-03', end: '2016-10-07', content:'MD4', type: 'background', className: 'blue'});
-	items.add({id: 'bg-2016-md5', start: '2016-10-27', end: '2016-10-30', content:'MD5', type: 'background', className: 'blue'});
-	
-	items.add({id: 'bg-2016-ts2', start: '2016-09-12', end: '2016-09-16', content:'TS2', type: 'background', className: 'green'});
-	items.add({id: 'bg-2016-ts3', start: '2016-10-31', end: '2016-11-04', content:'TS3', type: 'background', className: 'green'});
-	items.add({id: 'bg-2016-eyets', start: '2016-12-05', end: '2017-04-23', content:'EYETS', type: 'background', className: 'green'});
-	
-	items.add({id: 'bg-2017-mwgr1', start: '2017-02-08', end: '2017-02-10', content:'MWGR1', type: 'background', className: 'red'});
-	items.add({id: 'bg-2017-mwgr2', start: '2017-03-01', end: '2017-03-03', content:'MWGR2', type: 'background', className: 'red'});
-	items.add({id: 'bg-2017-mwgr3', start: '2017-03-15', end: '2017-03-17', content:'MWGR3', type: 'background', className: 'red'});
+
+	items.add({
+		id : 'bg-2016-md4',
+		start : '2016-10-03',
+		end : '2016-10-07',
+		content : 'MD4',
+		type : 'background',
+		className : 'blue'
+	});
+	items.add({
+		id : 'bg-2016-md5',
+		start : '2016-10-27',
+		end : '2016-10-30',
+		content : 'MD5',
+		type : 'background',
+		className : 'blue'
+	});
+
+	items.add({
+		id : 'bg-2016-ts2',
+		start : '2016-09-12',
+		end : '2016-09-16',
+		content : 'TS2',
+		type : 'background',
+		className : 'green'
+	});
+	items.add({
+		id : 'bg-2016-ts3',
+		start : '2016-10-31',
+		end : '2016-11-04',
+		content : 'TS3',
+		type : 'background',
+		className : 'green'
+	});
+	items.add({
+		id : 'bg-2016-eyets',
+		start : '2016-12-05',
+		end : '2017-04-23',
+		content : 'EYETS',
+		type : 'background',
+		className : 'green'
+	});
+
+	items.add({
+		id : 'bg-2017-mwgr1',
+		start : '2017-02-08',
+		end : '2017-02-10',
+		content : 'MWGR1',
+		type : 'background',
+		className : 'red'
+	});
+	items.add({
+		id : 'bg-2017-mwgr2',
+		start : '2017-03-01',
+		end : '2017-03-03',
+		content : 'MWGR2',
+		type : 'background',
+		className : 'red'
+	});
+	items.add({
+		id : 'bg-2017-mwgr3',
+		start : '2017-03-15',
+		end : '2017-03-17',
+		content : 'MWGR3',
+		type : 'background',
+		className : 'red'
+	});
 	items.add(visibleData);
 
 };

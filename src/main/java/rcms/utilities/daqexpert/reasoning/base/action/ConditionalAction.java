@@ -34,7 +34,7 @@ public class ConditionalAction implements Action {
 			if (this.action.containsKey(actionKey)) {
 				return this.action.get(actionKey);
 			} else {
-				logger.info("No action for key: " + actionKey + ", using default action");
+				logger.debug("No action for key: " + actionKey + ", using default action");
 				return this.action.get(DEFAULT_KEY);
 			}
 		} else {

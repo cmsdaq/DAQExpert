@@ -177,6 +177,16 @@ public class ConditionProducer {
 				// ActionLogicModule
 
 			}
+
+			if (logicModule instanceof SimpleLogicModule) {
+				SimpleLogicModule slm = (SimpleLogicModule) logicModule;
+				if (slm.isMature()) {
+					result.setMature(true);
+				}
+			} else{
+				result.setMature(true);
+			}
+
 		}
 		return Pair.of(leftResult, result);
 	}

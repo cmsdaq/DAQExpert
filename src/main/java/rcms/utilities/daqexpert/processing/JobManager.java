@@ -151,6 +151,7 @@ public class JobManager {
 	private void persistVersion(Date startDate, Date endDate) {
 
 		versionCondition = new Condition();
+		versionCondition.setMature(true);
 		versionCondition.setStart(startDate);
 		versionCondition.setEnd(endDate);
 		if (endDate != null) {

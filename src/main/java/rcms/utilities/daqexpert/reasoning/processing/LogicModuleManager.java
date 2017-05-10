@@ -18,6 +18,7 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
@@ -83,7 +84,8 @@ public class LogicModuleManager {
 
 		logger.info("Registering " + knownFailureClasses.size()
 				+ " known-failure logic modules to covering unidentified-failure logic module");
-		UnidentifiedFailure unidentifiedFailure = (UnidentifiedFailure) LogicModuleRegistry.UnidentifiedFailure.getLogicModule();
+		UnidentifiedFailure unidentifiedFailure = (UnidentifiedFailure) LogicModuleRegistry.UnidentifiedFailure
+				.getLogicModule();
 		unidentifiedFailure.setKnownFailureClasses(knownFailureClasses);
 
 		try {
@@ -167,6 +169,13 @@ public class LogicModuleManager {
 
 		if (checker instanceof SimpleLogicModule) {
 			SimpleLogicModule simpleChecker = (SimpleLogicModule) checker;
+
+			if (result) {
+				simpleChecker.increaseMaturity();
+			} else {
+				simpleChecker.resetMaturity();
+			}
+
 			Pair<Boolean, Condition> produceResult = conditionProducer.produce(simpleChecker, result, curr);
 
 			/*
@@ -182,9 +191,8 @@ public class LogicModuleManager {
 			if (produceResult.getLeft()) {
 				results.add(produceResult.getRight());
 			}
-		} else {
-			logger.warn("Problem postrprocessing LM results, not an instance of simple logic module");
 		}
+
 	}
 
 	/**

@@ -8,19 +8,28 @@ import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 
+/**
+ * Abstract base class for logic-modules that implement specific known failures.
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public abstract class KnownFailure extends ActionLogicModule {
 
 	public KnownFailure() {
 		this.priority = ConditionPriority.CRITICAL;
 	}
 
+	
 	public String getDescriptionWithContext() {
 		return this.getContext().getContentWithContext(this.description);
 	}
-	
+
 	public List<String> getActionWithContext() {
 		return this.getContext().getActionWithContext(this.action);
 	}
+
+	
 
 	protected boolean isMasked(FED fed) {
 		if (fed.isFmmMasked() || fed.isFrlMasked()) {
@@ -41,4 +50,5 @@ public abstract class KnownFailure extends ActionLogicModule {
 			return TTSState.getByCode(result);
 		}
 	}
+
 }

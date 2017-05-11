@@ -469,4 +469,8 @@ public class PersistenceManager {
 		return result;
 	}
 
+	public EntityManagerFactory getEntityManagerFactory() {
+		return entityManagerFactory;
+	}
+
 }

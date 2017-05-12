@@ -44,14 +44,15 @@ public class ReportManagerTestIT {
 	public void test() {
 
 		// create 2 fills
-		pm.persist(getFinishedEntry(t1, "fill 1", 50 * 1000, LogicModuleRegistry.StableBeams));
-		pm.persist(getFinishedEntry(t4, "fill 2", 500000 * 1000, LogicModuleRegistry.StableBeams));
-		pm.persist(getFinishedEntry(t1, "no rate", 25 * 1000, LogicModuleRegistry.NoRate));
-		pm.persist(getFinishedEntry(t1, "no rate when expected", 20 * 1000, LogicModuleRegistry.NoRateWhenExpected));
+		pm.persist(getFinishedEntry(t1, "fill 1", 50, LogicModuleRegistry.StableBeams));
+		pm.persist(getFinishedEntry(t4, "fill 2", 50, LogicModuleRegistry.StableBeams));
+		pm.persist(getFinishedEntry(t1, "no rate", 25, LogicModuleRegistry.NoRate));
+		pm.persist(getFinishedEntry(t1, "no rate when expected", 20, LogicModuleRegistry.NoRateWhenExpected));
 
 		ReportManager r = new ReportManager(pm.getEntityManagerFactory());
 
-		Report report = r.prepareReport();
+		Report report = r.prepareReport(DatatypeConverter.parseDateTime("2017-01-01T00:00:00Z").getTime(),
+				DatatypeConverter.parseDateTime("2017-02-01T00:00:00Z").getTime());
 		logger.info("Report: " + report);
 		logger.info("Report: " + report.getReport());
 
@@ -68,7 +69,7 @@ public class ReportManagerTestIT {
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);
-		cal.add(Calendar.MILLISECOND, duration);
+		cal.add(Calendar.SECOND, duration);
 		Date endDate = cal.getTime();
 		entry.setEnd(endDate);
 		entry.calculateDuration();

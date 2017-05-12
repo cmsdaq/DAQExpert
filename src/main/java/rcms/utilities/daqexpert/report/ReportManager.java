@@ -29,15 +29,13 @@ public class ReportManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	public Report prepareReport() {
+	public Report prepareReport(Date start, Date end) {
 		Report report = new Report();
 
 		Long threshold = 1000L;
 
 		// 1. get the list of all run ongoing events
-		List<Condition> a = getConditions(LogicModuleRegistry.StableBeams,
-				DatatypeConverter.parseDateTime("2017-01-01T00:00:00Z").getTime(),
-				DatatypeConverter.parseDateTime("2017-02-01T00:00:00Z").getTime(), threshold);
+		List<Condition> a = getConditions(LogicModuleRegistry.StableBeams, start, end, threshold);
 
 		logger.info("There are " + a.size() + " fills");
 		for (Condition condition : a) {
@@ -46,7 +44,7 @@ public class ReportManager {
 		}
 		long totalStableBeamTime = 0;
 
-		for(Condition condition: a){
+		for (Condition condition : a) {
 			totalStableBeamTime += condition.getDuration();
 		}
 		report.getValues().put("totalStableBeamTime", totalStableBeamTime);
@@ -55,25 +53,26 @@ public class ReportManager {
 		// 3. see how much rate zero
 		List<Condition> b = getConditionsInside(LogicModuleRegistry.NoRate, a, threshold);
 		Long totalNoRateDuration = 0L;
-		for(Condition condition: b){
+		for (Condition condition : b) {
 			totalNoRateDuration += condition.getDuration();
 		}
 		logger.info("There are " + b.size() + " no rate events with total duration of " + totalNoRateDuration + "ms");
 		report.getValues().put("totalNoRateDuration", totalNoRateDuration);
-		
+
 		report.getValues().put("totalUptime", (totalStableBeamTime - totalNoRateDuration));
 
 		// 4. see how much of this rate zero were recovery actions (reseting
 		// etc)
 		List<Condition> c = getConditionsInside(LogicModuleRegistry.NoRateWhenExpected, b, threshold);
 		Long totalNoRateWhenExpectedDuration = 0L;
-		for(Condition condition: c){
+		for (Condition condition : c) {
 			totalNoRateWhenExpectedDuration += condition.getDuration();
 		}
-		logger.info("There are " + b.size() + " no-rate-when-expected events with total duration of " + totalNoRateWhenExpectedDuration + "ms");
+		logger.info("There are " + b.size() + " no-rate-when-expected events with total duration of "
+				+ totalNoRateWhenExpectedDuration + "ms");
 		report.getValues().put("totalDecisionTime", totalNoRateWhenExpectedDuration);
-		report.getValues().put("totalRecoveryTime", (totalNoRateDuration -totalNoRateWhenExpectedDuration));
-		
+		report.getValues().put("totalRecoveryTime", (totalNoRateDuration - totalNoRateWhenExpectedDuration));
+
 		report.getValues().put("totalUptime", (totalStableBeamTime - totalNoRateDuration));
 
 		// 5. calculate the total down-time

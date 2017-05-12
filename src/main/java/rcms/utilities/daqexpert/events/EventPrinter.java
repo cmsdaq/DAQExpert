@@ -13,28 +13,28 @@ public class EventPrinter implements EventRegister {
 	private static final Logger logger = Logger.getLogger(EventPrinter.class);
 
 	@Override
-	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerBegin(Condition condition) {
 		if (condition.isShow())
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("+ " + logicModule);
+				logger.info("+ " + condition.getLogicModule());
 			}
 	}
 
 	@Override
-	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerEnd(Condition condition) {
 		if (condition.isShow())
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("- " + logicModule);
+				logger.info("- " + condition.getLogicModule());
 			}
 
 	}
 
 	@Override
-	public void registerUpdate(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerUpdate(Condition condition) {
 		if (condition.isShow())
 
 			if (condition.getPriority() == ConditionPriority.CRITICAL) {
-				logger.info("| " + logicModule);
+				logger.info("| " + condition.getLogicModule());
 			}
 
 	}

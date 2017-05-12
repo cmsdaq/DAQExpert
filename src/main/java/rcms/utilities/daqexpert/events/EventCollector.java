@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.ExpertException;
+import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
@@ -18,7 +20,11 @@ public class EventCollector implements EventRegister {
 	private final List<ConditionEvent> events = new ArrayList<>();
 
 	@Override
-	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerBegin(Condition condition) {
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		if (logicModule == null) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
+		}
 		if (condition.isShow()) {
 			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
@@ -51,7 +57,11 @@ public class EventCollector implements EventRegister {
 	}
 
 	@Override
-	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerEnd(Condition condition) {
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		if (logicModule == null) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
+		}
 		if (condition.isShow())
 			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
 					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
@@ -71,7 +81,11 @@ public class EventCollector implements EventRegister {
 	}
 
 	@Override
-	public void registerUpdate(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerUpdate(Condition condition) {
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		if (logicModule == null) {
+			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
+		}
 		if (condition.isShow())
 
 			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()

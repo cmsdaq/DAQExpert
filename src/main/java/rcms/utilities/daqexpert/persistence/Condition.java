@@ -307,6 +307,8 @@ public class Condition extends Observable implements Comparable<Condition> {
 
 	public void setMature(boolean mature) {
 		this.mature = mature;
+		setChanged();
+		notifyObservers();
 	}
 
 }

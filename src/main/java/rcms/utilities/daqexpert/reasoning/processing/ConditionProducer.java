@@ -183,7 +183,7 @@ public class ConditionProducer {
 				if (slm.isMature()) {
 					result.setMature(true);
 				}
-			} else{
+			} else {
 				result.setMature(true);
 			}
 
@@ -209,16 +209,17 @@ public class ConditionProducer {
 				finishedThisRound.add(toFinish);
 			}
 
-			eventRegister.registerEnd(logicModule.getLogicModuleRegistry(), toFinish);
+			eventRegister.registerEnd(toFinish);
 		}
 
 		/* add new condition */
 		Condition condition = new Condition();
+		condition.setLogicModule(logicModule.getLogicModuleRegistry());
 		condition.setClassName(eventClass);
 		condition.setTitle(content);
 		condition.setShow(value);
 		condition.setStart(date);
-		eventRegister.registerBegin(logicModule.getLogicModuleRegistry(), condition);
+		eventRegister.registerBegin(condition);
 
 		unfinished.put(logicModuleName, condition);
 		return condition;

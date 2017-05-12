@@ -22,7 +22,7 @@ public class Report {
 		return "Report [values=" + values + "]";
 	}
 
-	public String getReport() {
+	public String getSummary() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\nTimes:\n");
 		sb.append("Total time of stable beams: " + getHumanReadable(values.get("totalStableBeamTime")));

@@ -63,6 +63,15 @@
 		<servlet-name>ExperimentApi</servlet-name>
 		<url-pattern>/experiment</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>StatisticsAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.StatisticsAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StatisticsAPI</servlet-name>
+		<url-pattern>/statistics</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>ScriptsExperimentalAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.ScriptsExperimentalAPI</servlet-class>

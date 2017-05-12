@@ -80,6 +80,10 @@
 				<li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_ARCHIVE));%>"><i
 						class="glyphicon glyphicon-calendar"></i> Archive</a></li>
+						
+				<!-- EXPERT STATISTICS -->
+				<li><a id="reports-link" href="statistics"><i
+						class="glyphicon glyphicon-tasks"></i> Reports</a></li>
 
 			</ul>
 		</div>

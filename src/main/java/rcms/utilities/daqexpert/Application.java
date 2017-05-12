@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.report.Report;
+import rcms.utilities.daqexpert.report.ReportManager;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 public class Application {
@@ -19,6 +21,8 @@ public class Application {
 	private static final Logger logger = Logger.getLogger(Application.class);
 
 	private PersistenceManager persistenceManager;
+	
+	private ReportManager reportManager;
 
 	private DataManager dataManager;
 
@@ -55,6 +59,7 @@ public class Application {
 		logger.info("DAQExpert version: " + v);
 
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("history", instance.getProp());
+		instance.reportManager = new ReportManager(entityManagerFactory);
 		instance.persistenceManager = new PersistenceManager(entityManagerFactory);
 		instance.setDataManager(new DataManager());
 	}
@@ -122,5 +127,9 @@ public class Application {
 
 	public ConditionDashboard getDashboard() {
 		return conditionDashboard;
+	}
+
+	public ReportManager getReportManager() {
+		return reportManager;
 	}
 }

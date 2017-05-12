@@ -54,7 +54,7 @@ public class ReportManagerTestIT {
 		Report report = r.prepareReport(DatatypeConverter.parseDateTime("2017-01-01T00:00:00Z").getTime(),
 				DatatypeConverter.parseDateTime("2017-02-01T00:00:00Z").getTime());
 		logger.info("Report: " + report);
-		logger.info("Report: " + report.getReport());
+		logger.info("Report: " + report.getSummary());
 
 	}
 

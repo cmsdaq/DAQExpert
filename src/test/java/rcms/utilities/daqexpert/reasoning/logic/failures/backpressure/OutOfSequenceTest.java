@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,6 +12,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**
  * Out of sequence test

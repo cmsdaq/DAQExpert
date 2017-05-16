@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import java.util.Map;
 
@@ -9,15 +9,13 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class LinkProblem extends BackpressureAnalyzer {
+public class BugInFilterfarm extends BackpressureAnalyzer {
 
-	public LinkProblem() {
-		this.name = "Link problem";
+	public BugInFilterfarm() {
+		this.name = "Bug in filterfarm";
 
-		this.description = "Link problem detected. "
-				+ "RU {{AFFECTED-RU}} is waiting for backpressured FED {{AFFECTED-FED}}. "
-				+ "FED belongs to TTCP {{AFFECTED-TTCP}} in {{AFFECTED-SUBSYSTEM}} subsystem. "
-				+ "FED is in {{AFFECTED-TTCP-STATE}} and stopped sending data.";
+		this.description = "No requests on RUs and exists Bus which are not Blocked or Cloud"
+				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
 		this.action = null;
 
@@ -33,7 +31,7 @@ public class LinkProblem extends BackpressureAnalyzer {
 		assignPriority(results);
 
 		Subcase backpressureRootCase = detectBackpressure(daq);
-		if (backpressureRootCase == Subcase.LinkProblem) {
+		if (backpressureRootCase ==Subcase.BugInFilterfarm) {
 			result = true;
 		}
 		return result;

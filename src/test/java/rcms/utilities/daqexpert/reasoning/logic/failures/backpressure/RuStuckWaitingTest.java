@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
@@ -13,9 +13,15 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 
+	/*
+	 * Sat, 01 Apr 2017 17:55:52 GMT
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-04-01-19:55:52
+	 */
 	@Test
 	public void test() throws URISyntaxException {
 		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
@@ -29,6 +35,13 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertEquals(false, fc3.satisfied(snapshot, results));
 		assertEquals(false, fc4.satisfied(snapshot, results));
 		assertEquals(false, fc5.satisfied(snapshot, results));
+
+		assertEquals(false, b1.satisfied(snapshot, results));
+		assertEquals(false, b2.satisfied(snapshot, results));
+		assertEquals(false, b3.satisfied(snapshot, results));
+		assertEquals(false, b4.satisfied(snapshot, results));
+		assertEquals(false, ruStuck.satisfied(snapshot, results));
+
 		assertEquals(true, ruStuckWaiting.satisfied(snapshot, results));
 
 		System.out.println("New message:");

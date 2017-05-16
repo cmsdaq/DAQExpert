@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +21,7 @@ import rcms.utilities.daqaggregator.data.SubFEDBuilder;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 /**
  * Logic module identifying 6 flowchart case.

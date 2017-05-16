@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class RuStuck extends BackpressureAnalyzer {
 	public RuStuck() {
 		this.name = "RU stuck";
 
-		this.description = "RU {{AFFECTED-RU}} is stuck " + "RU has more than 0 requests"
+		this.description = "RU {{AFFECTED-RU}} is stuck. " + "RU has more than 0 requests - {{RU-REQUESTS}}. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
 		this.action = null;

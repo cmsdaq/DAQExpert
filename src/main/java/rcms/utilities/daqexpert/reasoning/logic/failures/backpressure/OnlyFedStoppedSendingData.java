@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import java.util.Map;
 
@@ -9,12 +9,12 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class HLTProblem extends BackpressureAnalyzer {
+public class OnlyFedStoppedSendingData extends BackpressureAnalyzer {
 
-	public HLTProblem() {
-		this.name = "HLT problem";
+	public OnlyFedStoppedSendingData() {
+		this.name = "FED stopped sending data";
 
-		this.description = "All BUs are in Blocked or Cloud"
+		this.description = "The only FED {{PROBLEM-FED}} in RU {{PROBLEM-RU}} stopped sending data. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
 		this.action = null;
@@ -31,7 +31,7 @@ public class HLTProblem extends BackpressureAnalyzer {
 		assignPriority(results);
 
 		Subcase backpressureRootCase = detectBackpressure(daq);
-		if (backpressureRootCase == Subcase.HltProblem) {
+		if (backpressureRootCase == Subcase.SpecificFedBlocking) {
 			result = true;
 		}
 		return result;

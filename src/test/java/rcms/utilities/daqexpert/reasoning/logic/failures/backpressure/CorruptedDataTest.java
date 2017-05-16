@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.reasoning.logic.failures;
+package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**
  * Test corrupted data discovery
@@ -22,8 +23,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 	/**
-	 * http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-
-	 * 03-27-15:52:23
+	 * http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-03-27-15:52:23
 	 * 
 	 * @throws URISyntaxException
 	 */

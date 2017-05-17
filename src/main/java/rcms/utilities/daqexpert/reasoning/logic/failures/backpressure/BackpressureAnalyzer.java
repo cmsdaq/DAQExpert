@@ -302,22 +302,25 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 						for (SubFEDBuilder sfb : sfbs) {
 
 							logger.debug("Checking sfbs of " + sfb.getFedBuilder().getName());
-							if (sfb.getMinTrig() < sfb.getMaxTrig()) {
+							if (sfb.getMinTrig() < sfb.getMaxTrig()
+									|| (sfb.getMinTrig() == 0 && sfb.getMaxTrig() == 0)) {
 								logger.info("Found sfb with suspicious number of triggers");
 
 								for (FED fed : sfb.getFeds()) {
-									
-									//if (!fed.isFrlMasked()) {
-										// dont count masked feds
-										if (fed.getNumTriggers() == 0) {
-											foundFedInOtherRuThatDidNotSendData = true;
-											context.register("PROBLEM-FED", fed.getSrcIdExpected());
-											context.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
-											context.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
-											context.register("PROBLEM-SUBSYSTEM", sfb.getTtcPartition().getSubsystem().getName());
-											context.register("AFFECTED-FED-BUILDER", affectedFed.getFrl().getSubFedbuilder().getFedBuilder().getName());
-										}
-									//}
+
+									// if (!fed.isFrlMasked()) {
+									// dont count masked feds
+									if (fed.getNumTriggers() == 0) {
+										foundFedInOtherRuThatDidNotSendData = true;
+										context.register("PROBLEM-FED", fed.getSrcIdExpected());
+										context.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
+										context.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
+										context.register("PROBLEM-SUBSYSTEM",
+												sfb.getTtcPartition().getSubsystem().getName());
+										context.register("AFFECTED-FED-BUILDER",
+												affectedFed.getFrl().getSubFedbuilder().getFedBuilder().getName());
+									}
+									// }
 								}
 
 							}
@@ -328,9 +331,11 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 						// problem accessing the FEDs from RU
 					}
 				}
-				if(foundFedInOtherRuThatDidNotSendData){
+				if (foundFedInOtherRuThatDidNotSendData) {
 					return Subcase.BackpressuredByOtherFed;
 				}
+
+				logger.debug("#8 check: tmp case covering mtca ");
 
 			}
 		}

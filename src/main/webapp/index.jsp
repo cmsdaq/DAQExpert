@@ -256,15 +256,15 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h4 class="modal-title">
-						Condition details <span class="immature-information label label-warning">Ignored</span>
+						Condition details <span
+							class="immature-information label label-warning">Ignored</span>
 					</h4>
 				</div>
 				<div class="modal-body">
-					<div class="immature-information alert alert-warning" >
-						<strong>Ignored condition</strong> This condition was ignored due
-						to possible monitoring data fluctuations. The condition was not
-						satisfied for the time longer than defined threshold. The
-						condition was not sent to Notification Manager.
+					<div class="immature-information alert alert-warning">
+						<strong>Ignored condition</strong> The condition was satisfied in
+						only one snapshot and thus it is ignored. It was not
+						sent to Notification Manager.
 					</div>
 					<h4 id="raport-name">/Name/</h4>
 					<p id="raport-description">/description/</p>

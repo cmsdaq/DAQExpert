@@ -103,6 +103,16 @@ public class JobManagerIT {
 		// verify 43 events if regular event-collector is used
 		// Mockito.verify(eventSender).sendBatchEvents((List)
 		// argThat(IsCollectionWithSize.hasSize(43)));
+
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Start FED stuck")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("End FED stuck")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
+		
+		
+
 	}
 
 }

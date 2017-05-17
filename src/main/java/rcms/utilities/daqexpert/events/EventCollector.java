@@ -5,15 +5,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 
-public class EventCollector implements EventRegister {
+public class EventCollector extends FilterRegister {
 
 	private static final Logger logger = Logger.getLogger(EventCollector.class);
 
@@ -22,76 +19,69 @@ public class EventCollector implements EventRegister {
 	@Override
 	public void registerBegin(Condition condition) {
 		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow()) {
-			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
-					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
+
+		boolean generate = isImportant(condition);
+
+		if (generate) {
+
+			ConditionEvent event = new ConditionEvent();
+			event.setCondition(condition);
+			event.setPriority(condition.getPriority());
+			event.setDate(condition.getStart());
+			event.setLogicModule(logicModule);
+			events.add(event);
+
+			if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
 				logger.debug("+ " + logicModule);
-
-				ConditionEvent event = new ConditionEvent();
 				event.setTitle("Start " + condition.getTitle());
-				event.setCondition(condition);
-				event.setPriority(condition.getPriority());
-				event.setDate(condition.getStart());
 				event.setType(EventType.ConditionStart);
-				event.setLogicModule(logicModule);
 
-				events.add(event);
-			}
-			if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
+			} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
 				logger.debug("# " + logicModule);
-
-				ConditionEvent event = new ConditionEvent();
 				event.setTitle(logicModule.getDescription() + ": " + condition.getTitle());
-				event.setCondition(condition);
-				event.setPriority(condition.getPriority());
-				event.setDate(condition.getStart());
 				event.setType(EventType.Single);
-				event.setLogicModule(logicModule);
-
-				events.add(event);
 			}
 		}
+
 	}
 
 	@Override
 	public void registerEnd(Condition condition) {
-		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow())
-			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
-					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
-				logger.debug("- " + logicModule);
 
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		boolean generate = isImportant(condition);
+
+		if (generate) {
+			
+
+			if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
+				logger.debug("- " + logicModule);
 				ConditionEvent event = new ConditionEvent();
-				event.setTitle("End " + condition.getTitle());
 				event.setPriority(condition.getPriority());
 				event.setCondition(condition);
 				event.setDate(condition.getEnd());
 				event.setType(EventType.ConditionEnd);
 				event.setLogicModule(logicModule);
-
 				events.add(event);
+				event.setTitle("End " + condition.getTitle());
+			} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
+				// nothing to do here - send notification on start of comparator
+				// LM
 			}
 
+		}
 	}
 
 	@Override
 	public void registerUpdate(Condition condition) {
-		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow())
 
-			if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()
-					|| logicModule.getLogicModule() instanceof ContextLogicModule) {
-				logger.debug("| " + logicModule);
-			}
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		boolean generate = isImportant(condition);
+
+		if (generate) {
+
+			logger.debug("| " + logicModule);
+		}
 
 	}
 

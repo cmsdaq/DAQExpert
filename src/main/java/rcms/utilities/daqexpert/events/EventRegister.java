@@ -21,4 +21,5 @@ public interface EventRegister {
 	public void registerUpdate(Condition condition);
 
 	public List<ConditionEvent> getEvents();
+	
 }

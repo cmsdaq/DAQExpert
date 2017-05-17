@@ -1,30 +1,23 @@
 package rcms.utilities.daqexpert.events;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
-public class MatureEventCollector implements EventRegister, Observer {
+public class MatureEventCollector extends FilterRegister {
 
 	private static final Logger logger = Logger.getLogger(MatureEventCollector.class);
 
 	private final List<ConditionEvent> events = new ArrayList<>();
 
-	private final Set<Condition> immature = new HashSet<>();
+	private final List<Condition> immature = new ArrayList<>();
 
 	private ConditionEvent generateConditionStartEvent(Condition condition) {
 
@@ -41,78 +34,84 @@ public class MatureEventCollector implements EventRegister, Observer {
 	@Override
 	public void registerBegin(Condition condition) {
 		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow()) {
-			if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
-				if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()) {
-					if (condition.isMature()) {
-						logger.debug("+ " + logicModule);
-						ConditionEvent event = generateConditionStartEvent(condition);
-						events.add(event);
-					} else {
-						condition.addObserver(this);
-						immature.add(condition);
-					}
-				}
-			}
-			if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
-				logger.debug("# " + logicModule);
 
+		boolean generate = isImportant(condition);
+
+		if (generate) {
+			if (condition.isMature()) {
 				ConditionEvent event = new ConditionEvent();
-				event.setTitle(logicModule.getDescription() + ": " + condition.getTitle());
 				event.setCondition(condition);
 				event.setPriority(condition.getPriority());
 				event.setDate(condition.getStart());
-				event.setType(EventType.Single);
 				event.setLogicModule(logicModule);
-
 				events.add(event);
+
+				if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
+
+					logger.debug("+ " + logicModule);
+					event.setTitle("Start " + condition.getTitle());
+					event.setType(EventType.ConditionStart);
+
+				} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
+					logger.debug("# " + logicModule);
+					event.setTitle(logicModule.getDescription() + ": " + condition.getTitle());
+					event.setType(EventType.Single);
+				}
+			} else {
+				immature.add(condition);
 			}
+
 		}
+
 	}
 
 	@Override
 	public void registerEnd(Condition condition) {
+
 		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow())
-			if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
-				if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()) {
-					if (condition.isMature()) {
-						logger.debug("- " + logicModule);
+		boolean generate = isImportant(condition);
 
-						ConditionEvent event = new ConditionEvent();
-						event.setTitle("End " + condition.getTitle());
-						event.setPriority(condition.getPriority());
-						event.setCondition(condition);
-						event.setDate(condition.getEnd());
-						event.setType(EventType.ConditionEnd);
-						event.setLogicModule(logicModule);
+		if (generate) {
+			if (condition.isMature()) {
 
-						events.add(event);
-					}
+				if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
+
+					logger.debug("- " + logicModule);
+					ConditionEvent event = new ConditionEvent();
+					event.setPriority(condition.getPriority());
+					event.setCondition(condition);
+					event.setDate(condition.getEnd());
+					event.setType(EventType.ConditionEnd);
+					event.setLogicModule(logicModule);
+					events.add(event);
+					event.setTitle("End " + condition.getTitle());
+
+				} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
+					// nothing to do here - send notification on start of
+					// comparator
+					// LM
 				}
+			} else {
+				// nothing to do here - if condition ends and it's not
+				// mature -
+				// nothing will change
 			}
 
+		}
 	}
 
 	@Override
 	public void registerUpdate(Condition condition) {
-		LogicModuleRegistry logicModule = condition.getLogicModule();
-		if (logicModule == null) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Condition has no logic module assigned");
-		}
-		if (condition.isShow())
 
-			if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
-				if (condition.getPriority().ordinal() > ConditionPriority.DEFAULTT.ordinal()) {
-					logger.debug("| " + logicModule);
-				}
+		LogicModuleRegistry logicModule = condition.getLogicModule();
+		boolean generate = isImportant(condition);
+
+		if (generate) {
+			if (condition.isMature()) {
+
+				logger.debug("| " + logicModule);
 			}
+		}
 
 	}
 
@@ -120,18 +119,36 @@ public class MatureEventCollector implements EventRegister, Observer {
 		return events;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-		if (o instanceof Condition) {
-			Condition c = (Condition) o;
-			if (immature.contains(c)) {
-				logger.info("Immature condition changed: " + c.getTitle());
-				if (c.isMature()) {
-					logger.info("Is now mature: " + c.getTitle());
-					immature.remove(c);
-					events.add(generateConditionStartEvent(c));
-				}
+	public void verifyImmature() {
+
+		int initial = immature.size();
+		int removed = 0;
+		List<Integer> toRemove = new ArrayList<>();
+		for (int i = 0; i < immature.size(); i++) {
+			Condition condition = immature.get(i);
+			// for (Condition condition : immature) {
+			if (condition.getEnd() != null) {
+				/* Condition finished but never become mature */
+				// immature.remove(condition);
+				toRemove.add(i);
+			} else if (condition.isMature()) {
+				/* Condition matured */
+				events.add(generateConditionStartEvent(condition));
+				// immature.remove(condition);
+				toRemove.add(i);
+				removed++;
 			}
+		}
+		Collections.reverse(toRemove);
+		for (int idx : toRemove) {
+			Condition removedElement = immature.remove(idx);
+			if (removedElement == null) {
+				logger.warn("Could not remove the element");
+			}
+		}
+		if (initial != 0 && removed != 0) {
+			logger.info("Some conditiones matured, before there were " + initial + " immature events, matured: "
+					+ removed + " this round, now: " + immature.size());
 		}
 	}
 

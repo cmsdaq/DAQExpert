@@ -15,6 +15,10 @@ public class MatureEventCollectorTest {
 		MatureEventCollector c = new MatureEventCollector();
 
 		Condition c1 = generate(LogicModuleRegistry.LHCBeamModeComparator);
+		
+		// comparator conditions are set to mature by condition producer
+		c1.setMature(true);
+		
 		c.registerBegin(c1);
 
 		Assert.assertEquals(1, c.getEvents().size());
@@ -31,6 +35,7 @@ public class MatureEventCollectorTest {
 		Assert.assertEquals(0, c.getEvents().size());
 
 		c1.setMature(true);
+		c.verifyImmature();
 
 		Assert.assertEquals(1, c.getEvents().size());
 

@@ -7,6 +7,15 @@ import java.net.URL;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
 
 /**
  * @author holzner
@@ -21,7 +30,7 @@ public class FlowchartCaseTestBase {
 
 		StructureSerializer serializer = new StructureSerializer();
 
-		URL url = OutOfSequenceData.class.getResource(fname);
+		URL url = KnownFailure.class.getResource(fname);
 
 		File file = new File(url.toURI());
 
@@ -38,8 +47,16 @@ public class FlowchartCaseTestBase {
 	protected final KnownFailure fc4 = new FlowchartCase4();
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
-	
+
 	protected final KnownFailure ruStuckWaiting = new RuStuckWaiting();
+	protected final KnownFailure ruStuckWaitingOther = new RuStuckWaitingOther();
+	
+
+	protected final KnownFailure b1 = new BugInFilterfarm();
+	protected final KnownFailure b2 = new HLTProblem();
+	protected final KnownFailure b3 = new LinkProblem();
+	protected final KnownFailure b4 = new OnlyFedStoppedSendingData();
+	protected final KnownFailure ruStuck = new RuStuck();
 
 	
 }

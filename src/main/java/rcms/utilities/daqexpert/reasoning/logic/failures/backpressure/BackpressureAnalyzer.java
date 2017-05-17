@@ -8,13 +8,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.BU;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
-import rcms.utilities.daqaggregator.data.FEDBuilder;
 import rcms.utilities.daqaggregator.data.FRL;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.SubFEDBuilder;
@@ -45,8 +43,6 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 	public BackpressureAnalyzer() {
 	}
 
-	private static Pair<Long, Subcase> result;
-
 	protected Subcase detectBackpressure(DAQ daq) {
 
 		logger.trace("++++++++++++++++++++++");
@@ -68,7 +64,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 						logger.trace("Found partition in B/W: TTCP " + ttcp.getName() + " of " + subSystem.getName());
 						for (FED fed : ttcp.getFeds()) {
 
-							if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+							if (!fed.isFrlMasked()) {
 								// TODO: removed check B or W due to some has
 								// null
 								TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
@@ -296,6 +292,46 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 					}
 				}
 
+				logger.debug("#7 check: check other feds did not send data");
+				boolean foundFedInOtherRuThatDidNotSendData = false;
+				for (RU ruWithRequests : rusWithManyRequests) {
+					try {
+
+						List<SubFEDBuilder> sfbs = ruWithRequests.getFedBuilder().getSubFedbuilders();
+						logger.info("Checking " + sfbs.size() + " sfbs");
+						for (SubFEDBuilder sfb : sfbs) {
+
+							logger.debug("Checking sfbs of " + sfb.getFedBuilder().getName());
+							if (sfb.getMinTrig() < sfb.getMaxTrig()) {
+								logger.info("Found sfb with suspicious number of triggers");
+
+								for (FED fed : sfb.getFeds()) {
+									
+									//if (!fed.isFrlMasked()) {
+										// dont count masked feds
+										if (fed.getNumTriggers() == 0) {
+											foundFedInOtherRuThatDidNotSendData = true;
+											context.register("PROBLEM-FED", fed.getSrcIdExpected());
+											context.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
+											context.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
+											context.register("PROBLEM-SUBSYSTEM", sfb.getTtcPartition().getSubsystem().getName());
+											context.register("AFFECTED-FED-BUILDER", affectedFed.getFrl().getSubFedbuilder().getFedBuilder().getName());
+										}
+									//}
+								}
+
+							}
+
+						}
+
+					} catch (NullPointerException e) {
+						// problem accessing the FEDs from RU
+					}
+				}
+				if(foundFedInOtherRuThatDidNotSendData){
+					return Subcase.BackpressuredByOtherFed;
+				}
+
 			}
 		}
 		return Subcase.Unknown;
@@ -409,6 +445,8 @@ enum Subcase {
 	OutOfSequenceDataReceived,
 	CorruptedDataReceived,
 	SpecificFedBlocking,
+
+	BackpressuredByOtherFed,
 
 	UnknownFilterfarmProblem,
 	BugInFilterfarm,

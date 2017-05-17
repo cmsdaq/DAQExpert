@@ -27,17 +27,17 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.failures.BugInFilterfarm;
-import rcms.utilities.daqexpert.reasoning.logic.failures.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase4;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
-import rcms.utilities.daqexpert.reasoning.logic.failures.HLTProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.LinkProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.OnlyFedStoppedSendingData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.OutOfSequenceData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuck;
-import rcms.utilities.daqexpert.reasoning.logic.failures.RuStuckWaiting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
 
 public enum LogicModuleRegistry {
 
@@ -72,6 +72,14 @@ public enum LogicModuleRegistry {
 	LevelZeroStateComparator(new LevelZeroStateComparator(), ConditionGroup.LEVEL_ZERO, "Level Zero State", 13),
 	TCDSStateComparator(new TCDSStateComparator(), ConditionGroup.TCDS_STATE, "TCDS State", 12),
 	DAQStateComparator(new DAQStateComparator(), ConditionGroup.DAQ_STATE, "DAQ state", 11),
+
+	
+//	 PiDisconnected(null, ConditionGroup.FLOWCHART, "a",0),
+//	 PiProblem(null, ConditionGroup.FLOWCHART, "a",0),
+//	 FEDDisconnected(null, ConditionGroup.FLOWCHART, "a",0),
+//	 FMMProblem(null, ConditionGroup.FLOWCHART, "a",0),
+//	 UnidentifiedFailure(null, ConditionGroup.FLOWCHART, "a",0),
+	 
 	LinkProblem(new LinkProblem(), ConditionGroup.FLOWCHART, "", 10010),
 	RuStuckWaiting(new RuStuckWaiting(), ConditionGroup.FLOWCHART, "", 10011),
 	RuStuck(new RuStuck(), ConditionGroup.FLOWCHART, "", 10012),

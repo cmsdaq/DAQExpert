@@ -89,7 +89,7 @@
 
 
 
-	<div class="container">
+	<div class="container-fluid">
 
 		<!-- <div id="guide-available-message" class="alert alert-success"
 			role="alert">

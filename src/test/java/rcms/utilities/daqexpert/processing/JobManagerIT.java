@@ -105,9 +105,9 @@ public class JobManagerIT {
 		// argThat(IsCollectionWithSize.hasSize(43)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Start FED stuck")))));
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));
 		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("End FED stuck")))));
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: FED stuck")))));
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
 		

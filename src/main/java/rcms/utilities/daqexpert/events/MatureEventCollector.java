@@ -22,7 +22,7 @@ public class MatureEventCollector extends FilterRegister {
 	private ConditionEvent generateConditionStartEvent(Condition condition) {
 
 		ConditionEvent event = new ConditionEvent();
-		event.setTitle("Start " + condition.getTitle());
+		event.setTitle("Started: " + condition.getTitle());
 		event.setCondition(condition);
 		event.setPriority(condition.getPriority());
 		event.setDate(condition.getStart());
@@ -49,7 +49,7 @@ public class MatureEventCollector extends FilterRegister {
 				if (logicModule.getLogicModule() instanceof SimpleLogicModule) {
 
 					logger.debug("+ " + logicModule);
-					event.setTitle("Start " + condition.getTitle());
+					event.setTitle("Started: " + condition.getTitle());
 					event.setType(EventType.ConditionStart);
 
 				} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
@@ -84,7 +84,7 @@ public class MatureEventCollector extends FilterRegister {
 					event.setType(EventType.ConditionEnd);
 					event.setLogicModule(logicModule);
 					events.add(event);
-					event.setTitle("End " + condition.getTitle());
+					event.setTitle("Ended: " + condition.getTitle());
 
 				} else if (logicModule.getLogicModule() instanceof ComparatorLogicModule) {
 					// nothing to do here - send notification on start of

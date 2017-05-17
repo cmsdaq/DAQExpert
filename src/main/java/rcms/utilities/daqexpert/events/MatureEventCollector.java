@@ -147,7 +147,7 @@ public class MatureEventCollector extends FilterRegister {
 			}
 		}
 		if (initial != 0 && removed != 0) {
-			logger.info("Some conditiones matured, before there were " + initial + " immature events, matured: "
+			logger.debug("Some conditiones matured, before there were " + initial + " immature events, matured: "
 					+ removed + " this round, now: " + immature.size());
 		}
 	}

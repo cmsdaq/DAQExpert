@@ -21,9 +21,8 @@
 
 			<property name="hibernate.c3p0.max_statements" value="50" />
 
-			<!-- When an idle connection is removed from the pool (in second) -->
-			<property name="hibernate.c3p0.timeout" value="600" />
-
+			<!-- When an idle connection is removed from the pool (in second) Let's do 1h -->
+			<property name="hibernate.c3p0.timeout" value="3600" />
 			<!-- The database server may close a connection on its side after a certain 
 				amount of time - causing some error in this application, because it'll attempt 
 				to send a query on a connection which is no longer available on the server 
@@ -31,8 +30,13 @@
 				(Think of a ping) for it's validity -->
 			<!-- This value must never exceed that of hibernate.c3p0.timeout. Otherwise 
 				C3P0 will never detect connections that has been closed -->
-			<!-- Value is in seconds: Let's keep it around 15 minutes -->
+			<!-- Value is in seconds: Let's keep it around 5 minutes -->
 			<property name="hibernate.c3p0.idle_test_period" value="300" />
+			<property name="hibernate.c3p0.preferredTestQuery" value="SELECT 1 FROM DUAL" />
+			<property name="hibernate.c3p0.testConnectionOnCheckin"
+				value="false" />
+			<property name="hibernate.c3p0.testConnectionOnCheckout"
+				value="true" />
 		</properties>
 
 

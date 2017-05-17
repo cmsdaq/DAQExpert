@@ -99,13 +99,13 @@ public class ConditionProducerTest {
 		} else {
 			daq = new DAQ();
 			daq.setDaqState(state);
-			
+
 			SubSystem tcds = new SubSystem();
 			tcds.setStatus(state);
 			List<SubSystem> subSystems = new ArrayList<>();
 			subSystems.add(tcds);
 			tcds.setName("TCDS");
-			daq.setSubSystems(subSystems );
+			daq.setSubSystems(subSystems);
 			daq.setLastUpdate(date.getTime());
 		}
 
@@ -122,17 +122,17 @@ public class ConditionProducerTest {
 class EventRegisterStub implements EventRegister {
 
 	@Override
-	public void registerBegin(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerBegin(Condition condition) {
 
 	}
 
 	@Override
-	public void registerEnd(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerEnd(Condition condition) {
 
 	}
 
 	@Override
-	public void registerUpdate(LogicModuleRegistry logicModule, Condition condition) {
+	public void registerUpdate(Condition condition) {
 
 	}
 

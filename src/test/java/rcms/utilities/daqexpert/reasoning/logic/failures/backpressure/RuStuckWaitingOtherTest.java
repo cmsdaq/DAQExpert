@@ -31,7 +31,13 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertEquals(false, fc1.satisfied(snapshot, results));
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+
 		assertEquals(false, fc5.satisfied(snapshot, results));
 
 		assertEquals(false, b1.satisfied(snapshot, results));
@@ -69,7 +75,13 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertEquals(false, fc1.satisfied(snapshot, results));
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+
 		assertEquals(false, fc5.satisfied(snapshot, results));
 
 		assertEquals(false, b1.satisfied(snapshot, results));
@@ -102,7 +114,13 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertEquals(false, fc1.satisfied(snapshot, results));
 		assertEquals(false, fc2.satisfied(snapshot, results));
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+
 		assertEquals(false, fc5.satisfied(snapshot, results));
 
 		assertEquals(false, b1.satisfied(snapshot, results));

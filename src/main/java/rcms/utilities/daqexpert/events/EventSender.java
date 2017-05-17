@@ -43,6 +43,9 @@ public class EventSender {
 
 	public int sendBatchEvents(List<ConditionEventResource> events) {
 
+		for (ConditionEventResource event : events) {
+			logger.debug("Sending: " + event.getConditionId() + " " + event.getEventType() + " :   " + event.getTitle());
+		}
 		try {
 			sendEvents(events);
 			return events.size();

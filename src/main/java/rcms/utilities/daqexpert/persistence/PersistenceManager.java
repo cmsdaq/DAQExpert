@@ -47,14 +47,13 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
+	
+	private EntityManager entityManager;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
 
-	private final EntityManager entryEntityManager;
-
 	public PersistenceManager(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
-		this.entryEntityManager = entityManagerFactory.createEntityManager();
 	}
 
 	/**
@@ -63,15 +62,22 @@ public class PersistenceManager {
 	 * @param entries
 	 */
 	public void persist(Set<Condition> entries) {
-
-		EntityTransaction tx = entryEntityManager.getTransaction();
+		ensureConditionEntityManagerOpen();
+		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
 		for (Condition point : entries) {
 
 			if (point.isShow())
-				entryEntityManager.persist(point);
+				entityManager.persist(point);
 		}
 		tx.commit();
+		//entityManager.close();
+	}
+	
+	private void ensureConditionEntityManagerOpen(){
+		if(entityManager == null || ! entityManager.isOpen()){
+			entityManager = entityManagerFactory.createEntityManager();
+		}
 	}
 
 	/**
@@ -80,14 +86,12 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-
-		// EntityManager entityManager =
-		// entityManagerFactory.createEntityManager();
-		EntityTransaction tx = entryEntityManager.getTransaction();
+		ensureConditionEntityManagerOpen();
+		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
-		entryEntityManager.persist(entry);
+		entityManager.persist(entry);
 		tx.commit();
-		// entityManager.close();
+		//entityManager.close();
 	}
 
 	public void persist(Point test) {
@@ -206,6 +210,7 @@ public class PersistenceManager {
 		sb.append("where duration < :threshold ");
 		sb.append("and start_date < :endDate ");
 		sb.append("and end_date > :startDate ");
+		sb.append("and mature = true ");
 		sb.append("group by GROUP_NAME ");
 
 		switch (resolution) {
@@ -297,6 +302,7 @@ public class PersistenceManager {
 		long filterId = 0;
 		for (TinyEntryMapObject mapObject : tinyData) {
 			Condition curr = new Condition();
+			curr.setMature(true);
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
 			curr.setTitle(Long.toString(mapObject.getCount()));

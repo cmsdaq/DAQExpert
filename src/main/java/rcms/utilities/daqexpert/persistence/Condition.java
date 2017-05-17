@@ -51,6 +51,8 @@ public class Condition extends Observable implements Comparable<Condition> {
 	@JsonIgnore
 	@Transient
 	private boolean show;
+	
+	private boolean mature;
 
 	@JsonIgnore
 	@Transient
@@ -297,6 +299,14 @@ public class Condition extends Observable implements Comparable<Condition> {
 		} else if (!title.equals(other.title))
 			return false;
 		return true;
+	}
+
+	public boolean isMature() {
+		return mature;
+	}
+
+	public void setMature(boolean mature) {
+		this.mature = mature;
 	}
 
 }

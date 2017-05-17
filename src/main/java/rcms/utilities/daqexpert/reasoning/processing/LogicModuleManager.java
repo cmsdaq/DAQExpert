@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +20,12 @@ import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
 /**
  * Manager of checking process
@@ -50,7 +54,9 @@ public class LogicModuleManager {
 
 		this.conditionProducer = conditionProducer;
 
-		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
+		HashSet<String> knownFailureClasses = new HashSet<String>();
+
+		for (LogicModuleRegistry lm : LogicModuleRegistry.getModulesInRunOrder()) {
 			if (lm.getLogicModule() != null) {
 				lm.getLogicModule().setLogicModuleRegistry(lm);
 				if (lm.getLogicModule() instanceof SimpleLogicModule) {
@@ -67,8 +73,20 @@ public class LogicModuleManager {
 					updatable.parametrize(Application.get().getProp());
 					logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
 				}
+
+				if (lm.getLogicModule() instanceof KnownFailure) {
+					knownFailureClasses.add(lm.getLogicModule().getClass().getSimpleName());
+				}
+			} else {
+				logger.info("This is not used: " + lm);
 			}
 		}
+
+		logger.info("Registering " + knownFailureClasses.size()
+				+ " known-failure logic modules to covering unidentified-failure logic module");
+		UnidentifiedFailure unidentifiedFailure = (UnidentifiedFailure) LogicModuleRegistry.UnidentifiedFailure
+				.getLogicModule();
+		unidentifiedFailure.setKnownFailureClasses(knownFailureClasses);
 
 		try {
 			experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));
@@ -151,6 +169,13 @@ public class LogicModuleManager {
 
 		if (checker instanceof SimpleLogicModule) {
 			SimpleLogicModule simpleChecker = (SimpleLogicModule) checker;
+
+			if (result) {
+				simpleChecker.increaseMaturity();
+			} else {
+				simpleChecker.resetMaturity();
+			}
+
 			Pair<Boolean, Condition> produceResult = conditionProducer.produce(simpleChecker, result, curr);
 
 			/*
@@ -159,16 +184,15 @@ public class LogicModuleManager {
 			 * EventProducer.produce so that context can be used to close the
 			 * event
 			 */
-			if (!result && checker instanceof ActionLogicModule) {
-				((ActionLogicModule) checker).getContext().clearContext();
+			if (!result && checker instanceof ContextLogicModule) {
+				((ContextLogicModule) checker).getContext().clearContext();
 			}
 
 			if (produceResult.getLeft()) {
 				results.add(produceResult.getRight());
 			}
-		} else {
-			logger.warn("Problem postrprocessing LM results, not an instance of simple logic module");
 		}
+
 	}
 
 	/**

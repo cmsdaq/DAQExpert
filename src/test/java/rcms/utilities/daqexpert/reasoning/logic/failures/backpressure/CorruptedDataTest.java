@@ -23,7 +23,8 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 	/**
-	 * http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-03-27-15:52:23
+	 * http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-
+	 * 03-27-15:52:23
 	 * 
 	 * @throws URISyntaxException
 	 */
@@ -45,7 +46,13 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		assertEquals(1360, fc2.getContext().getContext().get("AFFECTED-FED").iterator().next());
 
 		assertEquals(false, fc3.satisfied(snapshot, results));
-		assertEquals(false, fc4.satisfied(snapshot, results));
+
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+
 		assertEquals(false, fc5.satisfied(snapshot, results));
 		// assertEquals(false, fc6.satisfied(snapshot, results));
 

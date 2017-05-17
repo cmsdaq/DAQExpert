@@ -19,7 +19,7 @@
 <link href="external/bootstrap-tour.min.css" rel="stylesheet">
 <script src="external/bootstrap-tour.min.js"></script>
 <script src="external/moment-duration-format.min.js"></script>
-
+<script src="external/clipboard.min.js"></script>
 
 <!--  internal scripts -->
 <script src="static/js/basic.js"></script>
@@ -30,6 +30,7 @@
 <script src="static/js/run-info-link.js"></script>
 <script src="static/js/wbm-link.js"></script>
 <script src="static/js/daqview-link.js"></script>
+<script src="static/js/share.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -59,7 +60,6 @@
 		</div>
 
 
-
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse"
 			id="bs-example-navbar-collapse-1">
@@ -70,9 +70,10 @@
 				<li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_DASHBOARD));%>"><i
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
-						
+
 				<!-- EXPERT BROWSER -->
-				<li class="active"><a href="#"><i
+				<li class="active"><a id="browser-link" href=""
+					data-url="${pageContext.request.requestURL}"><i
 						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
 
 
@@ -88,7 +89,7 @@
 
 
 
-	<div class="container">
+	<div class="container-fluid">
 
 		<!-- <div id="guide-available-message" class="alert alert-success"
 			role="alert">
@@ -114,19 +115,24 @@
 
 			<div class="btn-group" role="group" aria-label="...">
 				<div class="btn-group" role="group">
+					<button class="btn btn-info btn-sm" id="daqview-button"
+						target="_blank">
+						DAQView <span class="glyphicon glyphicon-list"></span>
+					</button>
+					<button class="btn btn-default btn-sm btn-copy" id="share-button">
+						Share <span class="glyphicon glyphicon-share"></span>
+					</button>
 					<button type="button"
 						class="btn btn-default btn-sm dropdown-toggle"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						External Tools <span class="caret"></span>
+						External Links <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
+
 						<li><a id="run-info-button" target="_blank"> RunInfo <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 						<li><a id="wbm-button" target="_blank"> WBM run summary <span
-								class="glyphicon glyphicon-chevron-right"></span>
-						</a></li>
-						<li><a id="daqview-button" target="_blank"> DAQView <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 					</ul>
@@ -249,19 +255,29 @@
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Event details</h4>
+					<h4 class="modal-title">
+						Condition details <span
+							class="immature-information label label-warning">Ignored</span>
+					</h4>
 				</div>
 				<div class="modal-body">
+					<div class="immature-information alert alert-warning">
+						<strong>Ignored condition</strong> The condition was satisfied in
+						only one snapshot and thus it is ignored. It was not
+						sent to Notification Manager.
+					</div>
 					<h4 id="raport-name">/Name/</h4>
 					<p id="raport-description">/description/</p>
-					<p>Duration: <span id="raport-duration" class= "badge">/duration/</span> <small class="text-muted" id="raport-duration-humanized">aa</small></p>
+					<p>
+						Duration: <span id="raport-duration" class="badge">/duration/</span>
+						<small class="text-muted" id="raport-duration-humanized">aa</small>
+					</p>
 
 
 					<div id="action-section">
 						<h4>Action</h4>
 						<p id="raport-action">/action/</p>
 					</div>
-
 					<div id="context-section">
 
 						<button type="button" class="btn btn-info" data-toggle="collapse"

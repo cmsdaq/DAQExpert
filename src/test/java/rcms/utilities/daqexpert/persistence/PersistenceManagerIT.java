@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
@@ -199,6 +198,7 @@ public class PersistenceManagerIT {
 		entry.setTitle(name);
 		entry.setStart(startDate);
 		entry.setGroup(ConditionGroup.LHC_BEAM);
+		entry.setMature(true);
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(startDate);

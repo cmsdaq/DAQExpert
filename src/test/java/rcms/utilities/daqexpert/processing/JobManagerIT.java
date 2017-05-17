@@ -13,6 +13,7 @@ import static org.mockserver.model.HttpResponse.response;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -78,7 +79,8 @@ public class JobManagerIT {
 
 		Assert.assertEquals(52, result.size());
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("No rate when expected"))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
+		assertThat(result,
+				not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Corrupted data received")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition problem")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition disconnected")))));
@@ -94,7 +96,23 @@ public class JobManagerIT {
 
 		/* Verify generation of notifaications */
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(44)));
+
+		// verify 39 events if mature-event-collector is used
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(39)));
+
+		// verify 43 events if regular event-collector is used
+		// Mockito.verify(eventSender).sendBatchEvents((List)
+		// argThat(IsCollectionWithSize.hasSize(43)));
+
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: FED stuck")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
+		
+		
+
 	}
 
 }

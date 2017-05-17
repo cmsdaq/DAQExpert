@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.events.MatureEventCollector;
 import rcms.utilities.daqexpert.persistence.Condition;
 
 /**
@@ -40,6 +41,10 @@ public class SnapshotProcessor {
 				result.add(lmResult);
 			}
 
+			if(eventProducer.getEventRegister() instanceof MatureEventCollector){
+				MatureEventCollector mec = (MatureEventCollector) eventProducer.getEventRegister();
+				mec.verifyImmature();
+			}
 			// Application.get().getDataManager().getResult().addAll(result);
 
 			logger.debug("Results from CheckManager for this snapshot: " + lmResults);

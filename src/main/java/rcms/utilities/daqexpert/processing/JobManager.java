@@ -22,10 +22,10 @@ import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.events.EventCollector;
 import rcms.utilities.daqexpert.events.EventPrinter;
 import rcms.utilities.daqexpert.events.EventRegister;
 import rcms.utilities.daqexpert.events.EventSender;
+import rcms.utilities.daqexpert.events.MatureEventCollector;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
@@ -117,7 +117,7 @@ public class JobManager {
 
 		eventProducer = new ConditionProducer();
 
-		EventRegister eventRegister = new EventCollector();
+		EventRegister eventRegister = new MatureEventCollector();
 		eventProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor = new SnapshotProcessor(eventProducer);
 
@@ -151,6 +151,7 @@ public class JobManager {
 	private void persistVersion(Date startDate, Date endDate) {
 
 		versionCondition = new Condition();
+		versionCondition.setMature(true);
 		versionCondition.setStart(startDate);
 		versionCondition.setEnd(endDate);
 		if (endDate != null) {
@@ -232,5 +233,9 @@ public class JobManager {
 		versionCondition.calculateDuration();
 		persistenceManager.persist(versionCondition);
 
+	}
+
+	public ConditionProducer getEventProducer() {
+		return eventProducer;
 	}
 }

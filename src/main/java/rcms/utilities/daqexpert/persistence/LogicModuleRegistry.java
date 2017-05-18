@@ -35,11 +35,14 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
@@ -66,11 +69,11 @@ public enum LogicModuleRegistry {
 	Downtime                (new Downtime(),                 ConditionGroup.DOWNTIME,              "",                                                   16),
 	Deadtime                (new Deadtime(),                 ConditionGroup.DEADTIME,              "",                                                   17),
 	CriticalDeadtime        (new CriticalDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   18,   105),
-	FlowchartCase1          (null,                           ConditionGroup.FLOWCHART,             "",                                                   19, 10004),
-	FlowchartCase2          (null,                           ConditionGroup.FLOWCHART,             "",                                                   20, 10005),
+	FlowchartCase1          (null,                           ConditionGroup.FLOWCHART,             "",                                                  -19, 10004),
+	FlowchartCase2          (null,                           ConditionGroup.FLOWCHART,             "",                                                  -20, 10005),
 	FlowchartCase3          (new FlowchartCase3(),           ConditionGroup.FLOWCHART,             "",                                                   21, 10006),
 	FlowchartCase4          (null,                           ConditionGroup.FLOWCHART,             "Partition disconnected: extended to other LMs",      22,     0),
-	FlowchartCase5          (null,                           ConditionGroup.FLOWCHART,             "",                                                   23, 10008),
+	FlowchartCase5          (new FlowchartCase5(),           ConditionGroup.FLOWCHART,             "",                                                   23, 10008),
 	FlowchartCase6          (null,                           ConditionGroup.FLOWCHART,             "",                                                   24, 10009),
 
 	SessionComparator       (new SessionComparator(),        ConditionGroup.SESSION_NUMBER,        "Session",                                            25,    15),
@@ -95,6 +98,8 @@ public enum LogicModuleRegistry {
 	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   39, 10013),
 	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   40, 10013),
 	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   41, 10013),
+	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10004),
+	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10005),
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

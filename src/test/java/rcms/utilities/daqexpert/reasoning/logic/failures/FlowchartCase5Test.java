@@ -2,7 +2,6 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.net.URISyntaxException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -11,25 +10,13 @@ import rcms.utilities.daqaggregator.data.DAQ;
  *
  * @author Maciej Gladki
  */
-@Ignore // move to backpressure analysis
 public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void case1Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1479614378467.smile");
 
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
-
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-
-		assertEqualsAndUpdateResults(true, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
+		assertOnlyOneIsSatisified(fc5, snapshot);
 
 	}
 

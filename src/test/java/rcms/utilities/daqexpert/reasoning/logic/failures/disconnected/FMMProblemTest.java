@@ -16,22 +16,7 @@ public class FMMProblemTest extends FlowchartCaseTestBase {
 
 		DAQ snapshot = getSnapshot("1491011351248.smile");
 
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
-
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(true, fmmProblem, snapshot);
-
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
-
-		System.out.println("New message:");
-		System.out.println(fmmProblem.getDescriptionWithContext());
+		assertOnlyOneIsSatisified(fmmProblem, snapshot);
 
 		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
 		assertEquals("TRACKER", fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());

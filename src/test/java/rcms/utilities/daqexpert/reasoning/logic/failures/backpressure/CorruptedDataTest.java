@@ -3,11 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -30,31 +26,28 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 	 */
 	@Test
 	public void ecalFedCorruptedDataTest() throws URISyntaxException {
-		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1490622743834.smile");
-		Map<String, Boolean> results = new HashMap<String, Boolean>();
 
-		results.put("StableBeams", true);
-		results.put("NoRateWhenExpected", true);
+		assertOnlyOneIsSatisified(fc2, snapshot);
 
-		assertEquals(false, fc1.satisfied(snapshot, results));
-		assertEquals(true, fc2.satisfied(snapshot, results));
-		System.out.println(fc2.getDescriptionWithContext());
 		assertEquals(1, fc2.getContext().getContext().get("PROBLEM-FED").size());
 		assertEquals(644, fc2.getContext().getContext().get("PROBLEM-FED").iterator().next());
 		assertEquals(1, fc2.getContext().getContext().get("AFFECTED-FED").size());
 		assertEquals(1360, fc2.getContext().getContext().get("AFFECTED-FED").iterator().next());
 
-		assertEquals(false, fc3.satisfied(snapshot, results));
+	}
 
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+	/**
+	 * Test case taken from legacy test FC2
+	 * 
+	 * @throws URISyntaxException
+	 */
+	@Test
+	public void case1Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1478793337902.smile");
 
-		assertEquals(false, fc5.satisfied(snapshot, results));
-		// assertEquals(false, fc6.satisfied(snapshot, results));
+		assertOnlyOneIsSatisified(fc2, snapshot);
 
 	}
 

@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,32 +25,8 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 	public void test() throws URISyntaxException {
 		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1491069352157.smile");
-		Map<String, Boolean> results = new HashMap();
-		results.put("StableBeams", false);
-		results.put("NoRateWhenExpected", true);
 
-		assertEquals(false, fc1.satisfied(snapshot, results));
-		assertEquals(false, fc2.satisfied(snapshot, results));
-		assertEquals(false, fc3.satisfied(snapshot, results));
-
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-
-		assertEquals(false, fc5.satisfied(snapshot, results));
-
-		assertEquals(false, b1.satisfied(snapshot, results));
-		assertEquals(false, b2.satisfied(snapshot, results));
-		assertEquals(false, b3.satisfied(snapshot, results));
-		assertEquals(false, b4.satisfied(snapshot, results));
-		assertEquals(false, ruStuck.satisfied(snapshot, results));
-
-		assertEquals(true, ruStuckWaiting.satisfied(snapshot, results));
-
-		System.out.println("New message:");
-		System.out.println(ruStuckWaiting.getDescriptionWithContext());
+		assertOnlyOneIsSatisified(ruStuckWaiting, snapshot);
 
 		/* Assert problem FEDs */
 		assertEquals(8, ruStuckWaiting.getContext().getContext().get("PROBLEM-FED").size());

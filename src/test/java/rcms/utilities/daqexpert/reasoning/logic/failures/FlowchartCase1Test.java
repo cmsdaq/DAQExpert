@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -15,6 +16,7 @@ import rcms.utilities.daqexpert.reasoning.base.Context;
  *
  * @author holzner
  */
+@Ignore // move to backpressure analysis
 public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
 	/**

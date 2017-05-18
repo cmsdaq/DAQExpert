@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.net.URISyntaxException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -10,6 +11,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
  *
  * @author Maciej Gladki
  */
+@Ignore // move to backpressure analysis
 public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 	@Test

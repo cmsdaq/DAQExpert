@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -12,6 +13,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
  *
  * @author Maciej Gladki
  */
+@Ignore // move to backpressure analysis
 public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 	@Test

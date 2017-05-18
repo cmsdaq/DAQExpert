@@ -99,7 +99,7 @@ public class ConditionProducer {
 			Pair<Boolean, Condition> b = build(comparator, value, current);
 			b.getRight().setShow(true);
 
-			logger.trace("Result for comparator LM: " + b.getLeft());
+			logger.trace("Result for comparator LM: " + b.getLeft() + ": " + b.getRight());
 			return b;
 		}
 
@@ -177,6 +177,14 @@ public class ConditionProducer {
 				// ActionLogicModule
 
 			}
+
+			if (logicModule instanceof SimpleLogicModule) {
+				SimpleLogicModule slm = (SimpleLogicModule) logicModule;
+				if (slm.isMature()) {
+					result.setMature(true);
+				}
+			}
+
 		}
 		return Pair.of(leftResult, result);
 	}
@@ -199,16 +207,27 @@ public class ConditionProducer {
 				finishedThisRound.add(toFinish);
 			}
 
-			eventRegister.registerEnd(logicModule.getLogicModuleRegistry(), toFinish);
+			eventRegister.registerEnd(toFinish);
 		}
 
 		/* add new condition */
 		Condition condition = new Condition();
+		condition.setLogicModule(logicModule.getLogicModuleRegistry());
 		condition.setClassName(eventClass);
 		condition.setTitle(content);
 		condition.setShow(value);
 		condition.setStart(date);
-		eventRegister.registerBegin(logicModule.getLogicModuleRegistry(), condition);
+
+		if (logicModule instanceof SimpleLogicModule) {
+			SimpleLogicModule slm = (SimpleLogicModule) logicModule;
+			if (slm.isMature()) {
+				condition.setMature(true);
+			}
+		} else {
+			condition.setMature(true);
+		}
+
+		eventRegister.registerBegin(condition);
 
 		unfinished.put(logicModuleName, condition);
 		return condition;

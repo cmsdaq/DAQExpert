@@ -97,8 +97,8 @@ public class JobManagerIT {
 		/* Verify generation of notifaications */
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
-		// verify 39 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(39)));
+		// verify 43 events if mature-event-collector is used
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(43)));
 
 		// verify 43 events if regular event-collector is used
 		// Mockito.verify(eventSender).sendBatchEvents((List)

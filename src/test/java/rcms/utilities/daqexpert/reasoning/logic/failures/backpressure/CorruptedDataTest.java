@@ -51,4 +51,15 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 	}
 
+	/**
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-05-18-20:16:51
+	 */
+	@Test
+	public void case2Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1495131411780.smile");
+
+		assertOnlyOneIsSatisified(fc2, snapshot);
+
+	}
+
 }

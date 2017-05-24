@@ -298,13 +298,13 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 					try {
 
 						List<SubFEDBuilder> sfbs = ruWithRequests.getFedBuilder().getSubFedbuilders();
-						logger.info("Checking " + sfbs.size() + " sfbs");
+						logger.debug("Checking " + sfbs.size() + " sfbs");
 						for (SubFEDBuilder sfb : sfbs) {
 
 							logger.debug("Checking sfbs of " + sfb.getFedBuilder().getName());
 							if (sfb.getMinTrig() < sfb.getMaxTrig()
 									|| (sfb.getMinTrig() == 0 && sfb.getMaxTrig() == 0)) {
-								logger.info("Found sfb with suspicious number of triggers");
+								logger.debug("Found sfb with suspicious number of triggers");
 
 								for (FED fed : sfb.getFeds()) {
 

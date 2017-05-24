@@ -23,7 +23,7 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 	 */
 	@Test
 	public void test() throws URISyntaxException {
-		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		//Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1491069352157.smile");
 
 		assertOnlyOneIsSatisified(ruStuckWaiting, snapshot);

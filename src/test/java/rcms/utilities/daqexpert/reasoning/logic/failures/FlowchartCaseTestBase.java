@@ -3,11 +3,15 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -105,25 +109,40 @@ public class FlowchartCaseTestBase {
 	}
 
 	protected void assertOnlyOneIsSatisified(SimpleLogicModule satisfied, DAQ snapshot) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		TimeZone tz = TimeZone.getTimeZone("Europe/Zurich");
+		df.setTimeZone(tz);
+		logger.info("Running LMs on snapshot " + df.format(new Date(snapshot.getLastUpdate())));
 		for (SimpleLogicModule lm : allLMsUnderTest) {
 			if (lm.getClass().getSimpleName().equals(satisfied.getClass().getSimpleName())) {
 
 				logger.info("Asserting target LM " + lm.getClass().getSimpleName() + " is satisfied");
 				assertEqualsAndUpdateResults(true, lm, snapshot);
-				if (lm instanceof KnownFailure) {
-					KnownFailure kf = (KnownFailure) lm;
-					logger.info("Output:\n" + kf.getDescriptionWithContext());
-				}
 			} else {
-				logger.info("Asserting other LM " + lm.getClass().getSimpleName() + " is not satisfied");
+				logger.debug("Asserting other LM " + lm.getClass().getSimpleName() + " is not satisfied");
 				assertEqualsAndUpdateResults(false, lm, snapshot);
 			}
 		}
+		logger.info("---");
 
 	}
 
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
 		boolean result = logicModule.satisfied(snapshot, results);
+		if (result) {
+			String output = null;
+			if (logicModule instanceof KnownFailure) {
+				KnownFailure kf = (KnownFailure) logicModule;
+				output = kf.getDescriptionWithContext();
+			} else {
+				output = logicModule.getDescription();
+			}
+			TimeZone tz = TimeZone.getTimeZone("UTC");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			df.setTimeZone(tz);
+			String date = df.format(new Date(snapshot.getLastUpdate()));
+			logger.info("Output of LM '" + logicModule.getName() + "' for " + date + ":\n" + output);
+		}
 		Assert.assertEquals(logicModule.getClass().getSimpleName() + " is expected to return " + expected, expected,
 				result);
 		results.put(logicModule.getClass().getSimpleName(), result);

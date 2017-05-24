@@ -29,5 +29,18 @@ public class RuStuckTest extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(ruStuck, snapshot);
 
 	}
+	
+	/**
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-05-18-20:15:59
+	 */
+	@Test
+	public void case1Test() throws URISyntaxException {
+		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		DAQ snapshot = getSnapshot("1495131324630.smile");
+
+		assertOnlyOneIsSatisified(ruStuck, snapshot);
+
+	}
 
 }

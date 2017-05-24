@@ -13,7 +13,7 @@ public class CriticalDeadtime extends SimpleLogicModule {
 
 	public CriticalDeadtime() {
 		this.name = "Critical deadtime";
-		this.priority = ConditionPriority.DEFAULTT;
+		this.priority = ConditionPriority.IMPORTANT;
 		this.description = "There is deadtime during running";
 	}
 

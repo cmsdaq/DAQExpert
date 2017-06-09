@@ -39,10 +39,10 @@ public abstract class KnownFailure extends ActionLogicModule {
 	}
 
 	protected TTSState getParitionState(TTCPartition partition) {
-		String result = partition.getTtsState();
+		String result = partition.getTcds_pm_ttsState();
 
 		if (result == null) {
-			result = partition.getTcds_pm_ttsState();
+			result = partition.getTtsState();
 		}
 		if (result == null) {
 			return TTSState.UNKNOWN;

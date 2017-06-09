@@ -55,6 +55,9 @@ public class FlowchartCaseTestBase {
 		unidentified.setKnownFailureClasses(logicModules);
 	}
 
+	/** method to assert that the given logic module has found the expected 
+	 *  result. This is used iteratively check the chain of reasoning (where later 
+	 *  modules potentially depend on the results of earlier ones) at each step. */ 
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
 		boolean result = logicModule.satisfied(snapshot, results);
 		Assert.assertEquals(expected, result);

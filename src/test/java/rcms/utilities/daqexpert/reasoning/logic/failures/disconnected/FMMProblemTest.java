@@ -28,6 +28,8 @@ public class FMMProblemTest extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 
 		System.out.println("New message:");

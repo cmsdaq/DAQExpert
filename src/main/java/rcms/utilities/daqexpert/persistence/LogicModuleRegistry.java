@@ -34,6 +34,7 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
@@ -84,7 +85,10 @@ public enum LogicModuleRegistry {
 	PiProblem               (new ProblemWithPi(),            ConditionGroup.FLOWCHART,             "",                                                   33, 10014),
 	FEDDisconnected         (new FEDDisconnected(),          ConditionGroup.FLOWCHART,             "",                                                   34, 10014),
 	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),
-	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 10000),
+	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 9000),
+
+	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  9500),
+
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

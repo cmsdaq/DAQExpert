@@ -60,7 +60,7 @@ public class FlowchartCaseTestBase {
 	 *  modules potentially depend on the results of earlier ones) at each step. */ 
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
 		boolean result = logicModule.satisfied(snapshot, results);
-		Assert.assertEquals(expected, result);
+		Assert.assertEquals("unexpected result for module " + logicModule.getClass().getSimpleName() + ":", expected, result);
 		results.put(logicModule.getClass().getSimpleName(), result);
 	}
 

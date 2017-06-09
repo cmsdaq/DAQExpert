@@ -42,6 +42,9 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
 	protected final KnownFailure fc6 = new FlowchartCase6();
+	
+	protected final FEROLFifoStuck ferolFifoStuck = new FEROLFifoStuck();
+	
 	protected final UnidentifiedFailure unidentified = new UnidentifiedFailure();
 
 	public FlowchartCaseTestBase() {

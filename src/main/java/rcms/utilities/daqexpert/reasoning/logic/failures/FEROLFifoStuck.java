@@ -26,7 +26,7 @@ public class FEROLFifoStuck extends KnownFailure {
 	public FEROLFifoStuck() {
 		this.name = "FEROL/FEROL40 FIFO stuck";
 
-		this.description = "FEROL of FED {{FEDID}} stopped sending fragments " 
+		this.description = "FEROL of FED {{FEDID}} stopped sending fragments to "
 				+ "its RU. This is likely a bug in the FEROL/FEROL40 firmware."
 			;
 

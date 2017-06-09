@@ -42,6 +42,9 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc5 = new FlowchartCase5();
 	protected final KnownFailure fc6 = new FlowchartCase6();
+	
+	protected final FEROLFifoStuck ferolFifoStuck = new FEROLFifoStuck();
+	
 	protected final UnidentifiedFailure unidentified = new UnidentifiedFailure();
 
 	public FlowchartCaseTestBase() {
@@ -55,9 +58,12 @@ public class FlowchartCaseTestBase {
 		unidentified.setKnownFailureClasses(logicModules);
 	}
 
+	/** method to assert that the given logic module has found the expected 
+	 *  result. This is used iteratively check the chain of reasoning (where later 
+	 *  modules potentially depend on the results of earlier ones) at each step. */ 
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
 		boolean result = logicModule.satisfied(snapshot, results);
-		Assert.assertEquals(expected, result);
+		Assert.assertEquals("unexpected result for module " + logicModule.getClass().getSimpleName() + ":", expected, result);
 		results.put(logicModule.getClass().getSimpleName(), result);
 	}
 

@@ -28,6 +28,9 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(true, fc5, snapshot);
 		assertEqualsAndUpdateResults(false, fc6, snapshot);
+
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 
 	}

@@ -28,6 +28,8 @@ public class PiDisconnectedTest extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, piProblem, snapshot);
 		assertEqualsAndUpdateResults(true, piDisconnected, snapshot);
 
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 
 		System.out.println("New message:");

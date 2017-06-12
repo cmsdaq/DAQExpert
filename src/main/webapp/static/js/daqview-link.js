@@ -3,7 +3,10 @@
  */
 
 $(document).ready(function() {
-	var daqViewBase = "http://daq-expert.cms/daq2view-react/index.html?setup=cdaq";
+	// e.g. "http://daq-expert-dev.cms/daq2view-react/index.html?setup=testbed";
+	var daqViewBase = $('#daqview-button').data("url");
+	var setupKey = "?setup=";
+	var setup = $('#daqview-button').data("setup");
 	var timeKey = "&time=";
 	var time = "";
 
@@ -12,7 +15,7 @@ $(document).ready(function() {
 		if(realtime === true){
 			return daqViewBase ;
 		} else{
-			return daqViewBase +timeKey+ time ;
+			return daqViewBase +setupKey+setup+timeKey+ time ;
 		}
 	}
 

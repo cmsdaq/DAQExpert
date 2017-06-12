@@ -71,6 +71,10 @@ public class FlowchartCase5 extends KnownFailure {
 										context.register("SUBSYSTEM", subSystem.getName());
 										context.register("FED", fed.getSrcIdExpected());
 										context.register("FEDSTATE", currentFedState.name());
+										
+										// add triggers info (behind or the same number)
+										// TODO: add hierarchy of FEDS (pseudo feds)
+										
 										context.setActionKey(subSystem.getName());
 										result = true;
 									}

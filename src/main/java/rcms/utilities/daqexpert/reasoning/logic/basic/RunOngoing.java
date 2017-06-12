@@ -9,6 +9,9 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class RunOngoing extends SimpleLogicModule {
 
+	/**
+	 * TODO: L0 or TCDS may toggle on the run ongoing
+	 */
 	public RunOngoing() {
 		this.name = "Run ongoing";
 		this.priority = ConditionPriority.IMPORTANT;

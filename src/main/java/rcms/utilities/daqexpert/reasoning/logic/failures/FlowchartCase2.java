@@ -55,6 +55,10 @@ public class FlowchartCase2 extends KnownFailure {
 
 				List<RU> failedRus = daq.getRusInState("Failed");
 
+				if (failedRus.isEmpty()) {
+					return false;
+				}
+
 				for (RU ru : failedRus) {
 				
 					i++;

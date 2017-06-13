@@ -16,6 +16,7 @@ public class FEDDisconnectedTest extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, fc1, snapshot);
 		assertEqualsAndUpdateResults(false, fc2, snapshot);
+		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
 		assertEqualsAndUpdateResults(false, fc3, snapshot);
 
 		// new subcases of old flowchart case 4

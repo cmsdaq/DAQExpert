@@ -22,6 +22,7 @@ public class PiDisconnectedTest extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, fc1, snapshot);
 		assertEqualsAndUpdateResults(false, fc2, snapshot);
+		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
 		assertEqualsAndUpdateResults(false, fc3, snapshot);
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);

@@ -20,6 +20,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, fc1,snapshot);
 		assertEqualsAndUpdateResults(true, fc2,snapshot);
+		assertEqualsAndUpdateResults(true, ruFailed, snapshot);
 		assertEqualsAndUpdateResults(false, fc3,snapshot);
 		
 		// new subcases of old flowchart case 4

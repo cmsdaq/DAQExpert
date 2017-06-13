@@ -63,7 +63,6 @@ public class FlowchartCase2 extends KnownFailure {
 				
 					i++;
 					context.register("RU", ru.getHostname());
-					result = true;
 
 				}
 
@@ -85,6 +84,8 @@ public class FlowchartCase2 extends KnownFailure {
 							context.register("TTCP", ttcpName);
 							context.register("SUBSYSTEM", subsystemName);
 							i++;
+
+							result = true;
 						}
 					}
 				}

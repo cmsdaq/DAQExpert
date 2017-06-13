@@ -1,11 +1,13 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -19,6 +21,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 
 	@Test
+	@Ignore
 	public void test01() throws URISyntaxException {
 		// Sat,  3 Jun 2017 06:41:27 CEST
 		// Sat,  3 Jun 2017 04:41:27 UTC
@@ -27,24 +30,28 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 		test("1496464887925.smile");
 	}
 
+	@Test
 	public void test02() throws URISyntaxException {
 		// Sat,  3 Jun 2017 06:20:00 CEST
 		// Sat,  3 Jun 2017 04:20:00 UTC
 		test("1496463600386.smile");
 	}
 
+	@Test
 	public void test03() throws URISyntaxException {
 		// Sat,  3 Jun 2017 05:55:00 CEST
 		// Sat,  3 Jun 2017 03:55:00 UTC
 		test("1496462100235.smile");
 	}
 
+	@Test
 	public void test04() throws URISyntaxException {
 		// Sat,  3 Jun 2017 05:43:59 CEST
 		// Sat,  3 Jun 2017 03:43:59 UTC
 		test("1496461439700.smile");
 	}
 
+	@Test
 	public void test05() throws URISyntaxException {
 		// Sat,  3 Jun 2017 05:39:00 CEST
 		// Sat,  3 Jun 2017 03:39:00 UTC

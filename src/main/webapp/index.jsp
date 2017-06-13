@@ -31,6 +31,7 @@
 <script src="static/js/wbm-link.js"></script>
 <script src="static/js/daqview-link.js"></script>
 <script src="static/js/share.js"></script>
+<script src="static/js/raw-data-buttons.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -123,6 +124,7 @@
 					<button class="btn btn-default btn-sm btn-copy" id="share-button">
 						Share <span class="glyphicon glyphicon-share"></span>
 					</button>
+					<div class="btn-group">
 					<button type="button"
 						class="btn btn-default btn-sm dropdown-toggle"
 						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -137,6 +139,23 @@
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
 					</ul>
+					</div>
+					<div class="btn-group">
+					<button type="button"
+						class="btn btn-default btn-sm dropdown-toggle"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Raw data <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+
+						<li><a id="raw-data-snapshot-button" target="_blank"> DAQ snapshot <span
+								class="glyphicon glyphicon-chevron-right"></span>
+						</a></li>
+						<li><a id="raw-data-flashlist-button" target="_blank"> Flashlist <span
+								class="glyphicon glyphicon-chevron-right"></span>
+						</a></li>
+					</ul>
+					</div>
 				</div>
 				<button type="button" class="btn btn-sm btn-info"
 					id="run-experimental-lm-button" href="#" style="display: none;">
@@ -171,6 +190,30 @@
 						Snapshot <span id="snapshot-date">/date/</span> in JSON format:
 					</p>
 					<pre class="prettyprint lang-json" id="json-body"></pre>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	
+	<div id="flashlist-popup" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Snapshot</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Flashlist <span id="flashlist-name">/name/</span> <span id="flashlist-date">/date/</span> in JSON format:
+					</p>
+					<pre class="prettyprint lang-json" id="flashlist-json-body"></pre>
 				</div>
 				<div class="modal-footer"></div>
 			</div>

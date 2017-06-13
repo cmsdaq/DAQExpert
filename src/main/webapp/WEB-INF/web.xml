@@ -48,6 +48,14 @@
 		<url-pattern>/snapshot</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>FlashlistAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.FlashlistAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FlashlistAPI</servlet-name>
+		<url-pattern>/flashlist</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>RaportAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.RaportAPI</servlet-class>
 	</servlet>

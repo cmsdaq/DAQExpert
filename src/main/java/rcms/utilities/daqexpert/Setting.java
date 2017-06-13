@@ -26,7 +26,7 @@ public enum Setting {
 	DATABASE_PASSWORD("hibernate.connection.password"),
 	DATABASE_URL("hibernate.connection.url"),
 	DATABASE_DRIVER("hibernate.connection.driver_class"),
-	DATABASE_MODE("hibernate.hbm2ddl.auto"),
+	DATABASE_MODE("hibernate.hbm2ddl.auto"), FLASHLIST_DIR("flashlist.dir"),
 
 	;
 

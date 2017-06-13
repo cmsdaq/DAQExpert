@@ -32,13 +32,13 @@ public class FlowchartCase6 extends KnownFailure {
 
 		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
 				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
-				+ "A FED stopped sending data.";
+				+ "A FED stopped sending data in subsystem {{FROZENSUBSYSTEM}}.";
 
 		this.action = new SimpleAction("Try to recover: Stop the run",
-				"Red & green recycle the subsystem {{SUBSYSTEM}} (whose FED stopped sending data)",
+				"Red & green recycle the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data)",
 				"Start new Run (Try 1 time)",
-				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} (whose FED stopped sending data) to inform",
-				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}} (whose FED stopped sending data)");
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data) to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data)");
 
 	}
 

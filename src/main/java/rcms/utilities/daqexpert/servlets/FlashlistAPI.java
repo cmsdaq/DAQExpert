@@ -40,14 +40,20 @@ public class FlashlistAPI extends HttpServlet {
 			throws ServletException, IOException {
 
 		String time = request.getParameter("time");
-		logger.debug("Requested flashlit date: " + time);
+		String typeString = request.getParameter("type");
+		logger.info("Requested flashlit date: " + time);
 		Date timeDate = objectMapper.readValue(time, Date.class);
 		logger.debug("Parsed requested snapshot date: " + timeDate);
 		String json = "";
 		FlashlistType type = FlashlistType.BU;
+		for(FlashlistType t: FlashlistType.values()){
+			if(t.name().equalsIgnoreCase(typeString)){
+				type = t;
+			}
+		}
 		try {
 			Flashlist result = ExpertPersistorManager.get().findFlashlist(timeDate, type);
-
+			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			StructureSerializer ss = new StructureSerializer();

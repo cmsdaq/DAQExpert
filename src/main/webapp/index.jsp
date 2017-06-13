@@ -151,9 +151,35 @@
 						<li><a id="raw-data-snapshot-button" target="_blank"> DAQ snapshot <span
 								class="glyphicon glyphicon-chevron-right"></span>
 						</a></li>
-						<li><a id="raw-data-flashlist-button" target="_blank"> Flashlist <span
-								class="glyphicon glyphicon-chevron-right"></span>
-						</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="BU" target="_blank"> Flashlist: BU</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="EVM" target="_blank"> Flashlist: EVM</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="FMMInput" target="_blank"> Flashlist: FMMInput</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="FMMInputDetail" target="_blank"> Flashlist: FMMInputDetail</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="FMMStatus" target="_blank"> Flashlist: FMMStatus</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="RU" target="_blank"> Flashlist: RU</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferolConfiguration" target="_blank"> Flashlist: ferolConfiguration</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferolInputStream" target="_blank"> Flashlist: ferolInputStream</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferolMonitoring" target="_blank"> Flashlist: ferolMonitoring</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferolStatus" target="_blank"> Flashlist: ferolStatus</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferolTcpStream" target="_blank"> Flashlist: ferolTcpStream</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="frlMonitoring" target="_blank"> Flashlist: frlMonitoring</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="hostInfo" target="_blank"> Flashlist: hostInfo</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="levelZeroFM_dynamic" target="_blank"> Flashlist: levelZeroFM_dynamic</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="levelZeroFM_static" target="_blank"> Flashlist: levelZeroFM_static</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="levelZeroFM_subsys" target="_blank"> Flashlist: levelZeroFM_subsys</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="jobcontrol" target="_blank"> Flashlist: jobcontrol</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="diskInfo" target="_blank"> Flashlist: diskInfo</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcds_cpm_counts" target="_blank"> Flashlist: tcds_cpm_counts</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcds_cpm_deadtimes" target="_blank"> Flashlist: tcds_cpm_deadtimes</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcds_cpm_rates" target="_blank"> Flashlist: tcds_cpm_rates</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcds_pm_action_counts" target="_blank"> Flashlist: tcds_pm_action_counts</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcds_pm_tts_channel" target="_blank"> Flashlist: tcds_pm_tts_channel</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferol40Configuration" target="_blank"> Flashlist: ferol40Configuration</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferol40InputStream" target="_blank"> Flashlist: ferol40InputStream</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferol40Status" target="_blank"> Flashlist: ferol40Status</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferol40StreamConfiguration" target="_blank"> Flashlist: ferol40StreamConfiguration</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="ferol40TcpStream" target="_blank"> Flashlist: ferol40TcpStream</a></li>
+						<li><a class="raw-data-flashlist-button" data-type="tcdsFM" target="_blank"> Flashlist: tcdsFM</a></li>
 					</ul>
 					</div>
 				</div>
@@ -207,7 +233,7 @@
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Snapshot</h4>
+					<h4 class="modal-title">Flashlist</h4>
 				</div>
 				<div class="modal-body">
 					<p>

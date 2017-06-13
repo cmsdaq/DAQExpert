@@ -88,13 +88,13 @@ public class ExpertPersistorManager extends PersistorManager {
 		if(!flashlistBaseDir.endsWith("/")){
 			flashlistBaseDir = flashlistBaseDir + "/";
 		}
-		flashlistBaseDir = flashlistBaseDir + flashlist.name();
+		flashlistBaseDir = flashlistBaseDir + flashlist.name() + "/";
 		
-		logger.debug("Searching flaslhist for date: " + date + ", base dir: " + flashlistBaseDir);
+		logger.info("Searching flaslhist for date: " + date + ", base dir: " + flashlistBaseDir);
 
 		candidateDir = this.getTimeDir(flashlistBaseDir , date);
 
-		logger.debug("Candidates will be searched in " + candidateDir);
+		logger.info("Candidates will be searched in " + candidateDir);
 
 		try {
 			candidates.addAll(persistenceExplorer.getFileSystemConnector().getFiles(candidateDir));
@@ -166,7 +166,7 @@ public class ExpertPersistorManager extends PersistorManager {
 	private Flashlist findFlashlist(Date date, List<File> candidates) {
 		StructureSerializer structurePersistor = new StructureSerializer();
 		String bestFile = findBestCandidate(date, candidates);
-		Flashlist best = structurePersistor.deserializeFlashlist(new File(bestFile), PersistenceFormat.SMILE);
+		Flashlist best = structurePersistor.deserializeFlashlist(new File(bestFile), PersistenceFormat.JSON);
 		return best;
 	}
 

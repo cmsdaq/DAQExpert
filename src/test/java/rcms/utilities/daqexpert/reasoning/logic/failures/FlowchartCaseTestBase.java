@@ -81,7 +81,7 @@ public class FlowchartCaseTestBase {
 	/**
 	 * method to load a deserialize a snapshot given a file name
 	 */
-	protected static DAQ getSnapshot(String fname) throws URISyntaxException {
+	public static DAQ getSnapshot(String fname) throws URISyntaxException {
 
 		StructureSerializer serializer = new StructureSerializer();
 

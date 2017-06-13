@@ -31,6 +31,8 @@ public class FlowchartCaseTestBase {
 
 	protected final KnownFailure fc1 = new FlowchartCase1();
 
+	protected final KnownFailure ruFailed = new RuFailed();
+
 	protected final KnownFailure fc2 = new FlowchartCase2();
 
 	protected final KnownFailure fc3 = new FlowchartCase3();

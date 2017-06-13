@@ -1,7 +1,10 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +15,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
  * Logic module identifying 6 flowchart case.
@@ -53,6 +57,10 @@ public class FlowchartCase6 extends KnownFailure {
 		String daqstate = daq.getDaqState();
 
 		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
+
+			// FEDs which are backpressured by the DAQ, we do NOT report those
+			Set<FED> fedsBackpressuredByDaq = new HashSet<>();
+
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
@@ -74,6 +82,8 @@ public class FlowchartCase6 extends KnownFailure {
 										context.register("FED", fed.getSrcIdExpected());
 										context.register("FEDSTATE", currentFedState.name());
 
+										fedsBackpressuredByDaq.add(fed);
+
 										logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
 												+ new Date(daq.getLastUpdate()));
 										result = true;
@@ -84,6 +94,22 @@ public class FlowchartCase6 extends KnownFailure {
 					}
 				}
 			}
+
+			if (result) {
+				
+				// get the feds whose event counter is behind the one of the TCDS fed
+				List<FED> behindFeds = LogicModuleHelper.getFedsWithFewerFragments(daq);
+
+				for (FED fed : behindFeds) {
+					if (! fedsBackpressuredByDaq.contains(fed)) {
+
+						// this FED stopped sending data for no apparent reason
+						// (note that context.register() ignores duplicate entries)
+						context.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+					}
+				} // loop over FEDs
+			} // if condition is satisfied
+
 		}
 
 		return result;

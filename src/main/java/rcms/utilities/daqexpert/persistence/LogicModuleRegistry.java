@@ -40,6 +40,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.RuFailed;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
@@ -88,6 +89,8 @@ public enum LogicModuleRegistry {
 	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 9000),
 
 	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  10500),
+
+	RuFailed                (new RuFailed(),                 ConditionGroup.OTHER,                 "",                                                  900,   9500),
 
 	;
 	

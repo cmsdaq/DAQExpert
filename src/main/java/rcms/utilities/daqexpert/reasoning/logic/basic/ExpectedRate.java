@@ -4,7 +4,6 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class ExpectedRate extends SimpleLogicModule {
@@ -27,12 +26,14 @@ public class ExpectedRate extends SimpleLogicModule {
 		boolean resuming = daq.getLevelZeroState().equalsIgnoreCase("Resuming") ? true : false;
 		boolean ttcHardResettingFromRunning = daq.getLevelZeroState().equalsIgnoreCase("TTCHardResettingFromRunning")
 				? true : false;
-		boolean ttcResyncingFromRunning = daq.getLevelZeroState().equalsIgnoreCase("TTCResyncingFromRunning")
-				? true : false;
-		
+		boolean ttcResyncingFromRunning = daq.getLevelZeroState().equalsIgnoreCase("TTCResyncingFromRunning") ? true
+				: false;
+
+		boolean ttcHardResetting = daq.getLevelZeroState().equalsIgnoreCase("TTCHardResetting") ? true : false;
+		boolean ttcResyncing = daq.getLevelZeroState().equalsIgnoreCase("TTCResyncing") ? true : false;
 
 		if (runOngoing && !fixingSoftError && !dcsPauseResume && !pausing && !paused && !resuming
-				&& !ttcHardResettingFromRunning && !ttcResyncingFromRunning)
+				&& !ttcHardResettingFromRunning && !ttcResyncingFromRunning && !ttcHardResetting && !ttcResyncing)
 			return true;
 		return false;
 	}

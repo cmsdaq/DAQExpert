@@ -66,19 +66,26 @@ public class RunOngoing extends SimpleLogicModule {
 	}
 
 	public boolean determineRunOngoing(String tcdsState, String levelZeroState) {
-		if (levelZeroRunningStates.contains(levelZeroState) || tcdsRunningStates.contains(tcdsState)) {
-			logger.info("At least one of them has 'runnning' state: L0=" + levelZeroState + ", TCDS=" + tcdsState);
+		String tcdsStateNormalized = tcdsState.toUpperCase();
+		String levelZeroStateNormalized = levelZeroState.toUpperCase();
+		if (levelZeroRunningStates.contains(levelZeroStateNormalized)
+				|| tcdsRunningStates.contains(tcdsStateNormalized)) {
+			logger.debug("At least one of them has 'runnning' state: L0=" + levelZeroStateNormalized + ", TCDS="
+					+ tcdsStateNormalized);
 			return true;
 		}
 
-		if (levelZeroNotRunningStates.contains(levelZeroState) || tcdsNotRunningStates.contains(tcdsState)) {
-			logger.info("At least one of them has 'runnning' state: L0=" + levelZeroState + ", TCDS=" + tcdsState);
+		if (levelZeroNotRunningStates.contains(levelZeroStateNormalized)
+				|| tcdsNotRunningStates.contains(tcdsStateNormalized)) {
+			logger.debug("At least one of them has 'NOT running' state: L0=" + levelZeroStateNormalized + ", TCDS="
+					+ tcdsStateNormalized);
 			return false;
 		}
 
-		if (levelZeroNotSureStates.contains(levelZeroState) && tcdsNotSureStates.contains(tcdsState)) {
-			logger.info("Both L0 and TCDS has a state from 'not sure', keeping the previous value: L0=" + levelZeroState
-					+ ", TCDS=" + tcdsState);
+		if (levelZeroNotSureStates.contains(levelZeroStateNormalized)
+				&& tcdsNotSureStates.contains(tcdsStateNormalized)) {
+			logger.debug("Both L0 and TCDS has a state from 'not sure', keeping the previous value: L0="
+					+ levelZeroStateNormalized + ", TCDS=" + tcdsStateNormalized);
 			return previousState;
 		}
 

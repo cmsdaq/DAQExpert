@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -21,7 +20,6 @@ import rcms.utilities.daqaggregator.data.DAQ;
 public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 
 	@Test
-	@Ignore
 	public void test01() throws URISyntaxException {
 		// Sat,  3 Jun 2017 06:41:27 CEST
 		// Sat,  3 Jun 2017 04:41:27 UTC
@@ -78,7 +76,13 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 		// the FEROL fifo stuck case actually looks very similar to FC6
 		// but the event counters on the FEROL match those on the TCDS FED
 		// (which they don't for FC6)
-		assertEqualsAndUpdateResults(false, fc6,snapshot);
+		//
+		// For the moment we ignore whether FlowchartCase6 fires or not and rely
+		// on the fact that FEROLFifoStuck has higher usefulness i.e. will be
+		// displayed with higher priority
+		//
+		// assertEqualsAndUpdateResults(false, fc6,snapshot);
+		
 		assertEqualsAndUpdateResults(true,  ferolFifoStuck,snapshot);
 
 		// check that the FEROL controller URL is correct

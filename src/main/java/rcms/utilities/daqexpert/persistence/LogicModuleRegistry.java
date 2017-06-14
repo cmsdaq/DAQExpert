@@ -34,6 +34,7 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
+import rcms.utilities.daqexpert.reasoning.logic.failures.ContinouslySoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
@@ -88,6 +89,7 @@ public enum LogicModuleRegistry {
 	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 9000),
 
 	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  10500),
+	ContinousSoftError		   		(new ContinouslySoftError(),  ConditionGroup.OTHER,                 "",                                                  36,  1010),
 
 	;
 	

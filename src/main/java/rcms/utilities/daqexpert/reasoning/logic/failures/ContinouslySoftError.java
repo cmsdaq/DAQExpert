@@ -1,13 +1,20 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
@@ -22,9 +29,11 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		this.previousState = "";
 	}
 
+	private static final Logger logger = Logger.getLogger(ContinouslySoftError.class);
+
 	private static final String levelZeroProblematicState = "FixingSoftError";
 
-	private List<Date> pastOccurrences;
+	private List<Pair<Date, List<String>>> pastOccurrences;
 	private Date lastFinish;
 	private boolean previousResult;
 	private String previousState;
@@ -32,18 +41,20 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 	private int mergePeriod;
 	private int occurrencesThreshold;
 
+	private List<String> problemStates = Arrays.asList("FixingSoftError", "RunningSoftErrorDetected");
+
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 		boolean currentResult = false;
 		String currentState = daq.getLevelZeroState();
 
 		// 1. clear too old occurrences
-		Iterator<Date> i = this.pastOccurrences.iterator();
+		Iterator<Pair<Date, List<String>>> i = this.pastOccurrences.iterator();
 		Date repeatThreshold = new Date(daq.getLastUpdate() - thresholdPeriod);
 		Date mergeThreshold = new Date(daq.getLastUpdate() - mergePeriod);
 		while (i.hasNext()) {
-			Date date = i.next();
-			if (date.before(repeatThreshold)) {
+			Pair<Date, List<String>> entry = i.next();
+			if (entry.getLeft().before(repeatThreshold)) {
 				i.remove();
 			}
 		}
@@ -51,12 +62,35 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		if (levelZeroProblematicState.equalsIgnoreCase(currentState)) {
 
 			if (!previousState.equals(currentState)) {
-				pastOccurrences.add(new Date(daq.getLastUpdate()));
+
+				List<String> subsystemsInFixing = new ArrayList<>();
+				for (SubSystem subsystem : daq.getSubSystems()) {
+					if (problemStates.contains(subsystem.getStatus())) {
+						logger.debug("Subsystem " + subsystem.getName() + " if in one of problematic states: "
+								+ subsystem.getStatus());
+						subsystemsInFixing.add(subsystem.getName());
+					}
+				}
+
+				pastOccurrences.add(Pair.of(new Date(daq.getLastUpdate()), subsystemsInFixing));
 			}
 
 			if (pastOccurrences.size() > occurrencesThreshold) {
 				currentResult = true;
 				lastFinish = new Date(daq.getLastUpdate());
+
+				Set<String> problematicSubsystems = new HashSet<>();
+				for (Pair<Date, List<String>> entry : pastOccurrences) {
+					for (String subsystem : entry.getRight()) {
+						problematicSubsystems.add(subsystem);
+					}
+				}
+
+				logger.debug("Registering " + problematicSubsystems);
+
+				for (String problematicSubsystem : problematicSubsystems) {
+					context.register("SUBSYSTEM", problematicSubsystem);
+				}
 			}
 
 		}
@@ -86,7 +120,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 			this.occurrencesThreshold = Integer
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
 			this.description = "Level zero in FixingSoftError more than 3 times in past "
-					+ (thresholdPeriod / 1000 / 60) + " min";
+					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM}}";
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

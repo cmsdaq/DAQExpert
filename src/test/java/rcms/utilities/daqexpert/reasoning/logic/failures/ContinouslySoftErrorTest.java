@@ -1,13 +1,23 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.Properties;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.Condition;
 
 public class ContinouslySoftErrorTest {
 
@@ -38,6 +48,8 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 8), null));
 
 		// TODO: check list of previous occ
+
+		Assert.assertNull(lm.getContext().getContext().get("SUBSYSTEM"));
 	}
 
 	@Test
@@ -50,6 +62,12 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
+
+		Set<Object> problematicSubsystems = lm.getContext().getContext().get("SUBSYSTEM");
+		Assert.assertNotNull(problematicSubsystems);
+		Assert.assertEquals(2, problematicSubsystems.size());
+		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B")));
+		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("C")));
 	}
 
 	@Test
@@ -68,6 +86,7 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14), null));
+
 	}
 
 	@Test
@@ -172,6 +191,18 @@ public class ContinouslySoftErrorTest {
 
 	private DAQ generateSnapshot(String levelZeroState, long lastUpdate) {
 		DAQ daq = new DAQ();
+		SubSystem subsystem1 = new SubSystem();
+		SubSystem subsystem2 = new SubSystem();
+		SubSystem subsystem3 = new SubSystem();
+		subsystem1.setName("A");
+		subsystem2.setName("B");
+		subsystem3.setName("C");
+
+		subsystem1.setStatus("A");
+		subsystem2.setStatus("RunningSoftErrorDetected");
+		subsystem3.setStatus("FixingSoftError");
+		List<SubSystem> subSystems = Arrays.asList(subsystem1, subsystem2, subsystem3);
+		daq.setSubSystems(subSystems);
 		daq.setLevelZeroState(levelZeroState);
 		daq.setLastUpdate(lastUpdate);
 		return daq;

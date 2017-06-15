@@ -11,16 +11,26 @@ import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+import javax.persistence.RollbackException;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.h2.tools.RunScript;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,33 +61,51 @@ public class JobManagerIT {
 
 	}
 
+	private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
+			throws InterruptedException {
+
+		Application.get().getProp().setProperty("processing.start", startDateString);
+		Application.get().getProp().setProperty("processing.end", endDateString);
+		DataManager dataManager = new DataManager();
+		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
+		JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+		jobManager.startJobs();
+		Thread.sleep(1000);
+	}
+
 	@Test
 	public void test() throws InterruptedException {
 
+		String startDateString = "2016-11-30T11:00:20Z";
+		String endDateString = "2016-11-30T14:00:30Z";
+
 		Application.initialize("src/test/resources/integration.properties");
-
-		DataManager dataManager = new DataManager();
-
 		HttpClient client = HttpClientBuilder.create().build();
+
 		EventSender eventSender = Mockito
 				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
 
-		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-		JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+		runOverTestPeriod(startDateString, endDateString, eventSender);
 
-		jobManager.startJobs();
-
-		Thread.sleep(8000);
+		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
 
 		/* Verify Conditions produced in DB */
-		Date startDate = DatatypeConverter.parseDateTime("2016-11-30T11:00:20").getTime();
-		Date endDate = DatatypeConverter.parseDateTime("2016-11-30T14:00:30Z").getTime();
 		long durationThreshold = 0;
 		boolean includeTinyEntriesMask = false;
-		List<Condition> result = Application.get().getPersistenceManager().getEntries(startDate, endDate,
-				durationThreshold, includeTinyEntriesMask);
+		List<Condition> result = null;
 
-		Assert.assertEquals(52, result.size());
+		int retries = 15;
+		int expectedResult = 52;
+		for (int i = 0; i < retries; i++) {
+			if (result == null || result.size() != expectedResult) {
+				Thread.sleep(1000);
+				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+						includeTinyEntriesMask);
+			}
+
+		}
+		Assert.assertEquals(expectedResult, result.size());
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("No rate when expected"))));
 		assertThat(result,
 				not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
@@ -110,8 +138,73 @@ public class JobManagerIT {
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: FED stuck")))));
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
-		
-		
+
+	}
+
+	@Test
+	public void test2() throws InterruptedException {
+
+		String startDateString = "2017-06-12T09:15:00Z";
+		String endDateString = "2017-06-12T09:45:00Z";
+
+		Application.initialize("src/test/resources/integration.properties");
+		HttpClient client = HttpClientBuilder.create().build();
+
+		EventSender eventSender = Mockito
+				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+
+		runOverTestPeriod(startDateString, endDateString, eventSender);
+
+		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+
+		/* Verify Conditions produced in DB */
+		long durationThreshold = 0;
+		boolean includeTinyEntriesMask = false;
+		List<Condition> result = null;
+
+		int retries = 10;
+		int expectedResult = 63;
+		for (int i = 0; i < retries; i++) {
+			if (result == null || result.size() != expectedResult) {
+				Thread.sleep(1000);
+				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+						includeTinyEntriesMask);
+			}
+
+		}
+		Assert.assertEquals(expectedResult, result.size());
+
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Detected continous soft error"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FixingSoftError"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Running"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Run ongoing"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description",
+				is("Level zero in FixingSoftError more than 3 times in past 10 min"))));
+
+		/* Verify Raw data produced in DB */
+		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
+				DataResolution.Full);
+		Assert.assertEquals(208, rawResult.size());
+
+		/* Verify generation of notifaications */
+		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+
+		// verify 42 events if mature-event-collector is used
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(42)));
+
+		// verify 43 events if regular event-collector is used
+		// Mockito.verify(eventSender).sendBatchEvents((List)
+		// argThat(IsCollectionWithSize.hasSize(43)));
+
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Started: Detected continous soft error")))));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Detected continous soft error")))));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: FixingSoftError")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: Running")))));
 
 	}
 

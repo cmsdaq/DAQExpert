@@ -41,6 +41,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.StuckAfterSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
@@ -88,9 +89,10 @@ public enum LogicModuleRegistry {
 	FMMProblem              (new FMMProblem(),               ConditionGroup.FLOWCHART,             "",                                                   35, 10014),
 	UnidentifiedFailure		(new UnidentifiedFailure(),		 ConditionGroup.OTHER,                 "",                                                  999, 9000),
 
-	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  10500),
-	ContinousSoftError		   		(new ContinouslySoftError(),  ConditionGroup.OTHER,                 "",                                                  36,  1010),
-
+	FEROLFifoStuck		   	(new FEROLFifoStuck(),		     ConditionGroup.OTHER,                 "",                                                  500,  10500),
+	ContinousSoftError		(new ContinouslySoftError(),     ConditionGroup.OTHER,                 "",                                                  36,  1010),
+	StuckAfterSoftError    	(new StuckAfterSoftError(),      ConditionGroup.OTHER,                 "",                                                  37,  1011),
+	
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

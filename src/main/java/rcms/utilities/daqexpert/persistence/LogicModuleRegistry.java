@@ -46,6 +46,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
 public enum LogicModuleRegistry {
 
@@ -92,6 +93,7 @@ public enum LogicModuleRegistry {
 	FEROLFifoStuck		   	(new FEROLFifoStuck(),		     ConditionGroup.OTHER,                 "",                                                  500,  10500),
 	ContinousSoftError		(new ContinouslySoftError(),     ConditionGroup.OTHER,                 "",                                                  36,  1010),
 	StuckAfterSoftError    	(new StuckAfterSoftError(),      ConditionGroup.OTHER,                 "",                                                  37,  1011),
+	LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  38,  1012),
 	
 	;
 	

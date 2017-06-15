@@ -208,4 +208,67 @@ public class JobManagerIT {
 
 	}
 
+	@Test
+	public void test3() throws InterruptedException {
+
+		String startDateString = "2017-06-02T21:15:00Z";
+		String endDateString = "2017-06-02T21:30:00Z";
+
+		Application.initialize("src/test/resources/integration.properties");
+		HttpClient client = HttpClientBuilder.create().build();
+
+		EventSender eventSender = Mockito
+				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+
+		runOverTestPeriod(startDateString, endDateString, eventSender);
+
+		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
+		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+
+		/* Verify Conditions produced in DB */
+		long durationThreshold = 0;
+		boolean includeTinyEntriesMask = false;
+		List<Condition> result = null;
+
+		int retries = 10;
+		int expectedResult = 44;
+		for (int i = 0; i < retries; i++) {
+			if (result == null || result.size() != expectedResult) {
+				Thread.sleep(1000);
+				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+						includeTinyEntriesMask);
+			}
+
+		}
+		Assert.assertEquals(expectedResult, result.size());
+
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Stuck after soft error"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FixingSoftError"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Running"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Run ongoing"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description",
+				is("Level zero is stuck after fixing soft error. This is caused by subsystem(s) ES"))));
+
+		/* Verify Raw data produced in DB */
+		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
+				DataResolution.Full);
+		Assert.assertEquals(634, rawResult.size());
+
+		/* Verify generation of notifaications */
+		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+
+		// verify 39 events if mature-event-collector is used
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(39)));
+
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Started: Stuck after soft error")))));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Stuck after soft error")))));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+				hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: FixingSoftError")))));
+		Mockito.verify(eventSender).sendBatchEvents(
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: Running")))));
+
+	}
+
 }

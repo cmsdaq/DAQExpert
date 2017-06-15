@@ -14,7 +14,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 public class LengthyFixingSoftError extends KnownFailure implements Parameterizable {
 
 	public LengthyFixingSoftError() {
-		this.name = "Lengthy fixing soft error";
+		this.name = "Lengthy fixing-soft-error state detected";
 	}
 
 	@Override

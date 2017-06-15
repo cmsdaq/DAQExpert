@@ -44,7 +44,7 @@ public class StuckAfterSoftError extends KnownFailure {
 	private final static Logger logger = Logger.getLogger(StuckAfterSoftError.class);
 
 	public StuckAfterSoftError() {
-		this.name = "Stuck after soft error";
+		this.name = "Stuck after fixing-soft-error";
 		this.description = "Level zero is stuck after fixing soft error. This is caused by subsystem(s) {{SUBSYSTEM}}";
 	}
 

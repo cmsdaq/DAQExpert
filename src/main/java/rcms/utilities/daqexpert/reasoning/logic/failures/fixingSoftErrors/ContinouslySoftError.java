@@ -24,7 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 public class ContinouslySoftError extends KnownFailure implements Parameterizable {
 
 	public ContinouslySoftError() {
-		this.name = "Detected continous soft error";
+		this.name = "Detected continous fixing-soft-error";
 		this.pastOccurrences = new ArrayList<>();
 		this.previousResult = false;
 		this.previousState = "";

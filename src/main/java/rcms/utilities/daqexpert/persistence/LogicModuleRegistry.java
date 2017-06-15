@@ -34,19 +34,19 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateCompar
 import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.failures.ContinouslySoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
-import rcms.utilities.daqexpert.reasoning.logic.failures.StuckAfterSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
 public enum LogicModuleRegistry {
 
 	NoRate                  (new NoRate(),                   ConditionGroup.NO_RATE,               "Satisfied when no rate in DAQ fed builder summary",   1,    10),

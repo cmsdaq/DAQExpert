@@ -36,10 +36,7 @@ public class StuckAfterSoftError extends KnownFailure {
 	private final String stateToToggle = "Error";
 
 	/** List of problematic states that will be used in report */
-	private List<String> problemStates = Arrays.asList("FixingSoftError", "RunningSoftErrorDetected");
-
-	/** List of subsystems in problematic states that will be used in report */
-	private List<String> subsystemsInProblematicState = new ArrayList<>();
+	private List<String> problemStates = Arrays.asList("Error");
 
 	private final static Logger logger = Logger.getLogger(StuckAfterSoftError.class);
 
@@ -61,8 +58,10 @@ public class StuckAfterSoftError extends KnownFailure {
 			logger.debug("Condition satisfied: " + precedingState + ", current state: " + currentState);
 			result = true;
 
-			for (String subsystemInProblematicState : subsystemsInProblematicState) {
-				context.register("SUBSYSTEM", subsystemInProblematicState);
+			for (SubSystem subsystem : daq.getSubSystems()) {
+				if (problemStates.contains(subsystem.getStatus())) {
+					context.register("SUBSYSTEM", subsystem.getName());
+				}
 			}
 
 		}
@@ -70,20 +69,6 @@ public class StuckAfterSoftError extends KnownFailure {
 		if (!previousState.equalsIgnoreCase(currentState)) {
 			logger.debug("Changing state from: " + previousState + " to " + currentState);
 			precedingState = previousState;
-
-			if (!stateToToggle.equalsIgnoreCase(currentState)) {
-				logger.debug("Clearing past information about subsystems in problematic state: "
-						+ subsystemsInProblematicState.size());
-				subsystemsInProblematicState.clear();
-			}
-		}
-
-		if (precedingStateToToggle.equalsIgnoreCase(currentState)) {
-			for (SubSystem subsystem : daq.getSubSystems()) {
-				if (problemStates.contains(subsystem.getStatus())) {
-					subsystemsInProblematicState.add(subsystem.getName());
-				}
-			}
 		}
 
 		previousState = currentState;

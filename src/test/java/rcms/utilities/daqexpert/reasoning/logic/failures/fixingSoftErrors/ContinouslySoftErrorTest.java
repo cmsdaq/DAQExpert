@@ -66,8 +66,8 @@ public class ContinouslySoftErrorTest {
 		Set<Object> problematicSubsystems = lm.getContext().getContext().get("SUBSYSTEM");
 		Assert.assertNotNull(problematicSubsystems);
 		Assert.assertEquals(2, problematicSubsystems.size());
-		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B")));
-		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("C")));
+		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));
+		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("C 4 time(s)")));
 	}
 
 	@Test

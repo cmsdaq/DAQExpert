@@ -3,10 +3,12 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -76,15 +78,33 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				pastOccurrences.add(Pair.of(new Date(daq.getLastUpdate()), subsystemsInFixing));
 			}
 
-			if (pastOccurrences.size() > occurrencesThreshold) {
+			Map<String, Integer> coutsPerSubsystem = new HashMap<>();
+
+			for (Pair<Date, List<String>> occurrence : pastOccurrences) {
+				for (String subsystem : occurrence.getRight()) {
+					if (coutsPerSubsystem.containsKey(subsystem)) {
+						int count = coutsPerSubsystem.get(subsystem);
+						coutsPerSubsystem.put(subsystem, count + 1);
+					} else {
+						coutsPerSubsystem.put(subsystem, 1);
+					}
+				}
+			}
+
+			boolean existsSubsystemWithTooManyResets = false;
+			for (int count : coutsPerSubsystem.values()) {
+				if (count > occurrencesThreshold) {
+					existsSubsystemWithTooManyResets = true;
+				}
+			}
+
+			if (existsSubsystemWithTooManyResets) {
 				currentResult = true;
 				lastFinish = new Date(daq.getLastUpdate());
 
 				Set<String> problematicSubsystems = new HashSet<>();
-				for (Pair<Date, List<String>> entry : pastOccurrences) {
-					for (String subsystem : entry.getRight()) {
-						problematicSubsystems.add(subsystem);
-					}
+				for (Entry<String, Integer> count : coutsPerSubsystem.entrySet()) {
+					problematicSubsystems.add(count.getKey() + " " + count.getValue() + " time(s)");
 				}
 
 				logger.debug("Registering " + problematicSubsystems);

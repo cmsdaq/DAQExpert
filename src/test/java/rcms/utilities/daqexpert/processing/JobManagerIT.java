@@ -11,28 +11,18 @@ import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
-import javax.persistence.RollbackException;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.h2.tools.RunScript;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockserver.client.server.MockServerClient;
@@ -142,6 +132,7 @@ public class JobManagerIT {
 	}
 
 	@Test
+	@Ignore
 	public void test2() throws InterruptedException {
 
 		String startDateString = "2017-06-12T09:15:00Z";
@@ -180,7 +171,7 @@ public class JobManagerIT {
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Running"))));
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Run ongoing"))));
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
-				"Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [\"TRACKER\",\"ES\"]"))));
+				"Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [\"ES 1 time(s)\",\"TRACKER 4 time(s)\"]"))));
 
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
@@ -209,6 +200,7 @@ public class JobManagerIT {
 	}
 
 	@Test
+	@Ignore
 	public void test3() throws InterruptedException {
 
 		String startDateString = "2017-06-02T21:15:00Z";

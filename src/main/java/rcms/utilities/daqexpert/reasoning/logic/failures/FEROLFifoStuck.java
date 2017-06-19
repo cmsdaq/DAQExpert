@@ -127,6 +127,10 @@ public class FEROLFifoStuck extends KnownFailure {
 					if ("Failed".equalsIgnoreCase(ru.getStateName()))
 						continue;
 
+					// RU must not be in SyncLoss state
+					if ("SyncLoss".equalsIgnoreCase(ru.getStateName()))
+						continue;
+
 					if (fed.getEventCounter() >= eventCounterRef) {
 						
 						// but the FRL has received the same amount of fragments

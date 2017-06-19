@@ -56,6 +56,30 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 		test("1496461140693.smile", false);
 	}
 
+	/** test case where this module should NOT fire */
+	@Test
+	public void test06() throws URISyntaxException {
+		// Sun, 17 Jun 2017 14:44:52 CEST
+		// Sun, 17 Jun 2017 12:44:520 UTC
+		String snapshotFile = "1497703492467.smile";
+
+		DAQ snapshot = getSnapshot(snapshotFile);
+
+		assertEqualsAndUpdateResults(false, fc1, snapshot);
+		assertEqualsAndUpdateResults(false, fc2, snapshot);
+		assertEqualsAndUpdateResults(false, fc3, snapshot);
+
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+
+		// this snapshot should NOT fire FEROLFifoStuck
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+
+	}
+
 	private void test(String snapshotFile, boolean ignoreFc6) throws URISyntaxException {
 
 		DAQ snapshot = getSnapshot(snapshotFile);

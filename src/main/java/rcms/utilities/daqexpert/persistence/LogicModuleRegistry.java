@@ -90,7 +90,7 @@ public enum LogicModuleRegistry {
 
 	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  10500),
 
-	RuFailed                (new RuFailed(),                 ConditionGroup.OTHER,                 "",                                                  900,   9500),
+	RuFailed                (new RuFailed(),                 ConditionGroup.OTHER,                 "",                                                   36,   9500),
 
 	;
 	

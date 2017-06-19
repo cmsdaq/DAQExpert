@@ -73,7 +73,13 @@ public class FlowchartCase1 extends KnownFailure {
 
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error'
-		if (RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
+
+		// we do not require anymore that DAQ is in 'RunBlocked' state for the moment
+		// since sometimes the state is not propagated properly
+		//
+		// SyncLoss state of the RU is a strong enough signal that we have
+		// the problem this class should detect
+		{
 
 			// for the moment, just find the first RU in SyncLoss
 			RU syncLossRU = null;
@@ -87,9 +93,9 @@ public class FlowchartCase1 extends KnownFailure {
 			}
 
 			if (syncLossRU == null) {
-				// no RU in syncloss found, we don't know FED, TTCP and
-				// SUBSYSTEM
-				setContextValues("(RU not found)");
+
+				// we insist that there is at least one RU in SyncLoss state
+				return false;
 
 			} else {
 
@@ -143,8 +149,6 @@ public class FlowchartCase1 extends KnownFailure {
 
 			return true;
 		} // if runblocked state
-
-		return false;
 	}
 
 }

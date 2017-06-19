@@ -116,7 +116,8 @@
 			<div class="btn-group" role="group" aria-label="...">
 				<div class="btn-group" role="group">
 					<button class="btn btn-info btn-sm" id="daqview-button"
-						target="_blank">
+						target="_blank" data-url="<%out.println(Application.get().getProp(Setting.DAQVIEW_LINK));%>"
+						data-setup="<%out.println(Application.get().getProp(Setting.DAQVIEW_SETUP));%>">
 						DAQView <span class="glyphicon glyphicon-list"></span>
 					</button>
 					<button class="btn btn-default btn-sm btn-copy" id="share-button">

@@ -6,6 +6,8 @@ public enum Setting {
 	NM_ARCHIVE("nm.archive"),
 	NM_API_CREATE("nm.api"),
 	NM_OFFSET("nm.offset"),
+	DAQVIEW_LINK("daqview.link"),
+	DAQVIEW_SETUP("daqview.setup"),
 
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),

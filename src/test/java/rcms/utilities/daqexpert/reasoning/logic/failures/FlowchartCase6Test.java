@@ -20,8 +20,8 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		// GMT: Sat, 26 Nov 2016 06:21:35 GMT
 		DAQ snapshot = getSnapshot("1480141295312.smile");
 
-
-		assertEqualsAndUpdateResults(false, fc1,snapshot);
+		// there is actually one RU in syncloss
+		assertEqualsAndUpdateResults(true, fc1,snapshot);
 		assertEqualsAndUpdateResults(false, fc2,snapshot);
 		assertEqualsAndUpdateResults(false, fc3,snapshot);
 		

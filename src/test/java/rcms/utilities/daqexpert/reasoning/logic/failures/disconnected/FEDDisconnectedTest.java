@@ -27,6 +27,8 @@ public class FEDDisconnectedTest extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		assertEqualsAndUpdateResults(false, fc6, snapshot);
 
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 	}
 

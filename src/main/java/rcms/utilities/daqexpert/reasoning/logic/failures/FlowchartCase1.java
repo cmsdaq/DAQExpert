@@ -148,7 +148,7 @@ public class FlowchartCase1 extends KnownFailure {
 			} // RU in syncloss state found
 
 			return true;
-		} // if runblocked state
+		}
 	}
 
 }

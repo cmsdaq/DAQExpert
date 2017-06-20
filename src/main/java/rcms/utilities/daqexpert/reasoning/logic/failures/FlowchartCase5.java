@@ -74,7 +74,7 @@ public class FlowchartCase5 extends KnownFailure {
 								if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)) {
 
 									/* there are FEDs behind the pseudo FED */
-									if (fed.getValue() != null) {
+									if (fed.getValue().size() > 0) {
 										for (FED dep : fed.getValue()) {
 											if (dep.getPercentBackpressure() == 0F) {
 												result = true;

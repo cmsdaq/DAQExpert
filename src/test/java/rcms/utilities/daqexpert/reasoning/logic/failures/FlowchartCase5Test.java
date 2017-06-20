@@ -27,6 +27,9 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 
 		assertEqualsAndUpdateResults(true, fc5, snapshot);
+
+		System.out.println(fc5.getDescriptionWithContext());
+		
 		assertEqualsAndUpdateResults(false, fc6, snapshot);
 
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);

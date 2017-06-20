@@ -31,6 +31,18 @@ public class FEDHierarchyRetrieverTest {
 		f4 = new FED();
 		f5 = new FED();
 
+		f1.setFmmMasked(false);
+		f2.setFmmMasked(false);
+		f3.setFmmMasked(false);
+		f4.setFmmMasked(false);
+		f5.setFmmMasked(false);
+
+		f1.setFrlMasked(false);
+		f2.setFrlMasked(false);
+		f3.setFrlMasked(false);
+		f4.setFrlMasked(false);
+		f5.setFrlMasked(false);
+
 		f1.setSrcIdExpected(1);
 		f2.setSrcIdExpected(2);
 		f3.setSrcIdExpected(3);
@@ -68,7 +80,7 @@ public class FEDHierarchyRetrieverTest {
 		Map<FED, Set<FED>> r2 = FEDHierarchyRetriever.getFEDHierarchy(p);
 		assertEquals(4, r2.size());
 		assertEquals(1, r2.get(f1).size());
-		assertEquals("FED2 is no longer accessible as key", false, r2.containsKey(f2));
+		assertEquals("FED2 is not a root of hierarchy", false, r2.containsKey(f2));
 		assertEquals(0, r2.get(f3).size());
 		assertEquals(0, r2.get(f4).size());
 		assertEquals(0, r2.get(f5).size());
@@ -84,8 +96,8 @@ public class FEDHierarchyRetrieverTest {
 		Map<FED, Set<FED>> r3 = FEDHierarchyRetriever.getFEDHierarchy(p);
 		assertEquals(3, r3.size());
 		assertEquals(2, r3.get(f1).size());
-		assertEquals("FED2 is no longer accessible as key", false, r3.containsKey(f2));
-		assertEquals("FED3 is no longer accessible as key", false, r3.containsKey(f3));
+		assertEquals("FED2 is not a root of hierarchy", false, r3.containsKey(f2));
+		assertEquals("FED3 is not a root of hierarchy", false, r3.containsKey(f3));
 		assertEquals(0, r3.get(f4).size());
 		assertEquals(0, r3.get(f5).size());
 
@@ -102,9 +114,81 @@ public class FEDHierarchyRetrieverTest {
 		Map<FED, Set<FED>> r4 = FEDHierarchyRetriever.getFEDHierarchy(p);
 		assertEquals(2, r4.size());
 		assertEquals(2, r4.get(f1).size());
-		assertEquals("FED2 is no longer accessible as key", false, r4.containsKey(f2));
-		assertEquals("FED3 is no longer accessible as key", false, r4.containsKey(f3));
-		assertEquals("FED4 is no longer accessible as key", false, r4.containsKey(f4));
+		assertEquals("FED2 is not a root of hierarchy", false, r4.containsKey(f2));
+		assertEquals("FED3 is not a root of hierarchy", false, r4.containsKey(f3));
+		assertEquals("FED4 is not a root of hierarchy", false, r4.containsKey(f4));
 		assertEquals(1, r4.get(f5).size());
+	}
+
+	/*
+	 * All feds independent one FED only FRL masked [[1:],[M2:],[3:],[4:],[5:]]
+	 */
+	@Test
+	public void oneFedFrlMaskedShouldGetToHierarchyTest() {
+
+		f2.setFrlMasked(true);
+		Map<FED, Set<FED>> r1 = FEDHierarchyRetriever.getFEDHierarchy(p);
+		assertEquals(5, r1.size());
+		assertEquals(0, r1.get(f1).size());
+		assertEquals(0, r1.get(f2).size());
+		assertEquals(0, r1.get(f3).size());
+		assertEquals(0, r1.get(f4).size());
+		assertEquals(0, r1.get(f5).size());
+
+	}
+
+	/*
+	 * All feds independent one FED FRL and FMM masked
+	 * [[1:],[M2:],[3:],[4:],[5:]]
+	 */
+	@Test
+	public void oneFEDMaskedShouldNotGetToHierarchyTest() {
+
+		f2.setFrlMasked(true);
+		f2.setFmmMasked(true);
+		Map<FED, Set<FED>> r1 = FEDHierarchyRetriever.getFEDHierarchy(p);
+		assertEquals(4, r1.size());
+		assertEquals(0, r1.get(f1).size());
+		assertEquals("FED2 should not get to hierarchy", false, r1.containsKey(f2));
+		assertEquals(0, r1.get(f3).size());
+		assertEquals(0, r1.get(f4).size());
+		assertEquals(0, r1.get(f5).size());
+
+	}
+
+	/* hierarchy with one child masked [[1: 3,M2],[4:],[5:]] */
+	@Test
+	public void multipleFEDsBehindOneFEDAndChildMaskedShouldNotGetToHierarchyTest() {
+
+		f2.setFrlMasked(true);
+		f2.setFmmMasked(true);
+		f2.setDependentFeds(Arrays.asList(f1));
+		f3.getDependentFeds().add(f1);
+		Map<FED, Set<FED>> r3 = FEDHierarchyRetriever.getFEDHierarchy(p);
+		assertEquals(3, r3.size());
+		assertEquals("Reduced to 1 as FED2 should not get here", 1, r3.get(f1).size());
+		assertEquals("FED2 is not a root of hierarchy", false, r3.containsKey(f2));
+		assertEquals("FED3 is not a root of hierarchy", false, r3.containsKey(f3));
+		assertEquals(0, r3.get(f4).size());
+		assertEquals(0, r3.get(f5).size());
+
+	}
+
+	/* hierarchy with one child masked [[M1: 3,2],[4:],[5:]] */
+	@Test
+	public void rootOfHierarchyMasked() {
+
+		f1.setFrlMasked(true);
+		f1.setFmmMasked(true);
+		f2.setDependentFeds(Arrays.asList(f1));
+		f3.getDependentFeds().add(f1);
+		Map<FED, Set<FED>> r3 = FEDHierarchyRetriever.getFEDHierarchy(p);
+		assertEquals(4, r3.size());
+		assertEquals("FED1 is masked out", false, r3.containsKey(f1));
+		assertEquals(0, r3.get(f2).size());
+		assertEquals(0, r3.get(f3).size());
+		assertEquals(0, r3.get(f4).size());
+		assertEquals(0, r3.get(f5).size());
+
 	}
 }

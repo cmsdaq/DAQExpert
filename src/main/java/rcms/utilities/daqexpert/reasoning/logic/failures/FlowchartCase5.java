@@ -12,7 +12,6 @@ import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
-import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
  * Logic module identifying 5 flowchart case.

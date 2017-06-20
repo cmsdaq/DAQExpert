@@ -5,47 +5,58 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 
+/**
+ * FED hierarchy resolver.
+ * 
+ * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
+ *
+ */
 public class FEDHierarchyRetriever {
 
 	private static final Logger logger = Logger.getLogger(FEDHierarchyRetriever.class);
 
 	/**
-	 * TODO: if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+	 * Retrieves FED hierarchy from given partition. Note that the depth of
+	 * hierarchy is maximum 1
 	 * 
 	 * @param partition
-	 * @return
+	 * @return Map of FEDs representing groups of hierarchies
 	 */
 	public static Map<FED, Set<FED>> getFEDHierarchy(TTCPartition partition) {
 
 		Map<FED, Set<FED>> depende = new HashMap<>();
 		Map<FED, Set<FED>> revertedDependencyTree = new HashMap<>();
-		Set<FED> dependent = new HashSet<>();
 
 		logger.debug("Listing all FEDs (" + partition.getFeds().size() + ") of partition " + partition.getName());
 		for (FED fed : partition.getFeds()) {
 
-			Set<FED> depFeds = new HashSet<>();
+			if (!(fed.isFrlMasked() && fed.isFmmMasked())) {
 
-			String compactDependentList = "[";
-			for (FED dep : fed.getDependentFeds()) {
+				Set<FED> depFeds = new HashSet<>();
 
-				compactDependentList += dep.getSrcIdExpected() + ", ";
-				dependent.add(dep);
-				depFeds.add(dep);
+				String compactDependentList = "[";
+				for (FED dep : fed.getDependentFeds()) {
+
+					if (!(dep.isFrlMasked() && dep.isFmmMasked())) {
+
+						compactDependentList += dep.getSrcIdExpected() + ", ";
+						depFeds.add(dep);
+					}
+				}
+				compactDependentList += "]";
+				depende.put(fed, depFeds);
+
+				logger.debug("FED: " + fed.getSrcIdExpected() + ", deps: " + fed.getDependentFeds().size() + ": "
+						+ compactDependentList);
 			}
-			compactDependentList += "]";
-			depende.put(fed, depFeds);
-
-			logger.debug("FED: " + fed.getSrcIdExpected() + ", deps: " + fed.getDependentFeds().size() + ": "
-					+ compactDependentList);
 		}
 
 		Iterator<Entry<FED, Set<FED>>> i = depende.entrySet().iterator();

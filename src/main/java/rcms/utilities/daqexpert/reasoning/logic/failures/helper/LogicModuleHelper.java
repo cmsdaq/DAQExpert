@@ -109,7 +109,7 @@ public class LogicModuleHelper {
 		Map<FED, Set<FED>> revertedDependencyTree = new HashMap<>();
 		Set<FED> dependent = new HashSet<>();
 
-		logger.info("Listing all FEDs (" + partition.getFeds().size() + ") of partition " + partition.getName());
+		logger.debug("Listing all FEDs (" + partition.getFeds().size() + ") of partition " + partition.getName());
 		for (FED fed : partition.getFeds()) {
 
 			Set<FED> depFeds = new HashSet<>();
@@ -124,26 +124,17 @@ public class LogicModuleHelper {
 			compactDependentList += "]";
 			depende.put(fed, depFeds);
 
-			logger.info("FED: " + fed.getSrcIdExpected() + ", deps: " + fed.getDependentFeds().size() + ": "
+			logger.debug("FED: " + fed.getSrcIdExpected() + ", deps: " + fed.getDependentFeds().size() + ": "
 					+ compactDependentList);
-		}
-
-		/* Debug */
-		for (Entry<FED, Set<FED>> a : depende.entrySet()) {
-			String compactDep = "";
-			for (FED fed : a.getValue()) {
-				compactDep += fed.getSrcIdExpected() + ", ";
-			}
-			logger.info("> " + a.getKey().getSrcIdExpected() + ": " + compactDep);
 		}
 
 		Iterator<Entry<FED, Set<FED>>> i = depende.entrySet().iterator();
 		while (i.hasNext()) {
 			Entry<FED, Set<FED>> n = i.next();
 
-			logger.info("Reverting entry: " + n.getKey().getSrcIdExpected() + ":" + n.getValue());
+			logger.debug("Reverting entry: " + n.getKey().getSrcIdExpected() + ":" + n.getValue());
 			if (n.getValue() == null || n.getValue().size() == 0) {
-				logger.info("- putting single key");
+				logger.trace("- putting single key");
 				if (!revertedDependencyTree.containsKey(n.getKey())) {
 					revertedDependencyTree.put(n.getKey(), new HashSet<FED>());
 				}
@@ -151,24 +142,15 @@ public class LogicModuleHelper {
 
 			for (FED dep : n.getValue()) {
 				if (revertedDependencyTree.containsKey(dep)) {
-					logger.info("- reverting");
+					logger.trace("- reverting");
 					revertedDependencyTree.get(dep).add(n.getKey());
 				} else {
-					logger.info("- Initializing set with one element");
+					logger.trace("- Initializing set with one element");
 					revertedDependencyTree.put(dep, new HashSet<FED>(Arrays.asList(n.getKey())));
 				}
 			}
-			logger.info("Current: " + revertedDependencyTree);
+			logger.debug("Current: " + revertedDependencyTree);
 
-		}
-
-		/* Debug */
-		for (Entry<FED, Set<FED>> a : revertedDependencyTree.entrySet()) {
-			String compactDep = "";
-			for (FED fed : a.getValue()) {
-				compactDep += fed.getSrcIdExpected() + ", ";
-			}
-			logger.info(">> " + a.getKey().getSrcIdExpected() + ": " + compactDep);
 		}
 
 		return revertedDependencyTree;

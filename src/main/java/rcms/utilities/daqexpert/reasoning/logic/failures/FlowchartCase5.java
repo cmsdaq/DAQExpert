@@ -11,6 +11,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
@@ -67,7 +68,7 @@ public class FlowchartCase5 extends KnownFailure {
 						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-							Map<FED, Set<FED>> fedHierarchy = LogicModuleHelper.getFEDHierarchy(ttcp);
+							Map<FED, Set<FED>> fedHierarchy = FEDHierarchyRetriever.getFEDHierarchy(ttcp);
 
 							for (Entry<FED, Set<FED>> fed : fedHierarchy.entrySet()) {
 								TTSState currentFedState = TTSState.getByCode(fed.getKey().getTtsState());

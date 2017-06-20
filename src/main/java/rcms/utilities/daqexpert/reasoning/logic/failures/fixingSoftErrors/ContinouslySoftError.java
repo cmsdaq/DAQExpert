@@ -20,6 +20,7 @@ import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
@@ -27,6 +28,21 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 	public ContinouslySoftError() {
 		this.name = "Continous fixing-soft-error";
+
+		/* default action */
+		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{SUBSYSTEM}}");
+
+		/* ES specific instructions */
+		action.addContextSteps("ES", "Stop the run and re-start it",
+				"If 1) doesn't work and DAQ is in the same condition as before, stop the run and red-recycle ES");
+
+		/* Pixel specific instructions */
+		action.addContextSteps("Pixel", "Check DCS",
+				"If problem in DCS (sectors turned off) ask DCS shifter to call Pixel DOC",
+				"If no problem in DCS call Pixel DOC immediately");
+
+		this.action = action;
+
 		this.pastOccurrences = new ArrayList<>();
 		this.previousResult = false;
 		this.previousState = "";

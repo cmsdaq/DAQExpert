@@ -1,25 +1,38 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 
 /**
- *  Some utility functions used by the logic modules.
+ * Some utility functions used by the logic modules.
  */
-public class LogicModuleHelper
-{
+public class LogicModuleHelper {
 
-	/** @return the event counter of the reference FED (TCDS) or null
-	    if this can't be found. */
+	private static final Logger logger = Logger.getLogger(LogicModuleHelper.class);
+
+	/**
+	 * @return the event counter of the reference FED (TCDS) or null if this
+	 *         can't be found.
+	 */
 	public static Long getRefEventCounter(DAQ daq) {
 		// find the EVM
 		// TODO: we could cache this as long as the session id
-		//       does not change
+		// does not change
 		RU evm = daq.getEVM();
 
 		if (evm == null)
@@ -42,11 +55,14 @@ public class LogicModuleHelper
 		return refFED.getEventCounter();
 	}
 
-	/** @return a list of FEDs which have sent fewer events than the TCDS.
-	 *   Ignores those which are FRL masked or do not have an FRL (pseudofeds).
+	/**
+	 * @return a list of FEDs which have sent fewer events than the TCDS.
+	 *         Ignores those which are FRL masked or do not have an FRL
+	 *         (pseudofeds).
 	 *
-	 *   This can be used to find the FEDs which block data taking because
-	 *   they are not sending fragments anymore (if the trigger rate is zero).
+	 *         This can be used to find the FEDs which block data taking because
+	 *         they are not sending fragments anymore (if the trigger rate is
+	 *         zero).
 	 */
 	public static List<FED> getFedsWithFewerFragments(DAQ daq) {
 
@@ -61,7 +77,7 @@ public class LogicModuleHelper
 
 		for (FED fed : daq.getFeds()) {
 
-			if (! fed.isHasSLINK()) {
+			if (!fed.isHasSLINK()) {
 				// pseudofed, can't block data taking by not sending triggers
 				continue;
 			}
@@ -79,6 +95,83 @@ public class LogicModuleHelper
 		} // loop over FEDs
 
 		return result;
+	}
+
+	/**
+	 * TODO: if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+	 * 
+	 * @param partition
+	 * @return
+	 */
+	public static Map<FED, Set<FED>> getFEDHierarchy(TTCPartition partition) {
+
+		Map<FED, Set<FED>> depende = new HashMap<>();
+		Map<FED, Set<FED>> revertedDependencyTree = new HashMap<>();
+		Set<FED> dependent = new HashSet<>();
+
+		logger.info("Listing all FEDs (" + partition.getFeds().size() + ") of partition " + partition.getName());
+		for (FED fed : partition.getFeds()) {
+
+			Set<FED> depFeds = new HashSet<>();
+
+			String compactDependentList = "[";
+			for (FED dep : fed.getDependentFeds()) {
+
+				compactDependentList += dep.getSrcIdExpected() + ", ";
+				dependent.add(dep);
+				depFeds.add(dep);
+			}
+			compactDependentList += "]";
+			depende.put(fed, depFeds);
+
+			logger.info("FED: " + fed.getSrcIdExpected() + ", deps: " + fed.getDependentFeds().size() + ": "
+					+ compactDependentList);
+		}
+
+		/* Debug */
+		for (Entry<FED, Set<FED>> a : depende.entrySet()) {
+			String compactDep = "";
+			for (FED fed : a.getValue()) {
+				compactDep += fed.getSrcIdExpected() + ", ";
+			}
+			logger.info("> " + a.getKey().getSrcIdExpected() + ": " + compactDep);
+		}
+
+		Iterator<Entry<FED, Set<FED>>> i = depende.entrySet().iterator();
+		while (i.hasNext()) {
+			Entry<FED, Set<FED>> n = i.next();
+
+			logger.info("Reverting entry: " + n.getKey().getSrcIdExpected() + ":" + n.getValue());
+			if (n.getValue() == null || n.getValue().size() == 0) {
+				logger.info("- putting single key");
+				if (!revertedDependencyTree.containsKey(n.getKey())) {
+					revertedDependencyTree.put(n.getKey(), new HashSet<FED>());
+				}
+			}
+
+			for (FED dep : n.getValue()) {
+				if (revertedDependencyTree.containsKey(dep)) {
+					logger.info("- reverting");
+					revertedDependencyTree.get(dep).add(n.getKey());
+				} else {
+					logger.info("- Initializing set with one element");
+					revertedDependencyTree.put(dep, new HashSet<FED>(Arrays.asList(n.getKey())));
+				}
+			}
+			logger.info("Current: " + revertedDependencyTree);
+
+		}
+
+		/* Debug */
+		for (Entry<FED, Set<FED>> a : revertedDependencyTree.entrySet()) {
+			String compactDep = "";
+			for (FED fed : a.getValue()) {
+				compactDep += fed.getSrcIdExpected() + ", ";
+			}
+			logger.info(">> " + a.getKey().getSrcIdExpected() + ": " + compactDep);
+		}
+
+		return revertedDependencyTree;
 	}
 
 }

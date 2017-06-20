@@ -1,6 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
@@ -9,6 +11,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
  * Logic module identifying 5 flowchart case.
@@ -33,12 +36,15 @@ public class FlowchartCase5 extends KnownFailure {
 
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "Stop the run", "Start new run (try up to 2 times)",
-				"Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Red recycle ECAL","Call the DOC for the ECAL");
+				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
+				"Call the DOC for the ECAL");
 
 		this.action = action;
 	}
 
+	// add triggers info (behind or the same
+	// number)
+	// TODO: add hierarchy of FEDS (pseudo feds)
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
@@ -60,23 +66,43 @@ public class FlowchartCase5 extends KnownFailure {
 					if (!ttcp.isMasked()) {
 						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
-							for (FED fed : ttcp.getFeds()) {
-								if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
-									TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-									if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-											&& fed.getPercentBackpressure() == 0F) {
 
+							Map<FED, Set<FED>> fedHierarchy = LogicModuleHelper.getFEDHierarchy(ttcp);
+
+							for (Entry<FED, Set<FED>> fed : fedHierarchy.entrySet()) {
+								TTSState currentFedState = TTSState.getByCode(fed.getKey().getTtsState());
+								if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)) {
+
+									/* there are FEDs behind the pseudo FED */
+									if (fed.getValue() != null) {
+										for (FED dep : fed.getValue()) {
+											if (dep.getPercentBackpressure() == 0F) {
+												result = true;
+												context.register("FED",
+														"(" + dep.getSrcIdExpected() + " behind pseudo FED "
+																+ fed.getKey().getSrcIdExpected() + ")");
+												context.register("FEDSTATE",
+														"(" + (dep.getTtsState() != null ? dep.getTtsState()
+																: "FED has no individual TTS state, ")
+																+ currentFedState.name() + " @ its pseudo FED)");
+											}
+										}
+									}
+									/* there are no FEDs in hierarchy */
+									else {
+										if (fed.getKey().getPercentBackpressure() == 0F) {
+											result = true;
+											context.register("FED", fed.getKey().getSrcIdExpected());
+											context.register("FEDSTATE", currentFedState.name());
+										}
+
+									}
+
+									if (result) {
 										context.register("TTCP", ttcp.getName());
 										context.register("TTCPSTATE", currentState.name());
 										context.register("SUBSYSTEM", subSystem.getName());
-										context.register("FED", fed.getSrcIdExpected());
-										context.register("FEDSTATE", currentFedState.name());
-										
-										// add triggers info (behind or the same number)
-										// TODO: add hierarchy of FEDS (pseudo feds)
-										
 										context.setActionKey(subSystem.getName());
-										result = true;
 									}
 								}
 							}
@@ -88,4 +114,5 @@ public class FlowchartCase5 extends KnownFailure {
 
 		return result;
 	}
+
 }

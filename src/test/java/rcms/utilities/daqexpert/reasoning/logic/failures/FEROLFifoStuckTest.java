@@ -84,10 +84,11 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 
 		DAQ snapshot = getSnapshot(snapshotFile);
 
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
-
+		assertEqualsAndUpdateResults(false, fc1,snapshot);
+		assertEqualsAndUpdateResults(false, fc2,snapshot);
+		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
+		assertEqualsAndUpdateResults(false, fc3,snapshot);
+		
 		// new subcases of old flowchart case 4
 		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
 		assertEqualsAndUpdateResults(false, piProblem, snapshot);

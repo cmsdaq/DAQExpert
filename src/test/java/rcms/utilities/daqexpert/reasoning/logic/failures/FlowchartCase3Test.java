@@ -36,6 +36,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot(snapshotFile);
 		assertEqualsAndUpdateResults(false, fc1,snapshot );
 		assertEqualsAndUpdateResults(false, fc2,snapshot );
+		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
 		assertEqualsAndUpdateResults(true, fc3,snapshot );
 
 		// new subcases of old flowchart case 4

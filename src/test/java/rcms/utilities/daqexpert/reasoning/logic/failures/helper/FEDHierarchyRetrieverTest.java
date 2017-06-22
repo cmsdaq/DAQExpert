@@ -2,19 +2,30 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.helper;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
+import rcms.utilities.daqaggregator.persistence.StructureSerializer;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
 
 public class FEDHierarchyRetrieverTest {
+
+	private final static Logger logger = Logger.getLogger(FEDHierarchyRetriever.class);
 
 	private FED f1;
 	private FED f2;
@@ -190,5 +201,60 @@ public class FEDHierarchyRetrieverTest {
 		assertEquals(0, r3.get(f4).size());
 		assertEquals(0, r3.get(f5).size());
 
+	}
+
+	@Test
+	public void realHierarchyTest() throws URISyntaxException {
+
+		DAQ snapshot = getSnapshot("1497562174081.smile");
+
+		int totalGroups = 0;
+		for (SubSystem s : snapshot.getSubSystems()) {
+
+			int subsystemGroups = 0;
+			System.out.println("SUBSYSTEM " + s.getName());
+
+			for (TTCPartition p : s.getTtcPartitions()) {
+				Map<FED, Set<FED>> h = FEDHierarchyRetriever.getFEDHierarchy(p);
+
+				int partitionGroups = 0;
+				System.out.println("  PARTITION" + p.getName());
+
+				for (Map.Entry<FED, Set<FED>> e : h.entrySet()) {
+					String deps = "";
+					boolean notFirst = false;
+					for (FED dep : e.getValue()) {
+						if (notFirst) {
+							deps += ", ";
+						}
+						notFirst = true;
+						deps += dep.getSrcIdExpected();
+					}
+					totalGroups++;
+					subsystemGroups++;
+					partitionGroups++;
+					System.out.println(
+							"    [" + e.getKey().getSrcIdExpected() + "]" + (deps.equals("") ? "" : ": " + deps));
+				}
+
+				System.out.println("    #" + partitionGroups + " groups in partition " + p.getName());
+			}
+			System.out.println("  #" + subsystemGroups + " groups in subsystem " + s.getName());
+		}
+		System.out.println("#" + totalGroups + " groups in DAQ");
+	}
+
+	/**
+	 * Copied from FlowchartCaseTestBase - refactor
+	 */
+	public DAQ getSnapshot(String fname) throws URISyntaxException {
+
+		StructureSerializer serializer = new StructureSerializer();
+
+		URL url = FlowchartCase1.class.getResource(fname);
+
+		File file = new File(url.toURI());
+
+		return serializer.deserialize(file.getAbsolutePath(), PersistenceFormat.SMILE);
 	}
 }

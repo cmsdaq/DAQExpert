@@ -43,12 +43,22 @@ public class FEDHierarchyRetriever {
 				Set<FED> depFeds = new HashSet<>();
 
 				String compactDependentList = "[";
-				for (FED dep : fed.getDependentFeds()) {
 
-					if (!(dep.isFrlMasked() && dep.isFmmMasked())) {
+				if (fed.isHasTTS() && fed.isHasSLINK()) {
+					// if FED has both SLINK and TTS than don't treat is
+					// as a dependent FED - that's the case for all ECAL
+					// FEDS
+					compactDependentList += "ignored";
+				} else {
 
-						compactDependentList += dep.getSrcIdExpected() + ", ";
-						depFeds.add(dep);
+					for (FED dep : fed.getDependentFeds()) {
+
+						if (!(dep.isFrlMasked() && dep.isFmmMasked())) {
+
+							compactDependentList += dep.getSrcIdExpected() + ", ";
+
+							depFeds.add(dep);
+						}
 					}
 				}
 				compactDependentList += "]";
@@ -64,6 +74,7 @@ public class FEDHierarchyRetriever {
 			Entry<FED, Set<FED>> n = i.next();
 
 			logger.debug("Reverting entry: " + n.getKey().getSrcIdExpected() + ":" + n.getValue());
+
 			if (n.getValue() == null || n.getValue().size() == 0) {
 				logger.trace("- putting single key");
 				if (!revertedDependencyTree.containsKey(n.getKey())) {

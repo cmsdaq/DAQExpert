@@ -33,7 +33,7 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 					if (!ttcp.isMasked()) {
-						TTSState pmTTSState = TTSState.getByCode(ttcp.getTcds_pm_ttsState());
+						TTSState pmTTSState = getParitionState(ttcp);
 						if (pmTTSState == TTSState.DISCONNECTED) {
 
 							context.register("PROBLEM-SUBSYSTEM", subSystem.getName());

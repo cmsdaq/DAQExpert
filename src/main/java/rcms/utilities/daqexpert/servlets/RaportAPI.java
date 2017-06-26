@@ -41,6 +41,7 @@ public class RaportAPI extends HttpServlet {
 
 			result.put("description", entry.getDescription());
 			result.put("name", entry.getTitle());
+			result.put("mature", entry.isMature());
 			result.put("duration", entry.getDuration());
 			
 			result.put("action", entry.getActionSteps());

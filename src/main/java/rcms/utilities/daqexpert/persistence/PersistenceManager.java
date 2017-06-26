@@ -210,6 +210,7 @@ public class PersistenceManager {
 		sb.append("where duration < :threshold ");
 		sb.append("and start_date < :endDate ");
 		sb.append("and end_date > :startDate ");
+		sb.append("and mature = true ");
 		sb.append("group by GROUP_NAME ");
 
 		switch (resolution) {
@@ -301,6 +302,7 @@ public class PersistenceManager {
 		long filterId = 0;
 		for (TinyEntryMapObject mapObject : tinyData) {
 			Condition curr = new Condition();
+			curr.setMature(true);
 			curr.setStart(mapObject.getStart());
 			curr.setEnd(mapObject.getEnd());
 			curr.setTitle(Long.toString(mapObject.getCount()));

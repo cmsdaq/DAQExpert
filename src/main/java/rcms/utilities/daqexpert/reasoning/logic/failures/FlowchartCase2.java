@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -52,14 +53,17 @@ public class FlowchartCase2 extends KnownFailure {
 
 			if (ERROR_STATE.equalsIgnoreCase(l0state) && ERROR_STATE.equalsIgnoreCase(daqstate)) {
 
-				for (FEDBuilder fb : daq.getFedBuilders()) {
-					RU ru = fb.getRu();
-					if (ru.getStateName().equalsIgnoreCase("Failed")) {
+				List<RU> failedRus = daq.getRusInState("Failed");
 
-						i++;
-						context.register("RU", ru.getHostname());
-						result = true;
-					}
+				if (failedRus.isEmpty()) {
+					return false;
+				}
+
+				for (RU ru : failedRus) {
+				
+					i++;
+					context.register("RU", ru.getHostname());
+
 				}
 
 				for (FED fed : daq.getFeds()) {
@@ -80,6 +84,8 @@ public class FlowchartCase2 extends KnownFailure {
 							context.register("TTCP", ttcpName);
 							context.register("SUBSYSTEM", subsystemName);
 							i++;
+
+							result = true;
 						}
 					}
 				}

@@ -29,6 +29,27 @@ public class ReportManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
+	public List<Long> getDowntimeHistogram(Date start, Date end) {
+
+		List<Long> result = new ArrayList<>();
+		Long threshold = 1000L;
+
+		List<Condition> a = getConditions(LogicModuleRegistry.RunOngoing, start, end, threshold);
+
+		for (Condition condition : a) {
+			if (condition.getDuration() < 1000 * 60 * 60 * 24) {
+				result.add(condition.getDuration() / 1000 / 60);
+			} else {
+				logger.info("Ignoring entry of duration " + condition.getDuration() / 1000 / 60 / 24 + "h");
+			}
+		}
+
+		logger.info("Returning " + result.size() + " set to prepare the histogram");
+
+		return result;
+
+	}
+
 	public Report prepareReport(Date start, Date end) {
 		Report report = new Report();
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -38,7 +39,7 @@ public class StatisticsAPI extends HttpServlet {
 
 		String startRange = request.getParameter("start");
 		String endRange = request.getParameter("end");
-		logger.debug("Getting statistics from : " + startRange + " to " + endRange);
+		logger.info("Getting statistics from : " + startRange + " to " + endRange);
 
 		Date startDate = null;
 		Date endDate = null;
@@ -57,10 +58,15 @@ public class StatisticsAPI extends HttpServlet {
 		logger.info("Parsed range from : " + startDate + " to " + endDate);
 
 		Report report = Application.get().getReportManager().prepareReport(startDate, endDate);
+		List<Long> downtimeHistogram = Application.get().getReportManager().getDowntimeHistogram(startDate, endDate);
 
 		logger.info(report.getSummary());
+		logger.info(downtimeHistogram);
 
+		request.setAttribute("startdate", startDate);
+		request.setAttribute("enddate", endDate);
 		request.setAttribute("summary", report.getSummary());
+		request.setAttribute("downtimehistogram", objectMapper.writeValueAsString(downtimeHistogram));
 
 		request.getRequestDispatcher("/statistics.jsp").forward(request, response);
 

@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <%@page import="rcms.utilities.daqexpert.Setting"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <html>
 
 <head>
@@ -20,17 +21,12 @@
 <script src="external/bootstrap-tour.min.js"></script>
 <script src="external/moment-duration-format.min.js"></script>
 <script src="external/clipboard.min.js"></script>
+<script src="external/highcharts.js"></script>
 
 <!--  internal scripts -->
-<script src="static/js/basic.js"></script>
-<script src="static/js/raw-graph.js"></script>
-<script src="static/js/analysis-graph.js"></script>
 <script src="static/js/tour.js"></script>
-<script src="static/js/experimental.js"></script>
-<script src="static/js/run-info-link.js"></script>
-<script src="static/js/wbm-link.js"></script>
-<script src="static/js/daqview-link.js"></script>
 <script src="static/js/share.js"></script>
+<script src="static/js/statistics.js"></script>
 
 <!--  internal stylesheets -->
 <link rel="stylesheet" href="static/css/experimental.css">
@@ -58,7 +54,7 @@
 				href="<%out.println(Application.get().getProp(Setting.LANDING));%>"><b>DAQ</b>
 				Expert</a>
 		</div>
-		
+
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse"
@@ -70,9 +66,10 @@
 				<li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_DASHBOARD));%>"><i
 						class="glyphicon glyphicon-bell"></i> Dashboard</a></li>
-						
+
 				<!-- EXPERT BROWSER -->
-				<li ><a id="browser-link" href="index.jsp" data-url="${pageContext.request.requestURL}"><i
+				<li><a id="browser-link" href="index.jsp"
+					data-url="${pageContext.request.requestURL}"><i
 						class="glyphicon glyphicon-tasks"></i> Browser</a></li>
 
 
@@ -80,11 +77,11 @@
 				<li><a
 					href="<%out.println(Application.get().getProp(Setting.NM_ARCHIVE));%>"><i
 						class="glyphicon glyphicon-calendar"></i> Archive</a></li>
-						
+
 				<!-- EXPERT STATISTICS -->
 				<li class="active"><a id="reports-link" href="statistics"><i
 						class="glyphicon glyphicon-tasks"></i> Reports</a></li>
-						
+
 
 			</ul>
 		</div>
@@ -94,7 +91,15 @@
 
 
 	<div class="container">
-	<p >${summary}</p>
+		<p>
+			Showing statistics for
+			<fmt:formatDate pattern="yyyy-MM-dd'T'HH:mm:ss Z"
+				value="${startdate}" />
+			-
+			<fmt:formatDate pattern="yyyy-MM-dd'T'HH:mm:ss Z" value="${enddate}" />
+		</p>
+		<p>${summary}</p>
+		<div id="histogram-container" data-histogram="${downtimehistogram}"></div>
 	</div>
 </body>
 

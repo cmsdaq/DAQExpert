@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.report.Report;
 
 /**
@@ -50,23 +51,32 @@ public class StatisticsAPI extends HttpServlet {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(new Date());
 			cal.add(Calendar.HOUR, -24);
-			startDate = cal.getTime();
-			cal.add(Calendar.HOUR, -24 * 365);
 			endDate = cal.getTime();
+			cal.add(Calendar.HOUR, -24 * 7);
+			startDate = cal.getTime();
 		}
 
 		logger.info("Parsed range from : " + startDate + " to " + endDate);
 
 		Report report = Application.get().getReportManager().prepareReport(startDate, endDate);
-		List<Long> downtimeHistogram = Application.get().getReportManager().getDowntimeHistogram(startDate, endDate);
+		List<Long> noRateWhenExpectedHistogram = Application.get().getReportManager()
+				.getHistogram(LogicModuleRegistry.NoRateWhenExpected, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
+		List<Long> stableBeamsHistogram = Application.get().getReportManager()
+				.getHistogram(LogicModuleRegistry.StableBeams, startDate, endDate, 1000L, 1000L * 60 * 60 * 24 * 30);
+		List<Long> runOngoingHistogram = Application.get().getReportManager()
+				.getHistogram(LogicModuleRegistry.RunOngoing, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
 
 		logger.info(report.getSummary());
-		logger.info(downtimeHistogram);
+		logger.info(noRateWhenExpectedHistogram);
+		logger.info(stableBeamsHistogram);
+		logger.info(runOngoingHistogram);
 
 		request.setAttribute("startdate", startDate);
 		request.setAttribute("enddate", endDate);
 		request.setAttribute("summary", report.getSummary());
-		request.setAttribute("downtimehistogram", objectMapper.writeValueAsString(downtimeHistogram));
+		request.setAttribute("runongoinghistogram", objectMapper.writeValueAsString(runOngoingHistogram));
+		request.setAttribute("nrwehistogram", objectMapper.writeValueAsString(noRateWhenExpectedHistogram));
+		request.setAttribute("stablebeamshistogram", objectMapper.writeValueAsString(stableBeamsHistogram));
 
 		request.getRequestDispatcher("/statistics.jsp").forward(request, response);
 

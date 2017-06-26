@@ -1,5 +1,3 @@
-var bucketSizeInMin = 5;
-
 /**
  * Get histogram data out of xy data
  * 
@@ -36,49 +34,61 @@ function histogram(data, step) {
 	return arr;
 }
 
+function buildChart(containerId, title, step, factor, unit) {
+	var container = document.getElementById(containerId);
+	console.log("Container: " + container);
+	data = $('#' + containerId).data("histogram");
+	var dataNormalized = [];
+	$(data).each(function(index) {
+		dataNormalized.push(this / factor);
+	});
+	console.log("Data: " + dataNormalized);
+	Highcharts.chart(container, {
+		chart : {
+			type : 'column'
+		},
+		title : {
+			text : title
+		},
+		xAxis : {
+			gridLineWidth : 1,
+			labels : {
+				formatter : function() {
+					return this.value + ' ' + unit;
+				}
+			},
+		},
+		tooltip : {
+			formatter : function() {
+				return '<b>' + this.y + '</b> occurrences of <b>' + this.x
+						+ '-' + (this.x + step) + ' ' + unit + ' </b> events';
+			}
+		},
+		yAxis : [ {
+			title : {
+				text : 'Count'
+			}
+		} ],
+
+		series : [ {
+			name : 'Duration',
+			type : 'column',
+			data : histogram(dataNormalized, step),
+
+			pointPadding : 0,
+			groupPadding : 0,
+			pointPlacement : 'between'
+		} ]
+	});
+
+}
+
 $(document).ready(
 		function() {
-			var containerId = 'histogram-container';
-			var container = document.getElementById(containerId);
-			console.log("Container: " + container);
-			data = $('#' + containerId).data("histogram");
-			console.log("Data: " + data);
-			Highcharts.chart(container, {
-				chart : {
-					type : 'column'
-				},
-				title : {
-					text : 'Run ongoing duration histogram'
-				},
-				xAxis : {
-					gridLineWidth : 1,
-					labels : {
-						formatter : function() {
-							return this.value + ' min';
-						}
-					},
-				},
-				tooltip : {
-					formatter : function() {
-						return '<b>' + this.y + '</b> occurrences of <b>'
-								+ this.x + '-' + (this.x + bucketSizeInMin)
-								+ ' min </b> events';
-					}
-				},
-				yAxis : [ {
-					title : {
-						text : 'Count'
-					}
-				} ],
-
-				series : [ {
-					name : 'Duration',
-					type : 'column',
-					data : histogram(data, 5),
-
-					pointPadding : 0,
-					groupPadding : 0,
-					pointPlacement : 'between'
-				} ]
-			});
+			buildChart('container-histogram-stable-beams',
+					'Stable beams histogram', 5, 60*60, 'h');
+			buildChart('container-histogram-nrwe',
+					'No rate when expected histogram', 5, 1, 'sec');
+			buildChart('container-histogram-run-ongoing',
+					'Run ongoing duration histogram', 5, 60, 'min');
 		});

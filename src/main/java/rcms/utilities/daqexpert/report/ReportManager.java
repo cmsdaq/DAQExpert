@@ -29,16 +29,16 @@ public class ReportManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	public List<Long> getDowntimeHistogram(Date start, Date end) {
+	public List<Long> getHistogram(LogicModuleRegistry logicModule, Date start, Date end, Long minThreshold,
+			Long maxThreshold) {
 
 		List<Long> result = new ArrayList<>();
-		Long threshold = 1000L;
 
-		List<Condition> a = getConditions(LogicModuleRegistry.RunOngoing, start, end, threshold);
+		List<Condition> a = getConditions(logicModule, start, end, minThreshold);
 
 		for (Condition condition : a) {
-			if (condition.getDuration() < 1000 * 60 * 60 * 24) {
-				result.add(condition.getDuration() / 1000 / 60);
+			if (condition.getDuration() < maxThreshold) {
+				result.add(condition.getDuration() / 1000);
 			} else {
 				logger.info("Ignoring entry of duration " + condition.getDuration() / 1000 / 60 / 24 + "h");
 			}

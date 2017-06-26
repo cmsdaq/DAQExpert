@@ -98,8 +98,14 @@
 			-
 			<fmt:formatDate pattern="yyyy-MM-dd'T'HH:mm:ss Z" value="${enddate}" />
 		</p>
-		<p>${summary}</p>
-		<div id="histogram-container" data-histogram="${downtimehistogram}"></div>
+		<p>${summary}</p>${downtimehistogram}
+
+		<div id="container-histogram-stable-beams"
+			data-histogram="${stablebeamshistogram}"></div>
+		<div id="container-histogram-run-ongoing"
+			data-histogram="${runongoinghistogram}"></div>
+		<div id="container-histogram-nrwe"
+			data-histogram="${nrwehistogram}"></div>
 	</div>
 </body>
 

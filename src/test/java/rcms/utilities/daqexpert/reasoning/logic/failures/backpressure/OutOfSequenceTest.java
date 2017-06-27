@@ -3,10 +3,13 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**
@@ -33,19 +36,15 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 		assertOnlyOneIsSatisified(fc1, snapshot);
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-FED").size());
-		assertEquals(548, fc1.getContext().getContext().get("PROBLEM-FED").iterator().next());
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-RU").size());
-		assertEquals("ru-c2e14-27-01.cms", fc1.getContext().getContext().get("PROBLEM-RU").iterator().next());
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ru-c2e14-27-01.cms")), context.getContext().get("PROBLEM-RU"));
+		assertEquals(new HashSet(Arrays.asList(1360)), context.getContext().get("AFFECTED-FED"));
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
-		assertEquals("ES", fc1.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
-
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-TTCP").size());
-		assertEquals("ES+", fc1.getContext().getContext().get("PROBLEM-TTCP").iterator().next());
-
-		assertEquals(1, fc1.getContext().getContext().get("AFFECTED-FED").size());
-		assertEquals(1360, fc1.getContext().getContext().get("AFFECTED-FED").iterator().next());
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
 
 	}
 
@@ -96,14 +95,63 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(true, fc1, snapshot);
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-FED").size());
-		assertEquals(622, fc1.getContext().getContext().get("PROBLEM-FED").iterator().next());
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
-		assertEquals("ECAL", fc1.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-TTCP").size());
-		assertEquals("EB-", fc1.getContext().getContext().get("PROBLEM-TTCP").iterator().next());
+	}
+
+	/////////////////////////////////////////////////////////////
+
+	@Test
+	public void fromDevTase03Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497898122474.smile");
+
+		assertOnlyOneIsSatisified(fc1, snapshot);
+
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
+
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("FED"));
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("TTCP"));
+
+	}
+
+	@Test
+	public void fromDevTase04Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1496315027862.smile");
+
+		assertOnlyOneIsSatisified(fc1, snapshot);
+
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
+
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("TTCP"));
+
+	}
+
+	@Test
+	public void fromDevTase05Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1495916283277.smile");
+
+		assertOnlyOneIsSatisified(fc1, snapshot);
+
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
+
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
 
 	}
 

@@ -34,13 +34,15 @@ function histogram(data, step) {
 	return arr;
 }
 
-function buildChart(containerId, title, step, factor, unit) {
+function buildChart(containerId, title, step, factor, unit, max) {
 	var container = document.getElementById(containerId);
 	console.log("Container: " + container);
 	data = $('#' + containerId).data("histogram");
 	var dataNormalized = [];
 	$(data).each(function(index) {
-		dataNormalized.push(this / factor);
+		if (this / factor < max) {
+			dataNormalized.push(this / factor);
+		}
 	});
 	console.log("Data: " + dataNormalized);
 	Highcharts.chart(container, {
@@ -86,9 +88,9 @@ function buildChart(containerId, title, step, factor, unit) {
 $(document).ready(
 		function() {
 			buildChart('container-histogram-stable-beams',
-					'Stable beams histogram', 5, 60*60, 'h');
+					'Stable beams histogram', 2, 60 * 60, 'h', 50);
 			buildChart('container-histogram-nrwe',
-					'No rate when expected histogram', 5, 1, 'sec');
+					'No rate when expected histogram', 5, 1, 'sec', 500);
 			buildChart('container-histogram-run-ongoing',
-					'Run ongoing duration histogram', 5, 60, 'min');
+					'Run ongoing duration histogram', 5, 60, 'min', 200);
 		});

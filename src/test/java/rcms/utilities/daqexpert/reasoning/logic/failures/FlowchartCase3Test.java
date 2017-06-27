@@ -105,4 +105,31 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 	}
 
+	@Test
+	public void case5Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497448564059.smile");
+
+		assertEqualsAndUpdateResults(true, fc2, snapshot);
+		assertEqualsAndUpdateResults(true, ruFailed, snapshot);
+
+		// TODO: why FC6 and FC2?
+		assertEqualsAndUpdateResults(true, fc3, snapshot);
+		assertEqualsAndUpdateResults(true, fc6, snapshot);
+
+		assertEqualsAndUpdateResults(false, fc1, snapshot);
+		// new subcases of old flowchart case 4
+		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, piProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
+		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+		assertEqualsAndUpdateResults(false, fc5, snapshot);
+		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+		assertEquals(false, unidentified.satisfied(snapshot, results));
+
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+
+	}
+
 }

@@ -29,8 +29,6 @@ public abstract class KnownFailure extends ActionLogicModule {
 		return this.getContext().getActionWithContext(this.action);
 	}
 
-	
-
 	protected boolean isMasked(FED fed) {
 		if (fed.isFmmMasked() || fed.isFrlMasked()) {
 			return true;

@@ -10,11 +10,16 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedDataTest;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceTest;
 
 /**
  *
  * @author Maciej Gladki
+ * 
+ * @deprecated replaced by {@link CorruptedDataTest}
  */
+@Deprecated
 public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 	@Test
@@ -36,7 +41,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 
@@ -67,7 +72,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 
@@ -98,7 +103,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 
 		assertEqualsAndUpdateResults(false, fc1, snapshot);
 		assertEqualsAndUpdateResults(false, fc3, snapshot);
@@ -108,7 +113,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
@@ -128,7 +133,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 		// TODO: why FC3 and FC6?
 		assertEqualsAndUpdateResults(true, fc3, snapshot);
-		assertEqualsAndUpdateResults(true, fc6, snapshot);
+		//assertEqualsAndUpdateResults(true, fc6, snapshot);
 
 		assertEqualsAndUpdateResults(false, fc1, snapshot);
 		// new subcases of old flowchart case 4
@@ -168,7 +173,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 

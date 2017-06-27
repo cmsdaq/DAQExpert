@@ -19,8 +19,9 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void case1Test() throws URISyntaxException {
-		test("1478748186297.smile");
 
+		DAQ snapshot = getSnapshot("1478748186297.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
@@ -28,7 +29,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void case2Test() throws URISyntaxException {
-		test("1480813540739.smile");
+		DAQ snapshot = getSnapshot("1480813540739.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
@@ -36,7 +38,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void ttsAtTopFMMNullButPmOutOfSyncTest() throws URISyntaxException {
-		test("1491576714151.smile");
+		DAQ snapshot = getSnapshot("1491576714151.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("TTCP"));
@@ -46,28 +49,10 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	public void case3Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1497963405145.smile");
 
+		assertOnlyOneIsSatisified(fc3, snapshot);
+
 		// TODO: why FC1?
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
 		System.out.println(fc1.getDescriptionWithContext());
-
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
-		assertEqualsAndUpdateResults(true, fc3, snapshot);
-
-		System.out.println(fc3.getDescriptionWithContext());
-
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
-
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
@@ -77,54 +62,22 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void case4Test() throws URISyntaxException {
-		test("1496647349638.smile");
+
+		DAQ snapshot = getSnapshot("1496647349638.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
+
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
-	}
-
-	private void test(String snapshotFile) throws URISyntaxException {
-
-		DAQ snapshot = getSnapshot(snapshotFile);
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
-		assertEqualsAndUpdateResults(true, fc3, snapshot);
-
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
-
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 	}
 
 	@Test
 	public void case5Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1497448564059.smile");
 
-		assertEqualsAndUpdateResults(true, fc2, snapshot);
-		assertEqualsAndUpdateResults(true, ruFailed, snapshot);
+		assertOnlyOneIsSatisified(fc3, snapshot);
 
-		// TODO: why FC6 and FC2?
-		assertEqualsAndUpdateResults(true, fc3, snapshot);
-		assertEqualsAndUpdateResults(true, fc6, snapshot);
-
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		// TODO: why FC6 and FC2, ruFailde?
 
 		Context context = fc3.getContext();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));

@@ -24,6 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelpe
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
+ * @deprecated
  */
 public class FlowchartCase6 extends KnownFailure {
 
@@ -96,15 +97,17 @@ public class FlowchartCase6 extends KnownFailure {
 			}
 
 			if (result) {
-				
-				// get the feds whose event counter is behind the one of the TCDS fed
+
+				// get the feds whose event counter is behind the one of the
+				// TCDS fed
 				List<FED> behindFeds = LogicModuleHelper.getFedsWithFewerFragments(daq);
 
 				for (FED fed : behindFeds) {
-					if (! fedsBackpressuredByDaq.contains(fed)) {
+					if (!fedsBackpressuredByDaq.contains(fed)) {
 
 						// this FED stopped sending data for no apparent reason
-						// (note that context.register() ignores duplicate entries)
+						// (note that context.register() ignores duplicate
+						// entries)
 						context.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
 					}
 				} // loop over FEDs

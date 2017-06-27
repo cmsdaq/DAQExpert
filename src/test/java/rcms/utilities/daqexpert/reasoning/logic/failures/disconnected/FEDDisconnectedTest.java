@@ -14,23 +14,8 @@ public class FEDDisconnectedTest extends FlowchartCaseTestBase {
 
 		DAQ snapshot = getSnapshot("1493157340132.smile");
 
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
+		assertOnlyOneIsSatisified(fedDisconnected, snapshot);
 
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(true, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
-
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 	}
 
 }

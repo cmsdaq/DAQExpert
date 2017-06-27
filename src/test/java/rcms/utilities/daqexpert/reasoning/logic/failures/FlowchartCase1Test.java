@@ -10,11 +10,15 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceTest;
 
 /**
  *
  * @author holzner
+ * 
+ * @deprecated replaced by {@link OutOfSequenceTest}
  */
+@Deprecated
 public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
 	/**
@@ -124,6 +128,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
 	}
 
+	@Deprecated
 	private void assertRestFalse(DAQ snapshot) {
 		assertEqualsAndUpdateResults(false, fc2, snapshot);
 		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
@@ -133,7 +138,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		// assertEqualsAndUpdateResults(false, fc6, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 	}

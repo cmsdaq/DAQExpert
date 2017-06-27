@@ -19,9 +19,9 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase2 extends KnownFailure {
+public class LegacyFlowchartCase2 extends KnownFailure {
 
-	public FlowchartCase2() {
+	public LegacyFlowchartCase2() {
 		this.name = "Corrupted data received";
 		this.description = "DAQ and level 0 in error state. "
 				+ "A RU {{RU}} is in Failed state. A FED {{FED}} has sent corrupted data to the DAQ. "
@@ -42,7 +42,7 @@ public class FlowchartCase2 extends KnownFailure {
 		this.action = action;
 	}
 
-	private static Logger logger = Logger.getLogger(FlowchartCase2.class);
+	private static Logger logger = Logger.getLogger(LegacyFlowchartCase2.class);
 	private final String ERROR_STATE = "ERROR";
 
 	@Override

@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -20,6 +21,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
  * @deprecated replaced by {@link CorruptedDataTest}
  */
 @Deprecated
+@Ignore
 public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 	@Test

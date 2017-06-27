@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -19,6 +20,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
  *             rcms.utilities.daqexpert.reasoning.logic.failures.backpressure
  */
 @Deprecated
+@Ignore
 public class FlowchartCase6Test extends FlowchartCaseTestBase {
 
 	@Test

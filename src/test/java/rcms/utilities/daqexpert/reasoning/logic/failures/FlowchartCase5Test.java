@@ -45,6 +45,18 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		// TODO: why ferol fifo stuck here?
 		assertOnlyOneIsSatisified(fc5, snapshot);
 
+		System.out.println(fc5.getDescriptionWithContext());
+
+	}
+
+	@Test
+	public void case5Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497562174081.smile");
+
+		assertOnlyOneIsSatisified(fc5, snapshot);
+
+		System.out.println(fc5.getDescriptionWithContext());
+
 		Context context = fc5.getContext();
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));

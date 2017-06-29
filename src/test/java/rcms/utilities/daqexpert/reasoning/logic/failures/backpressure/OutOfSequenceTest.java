@@ -6,6 +6,9 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -22,16 +25,17 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 	/**
+	 * NOTE that snapshot was produced before (TTS monitoring of upgraded FEDs) - it's not possible to identify it with
+	 * new BackpressureAnalyzer - no TTS of individual FED
 	 * 
-	 * Cannot detect with current logic. No FED is backpressured!
 	 * 
-	 * <a href=
-	 * "http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2016-12-04-01:05:48">
-	 * DAQView link</a>
+	 * <a href= "http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2016-12-04-01:05:48"> DAQView
+	 * link</a>
 	 */
 	@Test
+	@Ignore
 	public void testSatisfied() throws URISyntaxException {
-		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1480809948643.smile");
 
 		assertOnlyOneIsSatisified(fc1, snapshot);
@@ -49,31 +53,29 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 	}
 
 	/**
-	 * <a href=
-	 * "http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-03-20-13:49:09">
-	 * DAQView link</a>
+	 * NOTE that snapshot was produced before (TTS monitoring of upgraded FEDs) - it's not possible to identify it with
+	 * new BackpressureAnalyzer - no TTS of individual FED
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-03-20-13:49:09
 	 */
+	@Ignore
 	@Test
 	public void trgFedCase() throws URISyntaxException {
-		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1490014149195.smile");
 
 		assertOnlyOneIsSatisified(fc1, snapshot);
 
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-FED").size());
-		assertEquals(1386, fc1.getContext().getContext().get("PROBLEM-FED").iterator().next());
-		assertEquals(1, fc1.getContext().getContext().get("PROBLEM-RU").size());
-		assertEquals("ru-c2e12-40-01.cms", fc1.getContext().getContext().get("PROBLEM-RU").iterator().next());
-
-		assertEquals(1, fc1.getContext().getContext().get("AFFECTED-FED").size());
-		assertEquals(1380, fc1.getContext().getContext().get("AFFECTED-FED").iterator().next());
-
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1386")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ru-c2e12-40-01.cms")), context.getContext().get("PROBLEM-RU"));
+		assertEquals(new HashSet(Arrays.asList(1380)), context.getContext().get("AFFECTED-FED"));
 	}
 
 	/**
-	 * <a href=
-	 * "http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2016-11-26-07:21:35">
-	 * DAQView link</a>
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2016-11-26-07:21:35
 	 * 
 	 * @throws URISyntaxException
 	 */
@@ -84,19 +86,23 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1480141295312.smile");
 		assertOnlyOneIsSatisified(fc1, snapshot);
 
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList(774)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("DT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ru-c2e15-28-01.cms")), context.getContext().get("PROBLEM-RU"));
+		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().get("AFFECTED-FED"));
+
 	}
 
 	/**
-	 * test parsing of the FED number from the RU error message for a few cases.
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-04-27-05:21:15
 	 */
 	@Test
 	public void testFEDparsing() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1493263275021.smile");
 
 		assertEqualsAndUpdateResults(true, fc1, snapshot);
-
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
 
 		Context context = fc1.getContext();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
@@ -107,9 +113,16 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 	/////////////////////////////////////////////////////////////
 
+	/*
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-19-20:48:42
+	 * 
+	 * cannot identify as there is no backpressured FED
+	 */
 	@Test
+	@Ignore
 	public void fromDevTase03Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1497898122474.smile");
+		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 
 		assertOnlyOneIsSatisified(fc1, snapshot);
 
@@ -117,15 +130,24 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getActionWithContext());
 
 		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
 
 	}
 
+	/*
+	 * 
+	 * NOTE that snapshot was produced before (TTS monitoring of upgraded FEDs) - it's not possible to identify it with
+	 * new BackpressureAnalyzer - no TTS of individual FED
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-01-13:03:47
+	 */
 	@Test
+	@Ignore
 	public void fromDevTase04Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1496315027862.smile");
+		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 
 		assertOnlyOneIsSatisified(fc1, snapshot);
 
@@ -133,13 +155,20 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getActionWithContext());
 
 		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
 
 	}
 
+	/*
+	 * NOTE that snapshot was produced before (TTS monitoring of upgraded FEDs) - it's not possible to identify it with
+	 * new BackpressureAnalyzer - no TTS of individual FED
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-05-27-22:18:03
+	 */
 	@Test
+	@Ignore
 	public void fromDevTase05Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1495916283277.smile");
 
@@ -149,9 +178,9 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getActionWithContext());
 
 		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
 
 	}
 

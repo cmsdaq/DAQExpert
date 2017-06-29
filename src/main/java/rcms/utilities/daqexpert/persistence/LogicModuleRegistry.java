@@ -47,6 +47,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedSto
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -100,13 +101,14 @@ public enum LogicModuleRegistry {
 	
 	
 	LinkProblem				(new LinkProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   37, 10010),
-	RuStuckWaiting			(new RuStuckWaiting(),			 ConditionGroup.FLOWCHART,             "",                                                   38, 10011),
-	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10012),
-	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   20, 10013),
-	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   41, 10013),
-	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   42, 10013),
-	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10004),
-	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10005),
+	RuStuckWaiting			(new RuStuckWaiting(),			 ConditionGroup.FLOWCHART,             "",                                                   38, 10010),
+	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10010),
+	RuStuckWaitingOther		(new RuStuckWaitingOther(),		 ConditionGroup.FLOWCHART,             "",                                                   40, 10010),
+	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   41, 10010),
+	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 10010),
+	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   43, 10010),
+	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
+	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

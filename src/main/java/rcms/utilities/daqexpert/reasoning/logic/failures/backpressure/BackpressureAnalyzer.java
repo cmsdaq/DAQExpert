@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +22,7 @@ import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
 /**
  * Logic module identifying 6 flowchart case.
@@ -61,69 +64,111 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 							|| (ttsStateAtAPV == TTSState.BUSY || ttsStateAtAPV == TTSState.WARNING)
 							|| (ttsStateAtPM == TTSState.BUSY || ttsStateAtPM == TTSState.WARNING)) {
 
+						Map<FED, Set<FED>> feds = FEDHierarchyRetriever.getFEDHierarchy(ttcp);
+
 						logger.trace("Found partition in B/W: TTCP " + ttcp.getName() + " of " + subSystem.getName());
-						for (FED fed : ttcp.getFeds()) {
+						for (Entry<FED, Set<FED>> fed : feds.entrySet()) {
 
-							if (!fed.isFrlMasked()) {
-								// TODO: removed check B or W due to some has
-								// null
-								TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
+							TTSState currentFedState = TTSState.getByCode(fed.getKey().getTtsState());
+							if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)) {
 
-								if (fed.getPercentBackpressure() > 0F) {
+								logger.debug("Found FED in busy/warning: " + fed.getKey().getSrcIdExpected() + ": "
+										+ fed.getKey().getTtsState());
 
-									logger.trace("Found backpressured FED " + fed.getSrcIdExpected() + ", value: "
-											+ fed.getPercentBackpressure());
+								if (fed.getValue().size() > 0) {
 
-									saveAffectedElementsContext(subSystem, ttcp, fed);
+									logger.debug("FED " + fed.getKey().getSrcIdExpected() + " is a pseudofed");
 
-									// MODIFICATION for OOS: helps with OOS
-									// OutOfSequenceTest:trgFedCase
-									try {
+									for (FED dep : fed.getValue()) {
 
-										RU relatedRu = fed.getFrl().getSubFedbuilder().getFedBuilder().getRu();
-										logger.trace("  Checking state of " + relatedRu.getHostname()
-												+ " for OOS or corrupted from " + fed.getSrcIdExpected()
-												+ " because of partition " + ttcp.getName());
-										Subcase problemWithRu = checkProblemWithDataReceivedByRu(relatedRu);
-										if (problemWithRu != null) {
-											return problemWithRu;
+										if (dep.getPercentBackpressure() > 0F) {
+
+											logger.debug("Found FED in busy/warning: " + fed.getKey().getSrcIdExpected()
+													+ ": " + fed.getKey().getPercentBackpressure());
+
+											context.register("FED", dep.getSrcIdExpected());
+											context.register("FEDSTATE", "(" + currentFedState.name() + " seen on FED"
+													+ fed.getKey().getSrcIdExpected() + ")");
+
+											return foundFedInBusy(daq, dep);
 										}
-									} catch (NullPointerException e) {
+
 									}
 
-									Subcase subcase = detectSubcase(daq, fed);
+								} else {
 
-									if (subcase != null) {
-										switch (subcase) {
+									logger.debug("FED " + fed.getKey().getSrcIdExpected()
+											+ " is individual, has both TTS and slink");
 
-										case UnknownFilterfarmProblem:
-											// this.description += "Caused by
-											// unknown problem with
-											// filterfarm.";
-											break;
+									if (fed.getKey().getPercentBackpressure() > 0F) {
+										context.register("FED", fed.getKey().getSrcIdExpected());
+										context.register("FEDSTATE", currentFedState.name());
 
-										case SpecificFedBlocking:
-											// this.description += "Caused by
-											// {{FED}} that stopped sending data
-											// - it's the only FED in RU
-											// {{RU}}";
-											break;
-										case Unknown:
-											// this.description += "Could not
-											// determine the source problem";
-											break;
-
-										}
+										return foundFedInBusy(daq, fed.getKey());
 									}
-									return subcase;
 								}
+
 							}
+
+							// HERE WAS THE CODE THAT IS NOW IN foundFedInBusy
+
 						}
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	private Subcase foundFedInBusy(DAQ daq, FED fed) {
+
+		TTCPartition ttcp = fed.getTtcp();
+		SubSystem subSystem = ttcp.getSubsystem();
+
+		logger.trace("Found backpressured FED " + fed.getSrcIdExpected() + ", value: " + fed.getPercentBackpressure());
+
+		saveAffectedElementsContext(subSystem, ttcp, fed);
+
+		// MODIFICATION for OOS: helps with OOS
+		// OutOfSequenceTest:trgFedCase
+		try {
+
+			RU relatedRu = fed.getFrl().getSubFedbuilder().getFedBuilder().getRu();
+			logger.trace("  Checking state of " + relatedRu.getHostname() + " for OOS or corrupted from "
+					+ fed.getSrcIdExpected() + " because of partition " + ttcp.getName());
+			Subcase problemWithRu = checkProblemWithDataReceivedByRu(relatedRu);
+			if (problemWithRu != null) {
+				return problemWithRu;
+			}
+		} catch (NullPointerException e) {
+		}
+
+		Subcase subcase = detectSubcase(daq, fed);
+
+		if (subcase != null) {
+			switch (subcase) {
+
+			case UnknownFilterfarmProblem:
+				// this.description += "Caused by
+				// unknown problem with
+				// filterfarm.";
+				break;
+
+			case SpecificFedBlocking:
+				// this.description += "Caused by
+				// {{FED}} that stopped sending data
+				// - it's the only FED in RU
+				// {{RU}}";
+				break;
+			case Unknown:
+				// this.description += "Could not
+				// determine the source problem";
+				break;
+
+			}
+		}
+		return subcase;
+
 	}
 
 	private void saveAffectedElementsContext(SubSystem subSystem, TTCPartition ttcp, FED fed) {
@@ -401,6 +446,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			logger.trace(">Found failed RU " + ru.getHostname() + ", now will check for corrupted data");
 
 			List<FED> notMaskedFedsOfRuWithRequests = notMaskedFedsFromRU(ru);
+			boolean result = false;
 			for (FED fed : notMaskedFedsOfRuWithRequests) {
 				if (fed.getRuFedDataCorruption() > 0) {
 					logger.trace(">FED " + fed.getSrcIdExpected() + " has sent corrupted data "
@@ -409,10 +455,13 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 					context.register("PROBLEM-TTCP", fed.getTtcp().getName());
 					context.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
 					context.setActionKey(fed.getTtcp().getSubsystem().getName());
+					result = true;
 				}
 			}
+			if(result){
+				return Subcase.CorruptedDataReceived;				
+			}
 
-			return Subcase.CorruptedDataReceived;
 		} else if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
 
 			context.register("PROBLEM-RU", ru.getHostname());

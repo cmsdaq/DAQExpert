@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -16,10 +17,14 @@ public class RuStuckWaitingOther extends BackpressureAnalyzer {
 
 		this.description = "RU {{AFFECTED-RU}} is stuck waiting for FED {{PROBLEM-FED}}. "
 				+ "Problem FED(s) belong(s) to partition {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
-				+ "This causes backpressure at FED {{AFFECTED-FED}} in other FED-builder {{AFFECTED-FED-BUILDER}}. "
+				+ "This causes backpressure at FED {{AFFECTED-FED}} in other FED-builder {{AFFECTED-FED-BUILDER}} of subsystem {{AFFECTED-SUBSYSTEM}}. "
 				+ "Note that there is nothing wrong with backpressured FED {{AFFECTED-FED}}.";
 
-		this.action = null;
+		this.action = new SimpleAction("Try to recover: Stop the run",
+				"Red & green recycle the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data)",
+				"Start new Run (Try 1 time)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data) to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data)");
 
 	}
 

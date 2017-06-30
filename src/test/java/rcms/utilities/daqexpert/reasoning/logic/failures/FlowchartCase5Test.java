@@ -40,12 +40,20 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(149)), context.getContext().get("FED"));
 	}
 
-	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-22-04:01:25 */
+	/*
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-22-04:01:25
+	 * 
+	 * REMI: this issue has been discussed in detail in the email thread
+	 * "Fwd: ELOG : DAQ : Dump of FEROL40 with FED Id [1232 and 6 more] when blocking the run" on June 22/23. I think
+	 * the conclusion is that we do not know if the FEROL40 was indeed stuck for a couple of seconds, or if there was a
+	 * monitoring hiccup or anything else. I would keep the message as is for now and see if we can find another case.
+	 *
+	 */
 	@Test
 	public void case3Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1498096885568.smile");
 
-		// FIXME: why ferol fifo stuck here?
+		// FIXME: we dont know why ferol fifo stuck here: we keep it though?
 		assertSatisfiedLogicModules(snapshot, fc5, ferolFifoStuck);
 
 		System.out.println(fc5.getDescriptionWithContext());
@@ -86,6 +94,4 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(83)), context.getContext().get("FED"));
 	}
 
-	
-	
 }

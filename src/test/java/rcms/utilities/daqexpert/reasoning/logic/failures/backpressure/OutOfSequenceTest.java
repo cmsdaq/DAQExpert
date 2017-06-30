@@ -24,6 +24,32 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
  */
 public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
+	/*
+	 * 
+	 * THis issue is discussed in #84 - waiting for decisiont from #87
+	 * 
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-19-20:48:42
+	 * 
+	 * cannot identify as there is no backpressured FED
+	 */
+	@Test
+	public void testTheDecisionWhatToDoWithRedundantRuFailedTest() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497898122474.smile");
+		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+
+		assertSatisfiedLogicModules(snapshot, fc5);
+
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
+
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
+
+	}
+
+
 	/**
 	 * NOTE that snapshot was produced before (TTS monitoring of upgraded FEDs) - it's not possible to identify it with
 	 * new BackpressureAnalyzer - no TTS of individual FED
@@ -112,29 +138,6 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 	}
 
 	/////////////////////////////////////////////////////////////
-
-	/*
-	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-19-20:48:42
-	 * 
-	 * cannot identify as there is no backpressured FED
-	 */
-	@Test
-	@Ignore
-	public void fromDevTase03Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1497898122474.smile");
-		Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
-
-		assertOnlyOneIsSatisified(fc1, snapshot);
-
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
-
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
-
-	}
 
 	/*
 	 * 

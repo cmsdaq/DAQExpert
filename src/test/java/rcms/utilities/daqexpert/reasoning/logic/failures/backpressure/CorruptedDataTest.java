@@ -22,6 +22,27 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
  */
 public class CorruptedDataTest extends FlowchartCaseTestBase {
 
+	/*
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-24-05:12:16
+	 */
+	@Test
+	public void ecalSpecificCase2Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1498273936869.smile");
+
+		// FIXME: why ruFailed is satisfied?
+		assertSatisfiedLogicModules(snapshot, fc2, ruFailed);
+
+		System.out.println("Output: " + fc2.getDescriptionWithContext());
+		System.out.println("Output: " + fc2.getActionWithContext());
+
+		Context context = fc2.getContext();
+		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(4, fc2.getActionWithContext().size());
+
+	}
+
 	/**
 	 * http://daq-expert-dev.cms/daq2view-react/index.html?setup=cdaq&time=2017-03-27-15:52:23
 	 * 
@@ -87,27 +108,6 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		assertEquals(4, fc2.getActionWithContext().size());
 	}
 
-	/*
-	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-24-05:12:16
-	 */
-	@Test
-	public void ecalSpecificCase2Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1498273936869.smile");
-
-		// FIXME: why ruFailed is satisfied?
-		assertSatisfiedLogicModules(snapshot, fc2, ruFailed, fc5);
-
-		System.out.println("Output: " + fc2.getDescriptionWithContext());
-		System.out.println("Output: " + fc2.getActionWithContext());
-
-		Context context = fc2.getContext();
-		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
-		assertEquals(4, fc2.getActionWithContext().size());
-
-	}
-
 	@Test
 	public void nonEcalTest() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1498274256030.smile");
@@ -139,13 +139,15 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 	/*
 	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-27-10:20:36
+	 * 
+	 * corrupted-data (fc2) is correct. FED stuck should not trigger because 1120 is backpressured.
 	 */
 	@Test
 	public void case3Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1498551636794.smile");
 
 		// FIXME: why ruFailed is satisfied?
-		assertSatisfiedLogicModules(snapshot, fc2, fc5, ruFailed);
+		assertSatisfiedLogicModules(snapshot, fc2, ruFailed);
 
 		Context context = fc2.getContext();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));

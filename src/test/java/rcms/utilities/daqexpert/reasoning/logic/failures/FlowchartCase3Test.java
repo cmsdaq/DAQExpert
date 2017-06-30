@@ -78,12 +78,19 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	/*
 	 * 2017-06-14T15:56:04
 	 * 
+	 * REMI: The message (ru-failed) is indeed redundant. However, the RU error message gives the details about the
+	 * corruption. Is it possible to add the error message to the 'Corrupted data received' text?
+	 * 
+	 * HANNES: This is s strange case with multiple problems overlayed. It would be good to add the detailed error
+	 * message of 3 also to 2. We should check if we can make RU-failed more specific so that it does not trigger in
+	 * this case
+	 * 
 	 */
 	@Test
 	public void case5Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1497448564059.smile");
 
-		// FIXME: why FC2?
+		// FIXME: ru failed redundant
 		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
 
 		Context context = fc3.getContext();

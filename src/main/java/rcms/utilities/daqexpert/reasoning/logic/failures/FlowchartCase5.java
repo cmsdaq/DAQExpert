@@ -68,6 +68,7 @@ public class FlowchartCase5 extends KnownFailure {
 						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
 							Map<FED, Set<FED>> fedHierarchy = FEDHierarchyRetriever.getFEDHierarchy(ttcp);
+							boolean existsAtLeaseOneFedBackpressured = false;
 
 							for (Entry<FED, Set<FED>> fed : fedHierarchy.entrySet()) {
 								TTSState currentFedState = TTSState.getByCode(fed.getKey().getTtsState());
@@ -85,6 +86,8 @@ public class FlowchartCase5 extends KnownFailure {
 														"(" + (dep.getTtsState() != null ? dep.getTtsState()
 																: "FED has no individual TTS state, ")
 																+ currentFedState.name() + " @ its pseudo FED)");
+											} else {
+												existsAtLeaseOneFedBackpressured = true;
 											}
 										}
 									}
@@ -94,6 +97,8 @@ public class FlowchartCase5 extends KnownFailure {
 											result = true;
 											context.register("FED", fed.getKey().getSrcIdExpected());
 											context.register("FEDSTATE", currentFedState.name());
+										} else {
+											existsAtLeaseOneFedBackpressured = true;
 										}
 
 									}
@@ -105,6 +110,11 @@ public class FlowchartCase5 extends KnownFailure {
 										context.setActionKey(subSystem.getName());
 									}
 								}
+							}
+							if (existsAtLeaseOneFedBackpressured) {
+								// If there is at least one fed backpressured this LM should not
+								// fire (for more see github #83 issue)
+								result = false;
 							}
 						}
 					}

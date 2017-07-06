@@ -42,8 +42,7 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 
 		DAQ snapshot = getSnapshot("1497021716430.smile");
 
-		// FIXME: FC5 should not fire here but the snapshot is before 13 Jun when individual TTS states were introduced
-		assertSatisfiedLogicModules(snapshot, ruFailed, fc5);
+		assertSatisfiedLogicModules(snapshot, ruFailed);
 
 		// check the error message from ruFailed
 		// 9 RUs had the same error message, one had a slightly different one

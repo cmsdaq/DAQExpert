@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.net.URISyntaxException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -53,24 +54,6 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 		// Sat, 3 Jun 2017 03:39:00 UTC
 		DAQ snapshot = getSnapshot("1496461140693.smile");
 		assertOnlyOneIsSatisified(ferolFifoStuck, snapshot);
-	}
-
-	/**
-	 * test case where this module should NOT fire
-	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-17-14:44:51
-	 * 
-	 * this snapshot should NOT fire FEROLFifoStuck
-	 */
-	@Test
-	public void test06() throws URISyntaxException {
-		// Sun, 17 Jun 2017 14:44:52 CEST
-		// Sun, 17 Jun 2017 12:44:520 UTC
-
-		DAQ snapshot = getSnapshot("1497703492467.smile");
-		assertOnlyOneIsSatisified(fc5, snapshot);
-
-		// TODO: make sure FC1 fires correctly here
-
 	}
 
 }

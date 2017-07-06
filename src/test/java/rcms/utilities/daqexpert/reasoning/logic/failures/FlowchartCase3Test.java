@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -47,21 +48,6 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("TTCP"));
 	}
 
-	/* 2017-06-20T14:56:45 */
-	@Test
-	public void case3Test() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1497963405145.smile");
-
-		assertOnlyOneIsSatisified(fc3, snapshot);
-
-		// TODO: why FC1?
-		System.out.println(fc1.getDescriptionWithContext());
-
-		Context context = fc3.getContext();
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("TTCP"));
-
-	}
 
 	/* 2017-06-05T09:22:29 */
 	@Test

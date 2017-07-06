@@ -49,10 +49,12 @@ public class FlowchartCaseTestBase {
 	protected Map<String, Boolean> results = new HashMap<String, Boolean>();
 
 	protected final KnownFailure fc1 = new OutOfSequenceData();
+	protected final KnownFailure legacyFc1 = new LegacyFlowchartCase1();
 
 	protected final KnownFailure ruFailed = new RuFailed();
 
 	protected final KnownFailure fc2 = new CorruptedData();
+	protected final KnownFailure legacyFc2 = new LegacyFlowchartCase2();
 
 	protected final KnownFailure fc3 = new FlowchartCase3();
 
@@ -102,7 +104,10 @@ public class FlowchartCaseTestBase {
 		allLMsUnderTest.add(ruStuckWaitingOther);
 		allLMsUnderTest.add(fc1);
 		allLMsUnderTest.add(fc2);
-
+		
+		allLMsUnderTest.add(legacyFc1);
+		allLMsUnderTest.add(legacyFc2);
+		
 		allLMsUnderTest.add(ferolFifoStuck);
 		allLMsUnderTest.add(ruFailed);
 

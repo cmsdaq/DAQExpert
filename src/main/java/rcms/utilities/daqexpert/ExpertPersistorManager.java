@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +56,7 @@ public class ExpertPersistorManager extends PersistorManager {
 	 * @return DAQ snapshot found for given date
 	 * @throws IOException
 	 */
-	public DAQ findSnapshot(Date date) throws IOException {
+	public Pair<DAQ,String> findSnapshot(Date date) throws IOException {
 		List<File> candidates = new ArrayList<>();
 		String candidateDir = null;
 
@@ -76,7 +77,7 @@ public class ExpertPersistorManager extends PersistorManager {
 
 	}
 
-	private DAQ findSnapshot(Date date, List<File> candidates) {
+	private Pair<DAQ,String> findSnapshot(Date date, List<File> candidates) {
 		StructureSerializer structurePersistor = new StructureSerializer();
 		try {
 
@@ -116,8 +117,8 @@ public class ExpertPersistorManager extends PersistorManager {
 			}
 
 			logger.debug("Best file found: " + bestFile + " with time diff: " + diff + "ms.");
-			best = structurePersistor.deserialize(bestFile, PersistenceFormat.SMILE);
-			return best;
+			best = structurePersistor.deserialize(bestFile);
+			return Pair.of(best,bestFile);
 
 		} catch (IOException e) {
 			logger.error("IO problem finding snapshot", e);

@@ -11,9 +11,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.util.RawValue;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
@@ -43,15 +48,25 @@ public class SnapshotAPI extends HttpServlet {
 		logger.debug("Parsed requested snapshot date: " + timeDate);
 		String json = "";
 		try {
-			DAQ result = ExpertPersistorManager.get().findSnapshot(timeDate);
+			Pair<DAQ,String> fullResult = ExpertPersistorManager.get().findSnapshot(timeDate);
 
+			DAQ result = fullResult.getLeft();
+			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			StructureSerializer ss = new StructureSerializer();
 			ss.serialize(result, baos, PersistenceFormat.JSONREFPREFIXED);
 
-			json = baos.toString(java.nio.charset.StandardCharsets.UTF_8.toString());
-
+			String snapshot = baos.toString(java.nio.charset.StandardCharsets.UTF_8.toString());
+			
+			RawValue rv = new RawValue(snapshot);
+			JsonNode node = JsonNodeFactory.instance.rawValueNode(rv);
+			
+			Map<String, Object> jsonResult = new HashMap<>();
+			jsonResult.put("snapshot",node);
+			jsonResult.put("file",fullResult.getRight());
+			json = objectMapper.writeValueAsString(jsonResult);
+			
 			logger.debug("Found snapshot with timestamp: " + new Date(result.getLastUpdate()));
 			logger.debug("Snapshot fragment: " + json.substring(0, 1000));
 		} catch (RuntimeException e) {

@@ -76,7 +76,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 
 				try {
 					Long startDeserializing = System.currentTimeMillis();
-					daq = structureSerializer.deserialize(file.getAbsolutePath().toString(), PersistenceFormat.SMILE);
+					daq = structureSerializer.deserialize(file.getAbsolutePath().toString());
 
 					Long endDeserializing = System.currentTimeMillis();
 					deserializingTime += (endDeserializing - startDeserializing);

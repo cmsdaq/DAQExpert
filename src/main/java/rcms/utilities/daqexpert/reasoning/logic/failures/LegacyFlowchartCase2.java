@@ -11,6 +11,7 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
 
 /**
  * Logic module identifying flowchart case.
@@ -49,6 +50,9 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+			return false;
+		
+		if(results.get(CorruptedData.class.getSimpleName()))
 			return false;
 
 		assignPriority(results);

@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
 /**
  * Logic module identifying 1 flowchart case.
@@ -23,8 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 public class LegacyFlowchartCase1 extends KnownFailure {
 
 	/**
-	 * regex for getting ttc partition and FED source id which caused the sync
-	 * loss from the RU exception message
+	 * regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message
 	 */
 	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
@@ -69,6 +69,9 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
+		if (results.get(OutOfSequenceData.class.getSimpleName()))
+			return false;
+
 		assignPriority(results);
 
 		String daqstate = daq.getDaqState();
@@ -99,7 +102,25 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 			} else {
 
-				context.register("ORIGERRMSG", syncLossRU.getErrorMsg());
+				String originalMessage = syncLossRU.getErrorMsg();
+				String trimmedMessage = originalMessage;
+				int openingQuote = originalMessage.indexOf("'", 0);
+				if (-1 != openingQuote) {
+					int closingQuote = originalMessage.indexOf("'", openingQuote + 1);
+					if (-1 != closingQuote) {
+						// both opening and closing quote found,
+						int additionalQuote = originalMessage.indexOf("'", closingQuote + 1);
+						if (-1 == additionalQuote) {
+							// there is no additional quotes - for sure this is the only quotes, we can trim
+							trimmedMessage = originalMessage.substring(openingQuote, closingQuote);
+						} else {
+							System.out.println("Cannot trim the message: " + originalMessage + " too many quotes: "
+									+ openingQuote + ", " + closingQuote + ", " + additionalQuote);
+						}
+					}
+				}
+
+				context.register("ORIGERRMSG", trimmedMessage);
 
 				// find the FED from the exception message
 				//

@@ -37,6 +37,8 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
+import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase1;
+import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RuFailed;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
@@ -72,8 +74,8 @@ public enum LogicModuleRegistry {
 	Downtime                (new Downtime(),                 ConditionGroup.DOWNTIME,              "",                                                   16),
 	Deadtime                (new Deadtime(),                 ConditionGroup.DEADTIME,              "",                                                   17),
 	CriticalDeadtime        (new CriticalDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   18,   105),
-	FlowchartCase1          (null,                           ConditionGroup.FLOWCHART,             "Replaced by OutOfSequenceData",                     -19, 10004),
-	FlowchartCase2          (null,                           ConditionGroup.FLOWCHART,             "Replaced by CorruptedData",                         -20, 10005),
+	FlowchartCase1          (new LegacyFlowchartCase1(),     ConditionGroup.FLOWCHART,             "Legacy OutOfSequenceData",                     997, 10004),
+	FlowchartCase2          (new LegacyFlowchartCase2(),     ConditionGroup.FLOWCHART,             "Legacy CorruptedData",                         998, 10005),
 	FlowchartCase3          (new FlowchartCase3(),           ConditionGroup.FLOWCHART,             "",                                                   21, 10006),
 	FlowchartCase4          (null,                           ConditionGroup.FLOWCHART,             "Partition disconnected: extended to other LMs",      22,     0),
 	FlowchartCase5          (new FlowchartCase5(),           ConditionGroup.FLOWCHART,             "",                                                   23, 10008),

@@ -172,7 +172,7 @@
 				</div>
 				<div class="modal-body">
 					<p>
-						Snapshot <span id="snapshot-date">/date/</span> in JSON format:
+						Snapshot <span id="snapshot-date">/date/</span>. Persisted in <code id="snapshot-file">/path/</code>
 					</p>
 					<pre class="prettyprint lang-json" id="json-body"></pre>
 				</div>

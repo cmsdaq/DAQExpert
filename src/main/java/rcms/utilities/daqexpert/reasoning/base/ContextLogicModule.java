@@ -16,5 +16,9 @@ public abstract class ContextLogicModule extends SimpleLogicModule {
 	public Context getContext() {
 		return context;
 	}
+	
+	public String getDescriptionWithContext() {
+		return this.getContext().getContentWithContext(this.description);
+	}
 
 }

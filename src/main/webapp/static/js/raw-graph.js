@@ -88,10 +88,11 @@ var initRawGraph = function() {
 		var parameters = {};
 		parameters['time'] = JSON.stringify(properties['time']);
 		$.getJSON("snapshot", parameters, function(data) {
-			var preetified = JSON.stringify(data, null, 2);
+			var preetified = JSON.stringify(data['snapshot'], null, 2);
 			// console.log(data['lastUpdate']);
 			$("#json-body").html(preetified);
-			$("#snapshot-date").html(moment(data['lastUpdate']).format());
+			$("#snapshot-date").html(moment(data['snapshot']['lastUpdate']).format());
+			$("#snapshot-file").html(data['file']);
 			$('#snapshot-popup').modal('show')
 		}).error(function(jqXHR, textStatus, errorThrown) {
 			console.log("error " + textStatus);

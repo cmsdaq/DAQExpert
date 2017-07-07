@@ -1,25 +1,38 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 
 /**
- *  Some utility functions used by the logic modules.
+ * Some utility functions used by the logic modules.
  */
-public class LogicModuleHelper
-{
+public class LogicModuleHelper {
 
-	/** @return the event counter of the reference FED (TCDS) or null
-	    if this can't be found. */
+	private static final Logger logger = Logger.getLogger(LogicModuleHelper.class);
+
+	/**
+	 * @return the event counter of the reference FED (TCDS) or null if this
+	 *         can't be found.
+	 */
 	public static Long getRefEventCounter(DAQ daq) {
 		// find the EVM
 		// TODO: we could cache this as long as the session id
-		//       does not change
+		// does not change
 		RU evm = daq.getEVM();
 
 		if (evm == null)
@@ -42,11 +55,14 @@ public class LogicModuleHelper
 		return refFED.getEventCounter();
 	}
 
-	/** @return a list of FEDs which have sent fewer events than the TCDS.
-	 *   Ignores those which are FRL masked or do not have an FRL (pseudofeds).
+	/**
+	 * @return a list of FEDs which have sent fewer events than the TCDS.
+	 *         Ignores those which are FRL masked or do not have an FRL
+	 *         (pseudofeds).
 	 *
-	 *   This can be used to find the FEDs which block data taking because
-	 *   they are not sending fragments anymore (if the trigger rate is zero).
+	 *         This can be used to find the FEDs which block data taking because
+	 *         they are not sending fragments anymore (if the trigger rate is
+	 *         zero).
 	 */
 	public static List<FED> getFedsWithFewerFragments(DAQ daq) {
 
@@ -61,7 +77,7 @@ public class LogicModuleHelper
 
 		for (FED fed : daq.getFeds()) {
 
-			if (! fed.isHasSLINK()) {
+			if (!fed.isHasSLINK()) {
 				// pseudofed, can't block data taking by not sending triggers
 				continue;
 			}

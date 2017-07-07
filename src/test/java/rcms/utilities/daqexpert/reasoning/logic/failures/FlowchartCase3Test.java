@@ -1,12 +1,16 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashSet;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 
 /**
  *
@@ -14,42 +18,71 @@ import rcms.utilities.daqaggregator.data.DAQ;
  */
 public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
+	/* 2016-11-10T04:23:06 */
 	@Test
 	public void case1Test() throws URISyntaxException {
-		test("1478748186297.smile");
+		DAQ snapshot = getSnapshot("1478748186297.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
 	}
 
+	/* 2016-12-04T02:05:40 */
 	@Test
 	public void case2Test() throws URISyntaxException {
-		test("1480813540739.smile");
+		DAQ snapshot = getSnapshot("1480813540739.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 	}
-	
+
+	/* 2017-04-07T16:51:54 */
 	@Test
 	public void ttsAtTopFMMNullButPmOutOfSyncTest() throws URISyntaxException {
-		test("1491576714151.smile");
+		DAQ snapshot = getSnapshot("1491576714151.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("TTCP"));
 	}
-	
-	
 
-	private void test(String snapshotFile) throws URISyntaxException {
 
-		DAQ snapshot = getSnapshot(snapshotFile);
-		assertEqualsAndUpdateResults(false, fc1,snapshot );
-		assertEqualsAndUpdateResults(false, fc2,snapshot );
-		assertEqualsAndUpdateResults(true, fc3,snapshot );
+	/* 2017-06-05T09:22:29 */
+	@Test
+	public void case4Test() throws URISyntaxException {
 
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected,snapshot );
-		assertEqualsAndUpdateResults(false, piProblem,snapshot );
-		assertEqualsAndUpdateResults(false, fedDisconnected,snapshot );
-		assertEqualsAndUpdateResults(false, fmmProblem,snapshot );
+		DAQ snapshot = getSnapshot("1496647349638.smile");
+		assertOnlyOneIsSatisified(fc3, snapshot);
 
-		assertEqualsAndUpdateResults(false, fc5,snapshot );
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
+	}
 
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+	/*
+	 * 2017-06-14T15:56:04
+	 * 
+	 * REMI: The message (ru-failed) is indeed redundant. However, the RU error message gives the details about the
+	 * corruption. Is it possible to add the error message to the 'Corrupted data received' text?
+	 * 
+	 * HANNES: This is s strange case with multiple problems overlayed. It would be good to add the detailed error
+	 * message of 3 also to 2. We should check if we can make RU-failed more specific so that it does not trigger in
+	 * this case
+	 * 
+	 */
+	@Test
+	public void case5Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497448564059.smile");
 
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
+		// FIXME: ru failed redundant
+		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
+
+		Context context = fc3.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+
 	}
 
 }

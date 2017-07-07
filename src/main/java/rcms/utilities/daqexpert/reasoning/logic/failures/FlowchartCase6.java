@@ -1,12 +1,10 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
@@ -15,6 +13,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
@@ -24,15 +23,14 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelpe
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
+ * @deprecated
  */
 public class FlowchartCase6 extends KnownFailure {
 
 	public FlowchartCase6() {
 		this.name = "Backpressure detected";
 
-		this.description = "TTCP {{TTCP}} of subsystem {{SUBSYSTEM}} in {{TTCPSTATE}} TTS state, and FED {{FED}} is backpressured. "
-				+ "Backpressure is going through that FED, it's in {{FEDSTATE}} but there is NOTHING wrong with it. "
-				+ "A FED stopped sending data in subsystem {{FROZENSUBSYSTEM}}.";
+		this.description = "A FED stopped sending data in subsystem {{FROZENSUBSYSTEM}}. Therefore, FED {{FED}} is backpressured, which causes partition {{TTCP}} of subsystem {{SUBSYSTEM}} to be in {{TTCPSTATE}} TTS state. There is NOTHING wrong with {{SUBSYSTEM}}.";
 
 		this.action = new SimpleAction("Try to recover: Stop the run",
 				"Red & green recycle the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data)",
@@ -41,8 +39,6 @@ public class FlowchartCase6 extends KnownFailure {
 				"Problem not fixed: Call the DOC for the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data)");
 
 	}
-
-	private static final Logger logger = Logger.getLogger(FlowchartCase6.class);
 
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
@@ -61,6 +57,8 @@ public class FlowchartCase6 extends KnownFailure {
 			// FEDs which are backpressured by the DAQ, we do NOT report those
 			Set<FED> fedsBackpressuredByDaq = new HashSet<>();
 
+			Set<SubSystem> victimSubsystems = new HashSet<>();
+
 			for (SubSystem subSystem : daq.getSubSystems()) {
 
 				for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
@@ -69,26 +67,47 @@ public class FlowchartCase6 extends KnownFailure {
 						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.BUSY || currentState == TTSState.WARNING) {
 
-							for (FED fed : ttcp.getFeds()) {
+							Map<FED, Set<FED>> feds = FEDHierarchyRetriever.getFEDHierarchy(ttcp);
 
-								if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
-									TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
-									if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)
-											&& fed.getPercentBackpressure() > 0F) {
+							for (Entry<FED, Set<FED>> fed : feds.entrySet()) {
 
-										context.register("TTCP", ttcp.getName());
-										context.register("TTCPSTATE", currentState.name());
-										context.register("SUBSYSTEM", subSystem.getName());
-										context.register("FED", fed.getSrcIdExpected());
-										context.register("FEDSTATE", currentFedState.name());
+								TTSState currentFedState = TTSState.getByCode(fed.getKey().getTtsState());
+								if ((currentFedState == TTSState.BUSY || currentFedState == TTSState.WARNING)) {
 
-										fedsBackpressuredByDaq.add(fed);
+									if (fed.getValue().size() > 0) {
 
-										logger.debug("M6: " + name + " with fed " + fed.getId() + " in backpressure at "
-												+ new Date(daq.getLastUpdate()));
-										result = true;
+										for (FED dep : fed.getValue()) {
+
+											if (dep.getPercentBackpressure() > 0F) {
+
+												context.register("FED", dep.getSrcIdExpected());
+												context.register("FEDSTATE", "(" + currentFedState.name()
+														+ " seen on FED" + fed.getKey().getSrcIdExpected() + ")");
+												fedsBackpressuredByDaq.add(fed.getKey());
+												victimSubsystems.add(subSystem);
+												result = true;
+											}
+
+										}
+
+									} else {
+
+										if (fed.getKey().getPercentBackpressure() > 0F) {
+											context.register("FED", fed.getKey().getSrcIdExpected());
+											context.register("FEDSTATE", currentFedState.name());
+											fedsBackpressuredByDaq.add(fed.getKey());
+											result = true;
+										}
+
 									}
+
 								}
+							}
+
+							if (result) {
+								context.register("TTCP", ttcp.getName());
+								context.register("TTCPSTATE", currentState.name());
+								context.register("SUBSYSTEM", subSystem.getName());
 							}
 						}
 					}
@@ -96,16 +115,27 @@ public class FlowchartCase6 extends KnownFailure {
 			}
 
 			if (result) {
-				
-				// get the feds whose event counter is behind the one of the TCDS fed
+
+				// get the feds whose event counter is behind the one of the
+				// TCDS fed
 				List<FED> behindFeds = LogicModuleHelper.getFedsWithFewerFragments(daq);
 
 				for (FED fed : behindFeds) {
-					if (! fedsBackpressuredByDaq.contains(fed)) {
+					if (!fedsBackpressuredByDaq.contains(fed)) {
 
-						// this FED stopped sending data for no apparent reason
-						// (note that context.register() ignores duplicate entries)
-						context.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+						/*
+						 * make sure to not include victim subsystem (subsystem
+						 * when you observe the problem results) in the report
+						 * as problematic ones
+						 */
+						if (!victimSubsystems.contains(fed.getTtcp().getSubsystem())) {
+							/*
+							 * this FED stopped sending data for no apparent
+							 * reason (note that context.register() ignores
+							 * duplicate entries)
+							 */
+							context.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+						}
 					}
 				} // loop over FEDs
 			} // if condition is satisfied

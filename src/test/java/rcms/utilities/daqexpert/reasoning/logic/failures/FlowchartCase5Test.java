@@ -1,10 +1,15 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Context;
 
 /**
  *
@@ -12,27 +17,81 @@ import rcms.utilities.daqaggregator.data.DAQ;
  */
 public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
+	/* 2016-11-20T04:59:38 */
 	@Test
 	public void case1Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1479614378467.smile");
+		assertOnlyOneIsSatisified(fc5, snapshot);
+		Context context = fc5.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TEC-")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(169)), context.getContext().get("FED"));
+	}
 
-		assertEqualsAndUpdateResults(false, fc1, snapshot);
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
+	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-26-03:28:25 */
+	@Test
+	public void case2Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1498440505470.smile");
 
-		// new subcases of old flowchart case 4
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
+		assertOnlyOneIsSatisified(fc5, snapshot);
+		Context context = fc5.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(149)), context.getContext().get("FED"));
+	}
 
-		assertEqualsAndUpdateResults(true, fc5, snapshot);
-		assertEqualsAndUpdateResults(false, fc6, snapshot);
+	/*
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-22-04:01:25
+	 * 
+	 * REMI: this issue has been discussed in detail in the email thread
+	 * "Fwd: ELOG : DAQ : Dump of FEROL40 with FED Id [1232 and 6 more] when blocking the run" on June 22/23. I think
+	 * the conclusion is that we do not know if the FEROL40 was indeed stuck for a couple of seconds, or if there was a
+	 * monitoring hiccup or anything else. I would keep the message as is for now and see if we can find another case.
+	 *
+	 */
+	@Test
+	public void case3Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1498096885568.smile");
 
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
+		// FIXME: we dont know why ferol fifo stuck here: we keep it though?
+		assertSatisfiedLogicModules(snapshot, fc5, ferolFifoStuck);
 
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
+		System.out.println(fc5.getDescriptionWithContext());
 
+		Context context = fc5.getContext();
+		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(838)), context.getContext().get("FED"));
+
+	}
+
+	/*
+	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-15-23:29:34
+	 */
+	@Test
+	public void case5Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497562174081.smile");
+
+		assertOnlyOneIsSatisified(fc5, snapshot);
+
+		System.out.println(fc5.getDescriptionWithContext());
+
+		Context context = fc5.getContext();
+		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("HBHEC")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(11114)), context.getContext().get("FED"));
+	}
+
+	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-15-09:52:16 */
+	@Test
+	public void case4Test() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1497513136376.smile");
+
+		assertOnlyOneIsSatisified(fc5, snapshot);
+		Context context = fc5.getContext();
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(83)), context.getContext().get("FED"));
 	}
 
 }

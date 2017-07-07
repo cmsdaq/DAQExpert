@@ -1,15 +1,17 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.helper;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
@@ -17,17 +19,15 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**
- *  Tests for class LogicModuleHelper
+ * Tests for class LogicModuleHelper
  */
-public class LogicModuleHelperTest
-{
+public class LogicModuleHelperTest {
 
 	/**
 	 * Test of getRefEventCounter method, of class LogicModuleHelper.
 	 */
 	// @Test
-	public void testGetRefEventCounter() throws URISyntaxException
-	{
+	public void testGetRefEventCounter() throws URISyntaxException {
 		DAQ daq = FlowchartCaseTestBase.getSnapshot("1497017816236.smile");
 
 		long tcdsEventCounter = LogicModuleHelper.getRefEventCounter(daq);
@@ -39,24 +39,23 @@ public class LogicModuleHelperTest
 	 * Test of getFedsWithFewerFragments method, of class LogicModuleHelper.
 	 */
 	@Test
-	public void testGetFedsWithFewerFragments() throws URISyntaxException
-	{
+	public void testGetFedsWithFewerFragments() throws URISyntaxException {
 		// PIXEL did not send any fragments
 		DAQ daq = FlowchartCaseTestBase.getSnapshot("1497017816236.smile");
 
-		//----------
+		// ----------
 
 		List<Integer> expectedFedIds = new ArrayList<>();
 		// find fedids of subsystem PIXEL
 		for (SubSystem subsys : daq.getSubSystems()) {
 
 			if (subsys.getName().equals("PIXEL")) {
-				
+
 				for (TTCPartition ttcp : subsys.getTtcPartitions()) {
-					
+
 					for (FED fed : ttcp.getFeds()) {
 
-						if (fed.isHasSLINK() && ! fed.isFrlMasked()) {
+						if (fed.isHasSLINK() && !fed.isFrlMasked()) {
 							expectedFedIds.add(fed.getSrcIdExpected());
 						}
 
@@ -68,9 +67,9 @@ public class LogicModuleHelperTest
 
 		Collections.sort(expectedFedIds);
 
-		//----------
+		// ----------
 		// run the method to be tested
-		//----------
+		// ----------
 
 		List<FED> actualFeds = LogicModuleHelper.getFedsWithFewerFragments(daq);
 

@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import java.util.List;
 import java.util.Map;
 
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
@@ -31,6 +32,10 @@ public abstract class ActionLogicModule extends ContextLogicModule {
 	protected void assignPriority(Map<String, Boolean> results) {
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName());
 		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.WARNING;
+	}
+	
+	public List<String> getActionWithContext() {
+		return this.getContext().getActionWithContext(this.action);
 	}
 
 

@@ -13,6 +13,7 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.SubFEDBuilder;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
 
 /**
  * Logic module identifying cases when the FIFO in the FEROL40 (or FEROL) got 
@@ -46,34 +47,6 @@ public class FEROLFifoStuck extends KnownFailure {
 
 	private static final Logger logger = Logger.getLogger(FEROLFifoStuck.class);
 
-	/** @return the event counter of the reference FED (TCDS) or null
-	    if this can't be found. */
-	private Long getRefEventCounter(DAQ daq) {
-		// find the EVM
-		// TODO: we could cache this as long as the session id 
-		//       does not change
-		RU evm = daq.getEVM();
-		
-		if (evm == null)
-			return null;
-		
-		// find the FED(s) associated to the EVM
-		// note that we want to compare the event counter on the FEROL
-		// (which is reported in the FED object)
-		// to the event counter on the TCDS FEROL, NOT to the eventCount
-		// of the EVM which can be different (typically lower)
-		Set<FED> feds = evm.getFEDs(false);
-		
-		if (feds.isEmpty())
-			// no (unmasked) FED found
-			return null;
-		
-		// just get the first FED of this RU
-		FED refFED = feds.iterator().next();
-					
-		return refFED.getEventCounter();
-	}
-	
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
@@ -88,7 +61,7 @@ public class FEROLFifoStuck extends KnownFailure {
 
 		if (!"RUNBLOCKED".equalsIgnoreCase(daqstate)) {
 			
-			Long eventCounterRef = getRefEventCounter(daq);
+			Long eventCounterRef = LogicModuleHelper.getRefEventCounter(daq);
 			
 			if (eventCounterRef != null) {
 

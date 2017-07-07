@@ -20,17 +20,6 @@ public abstract class KnownFailure extends ActionLogicModule {
 		this.priority = ConditionPriority.CRITICAL;
 	}
 
-	
-	public String getDescriptionWithContext() {
-		return this.getContext().getContentWithContext(this.description);
-	}
-
-	public List<String> getActionWithContext() {
-		return this.getContext().getActionWithContext(this.action);
-	}
-
-	
-
 	protected boolean isMasked(FED fed) {
 		if (fed.isFmmMasked() || fed.isFrlMasked()) {
 			return true;

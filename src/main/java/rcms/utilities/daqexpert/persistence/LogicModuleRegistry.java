@@ -35,12 +35,21 @@ import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase1;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase2;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase6;
+import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase1;
+import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase2;
+import rcms.utilities.daqexpert.reasoning.logic.failures.RuFailed;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -65,12 +74,12 @@ public enum LogicModuleRegistry {
 	Downtime                (new Downtime(),                 ConditionGroup.DOWNTIME,              "",                                                   16),
 	Deadtime                (new Deadtime(),                 ConditionGroup.DEADTIME,              "",                                                   17),
 	CriticalDeadtime        (new CriticalDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   18,   105),
-	FlowchartCase1          (new FlowchartCase1(),           ConditionGroup.FLOWCHART,             "",                                                   19, 10004),
-	FlowchartCase2          (new FlowchartCase2(),           ConditionGroup.FLOWCHART,             "",                                                   20, 10005),
+	FlowchartCase1          (new LegacyFlowchartCase1(),     ConditionGroup.FLOWCHART,             "Legacy OutOfSequenceData",                     997, 10004),
+	FlowchartCase2          (new LegacyFlowchartCase2(),     ConditionGroup.FLOWCHART,             "Legacy CorruptedData",                         998, 10005),
 	FlowchartCase3          (new FlowchartCase3(),           ConditionGroup.FLOWCHART,             "",                                                   21, 10006),
 	FlowchartCase4          (null,                           ConditionGroup.FLOWCHART,             "Partition disconnected: extended to other LMs",      22,     0),
 	FlowchartCase5          (new FlowchartCase5(),           ConditionGroup.FLOWCHART,             "",                                                   23, 10008),
-	FlowchartCase6          (new FlowchartCase6(),           ConditionGroup.FLOWCHART,             "",                                                   24, 10009),
+	FlowchartCase6          (null,                           ConditionGroup.FLOWCHART,             "Extended to multiple LMs",                           -24, 10009),
 
 	SessionComparator       (new SessionComparator(),        ConditionGroup.SESSION_NUMBER,        "Session",                                            25,    15),
 	LHCBeamModeComparator   (new LHCBeamModeComparator(),    ConditionGroup.LHC_BEAM,              "LHC Beam Mode",                                      26,    20),
@@ -89,6 +98,19 @@ public enum LogicModuleRegistry {
 
 	FEROLFifoStuck		   		(new FEROLFifoStuck(),		       ConditionGroup.OTHER,                 "",                                                  500,  10500),
 
+	RuFailed                (new RuFailed(),                 ConditionGroup.OTHER,                 "",                                                   36,   9500),
+
+	
+	
+	LinkProblem				(new LinkProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   37, 10010),
+	RuStuckWaiting			(new RuStuckWaiting(),			 ConditionGroup.FLOWCHART,             "",                                                   38, 10010),
+	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10010),
+	RuStuckWaitingOther		(new RuStuckWaitingOther(),		 ConditionGroup.FLOWCHART,             "",                                                   40, 10010),
+	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   41, 10010),
+	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 10010),
+	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   43, 10010),
+	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
+	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
@@ -100,7 +122,6 @@ public enum LogicModuleRegistry {
 	// run after the others
 	
 	
-
 	}
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder, int usefulness) {

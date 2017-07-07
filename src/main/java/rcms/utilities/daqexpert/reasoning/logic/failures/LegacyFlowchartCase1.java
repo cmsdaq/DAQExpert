@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
 /**
  * Logic module identifying 1 flowchart case.
@@ -20,15 +21,14 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author holzner
  *
  */
-public class FlowchartCase1 extends KnownFailure {
+public class LegacyFlowchartCase1 extends KnownFailure {
 
 	/**
-	 * regex for getting ttc partition and FED source id which caused the sync
-	 * loss from the RU exception message
+	 * regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message
 	 */
 	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
-	public FlowchartCase1() {
+	public LegacyFlowchartCase1() {
 		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
@@ -69,11 +69,20 @@ public class FlowchartCase1 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
 			return false;
 
+		if (results.get(OutOfSequenceData.class.getSimpleName()))
+			return false;
+
 		assignPriority(results);
 
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error'
-		if (RUNBLOCKED_STATE.equalsIgnoreCase(daqstate)) {
+
+		// we do not require anymore that DAQ is in 'RunBlocked' state for the moment
+		// since sometimes the state is not propagated properly
+		//
+		// SyncLoss state of the RU is a strong enough signal that we have
+		// the problem this class should detect
+		{
 
 			// for the moment, just find the first RU in SyncLoss
 			RU syncLossRU = null;
@@ -87,13 +96,31 @@ public class FlowchartCase1 extends KnownFailure {
 			}
 
 			if (syncLossRU == null) {
-				// no RU in syncloss found, we don't know FED, TTCP and
-				// SUBSYSTEM
-				setContextValues("(RU not found)");
+
+				// we insist that there is at least one RU in SyncLoss state
+				return false;
 
 			} else {
 
-				context.register("ORIGERRMSG", syncLossRU.getErrorMsg());
+				String originalMessage = syncLossRU.getErrorMsg();
+				String trimmedMessage = originalMessage;
+				int openingQuote = originalMessage.indexOf("'", 0);
+				if (-1 != openingQuote) {
+					int closingQuote = originalMessage.indexOf("'", openingQuote + 1);
+					if (-1 != closingQuote) {
+						// both opening and closing quote found,
+						int additionalQuote = originalMessage.indexOf("'", closingQuote + 1);
+						if (-1 == additionalQuote) {
+							// there is no additional quotes - for sure this is the only quotes, we can trim
+							trimmedMessage = originalMessage.substring(openingQuote, closingQuote);
+						} else {
+							System.out.println("Cannot trim the message: " + originalMessage + " too many quotes: "
+									+ openingQuote + ", " + closingQuote + ", " + additionalQuote);
+						}
+					}
+				}
+
+				context.register("ORIGERRMSG", trimmedMessage);
 
 				// find the FED from the exception message
 				//
@@ -142,9 +169,7 @@ public class FlowchartCase1 extends KnownFailure {
 			} // RU in syncloss state found
 
 			return true;
-		} // if runblocked state
-
-		return false;
+		}
 	}
 
 }

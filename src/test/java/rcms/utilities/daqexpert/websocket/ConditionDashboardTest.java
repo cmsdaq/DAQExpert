@@ -24,7 +24,7 @@ public class ConditionDashboardTest {
 	Condition c1 = generateCondition("c1", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
 	Condition c2 = generateCondition("c2", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
 	Condition c3 = generateCondition("c3", ConditionPriority.DEFAULTT, LogicModuleRegistry.FEDDeadtime, d1);
-	Condition c4 = generateCondition("c4", ConditionPriority.DEFAULTT, LogicModuleRegistry.FlowchartCase1, d1);
+	Condition c4 = generateCondition("c4", ConditionPriority.DEFAULTT, LogicModuleRegistry.OutOfSequenceData, d1);
 	Condition c5 = generateCondition("c5", ConditionPriority.IMPORTANT, LogicModuleRegistry.FEDDeadtime, d1);
 	Condition c6 = generateCondition("c6", ConditionPriority.CRITICAL, LogicModuleRegistry.FEDDeadtime, d2);
 	Condition c7 = generateCondition("c6", ConditionPriority.CRITICAL, LogicModuleRegistry.FEDDeadtime, d3);

@@ -40,8 +40,10 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 	 * Rregex for getting ttc partition and FED source id which caused the sync
 	 * loss from the RU exception message
 	 */
-	private final Pattern syncLossPattern = Pattern.compile(
+	private final Pattern syncLossPattern1 = Pattern.compile(
 			"Caught exception: exception::MismatchDetected 'Mismatch detected: expected evb id .*, but found evb id .* in data block from FED (\\d+) \\((.+)\\)' raised at");
+	private final Pattern syncLossPattern2 = Pattern.compile(
+			"Caught exception: exception::EventOutOfSequence 'Received an event out of sequence from FED (\\d+) \\((.+)\\):");
 
 	public BackpressureAnalyzer() {
 	}
@@ -467,8 +469,15 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			context.register("PROBLEM-RU", ru.getHostname());
 
 			FED fed = null;
-			Matcher mo = syncLossPattern.matcher(ru.getErrorMsg());
-			if (mo.find()) {
+			Matcher mo = syncLossPattern1.matcher(ru.getErrorMsg());
+			boolean found = mo.find();
+
+			if (! found) {
+				mo = syncLossPattern2.matcher(ru.getErrorMsg());
+				found = mo.find();
+			}
+
+			if (found) {
 				int fedId = Integer.parseInt(mo.group(1));
 				context.register("PROBLEM-FED", fedId);
 				fed = findFEDinRUByFEDId(ru, fedId);

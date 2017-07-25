@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
-public class Report {
+public class KeyValueReport {
 
 	private final Map<String, Long> values;
 
-	public Report() {
+	public KeyValueReport() {
 		this.values = new HashMap<String, Long>();
 	}
 

@@ -36,7 +36,7 @@ public class ReportManagerTestIT {
 		Logger.getRootLogger().setLevel(Level.INFO);
 
 		Logger.getLogger(ReportManager.class).setLevel(Level.ALL);
-		Logger.getLogger(Report.class).setLevel(Level.ALL);
+		Logger.getLogger(KeyValueReport.class).setLevel(Level.ALL);
 		pm = Application.get().getPersistenceManager();
 	}
 
@@ -51,7 +51,7 @@ public class ReportManagerTestIT {
 
 		ReportManager r = new ReportManager(pm.getEntityManagerFactory());
 
-		Report report = r.prepareReport(DatatypeConverter.parseDateTime("2017-01-01T00:00:00Z").getTime(),
+		KeyValueReport report = r.getKeyValueStatistics(DatatypeConverter.parseDateTime("2017-01-01T00:00:00Z").getTime(),
 				DatatypeConverter.parseDateTime("2017-02-01T00:00:00Z").getTime());
 		logger.info("Report: " + report);
 		logger.info("Report: " + report.getSummary());

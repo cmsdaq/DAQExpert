@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.JobManager;
-import rcms.utilities.daqexpert.report.Report;
+import rcms.utilities.daqexpert.report.KeyValueReport;
 import rcms.utilities.daqexpert.report.ReportManager;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 

@@ -16,10 +16,12 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
-import rcms.utilities.daqexpert.report.Report;
+import rcms.utilities.daqexpert.report.KeyValueReport;
 
 /**
  * Statistics API.
@@ -58,7 +60,7 @@ public class StatisticsAPI extends HttpServlet {
 
 		logger.info("Parsed range from : " + startDate + " to " + endDate);
 
-		Report report = Application.get().getReportManager().prepareReport(startDate, endDate);
+		KeyValueReport report = Application.get().getReportManager().getKeyValueStatistics(startDate, endDate);
 		List<Long> noRateWhenExpectedHistogram = Application.get().getReportManager()
 				.getHistogram(LogicModuleRegistry.NoRateWhenExpected, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
 		List<Long> stableBeamsHistogram = Application.get().getReportManager()
@@ -70,6 +72,11 @@ public class StatisticsAPI extends HttpServlet {
 		logger.info(noRateWhenExpectedHistogram);
 		logger.info(stableBeamsHistogram);
 		logger.info(runOngoingHistogram);
+		
+		
+		ArrayNode problemsCausingDeadtime = Application.get().getReportManager().getProblemPieChart(startDate,endDate,1000L);
+		ArrayNode subsystemsCausingDeadtime = Application.get().getReportManager().getProblemSubSystems(startDate,endDate,1000L);
+        
 
 		request.setAttribute("startdate", startDate);
 		request.setAttribute("enddate", endDate);
@@ -77,6 +84,9 @@ public class StatisticsAPI extends HttpServlet {
 		request.setAttribute("runongoinghistogram", objectMapper.writeValueAsString(runOngoingHistogram));
 		request.setAttribute("nrwehistogram", objectMapper.writeValueAsString(noRateWhenExpectedHistogram));
 		request.setAttribute("stablebeamshistogram", objectMapper.writeValueAsString(stableBeamsHistogram));
+		request.setAttribute("piechart1", objectMapper.writeValueAsString(problemsCausingDeadtime));
+		request.setAttribute("piechart2", objectMapper.writeValueAsString(subsystemsCausingDeadtime));
+		
 
 		request.getRequestDispatcher("/statistics.jsp").forward(request, response);
 

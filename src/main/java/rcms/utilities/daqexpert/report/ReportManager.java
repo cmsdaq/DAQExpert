@@ -1,12 +1,15 @@
 package rcms.utilities.daqexpert.report;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -14,6 +17,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
@@ -24,6 +31,8 @@ public class ReportManager {
 	private final EntityManagerFactory entityManagerFactory;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
+
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	public ReportManager(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
@@ -50,8 +59,91 @@ public class ReportManager {
 
 	}
 
-	public Report prepareReport(Date start, Date end) {
-		Report report = new Report();
+	public ArrayNode getProblemSubSystems(Date start, Date end, Long minThreshold) {
+		ArrayNode arrayNode = objectMapper.createArrayNode();
+
+		List<String> subsystems = Arrays.asList("ECAL", "HCAL", "CSC", "CTPPS", "TRACKER", "SCAL", "RPC", "CTPPS_TOT",
+				"ES", "TCDS", "DT", "HF", "PIXEL", "TRG");
+
+		Map<String, Long> cumulatedTimes = new HashMap<>();
+		Long totalTime = 0L;
+
+		for (LogicModuleRegistry lmr : LogicModuleRegistry.getIdentifiedProblems()) {
+
+			logger.trace("Getting statistics for LM " + lmr.name());
+			List<Condition> a = getConditions(lmr, start, end, minThreshold);
+			for (Condition c : a) {
+				for (String subsystem : subsystems) {
+					if (c.getDescription().contains(subsystem)) {
+						if (!cumulatedTimes.containsKey(subsystem)) {
+							cumulatedTimes.put(subsystem, 0L);
+						}
+						Long current = cumulatedTimes.get(subsystem);
+						cumulatedTimes.put(subsystem, current + c.getDuration());
+					}
+				}
+			}
+
+		}
+
+		for (Entry<String, Long> x : cumulatedTimes.entrySet()) {
+			totalTime += x.getValue();
+		}
+
+		for (Entry<String, Long> subsystemTimes : cumulatedTimes.entrySet()) {
+
+			float percentage = (subsystemTimes.getValue() * 100) / totalTime;
+
+			ObjectNode objectNode1 = objectMapper.createObjectNode();
+			objectNode1.put("name", subsystemTimes.getKey());
+			objectNode1.put("y", percentage);
+
+			logger.info("part of response json built: " + objectNode1.toString());
+			arrayNode.add(objectNode1);
+		}
+
+		return arrayNode;
+	}
+
+	public ArrayNode getProblemPieChart(Date start, Date end, Long minThreshold) {
+		ArrayNode arrayNode = objectMapper.createArrayNode();
+
+		Map<String, Long> cumulatedTimes = new HashMap<>();
+		Long totalTime = 0L;
+
+		for (LogicModuleRegistry lmr : LogicModuleRegistry.getIdentifiedProblems()) {
+
+			logger.trace("Getting statistics for LM " + lmr.name());
+			List<Condition> a = getConditions(lmr, start, end, minThreshold);
+			Long cumulatedTime = 0L;
+			for (Condition c : a) {
+				cumulatedTime += c.getDuration();
+			}
+			if (!a.isEmpty()) {
+				cumulatedTimes.put(a.iterator().next().getLogicModule().name(), cumulatedTime);
+				totalTime += cumulatedTime;
+
+			}
+			logger.trace("Total time of " + lmr.name() + " is " + cumulatedTime + " ms");
+		}
+
+		for (Entry<String, Long> timePerLm : cumulatedTimes.entrySet()) {
+
+			float percentage = (timePerLm.getValue() * 100) / totalTime;
+
+			ObjectNode objectNode1 = objectMapper.createObjectNode();
+			objectNode1.put("name", timePerLm.getKey());
+			objectNode1.put("y", percentage);
+
+			logger.info("part of response json built: " + objectNode1.toString());
+			arrayNode.add(objectNode1);
+		}
+
+		return arrayNode;
+	}
+
+	public KeyValueReport getKeyValueStatistics(Date start, Date end) {
+		KeyValueReport report = new KeyValueReport();
 
 		Long threshold = 1000L;
 

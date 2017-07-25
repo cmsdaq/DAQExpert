@@ -1,7 +1,9 @@
 package rcms.utilities.daqexpert.persistence;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -112,6 +114,36 @@ public enum LogicModuleRegistry {
 	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
 	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
 	;
+	
+	public static Set<LogicModuleRegistry>getIdentifiedProblems(){
+		Set<LogicModuleRegistry> identified = new HashSet<>();
+		identified.add(FlowchartCase1);
+		identified.add(FlowchartCase2);
+		identified.add(FlowchartCase3);
+		identified.add(FlowchartCase4);
+		identified.add(FlowchartCase5);
+		identified.add(FlowchartCase6);
+		
+		identified.add(PiDisconnected);
+		identified.add(PiProblem);
+		identified.add(FEDDisconnected);
+		identified.add(FMMProblem);
+
+		identified.add(FEROLFifoStuck);
+		identified.add(RuFailed);
+		
+		identified.add(LinkProblem);
+		identified.add(RuStuckWaiting);
+		identified.add(RuStuck);
+		identified.add(RuStuckWaitingOther);
+		identified.add(HLTProblem);
+		identified.add(BugInFilterfarm);
+		identified.add(OnlyFedStoppedSendingData);
+		identified.add(OutOfSequenceData);
+		identified.add(CorruptedData);
+		identified.add(UnidentifiedFailure);
+		return identified;
+	}
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
 		this(logicModule, group, description, runOrder, 1);

@@ -65,12 +65,20 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>StatisticsServlet</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.StatisticsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StatisticsServlet</servlet-name>
+		<url-pattern>/statistics</url-pattern>
+	</servlet-mapping>
+		<servlet>
 		<servlet-name>StatisticsAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.StatisticsAPI</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>StatisticsAPI</servlet-name>
-		<url-pattern>/statistics</url-pattern>
+		<url-pattern>/stats</url-pattern>
 	</servlet-mapping>
 	<servlet>
 		<servlet-name>ScriptsExperimentalAPI</servlet-name>

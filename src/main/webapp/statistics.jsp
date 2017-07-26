@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <%@page import="rcms.utilities.daqexpert.Setting"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <html>
 
 <head>
@@ -10,10 +10,7 @@
 <!-- external scripts and stylesheets -->
 <script src="external/jquery.min.js"></script>
 
-<script type="text/javascript"
-	src="external/deparam.min.js"></script>
 
-<script src="external/jquery.min.js"></script>
 <link rel="stylesheet"
 	href="external/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -27,6 +24,7 @@
 <script src="external/moment-duration-format.min.js"></script>
 <script src="external/clipboard.min.js"></script>
 <script src="external/highcharts.js"></script>
+<script type="text/javascript" src="external/deparam.min.js"></script>
 
 
 
@@ -36,13 +34,18 @@
 	src="external/daterangepicker-2/daterangepicker.js"></script>
 <link rel="stylesheet" type="text/css"
 	href="external/daterangepicker-2/daterangepicker.css" />
-	
-	<!--  internal scripts -->
+
+
+<link rel="stylesheet" href="static/css/animation.css">
+
+<!--  internal scripts -->
 <script src="static/js/tour.js"></script>
 <script src="static/js/share.js"></script>
 <script src="static/js/statistics.js"></script>
-<script src="static/js/pie-chart.js"></script>
+<script src="static/js/statistics-histogram.js"></script>
+<script src="static/js/statistics-pie-chart.js"></script>
 <link rel="shortcut icon" href="">
+
 
 </head>
 
@@ -107,6 +110,7 @@
 
 	<div class="container">
 
+
 		<div class="row" style="margin-bottom: 15px;">
 			<div class="col-md-12">
 
@@ -117,8 +121,9 @@
 					<div class="input-group" id="date-range-picker-group">
 						<span class="input-group-addon">date range</span>
 						<div id="reportrange" class=" btn btn-default">
-							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span>showing
-								all</span> <b class="caret"></b>
+							<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span>
+								last week (<span id="week-no"></span>): <span id="exact-date"></span>
+							</span></span> <b class="caret"></b>
 						</div>
 					</div>
 					<div class="btn-group ">
@@ -131,31 +136,30 @@
 			</div>
 		</div>
 
-<p>
-			Showing statistics for
-			<fmt:formatDate pattern="yyyy-MM-dd'T'HH:mm:ss Z"
-				value="${startdate}" />
-			-
-			<fmt:formatDate pattern="yyyy-MM-dd'T'HH:mm:ss Z" value="${enddate}" />
-		</p>
-		
+		<div style="text-align: center">
+			<div style="display: inline-block;">
+				<div id="loader-animation" class="loader text-centered"></div>
+			</div>
+		</div>
+
 		<div class="row">
-			<div class="col-md-6" id="container-piechart-1" data-piechart="${fn:escapeXml(piechart1)}"
+			<div class="col-md-6" id="container-piechart-1"
 				style="width: 550px; height: 400px; margin: 0 auto;"></div>
-			<div class="col-md-6" id="container-piechart-2" data-piechart="${fn:escapeXml(piechart2)}"
+			<div class="col-md-6" id="container-piechart-2"
 				style="width: 550px; height: 400px; margin: 0 auto;"></div>
 		</div>
 
-		
-		${downtimehistogram}
+		<div class="row">
+			<div class="col-md-6" id="container-piechart-3"
+				style="width: 550px; height: 400px; margin: 0 auto;"></div>
+			<div class="col-md-6" id="container-piechart-4"
+				style="width: 550px; height: 400px; margin: 0 auto;"></div>
+		</div>
 
-		<div id="container-histogram-stable-beams"
-			data-histogram="${stablebeamshistogram}"></div>
-		<div id="container-histogram-run-ongoing"
-			data-histogram="${runongoinghistogram}"></div>
-		<div id="container-histogram-nrwe" data-histogram="${nrwehistogram}"></div>
-		<p>${summary}</p>
-		
+		<div id="container-histogram-stable-beams"></div>
+		<div id="container-histogram-run-ongoing"></div>
+		<div id="container-histogram-nrwe"></div>
+
 	</div>
 </body>
 

@@ -33,7 +33,7 @@
 <script src="static/js/share.js"></script>
 
 <!--  internal stylesheets -->
-<link rel="stylesheet" href="static/css/experimental.css">
+<link rel="stylesheet" href="static/css/animation.css">
 <link rel="stylesheet" href="static/css/graphs.css">
 
 

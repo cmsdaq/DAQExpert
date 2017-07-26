@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -137,6 +138,78 @@ public class ReportManager {
 
 			logger.info("part of response json built: " + objectNode1.toString());
 			arrayNode.add(objectNode1);
+		}
+
+		return arrayNode;
+	}
+
+	public Pair<ArrayNode, ArrayNode> getDowntimeStatistics(Date start, Date end) {
+
+		KeyValueReport kvr = getKeyValueStatistics(start, end);
+		ArrayNode efficiency = getEfficiency(kvr);
+		ArrayNode nature = getDowntimeNature(kvr);
+
+		return Pair.of(efficiency, nature);
+
+	}
+
+	public ArrayNode getEfficiency(KeyValueReport kvr) {
+		ArrayNode arrayNode = objectMapper.createArrayNode();
+
+		float totalValue = 0;
+		float uptimeValue = 0;
+		float downtimeValue = 0;
+
+		uptimeValue = kvr.getValues().get("totalUptime");
+		totalValue = kvr.getValues().get("totalStableBeamTime");
+
+		if (totalValue > 0) {
+			downtimeValue = totalValue - uptimeValue;
+
+			float uptimePercentage = (100 * uptimeValue) / totalValue;
+			float downtimePercentage = (100 * downtimeValue) / totalValue;
+
+			ObjectNode uptime = objectMapper.createObjectNode();
+			uptime.put("name", "uptime");
+			uptime.put("y", uptimePercentage);
+
+			ObjectNode downtime = objectMapper.createObjectNode();
+			downtime.put("name", "downtime");
+			downtime.put("y", downtimePercentage);
+
+			arrayNode.add(uptime);
+			arrayNode.add(downtime);
+		}
+
+		return arrayNode;
+	}
+
+	public ArrayNode getDowntimeNature(KeyValueReport kvr) {
+		ArrayNode arrayNode = objectMapper.createArrayNode();
+
+		float totalValue = 0;
+		float decisionTime = 0;
+		float recoveryTime = 0;
+
+		decisionTime = kvr.getValues().get("totalDecisionTime");
+		recoveryTime = kvr.getValues().get("totalRecoveryTime");
+
+		if (decisionTime > 0 || recoveryTime > 0) {
+			totalValue = decisionTime + recoveryTime;
+
+			float decisionPercentage = (100 * decisionTime) / totalValue;
+			float recoveryPercentage = (100 * recoveryTime) / totalValue;
+
+			ObjectNode uptime = objectMapper.createObjectNode();
+			uptime.put("name", "reaction time");
+			uptime.put("y", decisionPercentage);
+
+			ObjectNode downtime = objectMapper.createObjectNode();
+			downtime.put("name", "recovery time");
+			downtime.put("y", recoveryPercentage);
+
+			arrayNode.add(uptime);
+			arrayNode.add(downtime);
 		}
 
 		return arrayNode;

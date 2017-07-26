@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,51 +45,57 @@ public class StatisticsAPI extends HttpServlet {
 		String endRange = request.getParameter("end");
 		logger.info("Getting statistics from : " + startRange + " to " + endRange);
 
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Date startDate = null;
 		Date endDate = null;
 		try {
 			startDate = DatatypeConverter.parseDateTime(startRange).getTime();
 			endDate = DatatypeConverter.parseDateTime(endRange).getTime();
+
+			logger.info("Parsed range from : " + startDate + " to " + endDate);
+
+			KeyValueReport report = Application.get().getReportManager().getKeyValueStatistics(startDate, endDate);
+			List<Long> noRateWhenExpectedHistogram = Application.get().getReportManager().getHistogram(
+					LogicModuleRegistry.NoRateWhenExpected, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
+			List<Long> stableBeamsHistogram = Application.get().getReportManager().getHistogram(
+					LogicModuleRegistry.StableBeams, startDate, endDate, 1000L, 1000L * 60 * 60 * 24 * 30);
+			List<Long> runOngoingHistogram = Application.get().getReportManager()
+					.getHistogram(LogicModuleRegistry.RunOngoing, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
+
+			logger.info(report.getSummary());
+			logger.info(noRateWhenExpectedHistogram);
+			logger.info(stableBeamsHistogram);
+			logger.info(runOngoingHistogram);
+
+			ArrayNode problemsCausingDeadtime = Application.get().getReportManager().getProblemPieChart(startDate,
+					endDate, 1000L);
+			ArrayNode subsystemsCausingDeadtime = Application.get().getReportManager().getProblemSubSystems(startDate,
+					endDate, 1000L);
+			Pair<ArrayNode, ArrayNode> efficiencyResult = Application.get().getReportManager()
+					.getDowntimeStatistics(startDate, endDate);
+
+			Map<String, Object> result = new HashMap<>();
+			result.put("startdate", startDate);
+			result.put("enddate", endDate);
+			result.put("runongoinghistogram", runOngoingHistogram);
+			result.put("nrwehistogram", noRateWhenExpectedHistogram);
+			result.put("stablebeamshistogram", stableBeamsHistogram);
+			result.put("piechart1", efficiencyResult.getLeft());
+			result.put("piechart2", efficiencyResult.getRight());
+			result.put("piechart3", problemsCausingDeadtime);
+			result.put("piechart4", subsystemsCausingDeadtime);
+
+			String json = objectMapper.writeValueAsString(result);
+			response.getWriter().write(json);
+
 		} catch (NullPointerException e) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(new Date());
-			cal.add(Calendar.HOUR, -24);
-			endDate = cal.getTime();
-			cal.add(Calendar.HOUR, -24 * 7);
-			startDate = cal.getTime();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
-
-		logger.info("Parsed range from : " + startDate + " to " + endDate);
-
-		KeyValueReport report = Application.get().getReportManager().getKeyValueStatistics(startDate, endDate);
-		List<Long> noRateWhenExpectedHistogram = Application.get().getReportManager()
-				.getHistogram(LogicModuleRegistry.NoRateWhenExpected, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
-		List<Long> stableBeamsHistogram = Application.get().getReportManager()
-				.getHistogram(LogicModuleRegistry.StableBeams, startDate, endDate, 1000L, 1000L * 60 * 60 * 24 * 30);
-		List<Long> runOngoingHistogram = Application.get().getReportManager()
-				.getHistogram(LogicModuleRegistry.RunOngoing, startDate, endDate, 1000L, 1000L * 60 * 60 * 24);
-
-		logger.info(report.getSummary());
-		logger.info(noRateWhenExpectedHistogram);
-		logger.info(stableBeamsHistogram);
-		logger.info(runOngoingHistogram);
-		
-		
-		ArrayNode problemsCausingDeadtime = Application.get().getReportManager().getProblemPieChart(startDate,endDate,1000L);
-		ArrayNode subsystemsCausingDeadtime = Application.get().getReportManager().getProblemSubSystems(startDate,endDate,1000L);
-        
-
-		request.setAttribute("startdate", startDate);
-		request.setAttribute("enddate", endDate);
-		request.setAttribute("summary", report.getSummary());
-		request.setAttribute("runongoinghistogram", objectMapper.writeValueAsString(runOngoingHistogram));
-		request.setAttribute("nrwehistogram", objectMapper.writeValueAsString(noRateWhenExpectedHistogram));
-		request.setAttribute("stablebeamshistogram", objectMapper.writeValueAsString(stableBeamsHistogram));
-		request.setAttribute("piechart1", objectMapper.writeValueAsString(problemsCausingDeadtime));
-		request.setAttribute("piechart2", objectMapper.writeValueAsString(subsystemsCausingDeadtime));
-		
-
-		request.getRequestDispatcher("/statistics.jsp").forward(request, response);
 
 	}
 

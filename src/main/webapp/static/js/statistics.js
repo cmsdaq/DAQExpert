@@ -6,11 +6,11 @@ $(document).ready(
 
 			$('#loader-animation').show();
 			defaultRange = [
-				moment().subtract(1, 'isoWeek').startOf('isoWeek'),
-				moment().subtract(1, 'isoWeek').endOf('isoWeek')];
+				moment().subtract(7, 'days').startOf('isoWeek'),
+				moment().subtract(7, 'days').endOf('isoWeek')];
 			initDatePicker();
 			
-			console.log("Getting data");
+			console.log("Getting data for default timeframe: " + defaultRange);
 			getData();
 		});
 

@@ -23,7 +23,11 @@
 <script src="external/bootstrap-tour.min.js"></script>
 <script src="external/moment-duration-format.min.js"></script>
 <script src="external/clipboard.min.js"></script>
-<script src="external/highcharts.js"></script>
+
+<script src="external/highcharts/highcharts.js"></script>
+<script src="external/highcharts/exporting.js"></script>
+<script src="external/highcharts/offline-exporting.js"></script>
+
 <script type="text/javascript" src="external/deparam.min.js"></script>
 
 

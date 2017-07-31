@@ -44,7 +44,10 @@ public class ReportManager {
 
 		List<Long> result = new ArrayList<>();
 
+		List<Condition> insideStableBeams = getConditions(LogicModuleRegistry.StableBeams, start, end, minThreshold);
+
 		List<Condition> a = getConditions(logicModule, start, end, minThreshold);
+		//List<Condition> a = getConditionsInside(logicModule,insideStableBeams, minThreshold);
 
 		for (Condition condition : a) {
 			if (condition.getDuration() < maxThreshold) {
@@ -69,10 +72,13 @@ public class ReportManager {
 		Map<String, Long> cumulatedTimes = new HashMap<>();
 		Long totalTime = 0L;
 
+		List<Condition> insideStableBeams = getConditions(LogicModuleRegistry.StableBeams, start, end, minThreshold);
+
 		for (LogicModuleRegistry lmr : LogicModuleRegistry.getIdentifiedProblems()) {
 
 			logger.trace("Getting statistics for LM " + lmr.name());
-			List<Condition> a = getConditions(lmr, start, end, minThreshold);
+			List<Condition> a = getConditionsInside(lmr, insideStableBeams, minThreshold);
+			// List<Condition> a = getConditions(lmr, start, end, minThreshold);
 			for (Condition c : a) {
 				for (String subsystem : subsystems) {
 					if (c.getDescription().contains(subsystem)) {
@@ -112,16 +118,19 @@ public class ReportManager {
 		Map<String, Long> cumulatedTimes = new HashMap<>();
 		Long totalTime = 0L;
 
+		List<Condition> insideStableBeams = getConditions(LogicModuleRegistry.StableBeams, start, end, minThreshold);
+		
 		for (LogicModuleRegistry lmr : LogicModuleRegistry.getIdentifiedProblems()) {
 
 			logger.trace("Getting statistics for LM " + lmr.name());
-			List<Condition> a = getConditions(lmr, start, end, minThreshold);
+			//List<Condition> a = getConditions(lmr, start, end, minThreshold);
+			List<Condition> a = getConditionsInside(lmr, insideStableBeams, minThreshold);
 			Long cumulatedTime = 0L;
 			for (Condition c : a) {
 				cumulatedTime += c.getDuration();
 			}
 			if (!a.isEmpty()) {
-				cumulatedTimes.put(a.iterator().next().getLogicModule().name(), cumulatedTime);
+				cumulatedTimes.put(a.iterator().next().getLogicModule().getLogicModule().getName(), cumulatedTime);
 				totalTime += cumulatedTime;
 
 			}

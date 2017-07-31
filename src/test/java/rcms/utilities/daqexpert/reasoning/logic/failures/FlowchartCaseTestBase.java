@@ -211,7 +211,7 @@ public class FlowchartCaseTestBase {
 
 		File file = new File(url.toURI());
 
-		return serializer.deserialize(file.getAbsolutePath(), PersistenceFormat.SMILE);
+		return serializer.deserialize(file.getAbsolutePath());
 	}
 
 }

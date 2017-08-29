@@ -87,6 +87,10 @@ public class FEROLFifoStuck extends KnownFailure {
 					if (ru.getIncompleteSuperFragmentCount() == 0)
 						continue;
 
+					// see issue #98: RU must have at least one request
+					if (ru.getRequests() <= 0)
+						continue;
+
 					// require that all FEDs in this subfedbuilder
 					// have the same triggers on the FEROL
 					SubFEDBuilder subFedBuilder = fed.getFrl().getSubFedbuilder();

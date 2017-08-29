@@ -190,4 +190,25 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 	}
 
+	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-TTCP}}
+	 * and {{PROBLEM-SUBSYSTEM}} (see issue #90)
+	 *
+	 */
+	@Test
+	public void testProblemFedFilling01() throws URISyntaxException {
+
+		DAQ snapshot = getSnapshot("1499843690396.json.gz");
+
+		assertOnlyOneIsSatisified(fc1, snapshot);
+
+		System.out.println(fc1.getDescriptionWithContext());
+		System.out.println(fc1.getActionWithContext());
+
+		Context context = fc1.getContext();
+		assertEquals(new HashSet(Arrays.asList(1111)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
+
+  }
+
 }

@@ -56,4 +56,18 @@ public class FEROLFifoStuckTest extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(ferolFifoStuck, snapshot);
 	}
 
+	@Test
+	public void test06() throws URISyntaxException {
+		// Tue, 22 Aug 2017 09:33:03 CEST
+		// Tue, 22 Aug 2017 07:33:03 UTC
+
+		// test case where DT sent fragments without
+		// TCDS sending fragments (i.e. fragments without triggers)
+		DAQ snapshot = getSnapshot("1503387183232.json.gz");
+
+		// note that FEROLFifoStuck should NOT fire on this snapshot
+		// but DT has a lot of out of sync
+		assertSatisfiedLogicModules(snapshot, this.fc3);
+	}
+
 }

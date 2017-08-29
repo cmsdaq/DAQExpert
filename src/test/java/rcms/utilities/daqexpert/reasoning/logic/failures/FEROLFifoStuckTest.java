@@ -2,7 +2,6 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import java.net.URISyntaxException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;

@@ -11,49 +11,38 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceTest;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
 /**
  *
  * @author holzner
+ * @author mgl
  * 
- * @deprecated replaced by {@link OutOfSequenceTest}
+ *
  */
-@Deprecated
-@Ignore
 public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
-	/**
-	 * Test of satisfied method, of class FlowchartCase1.
-	 * 
-	 * @throws URISyntaxException
-	 */
-	@Test
-	public void testSatisfied() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1480809948643.smile");
-
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
-
-	}
 
 	/**
 	 * test parsing of the FED number from the RU error message for a few cases.
 	 */
 	@Test
+	@Ignore // now covered by OutOfSequenceData LM
 	public void testFEDparsing() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1493263275021.smile");
 
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
+		assertSatisfiedLogicModules ( snapshot,legacyFc1);
 
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("622")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("622")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("ECAL",context.getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -66,16 +55,18 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 	public void testFEDparsing2() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1480809948643.smile");
 
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
+		assertSatisfiedLogicModules ( snapshot,legacyFc1);
 
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("TTCP"));
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("ES",context.getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -83,16 +74,18 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 	public void case03Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1497898122474.smile");
 
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
+		assertSatisfiedLogicModules ( snapshot,legacyFc1);
 
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("TTCP"));
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("CTPPS_TOT",context.getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -100,16 +93,18 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 	public void case04Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1496315027862.smile");
 
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
+		assertSatisfiedLogicModules ( snapshot,legacyFc1);
 
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("TTCP"));
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
+		
+		assertEquals("PIXEL",context.getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -117,31 +112,47 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 	public void case05Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1495916283277.smile");
 
-		assertEqualsAndUpdateResults(true, fc1, snapshot);
-		assertRestFalse(snapshot);
+		assertSatisfiedLogicModules ( snapshot,legacyFc1);
 
-		System.out.println(fc1.getDescriptionWithContext());
-		System.out.println(fc1.getActionWithContext());
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = fc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
+		
+		assertEquals("PIXEL",context.getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
+	
+	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-TTCP}}
+	 * and {{PROBLEM-SUBSYSTEM}} (see issue #90)
+	 *
+	 */
+	@Test
+	public void testProblemFedFilling01() throws URISyntaxException {
 
-	@Deprecated
-	private void assertRestFalse(DAQ snapshot) {
-		assertEqualsAndUpdateResults(false, fc2, snapshot);
-		assertEqualsAndUpdateResults(false, ruFailed, snapshot);
-		assertEqualsAndUpdateResults(false, fc3, snapshot);
-		assertEqualsAndUpdateResults(false, piDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, piProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fedDisconnected, snapshot);
-		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
-		assertEqualsAndUpdateResults(false, fc5, snapshot);
-		// assertEqualsAndUpdateResults(false, fc6, snapshot);
-		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEqualsAndUpdateResults(false, unidentified, snapshot);
-	}
+		DAQ snapshot = getSnapshot("1499843690396.json.gz");
+
+		/* Fake that OutOfSequenceData LM did not found the problem... */
+		results.put(OutOfSequenceData.class.getSimpleName(), false);
+		
+		/* ... to give a chance to legacy LM*/
+		assertEqualsAndUpdateResults(true, legacyFc1, snapshot);
+
+		System.out.println(legacyFc1.getDescriptionWithContext());
+		System.out.println(legacyFc1.getActionWithContext());
+
+		Context context = legacyFc1.getContext();
+		assertEquals(new HashSet(Arrays.asList("1111")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("FED1111",legacyFc1.getContext().getActionKey());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
+
+  }
+
 }

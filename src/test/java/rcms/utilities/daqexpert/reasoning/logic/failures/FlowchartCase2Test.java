@@ -12,7 +12,6 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedDataTest;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceTest;
 
 /**
  *

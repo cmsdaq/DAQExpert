@@ -28,7 +28,9 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(169)), context.getContext().get("FED"));
 		
 
-		assertEquals("TRACKER",context.getActionKey());
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
 		assertEquals(6,fc5.getActionWithContext().size());
 	}
 
@@ -44,7 +46,9 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(149)), context.getContext().get("FED"));
 		
 
-		assertEquals("TRACKER",context.getActionKey());
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
 		assertEquals(6,fc5.getActionWithContext().size());
 	}
 
@@ -110,7 +114,9 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(83)), context.getContext().get("FED"));
 		
 
-		assertEquals("TRACKER",context.getActionKey());
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
 		assertEquals(6,fc5.getActionWithContext().size());
 	}
 

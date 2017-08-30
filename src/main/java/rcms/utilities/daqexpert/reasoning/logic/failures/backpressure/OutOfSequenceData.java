@@ -22,17 +22,22 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 		this.description = "Run blocked by out-of-sync data from FED {{PROBLEM-FED}} received by RU {{PROBLEM-RU}} - now in syncloss state. "
 				+ "Problem FED belongs to partition {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
-		
 
 		/* Default action */
 		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
-				"Stop the run. Red & green recycle the subsystem. Start a new Run",
+				"Stop the run. Red & green recycle the subsystem {{PROBLEM-SUBSYSTEM}}. Start a new Run",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
 		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)", "Stop the run, Start a new run.",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
+				"Problem fixed: Make an e-log entry."
+						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+
+		/* FED=1111 */
+		action.addContextSteps("FED1111", "Stop the run, Start a new run.",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
@@ -54,6 +59,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 		if (backpressureRootCase == Subcase.OutOfSequenceDataReceived) {
 			result = true;
 		}
+
 		return result;
 	}
 

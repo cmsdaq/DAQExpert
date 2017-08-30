@@ -24,29 +24,37 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
 public class LegacyFlowchartCase1 extends KnownFailure {
 
 	/**
-	 * regex for getting ttc partition and FED source id which caused the sync loss from the RU exception message
+	 * regex for getting ttc partition and FED source id which caused the sync
+	 * loss from the RU exception message
 	 */
 	private final Pattern syncLossPattern = Pattern.compile(" FED (\\d+) \\((.+)\\)");
 
 	public LegacyFlowchartCase1() {
 		this.name = "Out of sequence data received";
 
-		this.description = "Run blocked by out-of-sync data from FED {{FED}}, RU {{RU}} is in syncloss. "
-				+ "Problem FED belongs to TTCP {{TTCP}} in {{SUBSYSTEM}} subsystem. "
+		this.description = "Run blocked by out-of-sync data from FED {{PROBLEM-FED}}, RU {{RU}} is in syncloss. "
+				+ "Problem FED belongs to TTCP {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "Original error message: {{ORIGERRMSG}}";
 
 		/* Default action */
 		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
 				"Stop the run. Red & green recycle the subsystem. Start a new Run",
-				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that caused the SyncLoss)",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
-						+ "Call the DOC {{SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
 		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)", "Stop the run, Start a new run.",
-				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that caused the SyncLoss)",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
-						+ "Call the DOC {{SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+		
+		/* FED=1111 */
+		action.addContextSteps("FED1111", "Stop the run, Start a new run.",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
+				"Problem fixed: Make an e-log entry."
+						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
+
 
 		this.action = action;
 	}
@@ -56,9 +64,9 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	/** sets keys FED, TTCP and SUBSYSTEM to the given string */
 	private void setContextValues(String text) {
 
-		context.register("FED", text);
-		context.register("TTCP", text);
-		context.register("SUBSYSTEM", text);
+		context.register("PROBLEM-FED", text);
+		context.register("PROBLEM-TTCP", text);
+		context.register("PROBLEM-SUBSYSTEM", text);
 		context.register("ORIGERRMSG", "-");
 
 	}
@@ -77,7 +85,8 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error'
 
-		// we do not require anymore that DAQ is in 'RunBlocked' state for the moment
+		// we do not require anymore that DAQ is in 'RunBlocked' state for the
+		// moment
 		// since sometimes the state is not propagated properly
 		//
 		// SyncLoss state of the RU is a strong enough signal that we have
@@ -111,7 +120,8 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 						// both opening and closing quote found,
 						int additionalQuote = originalMessage.indexOf("'", closingQuote + 1);
 						if (-1 == additionalQuote) {
-							// there is no additional quotes - for sure this is the only quotes, we can trim
+							// there is no additional quotes - for sure this is
+							// the only quotes, we can trim
 							trimmedMessage = originalMessage.substring(openingQuote, closingQuote);
 						} else {
 							System.out.println("Cannot trim the message: " + originalMessage + " too many quotes: "
@@ -135,7 +145,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 				Matcher mo = syncLossPattern.matcher(syncLossRU.getErrorMsg());
 				if (mo.find()) {
 					int fedId = Integer.parseInt(mo.group(1));
-					context.register("FED", mo.group(1));
+					context.register("PROBLEM-FED", mo.group(1));
 
 					// get the FED object
 					FED problematicFED = daq.getFEDbySrcId(fedId);
@@ -151,9 +161,14 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 								subsystemName = ttcp.getSubsystem().getName();
 							}
 						}
-						context.register("TTCP", ttcpName);
-						context.register("SUBSYSTEM", subsystemName);
-						context.setActionKey(subsystemName);
+						context.register("PROBLEM-TTCP", ttcpName);
+						context.register("PROBLEM-SUBSYSTEM", subsystemName);
+
+						if (problematicFED.getSrcIdExpected() == 1111) {
+							context.setActionKey("FED" + problematicFED.getSrcIdExpected());
+						} else {
+							context.setActionKey(subsystemName);
+						}
 					} else {
 						setContextValues("(FED not found)");
 					}

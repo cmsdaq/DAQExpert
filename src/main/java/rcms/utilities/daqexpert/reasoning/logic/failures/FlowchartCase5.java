@@ -39,6 +39,11 @@ public class FlowchartCase5 extends KnownFailure {
 				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
 				"Call the DOC for the ECAL");
 
+		/* tracker specific case */
+		action.addContextSteps("TRACKER", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
+				"Problem not fixed: Stop the run", "Start new run (try up to 2 times)", "Problem still not fixed: Red recycle TRACKER",
+				"Call the DOC for the TRACKER");
+
 		this.action = action;
 	}
 
@@ -112,7 +117,8 @@ public class FlowchartCase5 extends KnownFailure {
 								}
 							}
 							if (existsAtLeaseOneFedBackpressured) {
-								// If there is at least one fed backpressured this LM should not
+								// If there is at least one fed backpressured
+								// this LM should not
 								// fire (for more see github #83 issue)
 								result = false;
 							}

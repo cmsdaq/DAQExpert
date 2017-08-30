@@ -460,8 +460,8 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 					result = true;
 				}
 			}
-			if(result){
-				return Subcase.CorruptedDataReceived;				
+			if (result) {
+				return Subcase.CorruptedDataReceived;
 			}
 
 		} else if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
@@ -472,20 +472,18 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			Matcher mo = syncLossPattern1.matcher(ru.getErrorMsg());
 			boolean found = mo.find();
 
-			if (! found) {
+			if (!found) {
 				mo = syncLossPattern2.matcher(ru.getErrorMsg());
 				found = mo.find();
 			}
 
 			if (found) {
 				int fedId = Integer.parseInt(mo.group(1));
-				context.register("PROBLEM-FED", fedId);
 				fed = findFEDinRUByFEDId(ru, fedId);
 			} else {
 				for (FED f : notMaskedFedsFromRU(ru)) {
 					if (f.getRuFedOutOfSync() > 0) {
 						fed = f;
-						context.register("PROBLEM-FED", f.getSrcIdExpected());
 						break;
 					}
 				}
@@ -493,6 +491,13 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			if (fed != null) {
 				context.register("PROBLEM-TTCP", fed.getTtcp().getName());
 				context.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+				context.register("PROBLEM-FED", fed.getSrcIdExpected());
+				if (fed.getSrcIdExpected() == 1111) {
+					// exists specific instructions for some fedsD
+					context.setActionKey("FED" + fed.getSrcIdExpected());
+				} else {
+					context.setActionKey(fed.getTtcp().getSubsystem().getName());
+				}
 			}
 			return Subcase.OutOfSequenceDataReceived;
 		}
@@ -501,18 +506,11 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 }
 
 enum Subcase {
-	LinkProblem,
-	WaitingForOtherFedsInFB,
-	RuIsStuck,
-	HltProblem,
+	LinkProblem, WaitingForOtherFedsInFB, RuIsStuck, HltProblem,
 
-	OutOfSequenceDataReceived,
-	CorruptedDataReceived,
-	SpecificFedBlocking,
+	OutOfSequenceDataReceived, CorruptedDataReceived, SpecificFedBlocking,
 
 	BackpressuredByOtherFed,
 
-	UnknownFilterfarmProblem,
-	BugInFilterfarm,
-	Unknown;
+	UnknownFilterfarmProblem, BugInFilterfarm, Unknown;
 }

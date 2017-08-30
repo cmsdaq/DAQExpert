@@ -22,7 +22,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class OutOfSequenceTest extends FlowchartCaseTestBase {
+public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 	/*
 	 * 
@@ -46,9 +46,13 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getActionWithContext());
 
 		Context context = legacyFc1.getContext();
-		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
+		
+
+		assertEquals("CTPPS_TOT",legacyFc1.getContext().getActionKey());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -78,6 +82,8 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 
 		System.out.println(fc1.getDescriptionWithContext());
 		System.out.println(fc1.getActionWithContext());
+		
+
 
 	}
 
@@ -121,6 +127,10 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().get("PROBLEM-TTCP"));
 		assertEquals(new HashSet(Arrays.asList("ru-c2e15-28-01.cms")), context.getContext().get("PROBLEM-RU"));
 		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().get("AFFECTED-FED"));
+		
+
+		assertEquals("DT",fc1.getContext().getActionKey());
+		assertEquals(4,fc1.getActionWithContext().size());
 
 	}
 
@@ -137,6 +147,9 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("ECAL",fc1.getContext().getActionKey());
+		assertEquals(4,fc1.getActionWithContext().size());
 
 	}
 
@@ -164,6 +177,10 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
+		
+
+		assertEquals("PIXEL",fc1.getContext().getActionKey());
+		assertEquals(4,fc1.getActionWithContext().size());
 
 	}
 
@@ -187,6 +204,10 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
+		
+
+		assertEquals("PIXEL", fc1.getContext().getActionKey());
+		assertEquals(4,fc1.getActionWithContext().size());
 
 	}
 
@@ -208,6 +229,9 @@ public class OutOfSequenceTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(1111)), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
+
+		assertEquals("FED1111",fc1.getContext().getActionKey());
+		assertEquals(3,fc1.getActionWithContext().size());
 
   }
 

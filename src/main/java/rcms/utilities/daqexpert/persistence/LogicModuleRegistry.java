@@ -39,6 +39,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
 import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase1;
 import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase2;
+import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RuFailed;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
@@ -111,6 +112,9 @@ public enum LogicModuleRegistry {
 	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   43, 10010),
 	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
 	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
+
+	RateTooHigh            (new RateTooHigh(),            ConditionGroup.RATE_OUT_OF_RANGE,         "Rate too high",                                     44, 10501),
+
 	;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {

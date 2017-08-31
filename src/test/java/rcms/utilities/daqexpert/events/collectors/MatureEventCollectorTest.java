@@ -1,8 +1,9 @@
-package rcms.utilities.daqexpert.events;
+package rcms.utilities.daqexpert.events.collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import rcms.utilities.daqexpert.events.collectors.MatureEventCollector;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;

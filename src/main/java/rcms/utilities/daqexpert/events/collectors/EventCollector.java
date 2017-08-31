@@ -1,10 +1,12 @@
-package rcms.utilities.daqexpert.events;
+package rcms.utilities.daqexpert.events.collectors;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.events.ConditionEvent;
+import rcms.utilities.daqexpert.events.EventType;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;

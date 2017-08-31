@@ -8,7 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.events.MatureEventCollector;
+import rcms.utilities.daqexpert.events.collectors.MatureEventCollector;
 import rcms.utilities.daqexpert.persistence.Condition;
 
 /**

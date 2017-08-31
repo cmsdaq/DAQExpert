@@ -1,4 +1,4 @@
-package rcms.utilities.daqexpert.events;
+package rcms.utilities.daqexpert.events.collectors;
 
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;

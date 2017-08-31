@@ -1,7 +1,8 @@
-package rcms.utilities.daqexpert.events;
+package rcms.utilities.daqexpert.events.collectors;
 
 import java.util.List;
 
+import rcms.utilities.daqexpert.events.ConditionEvent;
 import rcms.utilities.daqexpert.persistence.Condition;
 
 /**

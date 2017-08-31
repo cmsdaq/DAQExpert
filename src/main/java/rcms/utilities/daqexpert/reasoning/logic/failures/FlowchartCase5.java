@@ -41,7 +41,7 @@ public class FlowchartCase5 extends KnownFailure {
 
 		/* tracker specific case only when warning state */
 		action.addContextSteps("TRACKER-WARNING", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Stop the run", "Start new run (try up to 2 times)", "Problem still not fixed: Red recycle TRACKER",
+				"Problem not fixed: Stop the run", "Problem still not fixed: Red recycle TRACKER",
 				"Call the DOC for the TRACKER");
 
 		this.action = action;

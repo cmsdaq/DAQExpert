@@ -1,8 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -85,6 +83,10 @@ public class FEROLFifoStuck extends KnownFailure {
 					// the bug does not happen on all FEROLs attached to this RU
 					// at the same time)
 					if (ru.getIncompleteSuperFragmentCount() == 0)
+						continue;
+
+					// see issue #98: RU must have at least one request
+					if (ru.getRequests() <= 0)
 						continue;
 
 					// require that all FEDs in this subfedbuilder

@@ -39,6 +39,11 @@ public class FlowchartCase5 extends KnownFailure {
 				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
 				"Call the DOC for the ECAL");
 
+		/* tracker specific case only when warning state */
+		action.addContextSteps("TRACKER-WARNING", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
+				"Problem not fixed: Stop the run", "Problem still not fixed: Red recycle TRACKER",
+				"Call the DOC for the TRACKER");
+
 		this.action = action;
 	}
 
@@ -107,12 +112,19 @@ public class FlowchartCase5 extends KnownFailure {
 										context.register("TTCP", ttcp.getName());
 										context.register("TTCPSTATE", currentState.name());
 										context.register("SUBSYSTEM", subSystem.getName());
-										context.setActionKey(subSystem.getName());
+										
+										if(currentState == TTSState.WARNING && "TRACKER".equalsIgnoreCase(subSystem.getName())){
+											context.setActionKey("TRACKER-WARNING");
+										} else{
+
+											context.setActionKey(subSystem.getName());
+										}
 									}
 								}
 							}
 							if (existsAtLeaseOneFedBackpressured) {
-								// If there is at least one fed backpressured this LM should not
+								// If there is at least one fed backpressured
+								// this LM should not
 								// fire (for more see github #83 issue)
 								result = false;
 							}

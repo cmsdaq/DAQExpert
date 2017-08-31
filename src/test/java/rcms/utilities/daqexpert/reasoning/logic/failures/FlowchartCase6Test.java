@@ -1,16 +1,13 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
+
+import java.net.URISyntaxException;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceTest;
 
 /**
  *

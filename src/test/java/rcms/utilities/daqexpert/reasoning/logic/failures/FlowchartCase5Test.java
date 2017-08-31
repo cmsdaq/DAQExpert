@@ -26,6 +26,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TEC-")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(169)), context.getContext().get("FED"));
+		
+
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals(5,fc5.getActionWithContext().size());
 	}
 
 	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-26-03:28:25 */
@@ -38,6 +44,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(149)), context.getContext().get("FED"));
+		
+
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals(5,fc5.getActionWithContext().size());
 	}
 
 	/*
@@ -62,6 +74,10 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(838)), context.getContext().get("FED"));
+		
+
+		assertEquals("CSC",context.getActionKey());
+		assertEquals(5,fc5.getActionWithContext().size());
 
 	}
 
@@ -80,6 +96,10 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HBHEC")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(11114)), context.getContext().get("FED"));
+		
+
+		assertEquals("HCAL",context.getActionKey());
+		assertEquals(5,fc5.getActionWithContext().size());
 	}
 
 	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-15-09:52:16 */
@@ -92,6 +112,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(83)), context.getContext().get("FED"));
+		
+
+		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
+
+		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals(5,fc5.getActionWithContext().size());
 	}
 
 }

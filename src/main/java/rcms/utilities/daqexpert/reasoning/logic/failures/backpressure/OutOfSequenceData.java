@@ -37,7 +37,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* FED=1111 */
-		action.addContextSteps("FED1111", "Stop the run, Start a new run.",
+		action.addContextSteps("FED1111or1109", "Stop the run, Start a new run.",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");

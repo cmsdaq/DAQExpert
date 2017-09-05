@@ -230,7 +230,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
 
-		assertEquals("FED1111",fc1.getContext().getActionKey());
+		assertEquals("FED1111or1109",fc1.getContext().getActionKey());
 		assertEquals(3,fc1.getActionWithContext().size());
 
   }

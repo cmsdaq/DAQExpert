@@ -50,7 +50,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 		
 		/* FED=1111 */
-		action.addContextSteps("FED1111", "Stop the run, Start a new run.",
+		action.addContextSteps("FED1111or1109", "Stop the run, Start a new run.",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
@@ -164,8 +164,8 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 						context.register("PROBLEM-TTCP", ttcpName);
 						context.register("PROBLEM-SUBSYSTEM", subsystemName);
 
-						if (problematicFED.getSrcIdExpected() == 1111) {
-							context.setActionKey("FED" + problematicFED.getSrcIdExpected());
+						if (problematicFED.getSrcIdExpected() == 1111 || problematicFED.getSrcIdExpected() == 1109) {
+							context.setActionKey("FED1111or1109");
 						} else {
 							context.setActionKey(subsystemName);
 						}

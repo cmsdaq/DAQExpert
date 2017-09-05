@@ -494,9 +494,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				context.register("PROBLEM-TTCP", fed.getTtcp().getName());
 				context.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
 				context.register("PROBLEM-FED", fed.getSrcIdExpected());
-				if (fed.getSrcIdExpected() == 1111) {
+				if (fed.getSrcIdExpected() == 1111 || fed.getSrcIdExpected() == 1109) {
 					// exists specific instructions for some fedsD
-					context.setActionKey("FED" + fed.getSrcIdExpected());
+					context.setActionKey("FED1111or1109");
 				} else {
 					context.setActionKey(fed.getTtcp().getSubsystem().getName());
 				}

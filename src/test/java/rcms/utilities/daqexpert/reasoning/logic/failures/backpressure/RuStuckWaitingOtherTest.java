@@ -40,9 +40,9 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("HFb")), context.getContext().get("AFFECTED-FED-BUILDER"));
 		assertEquals(new HashSet<>(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 
-		assertEquals(new HashSet(
-				Arrays.asList(11248, 11200, 11296, 11284, 11236, 11332, 11272, 11224, 11320, 11260, 11212, 11308)),
-				context.getContext().get("PROBLEM-FED"));
+		assertEquals(
+				108,
+				context.getContext().get("PROBLEM-FED").size());
 		assertEquals(new HashSet(Arrays.asList(1122)), context.getContext().get("AFFECTED-FED"));
 
 	}
@@ -92,6 +92,8 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("AFFECTED-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("GTUP")), context.getContext().get("AFFECTED-TTCP"));
 		assertEquals(new HashSet<>(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		
+		System.out.println(ruStuckWaitingOther.getDescriptionWithContext());
 
 	}
 
@@ -144,6 +146,17 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1494357600307.smile");
 
 		assertOnlyOneIsSatisified(ruStuckWaitingOther, snapshot);
+		
+		System.out.println(ruStuckWaitingOther.getDescriptionWithContext());
+
+	}
+	
+	@Test
+	public void dontWaitForPseudoFedsTest() throws URISyntaxException {
+		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		DAQ snapshot = getSnapshot("1504266974356.json.gz");
+
+		assertSatisfiedLogicModules(snapshot,ruStuckWaitingOther, ruFailed);
 
 	}
 }

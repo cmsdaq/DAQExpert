@@ -353,21 +353,23 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 									|| (sfb.getMinTrig() == 0 && sfb.getMaxTrig() == 0)) {
 								logger.debug("Found sfb with suspicious number of triggers");
 
-								for (FED fed : sfb.getFeds()) {
+								for (FRL frl : sfb.getFrls()) {
+									for (FED fed : frl.getFeds().values()) {
 
-									// if (!fed.isFrlMasked()) {
-									// dont count masked feds
-									if (fed.getNumTriggers() == 0) {
-										foundFedInOtherRuThatDidNotSendData = true;
-										context.register("PROBLEM-FED", fed.getSrcIdExpected());
-										context.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
-										context.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
-										context.register("PROBLEM-SUBSYSTEM",
-												sfb.getTtcPartition().getSubsystem().getName());
-										context.register("AFFECTED-FED-BUILDER",
-												affectedFed.getFrl().getSubFedbuilder().getFedBuilder().getName());
+										if (fed.isHasSLINK() && !fed.isFrlMasked()) {
+											// dont count masked feds
+											if (fed.getNumTriggers() < sfb.getMaxTrig() || fed.getNumTriggers() == 0) {
+												foundFedInOtherRuThatDidNotSendData = true;
+												context.register("PROBLEM-FED", fed.getSrcIdExpected());
+												context.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
+												context.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
+												context.register("PROBLEM-SUBSYSTEM",
+														sfb.getTtcPartition().getSubsystem().getName());
+												context.register("AFFECTED-FED-BUILDER", affectedFed.getFrl()
+														.getSubFedbuilder().getFedBuilder().getName());
+											}
+										}
 									}
-									// }
 								}
 
 							}

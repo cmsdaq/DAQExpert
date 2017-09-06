@@ -156,7 +156,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1504266974356.json.gz");
 
-		assertSatisfiedLogicModules(snapshot,ruStuckWaitingOther, ruFailed);
+		assertSatisfiedLogicModules(snapshot, ruFailed);
 
 	}
 }

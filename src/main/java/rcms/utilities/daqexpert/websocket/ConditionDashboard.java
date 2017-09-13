@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.websocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,73 +31,46 @@ public class ConditionDashboard implements Observer {
 
 	private final static Logger logger = Logger.getLogger(ConditionDashboard.class);
 
-	private Condition currentCondition;
+	/**
+	 * Current condition
+	 */
+	private Condition dominatingCondition;
 
-	private HashMap<Long, Condition> recentConditions = new LinkedHashMap<>();
+	private HashMap<Long, Condition> conditions = new LinkedHashMap<>();
 
 	private ConditionSessionHandler sessionHander;
 
-	private final int max;
+	private final int maximumNumberOfConditionsHandled;
 
 	public ConditionDashboard(int max) {
-		this.max = max;
-	}
-
-	private void handleRemoveCurrent() {
-		currentCondition = null;
-		if (sessionHander != null) {
-			sessionHander.removeCurrent();
-			sessionHander.addRecent();
-		}
-	}
-
-	private void handleSetCurrent(Condition condition) {
-		currentCondition = condition;
-		if (sessionHander != null) {
-			sessionHander.setCurrent(condition);
-		}
-	}
-
-	private void handleReplaceCurrent(Condition condition) {
-		currentCondition = condition;
-
-		if (sessionHander != null) {
-			sessionHander.removeCurrent();
-			sessionHander.setCurrent(condition);
-		}
-		// remove (fire add recent) + set current
-	}
-
-	private void handleRemoveRecent(Condition condition) {
-		recentConditions.remove(condition.getId());
-		condition.deleteObserver(this);
-
-		if (sessionHander != null) {
-			sessionHander.removeRecent(condition.getId());
-		}
-	}
-
-	private void handleAddRecent(Condition condition) {
-		recentConditions.put(condition.getId(), condition);
-		condition.addObserver(this);
-		if (sessionHander != null) {
-			sessionHander.addRecent();
-		}
+		this.maximumNumberOfConditionsHandled = max;
 	}
 
 	private void handleUpdate(Condition condition) {
 		if (sessionHander != null) {
-			sessionHander.update(condition);
+			sessionHander.handleConditionUpdate(condition);
 		}
 	}
 
-	public void update(Set<Condition> conditions) {
+	public void update(Set<Condition> conditionsProduced) {
 
-		if (currentCondition != null && currentCondition.getEnd() != null) {
-			handleRemoveCurrent();
+		Set<Condition> addedThisRound = new HashSet<>();
+		Condition lastDominating = dominatingCondition;
+
+		if (dominatingCondition != null) {
+			boolean exists = false;
+			for (Condition condition : conditionsProduced) {
+				if (condition.getId() == dominatingCondition.getId()) {
+					exists = true;
+				}
+
+			}
+			if (!exists) {
+				dominatingCondition = null;
+			}
 		}
 
-		for (Condition condition : conditions) {
+		for (Condition condition : conditionsProduced) {
 			if (condition.isShow() /*
 									 * && condition.getPriority() ==
 									 * ConditionPriority.CRITICAL
@@ -108,20 +82,20 @@ public class ConditionDashboard implements Observer {
 				if (condition.getEnd() == null) {
 
 					// no condition at the moment
-					if (currentCondition == null) {
-						handleSetCurrent(condition);
+					if (dominatingCondition == null) {
+						this.dominatingCondition = condition;
 					}
 
 					// exists other condition at the moemnt
 					else {
 
 						// current is more important than old
-						if (condition.getPriority().ordinal() > currentCondition.getPriority().ordinal()) {
-							handleReplaceCurrent(condition);
+						if (condition.getPriority().ordinal() > dominatingCondition.getPriority().ordinal()) {
+							this.dominatingCondition = condition;
 						}
 
 						// current is less important than old
-						else if (condition.getPriority().ordinal() < currentCondition.getPriority().ordinal()) {
+						else if (condition.getPriority().ordinal() < dominatingCondition.getPriority().ordinal()) {
 							// nothing to do
 						}
 
@@ -129,21 +103,21 @@ public class ConditionDashboard implements Observer {
 						else {
 
 							// current is more useful than old
-							if (condition.getLogicModule().getUsefulness() > currentCondition.getLogicModule()
+							if (condition.getLogicModule().getUsefulness() > dominatingCondition.getLogicModule()
 									.getUsefulness()) {
-								handleReplaceCurrent(condition);
+								this.dominatingCondition = condition;
 
 							}
 							// current is less useful than old
-							else if (condition.getLogicModule().getUsefulness() < currentCondition.getLogicModule()
+							else if (condition.getLogicModule().getUsefulness() < dominatingCondition.getLogicModule()
 									.getUsefulness()) {
 								// nothing to do
 							}
 							// both are equally useful
 							else {
 								// newest will be displayed
-								if (condition.getStart().after(currentCondition.getStart())) {
-									handleReplaceCurrent(condition);
+								if (condition.getStart().after(dominatingCondition.getStart())) {
+									this.dominatingCondition = condition;
 								}
 							}
 
@@ -151,36 +125,55 @@ public class ConditionDashboard implements Observer {
 					}
 				}
 
-				if (!recentConditions.containsKey(condition.getId())) {
-					if (recentConditions.size() >= max) {
-						Condition oldest = recentConditions.values().iterator().next();
-						handleRemoveRecent(oldest);
+				if (!conditions.containsKey(condition.getId())) {
+					if (conditions.size() >= maximumNumberOfConditionsHandled) {
+						Condition oldest = conditions.values().iterator().next();
+						System.out.println("Observers before: " + oldest.countObservers());
+						oldest.deleteObserver(this);
+						System.out.println("Observers after: " + oldest.countObservers());
+						conditions.remove(oldest.getId());
 					}
+					conditions.put(condition.getId(), condition);
+					condition.addObserver(this);
 
-					handleAddRecent(condition);
+					addedThisRound.add(condition);
+
 				}
 			}
 		}
 
+		if (sessionHander != null) {
+			if (lastDominating != this.dominatingCondition) {
+				sessionHander.handleDominatingConditionChange(this.dominatingCondition);
+			}
+			if (addedThisRound.size() > 0) {
+				sessionHander.handleRecentConditionsChange(addedThisRound);
+			}
+		}
 	}
 
 	public Condition getCurrentCondition() {
-		return currentCondition;
+		return dominatingCondition;
 	}
 
 	protected Collection<Condition> getCurrentConditions() {
-		return recentConditions.values();
+		return conditions.values();
 	}
 
-	public Collection<Condition> getFilteredCurrentConditions() {
+	/**
+	 * Get condition list without dominating condition
+	 * 
+	 * @return
+	 */
+	public Collection<Condition> getConditionsWithoutDominatingCondition() {
 		List<Condition> result = new ArrayList<>();
-		Iterator<Condition> i = recentConditions.values().iterator();
+		Iterator<Condition> i = conditions.values().iterator();
 
 		while (i.hasNext()) {
 			Condition curr = i.next();
-			if (currentCondition == null) {
+			if (dominatingCondition == null) {
 				result.add(curr);
-			} else if (currentCondition.getId() != curr.getId()) {
+			} else if (dominatingCondition.getId() != curr.getId()) {
 				result.add(curr);
 			}
 		}
@@ -201,15 +194,15 @@ public class ConditionDashboard implements Observer {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("ConditionDashboard [currentCondition="
-				+ (currentCondition != null ? currentCondition.getId() : "<none>") + ", recentConditions=[");
-		logger.trace("recent size: " + recentConditions.size());
-		for (Condition condition : recentConditions.values()) {
+				+ (dominatingCondition != null ? dominatingCondition.getId() : "<none>") + ", recentConditions=[");
+		logger.trace("recent size: " + conditions.size());
+		for (Condition condition : conditions.values()) {
 			sb.append(condition.getId());
 			sb.append(",");
 		}
-		logger.trace("filtered size: " + getFilteredCurrentConditions().size());
+		logger.trace("filtered size: " + getConditionsWithoutDominatingCondition().size());
 		sb.append("], filteredConditions=[");
-		for (Condition condition : getFilteredCurrentConditions()) {
+		for (Condition condition : getConditionsWithoutDominatingCondition()) {
 			sb.append(condition.getId());
 			sb.append(",");
 		}

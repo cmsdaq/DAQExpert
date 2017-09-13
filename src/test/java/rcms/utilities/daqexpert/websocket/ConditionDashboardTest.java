@@ -40,7 +40,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c5, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		conditions.clear();
 		conditions.add(c5);
@@ -48,7 +48,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c5, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 	}
 
@@ -63,7 +63,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c7, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		conditions.clear();
 		conditions.add(c7);
@@ -71,7 +71,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c7, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 	}
 
@@ -86,7 +86,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c4, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		conditions.clear();
 		conditions.add(c4);
@@ -94,7 +94,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		Assert.assertEquals(c4, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(1, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(1, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 	}
 
@@ -114,7 +114,7 @@ public class ConditionDashboardTest {
 		/* 1 Result */
 		Assert.assertEquals("Conditions same priority and date -> first", c1, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(3, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(2, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(2, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		/* 2 Change */
 		conditions.add(c4);
@@ -124,7 +124,7 @@ public class ConditionDashboardTest {
 		Assert.assertEquals("Conditions same priority -> higher usefulness date", c4,
 				conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(3, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		/* 3 Change */
 		conditions.add(c5);
@@ -133,7 +133,7 @@ public class ConditionDashboardTest {
 		/* 3 Result */
 		Assert.assertEquals("Priority", c5, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		/* 4 Change */
 		c5.setEnd(d3);
@@ -143,7 +143,7 @@ public class ConditionDashboardTest {
 		/* 4 Result */
 		Assert.assertEquals("Return to last", c4, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		/* 5 Change */
 		conditions.add(c6);
@@ -152,7 +152,7 @@ public class ConditionDashboardTest {
 		/* 5 Result */
 		Assert.assertEquals(c6, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(4, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(4, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		/* 6 no more conditions */
 		c6.setEnd(d4);
@@ -162,7 +162,7 @@ public class ConditionDashboardTest {
 		/* 6 Only recent conditions */
 		Assert.assertEquals(null, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(5, conditionDashboard.getFilteredCurrentConditions().size());
+		Assert.assertEquals(5, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		Assert.assertNotNull(conditionDashboard.toString());
 

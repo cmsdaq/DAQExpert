@@ -58,14 +58,7 @@ public class ConditionDashboard implements Observer {
 		Condition lastDominating = dominatingCondition;
 
 		if (dominatingCondition != null) {
-			boolean exists = false;
-			for (Condition condition : conditionsProduced) {
-				if (condition.getId() == dominatingCondition.getId()) {
-					exists = true;
-				}
-
-			}
-			if (!exists) {
+			if(dominatingCondition.getEnd() != null){
 				dominatingCondition = null;
 			}
 		}

@@ -122,8 +122,13 @@ public class ConditionSessionHandler {
 			objectBuilder.add("timestamp", dateFormat.format(condition.getStart()));
 			objectBuilder.add("announced", false);
 
-			if (condition.getActionSteps() != null)
-				objectBuilder.add("action", condition.getActionSteps().toString());
+			if (condition.getActionSteps() != null){
+				JsonArrayBuilder actions = provider.createArrayBuilder();
+				for(String step: condition.getActionSteps()){
+					actions.add(step);
+				}
+				objectBuilder.add("action", actions);
+			}
 
 			if (condition.getDescription() != null)
 				objectBuilder.add("description", condition.getDescription());

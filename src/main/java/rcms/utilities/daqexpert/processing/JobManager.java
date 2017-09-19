@@ -86,7 +86,7 @@ public class JobManager {
 		}
 
 		if (demo) {
-			realTimeReaderPeriod = 200;
+			realTimeReaderPeriod = 2000;
 			batchSnapshotRead = 1;
 		}
 

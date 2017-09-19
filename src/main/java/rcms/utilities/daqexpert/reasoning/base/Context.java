@@ -1,24 +1,17 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
+import java.io.Serializable;
+import java.util.*;
+
 @SuppressWarnings("serial")
-public class Context implements Serializable {
+public class Context extends Observable implements Serializable {
 
 	private static final Logger logger = Logger.getLogger(Context.class);
 
@@ -40,8 +33,17 @@ public class Context implements Serializable {
 			context.get(key).add(object);
 		}
 
+		setChanged();
+
 	}
 
+	public void triggerReady(){
+		if(hasChanged()) {
+			logger.info("I changed "+this.context+". Notifying observers: " + this.countObservers());
+			notifyObservers();
+			clearChanged();
+		}
+	}
 	/**
 	 * Called when Condition ends
 	 */

@@ -51,6 +51,8 @@ public class Context extends Observable implements Serializable {
         cc.update(value.floatValue());
         boolean isChangeSignificant = cc.isReport();
 
+        changeset.add(key);
+        setChanged();
         if (isChangeSignificant) {
             System.out.println(
                     "Report this change: (min=" + cc.getMin() + ", max=" + cc.getMax() + ", avg=" + cc.getAvg() + ")");
@@ -67,7 +69,7 @@ public class Context extends Observable implements Serializable {
         }
     }
 
-    public void clearChangeset(){
+    public void clearChangeset() {
         changeset = new HashSet<>();
     }
 
@@ -128,7 +130,7 @@ public class Context extends Observable implements Serializable {
 
         for (java.util.Map.Entry<String, Set<Object>> entry : this.getContext().entrySet()) {
             boolean updated = false;
-            if( changeset.contains(entry.getKey())){
+            if (changeset.contains(entry.getKey())) {
                 updated = true;
             }
 
@@ -151,7 +153,7 @@ public class Context extends Observable implements Serializable {
                             replacement = mapper.writeValueAsString(entry.getValue());
                         }
                     }
-                    if(updated){
+                    if (updated) {
                         replacement = "<<" + replacement + ">>";
                     }
                     output = output.replaceAll(variableKeyRegex, replacement);
@@ -163,6 +165,32 @@ public class Context extends Observable implements Serializable {
                 logger.debug("No key " + variableKeyNoRgx + " in " + output);
             }
         }
+
+        for (Map.Entry<String, CalculationContext> entry : this.contextForCalculations.entrySet()) {
+            boolean updated = false;
+            if (changeset.contains(entry.getKey())) {
+                updated = true;
+            }
+
+            String variableKeyNoRgx = "{{" + entry.getKey() + "}}";
+            String variableKeyRegex = "\\{\\{" + entry.getKey() + "\\}\\}";
+
+            if (output.contains(variableKeyNoRgx)) {
+
+                String replacement = "";
+
+                replacement = entry.getValue().toString();
+                if (updated) {
+                    replacement = "<<" + replacement + ">>";
+                }
+                output = output.replaceAll(variableKeyRegex, replacement);
+
+
+            } else {
+                logger.debug("No key " + variableKeyNoRgx + " in " + output);
+            }
+        }
+
 
         return output;
     }

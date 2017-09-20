@@ -105,7 +105,7 @@ public class ConditionSessionHandler {
 	/**
 	 * Create message for adding multiple conditions
 	 * 
-	 * @param condition
+	 * @param conditions
 	 * @return
 	 */
 	private JsonObject createAddMessage(Collection<Condition> conditions) {
@@ -188,6 +188,8 @@ public class ConditionSessionHandler {
 		} else {
 			builder.add("status", "updated");
 		}
+
+		builder.add("description",condition.getDescription());
 
 		JsonObject object = builder.build();
 		JsonObject updateMessage = provider.createObjectBuilder().add("action", "update").add("object", object).build();

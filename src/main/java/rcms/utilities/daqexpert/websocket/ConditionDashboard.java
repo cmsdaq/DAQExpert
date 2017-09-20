@@ -27,7 +27,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class ConditionDashboard implements Observer {
+public class ConditionDashboard implements Observer{
 
 	private final static Logger logger = Logger.getLogger(ConditionDashboard.class);
 

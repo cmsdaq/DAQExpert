@@ -76,6 +76,7 @@ public class LogicModuleManager {
                 if (lm.getLogicModule() instanceof KnownFailure) {
                     knownFailureClasses.add(lm.getLogicModule().getClass().getSimpleName());
                 }
+
             } else {
                 logger.info("This is not used: " + lm);
             }
@@ -187,6 +188,7 @@ public class LogicModuleManager {
                 if (!result) {
                     contextLogicModule.getContext().clearContext();
                 }
+                produceResult.getRight().publishUpdate();
             }
 
             if (produceResult.getLeft()) {

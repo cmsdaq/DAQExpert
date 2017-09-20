@@ -55,6 +55,7 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
 					result = true;
 					context.register("TTCP", partition.getName());
 					context.register("SUBSYSTEM", partition.getSubsystem().getName());
+					context.registerForStatistics("VALUE", deadPercentage,"%",1);
 				}
 			}
 		}
@@ -69,7 +70,7 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
 			this.threshold = Integer
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION.getKey()));
 
-			this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is greater than "
+			this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is {{VALUE}} the threshold is "
 					+ threshold + "%";
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

@@ -42,9 +42,13 @@ public class Context extends Observable implements Serializable {
 
     }
 
-    public boolean registerForStatistics(String key, Number value) {
+    public boolean registerForStatistics(String key, Number value){
+        return registerForStatistics(key, value,"",1);
+    }
+
+    public boolean registerForStatistics(String key, Number value, String unit, int precision) {
         if (!contextForCalculations.containsKey(key)) {
-            contextForCalculations.put(key, new CalculationContext());
+            contextForCalculations.put(key, new CalculationContext(unit, precision));
         }
 
         CalculationContext cc = contextForCalculations.get(key);

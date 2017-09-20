@@ -16,12 +16,20 @@ public class CalculationContext implements Serializable {
     private Float current;
     private int count;
     private boolean report;
+    private boolean allTheSame;
 
+    private String unit;
     private DecimalFormat df;
 
-    public CalculationContext(){
-        df = new DecimalFormat();
-        df.setMaximumFractionDigits(1);
+    public CalculationContext(String unit, int precision) {
+
+        if (unit == null) {
+            this.unit = "";
+        } else {
+            this.unit = unit;
+        }
+        this.df = new DecimalFormat();
+        this.df.setMaximumFractionDigits(precision);
     }
 
     public void update(Float n) {
@@ -56,6 +64,16 @@ public class CalculationContext implements Serializable {
                 report = true;
             }
         }
+
+        allTheSame = allTheSame();
+    }
+
+    private boolean allTheSame() {
+        String base = getValueWithPrecision(current);
+        if (base.equals(getValueWithPrecision(avg)) && base.equals(getValueWithPrecision(max)) && base.equals(getValueWithPrecision(min))) {
+            return true;
+        }
+        return false;
     }
 
     public void reset() {
@@ -64,6 +82,7 @@ public class CalculationContext implements Serializable {
         avg = null;
         sum = null;
         report = false;
+        allTheSame = false;
     }
 
     public boolean isReport() {
@@ -94,8 +113,8 @@ public class CalculationContext implements Serializable {
         this.avg = avg;
     }
 
-    public String getValueWithPrecision(Float value){
-        if(value == null){
+    public String getValueWithPrecision(Float value) {
+        if (value == null) {
             return "-";
         }
         return df.format(value);
@@ -104,12 +123,16 @@ public class CalculationContext implements Serializable {
     @Override
     public String toString() {
 
+        if (allTheSame) {
+            return new StringBuilder().append(getValueWithPrecision(current)).append(unit).toString();
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("(");
-        sb.append("**").append("curr").append(":").append("**").append(getValueWithPrecision(current)).append(",");
-        sb.append("**").append("avg").append(":").append("**").append(getValueWithPrecision(avg)).append(",");
-        sb.append("**").append("min").append(":").append("**").append(getValueWithPrecision(min)).append(",");
-        sb.append("**").append("max").append(":").append("**").append(getValueWithPrecision(max));
+        sb.append("**").append("curr").append(":").append("**").append(getValueWithPrecision(current)).append("**").append(unit).append("**").append(", ");
+        sb.append("**").append("avg").append(":").append("**").append(getValueWithPrecision(avg)).append("**").append(unit).append("**").append(", ");
+        sb.append("**").append("min").append(":").append("**").append(getValueWithPrecision(min)).append("**").append(unit).append("**").append(", ");
+        sb.append("**").append("max").append(":").append("**").append(getValueWithPrecision(max)).append("**").append(unit).append("**");
         sb.append(")");
         return sb.toString();
     }

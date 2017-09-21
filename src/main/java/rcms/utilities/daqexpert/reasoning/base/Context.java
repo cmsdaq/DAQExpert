@@ -158,7 +158,7 @@ public class Context extends Observable implements Serializable {
                         }
                     }
                     if (updated) {
-                        replacement = "<<" + replacement + ">>";
+                        replacement = "<strong>" + replacement + "</strong>";
                     }
                     output = output.replaceAll(variableKeyRegex, replacement);
                 } catch (JsonProcessingException e) {

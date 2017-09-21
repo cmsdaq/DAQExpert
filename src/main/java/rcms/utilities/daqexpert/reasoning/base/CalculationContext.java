@@ -123,7 +123,7 @@ public class CalculationContext implements Serializable {
     @Override
     public String toString() {
 
-        if (false && allTheSame) {
+        if (allTheSame) {
             return new StringBuilder().append(getValueWithPrecision(current)).append(unit).toString();
         }
 

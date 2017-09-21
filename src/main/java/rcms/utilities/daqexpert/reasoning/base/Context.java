@@ -185,7 +185,7 @@ public class Context extends Observable implements Serializable {
 
                 replacement = entry.getValue().toString();
                 if (updated) {
-                    replacement = "<<" + replacement + ">>";
+                    replacement = "<strong>" + replacement + "</strong>";
                 }
                 output = output.replaceAll(variableKeyRegex, replacement);
 

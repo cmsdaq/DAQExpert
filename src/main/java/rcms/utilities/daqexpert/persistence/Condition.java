@@ -152,6 +152,7 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     public void setEnd(Date end) {
         this.end = end;
         setChanged();
+        publishUpdate();
     }
 
     @Override
@@ -308,10 +309,7 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
         logger.trace("Checking if condition '" + title + "'changed " + start);
         if (hasChanged()) {
 
-
             notifyObservers();
-        } else {
-            //logger.info("Condition '" + title + "' hasn't changed");
         }
     }
 }

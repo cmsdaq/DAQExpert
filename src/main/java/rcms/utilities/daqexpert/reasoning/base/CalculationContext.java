@@ -129,10 +129,10 @@ public class CalculationContext implements Serializable {
 
         StringBuilder sb = new StringBuilder();
         sb.append("(");
-        sb.append("<sub><sup>").append(" ").append("last").append(": ").append("</sub></sup>").append(getValueWithPrecision(current)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("avg").append(": ").append("</sub></sup>").append(getValueWithPrecision(avg)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("min").append(": ").append("</sub></sup>").append(getValueWithPrecision(min)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("max").append(": ").append("</sub></sup>").append(getValueWithPrecision(max)).append(unit);
+        sb.append("<sub><sup>").append(" ").append("last").append(": ").append("</sup></sub>").append(getValueWithPrecision(current)).append(unit).append(", ");
+        sb.append("<sub><sup>").append(" ").append("avg").append(": ").append("</sup></sub>").append(getValueWithPrecision(avg)).append(unit).append(", ");
+        sb.append("<sub><sup>").append(" ").append("min").append(": ").append("</sup></sub>").append(getValueWithPrecision(min)).append(unit).append(", ");
+        sb.append("<sub><sup>").append(" ").append("max").append(": ").append("</sup></sub>").append(getValueWithPrecision(max)).append(unit);
         sb.append(")");
         return sb.toString();
     }

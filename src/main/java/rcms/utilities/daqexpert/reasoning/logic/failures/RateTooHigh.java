@@ -39,7 +39,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 		boolean result = false;
 		if (max < readoutRate) {
-			context.register("ACTUAL_READOUT_RATE", readoutRate);
+			context.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"%",1);
 			result = true;
 		}
 		return result;
@@ -50,7 +50,6 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 		try {
 			this.max = Integer.parseInt(properties.getProperty(Setting.EXPERT_L1_RATE_MAX.getKey()));
-			this.description = "readout rate too high (greater than " + max + ")";
 			this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} Hz which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
 
 		} catch (NumberFormatException e) {

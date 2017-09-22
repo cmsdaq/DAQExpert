@@ -29,7 +29,7 @@ public class CorruptedData extends BackpressureAnalyzer {
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
 		
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Try a stop/start for {{PROBLEM-SUBSYSTEM}}",
+		action.addContextSteps("ECAL", "Try to stop/start the run (Red recycle DAQ only)",
 				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");

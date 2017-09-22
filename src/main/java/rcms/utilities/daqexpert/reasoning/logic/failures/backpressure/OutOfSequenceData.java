@@ -36,6 +36,12 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
+		/* ecal specific case */
+		action.addContextSteps("ECAL", "Try to stop/start the run",
+				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data) to inform about the problem",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data data)");
+
 		/* FED=1111 */
 		action.addContextSteps("FED1111or1109", "Stop the run, Start a new run.",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",

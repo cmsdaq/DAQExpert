@@ -25,20 +25,21 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 	public LegacyFlowchartCase2() {
 		this.name = "Corrupted data received";
 		this.description = "DAQ and level 0 in error state. "
-				+ "A RU {{RU}} is in Failed state. A FED {{FED}} has sent corrupted data to the DAQ. "
-				+ "Problem FED belongs to subsystem {{SUBSYSTEM}}";
+				+ "A RU {{PROBLEM-RU}} is in Failed state. A FED {{PROBLEM-FED}} has sent corrupted data to the DAQ. "
+				+ "Problem FED belongs to subsystem {{PROBLEM-SUBSYSTEM}}";
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
-				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
-				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data)");
+				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Try a stop/start for {{SUBSYSTEM}}",
-				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
-				"Problem not fixed: Call the DOC of {{SUBSYSTEM}} (subsystem that sent corrupted data)");
+		action.addContextSteps("ECAL", "Try to stop/start the run (Red recycle DAQ only)",
+				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
+				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
+
 
 		this.action = action;
 	}
@@ -75,7 +76,7 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 				for (RU ru : failedRus) {
 
 					i++;
-					context.register("RU", ru.getHostname());
+					context.register("PROBLEM-RU", ru.getHostname());
 
 				}
 
@@ -93,9 +94,9 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 								if (ttcp.getSubsystem() != null)
 									subsystemName = ttcp.getSubsystem().getName();
 							}
-							context.register("FED", fed.getSrcIdExpected());
-							context.register("TTCP", ttcpName);
-							context.register("SUBSYSTEM", subsystemName);
+							context.register("PROBLEM-FED", fed.getSrcIdExpected());
+							context.register("PROBLEM-TTCP", ttcpName);
+							context.register("PROBLEM-SUBSYSTEM", subsystemName);
 							context.setActionKey(subsystemName);
 							i++;
 

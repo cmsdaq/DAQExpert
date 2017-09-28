@@ -202,8 +202,11 @@ public class ConditionProducer {
             toFinish.setState(EntryState.FINISHED);
             toFinish.setEnd(date);
             toFinish.calculateDuration();
-            Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
-            toFinish.setFinishedContext(clone);
+            if(context != null) {
+                Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
+                toFinish.setFinishedContext(clone);
+                context.deleteObserver(toFinish);
+            }
             if (!toFinish.getStart().equals(toFinish.getEnd())) {
                 logger.debug("Finishing entry " + toFinish.getTitle() + " with id: " + toFinish.getId());
                 finishedThisRound.add(toFinish);

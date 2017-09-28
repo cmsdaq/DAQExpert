@@ -64,4 +64,25 @@ public class ContextTest {
 
 	}
 
+	@Test
+	public void resettingTest(){
+		Context c = new Context();
+		c.registerForStatistics("x",1);
+		c.registerForStatistics("x",2);
+		c.registerForStatistics("x",3);
+		Assert.assertEquals("( last: 3,  avg: 2,  min: 1,  max: 3)",c.putContext("{{x}}",false));
+
+
+		c.clearContext();
+
+		c.registerForStatistics("x",4);
+		c.registerForStatistics("x",5);
+		c.registerForStatistics("x",6);
+		Assert.assertEquals("( last: 6,  avg: 5,  min: 4,  max: 6)",c.putContext("{{x}}",false));
+
+
+
+
+	}
+
 }

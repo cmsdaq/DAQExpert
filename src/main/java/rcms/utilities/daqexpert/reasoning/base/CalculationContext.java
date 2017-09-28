@@ -120,20 +120,40 @@ public class CalculationContext implements Serializable {
         return df.format(value);
     }
 
-    @Override
-    public String toString() {
-
+    public String toString(boolean highlightMakrup) {
         if (allTheSame) {
             return new StringBuilder().append(getValueWithPrecision(current)).append(unit).toString();
         }
 
         StringBuilder sb = new StringBuilder();
+
         sb.append("(");
-        sb.append("<sub><sup>").append(" ").append("last").append(": ").append("</sup></sub>").append(getValueWithPrecision(current)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("avg").append(": ").append("</sup></sub>").append(getValueWithPrecision(avg)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("min").append(": ").append("</sup></sub>").append(getValueWithPrecision(min)).append(unit).append(", ");
-        sb.append("<sub><sup>").append(" ").append("max").append(": ").append("</sup></sub>").append(getValueWithPrecision(max)).append(unit);
+        if (highlightMakrup) sb.append("<sub><sup>");
+        sb.append(" ").append("last").append(": ");
+        if (highlightMakrup) sb.append("</sup></sub>");
+        sb.append(getValueWithPrecision(current)).append(unit).append(", ");
+
+        if (highlightMakrup) sb.append("<sub><sup>");
+        sb.append(" ").append("avg").append(": ");
+        if (highlightMakrup) sb.append("</sup></sub>");
+        sb.append(getValueWithPrecision(avg)).append(unit).append(", ");
+
+        if (highlightMakrup) sb.append("<sub><sup>");
+        sb.append(" ").append("min").append(": ");
+        if (highlightMakrup) sb.append("</sup></sub>");
+        sb.append(getValueWithPrecision(min)).append(unit).append(", ");
+        if (highlightMakrup) sb.append("<sub><sup>");
+        sb.append(" ").append("max").append(": ");
+        if (highlightMakrup) sb.append("</sup></sub>");
+        sb.append(getValueWithPrecision(max)).append(unit);
         sb.append(")");
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString(true);
+
+
     }
 }

@@ -89,10 +89,11 @@ public class JobManagerIT {
 				"TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING"))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
 
-
         System.out.println(result.toString());
         assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
-                "Deadtime is (<sub><sup> last: </sup></sub>100%, <sub><sup> avg: </sup></sub>93.8%, <sub><sup> min: </sup></sub>6.3%, <sub><sup> max: </sup></sub>100%), the threshold is 5.0%"))));
+                "Deadtime is <strong>(<sub><sup> last: </sup></sub>100%, <sub><sup> avg: </sup></sub>98.8%, <sub><sup> min: </sup></sub>79.2%, <sub><sup> max: </sup></sub>100%)</strong>, the threshold is 5.0%"))));
+		assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
+				"Deadtime is <strong>6.3%</strong>, the threshold is 5.0%"))));
 
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,

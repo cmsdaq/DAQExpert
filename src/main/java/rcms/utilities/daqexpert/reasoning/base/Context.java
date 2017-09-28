@@ -83,6 +83,7 @@ public class Context extends Observable implements Serializable {
     public void clearContext() {
         this.context = new HashMap<>();
         this.actionKey = new HashSet<>();
+        this.contextForCalculations = new HashMap<>();
     }
 
     public Map<String, Set<Object>> getContext() {
@@ -119,6 +120,10 @@ public class Context extends Observable implements Serializable {
         return null;
     }
 
+    protected String putContext(String input){
+        return putContext(input, true);
+    }
+
     /**
      * Put collected context into given text. All variables {{VARIABLE_NAME}}
      * will be replaced with value if exists in context or ? sign
@@ -126,7 +131,7 @@ public class Context extends Observable implements Serializable {
      * @param input text where context will be inserted
      * @return copy of the text with context inserted
      */
-    private String putContext(String input) {
+    protected String putContext(String input, boolean highlightMarkup) {
         ObjectMapper mapper = new ObjectMapper();
         String output = new String(input);
 
@@ -157,7 +162,7 @@ public class Context extends Observable implements Serializable {
                             replacement = mapper.writeValueAsString(entry.getValue());
                         }
                     }
-                    if (updated) {
+                    if (updated && highlightMarkup) {
                         replacement = "<strong>" + replacement + "</strong>";
                     }
                     output = output.replaceAll(variableKeyRegex, replacement);
@@ -183,8 +188,8 @@ public class Context extends Observable implements Serializable {
 
                 String replacement = "";
 
-                replacement = entry.getValue().toString();
-                if (updated) {
+                replacement = entry.getValue().toString(highlightMarkup);
+                if (updated && highlightMarkup) {
                     replacement = "<strong>" + replacement + "</strong>";
                 }
                 output = output.replaceAll(variableKeyRegex, replacement);

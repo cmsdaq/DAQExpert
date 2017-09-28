@@ -52,6 +52,57 @@ public class ConditionDashboard implements Observer{
 		}
 	}
 
+	public void compareWithCurrentlyDominating(Condition condition){
+		// exists some unfinished
+		// TODO: add some threshold
+		if (condition.getEnd() == null) {
+
+			// no condition at the moment
+			if (dominatingCondition == null) {
+				this.dominatingCondition = condition;
+			}
+
+			// exists other condition at the moemnt
+			else {
+
+				// current is more important than old
+				if (condition.getPriority().ordinal() > dominatingCondition.getPriority().ordinal()) {
+					this.dominatingCondition = condition;
+				}
+
+				// current is less important than old
+				else if (condition.getPriority().ordinal() < dominatingCondition.getPriority().ordinal()) {
+					// nothing to do
+				}
+
+				// both are equally important
+				else {
+
+					// current is more useful than old
+					if (condition.getLogicModule().getUsefulness() > dominatingCondition.getLogicModule()
+							.getUsefulness()) {
+						this.dominatingCondition = condition;
+
+					}
+					// current is less useful than old
+					else if (condition.getLogicModule().getUsefulness() < dominatingCondition.getLogicModule()
+							.getUsefulness()) {
+						// nothing to do
+					}
+					// both are equally useful
+					else {
+						// newest will be displayed
+						if (condition.getStart().after(dominatingCondition.getStart())) {
+							this.dominatingCondition = condition;
+						}
+					}
+
+				}
+			}
+		}
+
+	}
+
 	public void update(Set<Condition> conditionsProduced) {
 
 		Set<Condition> addedThisRound = new HashSet<>();
@@ -70,53 +121,7 @@ public class ConditionDashboard implements Observer{
 									 */
 					&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
 
-				// exists some unfinished
-				// TODO: add some threshold
-				if (condition.getEnd() == null) {
-
-					// no condition at the moment
-					if (dominatingCondition == null) {
-						this.dominatingCondition = condition;
-					}
-
-					// exists other condition at the moemnt
-					else {
-
-						// current is more important than old
-						if (condition.getPriority().ordinal() > dominatingCondition.getPriority().ordinal()) {
-							this.dominatingCondition = condition;
-						}
-
-						// current is less important than old
-						else if (condition.getPriority().ordinal() < dominatingCondition.getPriority().ordinal()) {
-							// nothing to do
-						}
-
-						// both are equally important
-						else {
-
-							// current is more useful than old
-							if (condition.getLogicModule().getUsefulness() > dominatingCondition.getLogicModule()
-									.getUsefulness()) {
-								this.dominatingCondition = condition;
-
-							}
-							// current is less useful than old
-							else if (condition.getLogicModule().getUsefulness() < dominatingCondition.getLogicModule()
-									.getUsefulness()) {
-								// nothing to do
-							}
-							// both are equally useful
-							else {
-								// newest will be displayed
-								if (condition.getStart().after(dominatingCondition.getStart())) {
-									this.dominatingCondition = condition;
-								}
-							}
-
-						}
-					}
-				}
+				compareWithCurrentlyDominating(condition);
 
 				if (!conditions.containsKey(condition.getId())) {
 					if (conditions.size() >= maximumNumberOfConditionsHandled) {
@@ -132,6 +137,12 @@ public class ConditionDashboard implements Observer{
 					addedThisRound.add(condition);
 
 				}
+			}
+		}
+
+		for(Condition condition: conditions.values()){
+			if(condition.getEnd() == null) {
+				compareWithCurrentlyDominating(condition);
 			}
 		}
 

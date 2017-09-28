@@ -160,9 +160,9 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		/* 6 Only recent conditions */
-		Assert.assertEquals(null, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(c4, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(5, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(5, conditionDashboard.getConditionsWithoutDominatingCondition().size());
+		Assert.assertEquals(4, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
 		Assert.assertNotNull(conditionDashboard.toString());
 

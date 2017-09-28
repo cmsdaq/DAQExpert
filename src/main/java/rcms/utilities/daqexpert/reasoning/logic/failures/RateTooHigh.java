@@ -39,7 +39,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 		boolean result = false;
 		if (max < readoutRate) {
-			context.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"%",1);
+			context.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"Hz",1);
 			result = true;
 		}
 		return result;

@@ -43,7 +43,7 @@ public class ConditionSessionHandler {
 	 *            condition that is now dominating
 	 */
 	public void handleDominatingConditionChange(Condition dominatingCondition) {
-		logger.info("Setting current");
+		logger.info("Setting current: " + dominatingCondition!=null?dominatingCondition.getId():"empty");
 		JsonObject addMessage = createSelectMessage(dominatingCondition);
 		sendToAllConnectedSessions(addMessage);
 	}

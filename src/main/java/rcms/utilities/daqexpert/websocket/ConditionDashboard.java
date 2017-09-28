@@ -136,7 +136,8 @@ public class ConditionDashboard implements Observer{
 		}
 
 		if (sessionHander != null) {
-			if (lastDominating != this.dominatingCondition) {
+			if (lastDominating != this.dominatingCondition && dominatingCondition != null) {
+				logger.info("Generating select command for dominating condition: " + dominatingCondition.getId());
 				sessionHander.handleDominatingConditionChange(this.dominatingCondition);
 			}
 			if (addedThisRound.size() > 0) {

@@ -43,7 +43,6 @@ public class ConditionSessionHandler {
 	 *            condition that is now dominating
 	 */
 	public void handleDominatingConditionChange(Condition dominatingCondition) {
-		logger.info("Setting current: " + dominatingCondition!=null?dominatingCondition.getId():"[no dominating]");
 		JsonObject addMessage = createSelectMessage(dominatingCondition);
 		sendToAllConnectedSessions(addMessage);
 	}
@@ -166,7 +165,7 @@ public class ConditionSessionHandler {
 			id = condition.getId();
 		}
 		JsonObject updateMessage = provider.createObjectBuilder().add("action", "select").add("id", id).build();
-		logger.debug("Created select message for event: " + updateMessage);
+		logger.info("Created select command for condition with id " + id + ": " + updateMessage);
 		return updateMessage;
 	}
 

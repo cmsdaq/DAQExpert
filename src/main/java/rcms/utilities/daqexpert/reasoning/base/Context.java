@@ -58,7 +58,7 @@ public class Context extends Observable implements Serializable {
         changeset.add(key);
         setChanged();
         if (isChangeSignificant) {
-            System.out.println(
+            logger.debug(
                     "Report this change: (min=" + cc.getMin() + ", max=" + cc.getMax() + ", avg=" + cc.getAvg() + ")");
             //conditionProducer.triggerUpdate();
         }

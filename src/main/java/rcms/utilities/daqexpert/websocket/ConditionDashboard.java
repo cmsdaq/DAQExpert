@@ -126,9 +126,9 @@ public class ConditionDashboard implements Observer{
 				if (!conditions.containsKey(condition.getId())) {
 					if (conditions.size() >= maximumNumberOfConditionsHandled) {
 						Condition oldest = conditions.values().iterator().next();
-						System.out.println("Observers before: " + oldest.countObservers());
+						logger.trace("Observers before: " + oldest.countObservers());
 						oldest.deleteObserver(this);
-						System.out.println("Observers after: " + oldest.countObservers());
+						logger.trace("Observers after: " + oldest.countObservers());
 						conditions.remove(oldest.getId());
 					}
 					conditions.put(condition.getId(), condition);

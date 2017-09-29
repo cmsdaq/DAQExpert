@@ -17,13 +17,13 @@ import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 
 /**
- * 
+ *
  * Logical Condition dashboard
- * 
+ *
  * ConditionWebSocketServer.sessionHandler.addCondition(condition);
  * ConditionWebSocketServer.sessionHandler.removeCurrent();
  * ConditionWebSocketServer.sessionHandler.updateCurrent(currentCondition);
- * 
+ *
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
@@ -147,8 +147,8 @@ public class ConditionDashboard implements Observer{
 		}
 
 		if (sessionHander != null) {
-			if (lastDominating != this.dominatingCondition && dominatingCondition != null) {
-				logger.info("Generating select command for dominating condition: " + dominatingCondition.getId());
+			if (lastDominating != this.dominatingCondition) {
+				// this fires also whe dominating is null - signal to the dashboard that 'all is ok' and no problem at the moment
 				sessionHander.handleDominatingConditionChange(this.dominatingCondition);
 			}
 			if (addedThisRound.size() > 0) {
@@ -167,7 +167,7 @@ public class ConditionDashboard implements Observer{
 
 	/**
 	 * Get condition list without dominating condition
-	 * 
+	 *
 	 * @return
 	 */
 	public Collection<Condition> getConditionsWithoutDominatingCondition() {

@@ -56,6 +56,18 @@ public class StuckAfterSoftError extends KnownFailure {
         boolean result = false;
         String currentState = daq.getLevelZeroState();
 
+        if(currentState == null){
+            precedingState = "";
+            previousState = "";
+            return false;
+        }
+
+
+        if (!previousState.equalsIgnoreCase(currentState)) {
+            logger.debug("Changing state from: " + previousState + " to " + currentState);
+            precedingState = previousState;
+        }
+
         logger.trace("Checking condition: " + precedingState + ", current state: " + currentState);
 
         if (precedingStateToToggle.equalsIgnoreCase(precedingState) && stateToToggle.equalsIgnoreCase(currentState)) {
@@ -69,11 +81,6 @@ public class StuckAfterSoftError extends KnownFailure {
                 }
             }
 
-        }
-
-        if (!previousState.equalsIgnoreCase(currentState)) {
-            logger.debug("Changing state from: " + previousState + " to " + currentState);
-            precedingState = previousState;
         }
 
         previousState = currentState;

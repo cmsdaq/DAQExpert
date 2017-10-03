@@ -61,7 +61,7 @@ public class Application {
 
 	private Application(String propertiesFile) {
 		this.prop = load(propertiesFile);
-		conditionDashboard = new ConditionDashboard(5);
+		conditionDashboard = new ConditionDashboard(50);
 	}
 
 	private static Application instance;

@@ -7,13 +7,14 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
  * This logic module identifies deadtime
  */
-public class Deadtime extends SimpleLogicModule implements Parameterizable {
+public class Deadtime extends ContextLogicModule implements Parameterizable {
 
 	private float threshold;
 
@@ -39,8 +40,10 @@ public class Deadtime extends SimpleLogicModule implements Parameterizable {
 		} catch (NullPointerException e) {
 		}
 
-		if (deadtime > threshold)
+		if (deadtime > threshold){
+			context.registerForStatistics("DEADTIME", deadtime,"%",1);
 			return true;
+		}
 		else
 			return false;
 	}
@@ -51,7 +54,7 @@ public class Deadtime extends SimpleLogicModule implements Parameterizable {
 			this.threshold = Integer
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL.getKey()));
 
-			this.description = "Deadtime is greater than " + threshold + "%";
+			this.description = "Deadtime is {{DEADTIME}}, the threshold is " + threshold + "%";
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
 					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());

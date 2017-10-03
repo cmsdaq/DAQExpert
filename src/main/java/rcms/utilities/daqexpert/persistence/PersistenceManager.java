@@ -459,7 +459,7 @@ public class PersistenceManager {
 
 		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.FLOWCHART));
 		elementsCriteria.addOrder(Order.desc("end"));
-		elementsCriteria.setMaxResults(3);
+		elementsCriteria.setMaxResults(50);
 
 		List<Condition> result = elementsCriteria.list();
 		for (Condition c : result) {

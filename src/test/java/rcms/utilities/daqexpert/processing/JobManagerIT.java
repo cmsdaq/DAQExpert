@@ -89,6 +89,12 @@ public class JobManagerIT {
 				"TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING"))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
 
+        System.out.println(result.toString());
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
+                "Deadtime is <strong>(<sub><sup> last: </sup></sub>100%, <sub><sup> avg: </sup></sub>98.8%, <sub><sup> min: </sup></sub>79.2%, <sub><sup> max: </sup></sub>100%)</strong>, the threshold is 5.0%"))));
+		assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
+				"Deadtime is <strong>6.3%</strong>, the threshold is 5.0%"))));
+
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
 				DataResolution.Full);
@@ -97,12 +103,8 @@ public class JobManagerIT {
 		/* Verify generation of notifaications */
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
-		// verify 43 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(43)));
-
-		// verify 43 events if regular event-collector is used
-		// Mockito.verify(eventSender).sendBatchEvents((List)
-		// argThat(IsCollectionWithSize.hasSize(43)));
+		// verify 47 events if mature-event-collector is used
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(47)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));

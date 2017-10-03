@@ -27,7 +27,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 public class ContinouslySoftError extends KnownFailure implements Parameterizable {
 
 	public ContinouslySoftError() {
-		this.name = "Continous fixing-soft-error";
+		this.name = "Continuous fixing-soft-error";
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{SUBSYSTEM}}");
@@ -46,6 +46,29 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		this.pastOccurrences = new ArrayList<>();
 		this.previousResult = false;
 		this.previousState = "";
+	}
+
+	@Override
+	public void parametrize(Properties properties) {
+
+		try {
+			this.thresholdPeriod = Integer
+					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey()));
+
+			this.mergePeriod = Integer
+					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey()));
+			this.occurrencesThreshold = Integer
+					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
+			this.description = "Level zero in FixingSoftError more than 3 times in past "
+					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM}}";
+
+		} catch (NumberFormatException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
+					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
+		} catch (NullPointerException e) {
+			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
+					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
+		}
 	}
 
 	private static final Logger logger = Logger.getLogger(ContinouslySoftError.class);
@@ -145,27 +168,6 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		return currentResult;
 	}
 
-	@Override
-	public void parametrize(Properties properties) {
 
-		try {
-			this.thresholdPeriod = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey()));
-
-			this.mergePeriod = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey()));
-			this.occurrencesThreshold = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
-			this.description = "Level zero in FixingSoftError more than 3 times in past "
-					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM}}";
-
-		} catch (NumberFormatException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-		} catch (NullPointerException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-		}
-	}
 
 }

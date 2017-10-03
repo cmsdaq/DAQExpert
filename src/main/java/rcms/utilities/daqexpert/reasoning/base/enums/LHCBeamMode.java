@@ -2,26 +2,32 @@ package rcms.utilities.daqexpert.reasoning.base.enums;
 
 public enum LHCBeamMode {
 
-	INJECTION_PROBE_BEAM(""),
-	INJECTION_SETUP_BEAM(""),
-	INJECTION_PHYSICS_BEAM(""),
-	PREPARE_RAMP(""),
-	RAMP(""),
-	FLAT_TOP(""),
-	SQUEEZE(""),
-	ADJUST(""),
+	/* string constants were taken from the LHC beam conditions SQL table.
+	   BEAM_DUMP_WARNING was not found in this table, the value below
+	   is the expected string.
+	*/
+
+	INJECTION_PROBE_BEAM("INJECTION PROBE BEAM"),
+	INJECTION_SETUP_BEAM("INJECTION SETUP BEAM"),
+	INJECTION_PHYSICS_BEAM("INJECTION PHYSICS BEAM"),
+	PREPARE_RAMP("PREPARE RAMP"),
+	RAMP("RAMP"),
+	FLAT_TOP("FLAT TOP"),
+	SQUEEZE("SQUEEZE"),
+	ADJUST("ADJUST"),
 	STABLE_BEAMS("STABLE BEAMS"),
 
-	ABORT(""),
-	SETUP(""),
-	INJECT_AND_DUMP(""),
-	CIRCULATE_AND_DUMP(""),
-	RAMP_DOWN(""),
-	RECOVER(""),
-	CYCLING(""),
-	BEAM_DUMP(""),
-	UNSTABLE_BEAMS(""),
-	BEAM_DUMP_WARNING(""),
+	ABORT("ABORT"),
+	SETUP("SETUP"),
+	INJECT_AND_DUMP("INJECT AND DUMP"),
+	CIRCULATE_AND_DUMP("CIRCULATE AND DUMP"),
+	RAMP_DOWN("RAMP DOWN"),
+	RECOVER("RECOVERY"),  // note the disagreement between Java symbol and string
+	CYCLING("CYCLING"),
+	BEAM_DUMP("BEAM DUMP"),
+	UNSTABLE_BEAMS("UNSTABLE BEAMS"),
+	BEAM_DUMP_WARNING("BEAM_DUMP_WARNING"), // this mode was not found in beam modes history
+
 	UNKNOWN("unknown");
 	
 	private final String code;

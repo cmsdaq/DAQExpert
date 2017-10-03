@@ -28,6 +28,8 @@ public enum LHCBeamMode {
 	UNSTABLE_BEAMS("UNSTABLE BEAMS"),
 	BEAM_DUMP_WARNING("BEAM_DUMP_WARNING"), // this mode was not found in beam modes history
 
+	NO_BEAM("NO BEAM"),
+
 	UNKNOWN("unknown");
 	
 	private final String code;

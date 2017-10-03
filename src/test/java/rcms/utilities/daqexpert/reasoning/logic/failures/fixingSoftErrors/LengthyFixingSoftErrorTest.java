@@ -55,7 +55,7 @@ public class LengthyFixingSoftErrorTest {
         daq.setLastUpdate(11000);
         Assert.assertTrue(lm.satisfied(daq,null));
 
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) <strong>TEST</strong>",lm.getDescriptionWithContext());
     }
 
 }

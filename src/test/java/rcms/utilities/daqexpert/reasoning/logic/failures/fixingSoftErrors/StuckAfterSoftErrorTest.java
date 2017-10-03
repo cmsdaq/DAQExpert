@@ -39,7 +39,7 @@ public class StuckAfterSoftErrorTest {
         Assert.assertTrue("Satisfied when preceding state to Error is FixingSoftError", lm.satisfied(daq, null));
         Assert.assertTrue(lm.satisfied(daq, null));
 
-        Assert.assertEquals("Level zero is stuck after fixing soft error. This is caused by subsystem(s) TEST", lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero is stuck after fixing soft error. This is caused by subsystem(s) <strong>TEST</strong>", lm.getDescriptionWithContext());
 
         daq.setLevelZeroState("Other");
         Assert.assertFalse(lm.satisfied(daq, null));

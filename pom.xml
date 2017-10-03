@@ -16,7 +16,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		
+
 		<repository>
 			<id>ext-release-local</id>
 			<url>http://dev-daq-expert.cern.ch/artifactory/ext-release-local</url>

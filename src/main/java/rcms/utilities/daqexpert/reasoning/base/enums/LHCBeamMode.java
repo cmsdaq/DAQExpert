@@ -42,10 +42,23 @@ public enum LHCBeamMode {
 		return code;
 	}
 
+	/** method to convert a string describing an LHC machine
+	 *  mode into an LHCBeamMode enum.
+	 *
+	 * @return the LHCBeamMode value corresponding to code
+	 *  or UNKNOWN if not found.
+	 */
 	public static LHCBeamMode getModeByCode(String code) {
-		if (code.equals(STABLE_BEAMS.getCode())) {
-			return LHCBeamMode.STABLE_BEAMS;
-		} else
-			return LHCBeamMode.UNKNOWN;
+
+		// note that some beam mode stirngs have spaces in them
+		// so we can't use LHCBeamMode.valueOf(code)
+		for (LHCBeamMode mode : LHCBeamMode.values()) {
+			if (code.equals(mode.getCode())) {
+				return mode;
+			}
+		}
+
+		// no matching string found
+		return LHCBeamMode.UNKNOWN;
 	}
 }

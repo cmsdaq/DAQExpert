@@ -153,7 +153,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 
 			// holdoff time in seconds
 			float holdOffTime = Float
-							.parseFloat(properties.getProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_SECONDS.getKey()));
+							.parseFloat(properties.getProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD.getKey()));
 
 			// convert to milliseconds and create a new timer
 			this.holdOffTimer = new HoldOffTimer(Math.round(holdOffTime * 1000));

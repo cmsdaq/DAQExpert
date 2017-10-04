@@ -23,7 +23,7 @@ public enum Setting {
 	/** maximum fraction of FUs in cloud mode around stable beams */
 	EXPERT_LOGIC_CLOUDFUNUMBER_THRESHOLD_TOTAL_FRACTION("expert.logic.cloudfunumber.threshold.total.fraction"),
 
-	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_SECONDS("expert.logic.cloudfunumber.holdoff.seconds"),
+	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
 
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

@@ -16,7 +16,7 @@ import rcms.utilities.daqexpert.Setting;
  *
  * @author holzner
  */
-public class CloudFUnumberTest
+public class CloudFuNumberTest
 {
 
 	private CloudFuNumber makeInstance() {

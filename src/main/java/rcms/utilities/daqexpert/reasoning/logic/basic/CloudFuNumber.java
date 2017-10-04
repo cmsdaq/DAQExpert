@@ -20,7 +20,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.helper.HoldOffTimer;
  * of filter units still in cloud mode when they should not be
  * according to the LHC beam mode.
  */
-public class CloudFUnumber extends ContextLogicModule implements Parameterizable {
+public class CloudFuNumber extends ContextLogicModule implements Parameterizable {
 
 	/** maximum fraction of filter units allowed in cloud mode close
 	 *  to stable beam state. Note that this is a fraction between 0 and 1,
@@ -34,7 +34,7 @@ public class CloudFUnumber extends ContextLogicModule implements Parameterizable
 
 	private HoldOffTimer holdOffTimer;
 
-	public CloudFUnumber() {
+	public CloudFuNumber() {
 		this.name = "CloudFUnumber";
 		this.priority = ConditionPriority.DEFAULTT;
 

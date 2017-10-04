@@ -19,8 +19,8 @@ import rcms.utilities.daqexpert.Setting;
 public class CloudFUnumberTest
 {
 
-	private CloudFUnumber makeInstance() {
-		CloudFUnumber result = new CloudFUnumber();
+	private CloudFuNumber makeInstance() {
+		CloudFuNumber result = new CloudFuNumber();
 
 		// mock properties
 		Properties properties = new Properties();
@@ -55,7 +55,7 @@ public class CloudFUnumberTest
    * @param expectedResultBeforeHoldOff is the expected 'raw' result
 	 *    before applying the holdoff timer
 	 */
-	private void doChecks(CloudFUnumber instance, String snapshotFname,
+	private void doChecks(CloudFuNumber instance, String snapshotFname,
 					boolean expectedResult,
 					boolean expectedResultBeforeHoldOff,
 					String expectedMessage) throws URISyntaxException {
@@ -92,7 +92,7 @@ public class CloudFUnumberTest
 	@Test
 	public void test01() throws URISyntaxException
 	{
-		CloudFUnumber instance = this.makeInstance();
+		CloudFuNumber instance = this.makeInstance();
 
 		// last snapshot of fill 6175 in 'PREPARE RAMP'
 		doChecks(instance, "1504781255663.json.gz",

@@ -10,7 +10,7 @@ import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
-import rcms.utilities.daqexpert.reasoning.logic.basic.CloudFUnumber;
+import rcms.utilities.daqexpert.reasoning.logic.basic.CloudFuNumber;
 import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
@@ -127,7 +127,7 @@ public enum LogicModuleRegistry {
     StuckAfterSoftError    	(new StuckAfterSoftError(),      ConditionGroup.OTHER,                 "",                                                  46,  1011),
     LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
 
-	CloudFUnumber          (new CloudFUnumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                               48),
+	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                               48),
 
     ;
 	

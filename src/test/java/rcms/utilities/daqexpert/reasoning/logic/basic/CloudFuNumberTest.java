@@ -25,7 +25,7 @@ public class CloudFuNumberTest
 		// mock properties
 		Properties properties = new Properties();
 		properties.setProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_THRESHOLD_TOTAL_FRACTION.getKey(), "0.03");
-		properties.setProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD.getKey(), "1800");
+		properties.setProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD.getKey(), "1800000");
 
 		result.parametrize(properties);
 

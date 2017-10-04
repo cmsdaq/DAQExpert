@@ -151,12 +151,12 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 			this.description = "Fraction of FUs in cloud mode is {{FRACTIONFUSCLOUDMODE}}, the threshold is " +
 							(this.maxCloudModeFraction * 100) + "%";
 
-			// holdoff time in seconds
-			float holdOffTime = Float
-							.parseFloat(properties.getProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD.getKey()));
+			// holdoff time in milliseconds
+			int holdOffTime = Integer
+							.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD.getKey()));
 
-			// convert to milliseconds and create a new timer
-			this.holdOffTimer = new HoldOffTimer(Math.round(holdOffTime * 1000));
+			// create a new timer
+			this.holdOffTimer = new HoldOffTimer(holdOffTime);
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

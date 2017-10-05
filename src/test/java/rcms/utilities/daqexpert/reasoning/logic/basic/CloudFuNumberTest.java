@@ -51,8 +51,8 @@ public class CloudFuNumberTest
 
 	/** @param expectedResult is the result which should be returned
 	 *    by the module, taking into account the holdoff time
-   *
-   * @param expectedResultBeforeHoldOff is the expected 'raw' result
+	 *
+	 * @param expectedResultBeforeHoldOff is the expected 'raw' result
 	 *    before applying the holdoff timer
 	 */
 	private void doChecks(CloudFuNumber instance, String snapshotFname,
@@ -87,8 +87,8 @@ public class CloudFuNumberTest
 	}
 
 	/**
-   *  sequence of snapshots
-   */
+	 *  sequence of snapshots
+	 */
 	@Test
 	public void test01() throws URISyntaxException
 	{

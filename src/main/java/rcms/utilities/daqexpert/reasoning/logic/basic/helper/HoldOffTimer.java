@@ -15,6 +15,9 @@ public class HoldOffTimer
 	 */
 	private Long start = null;
 
+	/** timestamp when the holdoff expires if input is true, null otherwise */
+	private Long holdOffRelease;
+	
 	private boolean input = false;
 
 	/** @param holdOffPeriod period in milliseconds for which the output should
@@ -35,10 +38,12 @@ public class HoldOffTimer
 			// start the timer if not yet started
 			if (start == null) {
 				start = now;
+				holdOffRelease = start + holdOffPeriod;
 			}
 		} else {
 			// input is still false or went back to false -- reset the timer
 			start = null;
+			holdOffRelease = null;
 		}
 
 	}
@@ -57,9 +62,7 @@ public class HoldOffTimer
 
 		// last input state was true, check for how long this has been
 		// the case
-		long duration = now - start;
-
-		if (duration >= holdOffPeriod) {
+		if (now >= holdOffRelease) {
 			// hold off period expired
 			return true;
 

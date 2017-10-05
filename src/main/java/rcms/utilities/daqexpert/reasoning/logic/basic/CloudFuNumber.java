@@ -28,8 +28,8 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	 */
 	private float maxCloudModeFraction;
 
-  /** list of LHC beam modes in which the cloud is allowed to run
-		*/
+	/** list of LHC beam modes in which the cloud is allowed to run
+	 */
 	private Set<LHCBeamMode> allowedBeamModes = new HashSet<LHCBeamMode>();
 
 	private HoldOffTimer holdOffTimer;
@@ -100,7 +100,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 						buSummary.getNumFUsHLT() +
 						buSummary.getNumFUsStale();
 
-		
+
 		if (numFusCloud > 0) {
 			return numFusCloud / (double) totalNumFus;
 		} else {

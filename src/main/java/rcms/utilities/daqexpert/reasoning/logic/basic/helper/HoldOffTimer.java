@@ -13,7 +13,7 @@ public class HoldOffTimer
 	/** the time when the input was set to true or -1 if it is currently false.
 	 *  From this, the duration of 'uninterrupted true' can be calculated.
 	 */
-	private long trueStartTime = -1;
+	private long start = -1;
 
 	private boolean input = false;
 
@@ -33,12 +33,12 @@ public class HoldOffTimer
 
 		if (input) {
 			// start the timer if not yet started
-			if (trueStartTime == -1) {
-				trueStartTime = now;
+			if (start == -1) {
+				start = now;
 			}
 		} else {
 			// input is still false or went back to false -- reset the timer
-			trueStartTime = -1;
+			start = -1;
 		}
 
 	}
@@ -57,7 +57,7 @@ public class HoldOffTimer
 
 		// last input state was true, check for how long this has been
 		// the case
-		long duration = now - trueStartTime;
+		long duration = now - start;
 
 		if (duration >= holdOffPeriod) {
 			// hold off period expired

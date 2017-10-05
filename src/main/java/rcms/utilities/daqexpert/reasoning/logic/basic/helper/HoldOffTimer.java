@@ -8,7 +8,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic.helper;
 public class HoldOffTimer
 {
 	/** holdoff period in milliseconds */
-	private final long period;
+	private final long holdOffPeriod;
 
 	/** the time when the input was set to true or -1 if it is currently false.
 	 *  From this, the duration of 'uninterrupted true' can be calculated.
@@ -17,11 +17,11 @@ public class HoldOffTimer
 
 	private boolean input = false;
 
-	/** @param period period in milliseconds for which the output should
+	/** @param holdOffPeriod period in milliseconds for which the output should
 	 *  still be false even if the input has been continuously true.
 	 */
-	public HoldOffTimer(long period) {
-		this.period = period;
+	public HoldOffTimer(long holdOffPeriod) {
+		this.holdOffPeriod = holdOffPeriod;
 	}
 
 	/** @param now is the current time (in milliseconds since epoch), typically
@@ -59,7 +59,7 @@ public class HoldOffTimer
 		// the case
 		long duration = now - trueStartTime;
 
-		if (duration >= period) {
+		if (duration >= holdOffPeriod) {
 			// hold off period expired
 			return true;
 

@@ -192,6 +192,29 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 		context.register("AFFECTED-FED-STATE", currentFedState.name());
 	}
 
+	/** @return true if the DAQ state is Running or RunningDegraded
+	    TODO: this could be added to class DAQ */
+	private boolean daqIsRunning(DAQ daq) {
+		return "Running".equalsIgnoreCase(daq.getDaqState()) ||
+		       "RunningDegraded".equalsIgnoreCase(daq.getDaqState());
+	}
+
+	/** @return the number of BUs in "Enabled" state.
+	 *  TODO: this could go into class DAQ
+	 */
+	private int numEnabledBus(DAQ daq) {
+
+		int result = 0;
+
+		for (BU bu : daq.getBus()) {
+			if ("Enabled".equalsIgnoreCase(bu.getStateName())) {
+				result++;
+			}
+		}
+
+		return result;
+	}
+
 	private Subcase detectSubcase(DAQ daq, FED affectedFed) {
 
 		RU relatedRu = null;

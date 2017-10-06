@@ -3,12 +3,12 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -18,34 +18,49 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 
 	private float threshold;
 
+	private final static Logger logger = Logger.getLogger(Deadtime.class);
+
 	public Deadtime() {
-		this.name = "Deadtime";
+		this.name = "Raw deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.threshold = 0;
 	}
 
 	/**
-	 * Dead time when greater than 5%
+	 * Dead time when greater than a threshold%
 	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		double deadtime = 0;
-		try {
-			if (results.get(BeamActive.class.getSimpleName())) {
-				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("beamactive_total");
-			} else {
-				deadtime = daq.getTcdsGlobalInfo().getDeadTimes().get("total");
-			}
-		} catch (NullPointerException e) {
-		}
-
+		double deadtime = getDeadtime(daq, results);
 		if (deadtime > threshold){
 			context.registerForStatistics("DEADTIME", deadtime,"%",1);
 			return true;
 		}
 		else
 			return false;
+	}
+
+
+	private double getDeadtime(DAQ daq, Map<String, Boolean> results){
+		try {
+			if (results.get(BeamActive.class.getSimpleName())) {
+				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
+						.get("beamactive_total");
+
+			} else {
+				return daq.getTcdsGlobalInfo().getDeadTimesInstant().get("total");
+			}
+		} catch (NullPointerException e) {
+			logger.warn("Instantaneous deadtime value is not available. Using per lumi section.");
+			if (results.get(BeamActive.class.getSimpleName())) {
+				return daq.getTcdsGlobalInfo().getDeadTimes()
+						.get("beamactive_total");
+
+			} else {
+				return daq.getTcdsGlobalInfo().getDeadTimes().get("total");
+			}
+		}
 	}
 
 	@Override

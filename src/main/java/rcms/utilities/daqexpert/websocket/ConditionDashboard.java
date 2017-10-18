@@ -115,11 +115,12 @@ public class ConditionDashboard implements Observer{
 		}
 
 		for (Condition condition : conditionsProduced) {
-			if (condition.isShow() /*
+			if (condition.isShow() && !condition.isHoldNotifications()/*
 									 * && condition.getPriority() ==
 									 * ConditionPriority.CRITICAL
 									 */
 					&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+
 
 				compareWithCurrentlyDominating(condition);
 

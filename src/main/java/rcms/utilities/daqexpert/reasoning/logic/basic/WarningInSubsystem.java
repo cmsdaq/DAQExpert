@@ -42,7 +42,7 @@ public class WarningInSubsystem extends ContextLogicModule {
 				if (ttcp.getPercentWarning() > 50F) {
 					context.register("TTCP", ttcp.getName());
 					context.register("SUBSYSTEM", subSystem.getName());
-					context.register("WARNING", ttcp.getPercentWarning());
+					context.registerForStatistics("WARNING", ttcp.getPercentWarning(),"%",1);
 					result = true;
 				}
 			}

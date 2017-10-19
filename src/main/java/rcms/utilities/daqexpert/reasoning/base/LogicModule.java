@@ -53,6 +53,12 @@ public abstract class LogicModule {
 	 */
 	protected String description;
 
+
+	/**
+	 * Hold generation of notifications
+	 */
+	protected boolean holdNotifications;
+
 	/**
 	 * Get name of the condition
 	 * 
@@ -105,6 +111,14 @@ public abstract class LogicModule {
 
 	public void setLogicModuleRegistry(LogicModuleRegistry logicModuleRegistry) {
 		this.logicModuleRegistry = logicModuleRegistry;
+	}
+
+	public boolean isHoldNotifications() {
+		return holdNotifications;
+	}
+
+	public void setHoldNotifications(boolean holdNotifications) {
+		this.holdNotifications = holdNotifications;
 	}
 
 }

@@ -55,6 +55,13 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconn
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
+import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
+
 public enum LogicModuleRegistry {
 
 	NoRate                  (new NoRate(),                   ConditionGroup.NO_RATE,               "Satisfied when no rate in DAQ fed builder summary",   1,    10),
@@ -101,8 +108,8 @@ public enum LogicModuleRegistry {
 
 	RuFailed                (new RuFailed(),                 ConditionGroup.OTHER,                 "",                                                   36,   9500),
 
-	
-	
+
+
 	LinkProblem				(new LinkProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   37, 10010),
 	RuStuckWaiting			(new RuStuckWaiting(),			 ConditionGroup.FLOWCHART,             "",                                                   38, 10010),
 	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10010),
@@ -115,7 +122,11 @@ public enum LogicModuleRegistry {
 
 	RateTooHigh            (new RateTooHigh(),            ConditionGroup.RATE_OUT_OF_RANGE,         "Rate too high",                                     44, 10501),
 
-	;
+    ContinousSoftError		(new ContinouslySoftError(),     ConditionGroup.OTHER,                 "",                                                  45,  1010),
+    StuckAfterSoftError    	(new StuckAfterSoftError(),      ConditionGroup.OTHER,                 "",                                                  46,  1011),
+    LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
+
+    ;
 	
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
 		this(logicModule, group, description, runOrder, 1);
@@ -125,7 +136,7 @@ public enum LogicModuleRegistry {
 	// identifying an error condition in order to have UnidentifiedFailure
 	// run after the others
 	
-	
+
 	}
 
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder, int usefulness) {

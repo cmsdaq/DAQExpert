@@ -14,7 +14,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.events.ConditionEvent;
-import rcms.utilities.daqexpert.events.EventRegister;
+import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;

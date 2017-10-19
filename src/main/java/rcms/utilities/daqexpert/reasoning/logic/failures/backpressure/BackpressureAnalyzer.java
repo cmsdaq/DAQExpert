@@ -192,6 +192,29 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 		context.register("AFFECTED-FED-STATE", currentFedState.name());
 	}
 
+	/** @return true if the DAQ state is Running or RunningDegraded
+	    TODO: this could be added to class DAQ */
+	private boolean daqIsRunning(DAQ daq) {
+		return "Running".equalsIgnoreCase(daq.getDaqState()) ||
+		       "RunningDegraded".equalsIgnoreCase(daq.getDaqState());
+	}
+
+	/** @return the number of BUs in "Enabled" state.
+	 *  TODO: this could go into class DAQ
+	 */
+	private int numEnabledBus(DAQ daq) {
+
+		int result = 0;
+
+		for (BU bu : daq.getBus()) {
+			if ("Enabled".equalsIgnoreCase(bu.getStateName())) {
+				result++;
+			}
+		}
+
+		return result;
+	}
+
 	private Subcase detectSubcase(DAQ daq, FED affectedFed) {
 
 		RU relatedRu = null;
@@ -275,31 +298,22 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				logger.debug("#4 check:  Other RUs has many requests?");
 				if (rusWithManyRequests.size() == 0) {
 					logger.trace("There is no RUs with requests - filterfarm problem");
-					// all bus blocked or cloud
-					int allBus = 0;
-					int blockedOrCloud = 0;
-					for (BU bu : daq.getBus()) {
-						if ("cloud".equalsIgnoreCase(bu.getStateName())) {
-							blockedOrCloud++;
-						} else if ("blocked".equalsIgnoreCase(bu.getStateName())) {
-							blockedOrCloud++;
-						}
-						allBus++;
-					}
-					if (allBus == blockedOrCloud) {
-						// all bus fu hlt == 0
 
-						int busWithFuHltZero = 0;
-						for (BU bu : daq.getBus()) {
-							if (0 == bu.getNumFUsHLT()) {
-								busWithFuHltZero++;
-							}
-						}
-						if (allBus == busWithFuHltZero) {
+					// as suggested in https://github.com/cmsdaq/DAQExpert/issues/115#issuecomment-329711423 :
+					//   if DAQ is in Running or RunningDegraded state and
+					//   if no BUs is in 'Enabled' state (i.e. crashed etc.)
+
+					if (daqIsRunning(daq) && numEnabledBus(daq) == 0) {
+
+						if (daq.getBuSummary().getNumFUsCrashed() > 0) {
+							// at least one filter unit in crashed state
 							return Subcase.HltProblem;
+
+						} else {
+
+							// all BUs blocked etc. but no crashed FUs
+							return Subcase.BugInFilterfarm;
 						}
-					} else {
-						return Subcase.BugInFilterfarm;
 					}
 
 					return Subcase.UnknownFilterfarmProblem;

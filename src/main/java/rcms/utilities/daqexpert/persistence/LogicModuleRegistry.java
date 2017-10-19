@@ -1,39 +1,13 @@
 package rcms.utilities.daqexpert.persistence;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.LevelZeroStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.RunComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.SessionComparator;
-import rcms.utilities.daqexpert.reasoning.logic.comparators.TCDSStateComparator;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FEROLFifoStuck;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase3;
-import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCase5;
-import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase1;
-import rcms.utilities.daqexpert.reasoning.logic.failures.LegacyFlowchartCase2;
-import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
-import rcms.utilities.daqexpert.reasoning.logic.failures.RuFailed;
-import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
+import rcms.utilities.daqexpert.reasoning.logic.comparators.*;
+import rcms.utilities.daqexpert.reasoning.logic.failures.*;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -41,9 +15,11 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWit
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
-import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
-import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
-import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public enum LogicModuleRegistry {
 
@@ -110,6 +86,7 @@ public enum LogicModuleRegistry {
     LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
 
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   48,   106),
+	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                               49),
 
     ;
 	

@@ -9,24 +9,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
-import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
-import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Deadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Downtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.LongTransition;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.PartitionDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.RateOutOfRange;
-import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemError;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemRunningDegraded;
-import rcms.utilities.daqexpert.reasoning.logic.basic.SubsystemSoftError;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
-import rcms.utilities.daqexpert.reasoning.logic.basic.WarningInSubsystem;
+import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.DAQStateComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCBeamModeComparator;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.LHCMachineModeComparator;
@@ -125,6 +108,8 @@ public enum LogicModuleRegistry {
     ContinousSoftError		(new ContinouslySoftError(),     ConditionGroup.OTHER,                 "",                                                  45,  1010),
     StuckAfterSoftError    	(new StuckAfterSoftError(),      ConditionGroup.OTHER,                 "",                                                  46,  1011),
     LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
+
+	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   48,   106),
 
     ;
 	

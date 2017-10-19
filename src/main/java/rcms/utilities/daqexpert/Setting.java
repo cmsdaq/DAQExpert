@@ -21,6 +21,13 @@ public enum Setting {
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP("expert.logic.continoussofterror.threshold.keep"),
 	EXPERT_LOGIC_LENGHTYFIXINGSOFTERROR_THESHOLD_PERIOD("expert.logic.lenghtyfixingsofterror.threshold.period"),
 
+	/** maximum fraction of FUs in cloud mode around stable beams */
+	EXPERT_LOGIC_CLOUDFUNUMBER_THRESHOLD_TOTAL_FRACTION("expert.logic.cloudfunumber.threshold.total.fraction"),
+
+	/** period in milliseconds after the appearance of the first non-cloud LHC beam mode
+	    after which a problem with too many FUs in cloud mode will be reported. */
+	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
+
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),

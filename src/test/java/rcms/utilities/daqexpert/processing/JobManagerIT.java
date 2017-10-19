@@ -122,7 +122,7 @@ public class JobManagerIT {
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
 		// verify 49 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(49)));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(45)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));

@@ -23,6 +23,7 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 	public Deadtime() {
 		this.name = "Raw deadtime";
 		this.priority = ConditionPriority.DEFAULTT;
+		this.holdNotifications = true;
 		this.threshold = 0;
 	}
 

@@ -33,9 +33,15 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @JsonIgnore
     private long duration;
 
+    /** Do not show this condition */
     @JsonIgnore
     @Transient
     private boolean show;
+
+    /** Do not generate notifications based on this condition */
+    @JsonIgnore
+    @Transient
+    private boolean holdNotifications;
 
     private boolean mature;
 
@@ -214,6 +220,15 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
     public void setGroup(ConditionGroup group) {
         this.group = group;
+    }
+
+
+    public boolean isHoldNotifications() {
+        return holdNotifications;
+    }
+
+    public void setHoldNotifications(boolean holdNotifications) {
+        this.holdNotifications = holdNotifications;
     }
 
     @Override

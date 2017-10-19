@@ -218,6 +218,7 @@ public class ConditionProducer {
 		/* add new condition */
         Condition condition = new Condition();
         condition.setLogicModule(logicModule.getLogicModuleRegistry());
+        condition.setHoldNotifications(logicModule.isHoldNotifications());
         condition.setClassName(eventClass);
         condition.setTitle(content);
         condition.setShow(value);

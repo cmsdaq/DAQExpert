@@ -34,6 +34,9 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromFerol;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -78,6 +81,10 @@ public class FlowchartCaseTestBase {
 	protected final KnownFailure b4 = new OnlyFedStoppedSendingData();
 	protected final KnownFailure ruStuck = new RuStuck();
 
+	protected final KnownFailure backpressureFromFerol = new BackpressureFromFerol();
+	protected final KnownFailure backpressureFromEventBuilding = new BackpressureFromEventBuilding();
+	protected final KnownFailure backpressureFromHlt = new BackpressureFromHlt();
+
 	protected final UnidentifiedFailure unidentified = new UnidentifiedFailure();
 
 	protected final List<SimpleLogicModule> allLMsUnderTest = new ArrayList<>();
@@ -110,6 +117,11 @@ public class FlowchartCaseTestBase {
 		
 		allLMsUnderTest.add(ferolFifoStuck);
 		allLMsUnderTest.add(ruFailed);
+
+		allLMsUnderTest.add(backpressureFromFerol);
+		allLMsUnderTest.add(backpressureFromEventBuilding);
+		allLMsUnderTest.add(backpressureFromHlt);
+
 
 		allLMsUnderTest.add(unidentified);
 

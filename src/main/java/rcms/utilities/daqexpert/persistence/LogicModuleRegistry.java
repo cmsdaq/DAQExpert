@@ -8,6 +8,9 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromFerol;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -87,6 +90,11 @@ public enum LogicModuleRegistry {
 
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   48,   106),
 	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                               49),
+
+
+	BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               50),
+	BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               51),
+	BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               52),
 
     ;
 	

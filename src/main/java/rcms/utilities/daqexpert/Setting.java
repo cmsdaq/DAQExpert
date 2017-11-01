@@ -28,6 +28,10 @@ public enum Setting {
 	    after which a problem with too many FUs in cloud mode will be reported. */
 	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
 
+	EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED("expert.logic.deadtimeanalysis.fed.backpressure.threshold"),
+	EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS("expert.logic.backpressurefromhlt.bus.enabled.threshold.fraction"),
+	EXPERT_LOGIC_EVM_FEW_EVENTS("expert.logic.evm.requests.few.max"),
+
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),

@@ -2,20 +2,25 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.deadtime;
 
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.*;
+import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
+import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Logic module identifying the reason behind deadtime
  */
-public class BackpressureFromFerol extends KnownFailure {
+public class BackpressureFromFerol extends KnownFailure implements Parameterizable {
 
     private static final Logger logger = Logger.getLogger(BackpressureFromFerol.class);
+
+    private static Integer fedBackpressureThreshold;
+
+    private Integer evmFewRequestsThreshold;
 
     public BackpressureFromFerol() {
         this.name = "Backpressure from FEROL/FEDBuilder";
@@ -31,39 +36,47 @@ public class BackpressureFromFerol extends KnownFailure {
     @Override
     public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
+        if (results.get(NoRateWhenExpected.class.getSimpleName()))
+            return false;
+
         assignPriority(results);
         boolean result = false;
 
-        Iterator<FED> i = daq.getFeds().iterator();
-
-        Set<RU> rusToCheck = new HashSet<>();
+        Iterator<RU> i = daq.getRus().iterator();
         Set<RU> problematicRus = new HashSet<>();
         Set<FED> problematicFeds = new HashSet<>();
-
         while (i.hasNext()) {
-            FED fed = i.next();
-            if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
-                float backpressure = fed.getPercentBackpressure();
+            RU ru = i.next();
+            if (ru.getRequests() > 0 && ru.getFragmentsInRU() < 256) {
 
-                if (backpressure > 2) {
-                    logger.trace("Found problematic FED: " + fed.getSrcIdExpected());
-                    problematicFeds.add(fed);
-                    context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                    context.registerForStatistics("BACKPRESSURE", backpressure);
-                    rusToCheck.add(fed.getRu());
+                boolean foundProblematicFeds = false;
+                for (FED fed : ru.getFEDs(false)) {
+
+
+                    if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+
+                        float backpressure = fed.getPercentBackpressure();
+                        if (backpressure > fedBackpressureThreshold) {
+
+                            logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
+                            context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                            context.registerForStatistics("BACKPRESSURE", backpressure);
+                            problematicFeds.add(fed);
+                            foundProblematicFeds = true;
+                        }
+
+                    }
                 }
-            }
-        }
-
-        if (rusToCheck.size() > 0) {
-            for (RU ru : rusToCheck) {
-                if (ru.getRequests() > 0 && ru.getFragmentsInRU() < 256) {
-                    logger.trace("Found problematic RU: " + ru.getHostname());
+                if (foundProblematicFeds) {
                     context.register("PROBLEMATIC-RU", ru.getHostname());
+                    logger.debug("Found problematic RU: " + ru.getHostname());
                     problematicRus.add(ru);
                 }
+
+
             }
         }
+
 
         if (problematicFeds.size() > 0 && problematicRus.size() > 0) {
             result = true;
@@ -72,4 +85,10 @@ public class BackpressureFromFerol extends KnownFailure {
         return result;
     }
 
+    @Override
+    public void parametrize(Properties properties) {
+        this.fedBackpressureThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
+        this.evmFewRequestsThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_EVM_FEW_EVENTS, this.getClass());
+
+    }
 }

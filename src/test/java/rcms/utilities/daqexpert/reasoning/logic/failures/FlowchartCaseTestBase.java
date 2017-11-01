@@ -228,6 +228,8 @@ public class FlowchartCaseTestBase {
 		// which introduces a dependency on other tests)
 		results.put("StableBeams", true);
 		results.put("NoRateWhenExpected", true);
+		results.put("Transition", false);
+		results.put("ExpectedRate", true);
 
 		}
 

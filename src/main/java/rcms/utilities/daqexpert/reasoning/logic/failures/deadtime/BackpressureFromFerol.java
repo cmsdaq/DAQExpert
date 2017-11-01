@@ -5,8 +5,10 @@ import rcms.utilities.daqaggregator.data.*;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
+import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 import java.util.*;
@@ -36,8 +38,16 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
     @Override
     public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-        if (results.get(NoRateWhenExpected.class.getSimpleName()))
+        boolean transition;
+        boolean expectedRate;
+        boolean noRateWhenExpected;
+        expectedRate = results.get(ExpectedRate.class.getSimpleName());
+        transition = results.get(Transition.class.getSimpleName());
+        noRateWhenExpected = results.get(NoRateWhenExpected.class.getSimpleName());
+
+        if (!(expectedRate && !transition && !noRateWhenExpected)) {
             return false;
+        }
 
         assignPriority(results);
         boolean result = false;

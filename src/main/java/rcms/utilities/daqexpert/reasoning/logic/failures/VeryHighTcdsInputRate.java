@@ -51,8 +51,8 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
 
 		try {
 			this.threshold = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH.getKey()));
-			this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} Hz " +
-							"which is very high (above " + threshold + "Hz). " +
+			this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
+							"which is very high (above " + threshold + " Hz). " +
 							"This may be a problem with the L1 trigger: noisy towers, failed links etc.";
 
 		} catch (NumberFormatException e) {

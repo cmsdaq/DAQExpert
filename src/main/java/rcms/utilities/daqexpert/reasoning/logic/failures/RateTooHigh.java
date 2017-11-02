@@ -50,7 +50,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 		try {
 			this.max = Integer.parseInt(properties.getProperty(Setting.EXPERT_L1_RATE_MAX.getKey()));
-			this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} Hz which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
+			this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

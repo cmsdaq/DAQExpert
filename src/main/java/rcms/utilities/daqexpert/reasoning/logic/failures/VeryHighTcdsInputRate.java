@@ -19,7 +19,7 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
 	private float threshold;
 
 	public VeryHighTcdsInputRate() {
-		this.name = "TCDS trigger input rate very high";
+		this.name = "Very high TCDS trigger input rate";
 		this.threshold = 0;
 
 		this.description = "failed to set description";

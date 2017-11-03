@@ -23,11 +23,8 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         this.name = "Too high HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
-        this.action = new SimpleAction("Are we running with the correct pre-scale column?",
-                "Talk to the trigger shifter and shift leader",
-                "You may need to call the HLT DOC",
-                "Check if DAQ backpressure from Filter Farm also fired and mention if it did. (This may appear after the condition has started)"
-        );
+        this.action = new SimpleAction("Talk to the trigger shifter and shift leader. " +
+                "Have them check the pre-scale column. You may need to call the HLT DOC.");
     }
 
     @Override
@@ -52,7 +49,9 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
 
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s";
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
+                    + bandwidthThresholdInGbps + " GB/s at which delays Rate Monitoring and Express streams can appear. " +
+                    "DQM files may get truncated resulting in lower statistics";
 
             logger.debug("Parametrized: " + description);
 

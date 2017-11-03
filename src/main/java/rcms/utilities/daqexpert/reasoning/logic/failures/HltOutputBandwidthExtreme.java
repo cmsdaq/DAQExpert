@@ -18,10 +18,10 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
         this.name = "Extreme HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
-        this.action = new SimpleAction("Are we running with the correct pre-scale column?",
-                "Talk to the trigger shifter and shift leader",
-                "You may need to call the HLT DOC",
-                "Check if DAQ backpressure from Filter Farm also fired and mention if it did. (This may appear after the condition has started)"
+        this.action = new SimpleAction("You should not continue running in these conditions. " +
+                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
+                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. " +
+                "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }
 

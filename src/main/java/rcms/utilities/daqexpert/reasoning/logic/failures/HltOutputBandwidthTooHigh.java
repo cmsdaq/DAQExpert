@@ -13,16 +13,15 @@ import java.util.Properties;
 
 public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameterizable {
 
+    private static final Logger logger = Logger.getLogger(HltOutputBandwidthTooHigh.class);
     /**
      * upper end of range for expected  rate
      */
-    private double max;
-
-    private static final Logger logger = Logger.getLogger(HltOutputBandwidthTooHigh.class);
+    private double bandwidthThresholdInGbps;
 
     public HltOutputBandwidthTooHigh() {
         this.name = "Too high HLT output bandwidth";
-        this.max = 0;
+        this.bandwidthThresholdInGbps = 0;
 
         this.action = new SimpleAction("Are we running with the correct pre-scale column?",
                 "Talk to the trigger shifter and shift leader",
@@ -37,12 +36,12 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);
 
-        double outputBandwidth = daq.getBuSummary().getFuOutputBandwidthInMB();
-        logger.trace("Current HLT output bandwidth is: " + outputBandwidth);
+        double currentOutputBandwidthInGbps = daq.getBuSummary().getFuOutputBandwidthInMB() / 1024;
+        logger.trace("Current HLT output bandwidth is: " + currentOutputBandwidthInGbps);
 
         boolean result = false;
-        if (max < outputBandwidth) {
-            context.registerForStatistics("BANDWIDTH", outputBandwidth, "MB/s", 1);
+        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps) {
+            context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
         return result;
@@ -52,8 +51,8 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
     public void parametrize(Properties properties) {
 
         try {
-            this.max = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + max + " MB/s";
+            this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s";
 
             logger.debug("Parametrized: " + description);
 

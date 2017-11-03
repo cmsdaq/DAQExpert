@@ -12,14 +12,11 @@ import java.util.Properties;
 
 public class HltOutputBandwidthExtreme extends KnownFailure implements Parameterizable {
 
-    /**
-     * upper end of range for expected  rate
-     */
-    private double max;
+    private double bandwidthThresholdInGbps;
 
     public HltOutputBandwidthExtreme() {
         this.name = "Extreme HLT output bandwidth";
-        this.max = 0;
+        this.bandwidthThresholdInGbps = 0;
 
         this.action = new SimpleAction("Are we running with the correct pre-scale column?",
                 "Talk to the trigger shifter and shift leader",
@@ -34,11 +31,11 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);
 
-        double outputBandwidth = daq.getBuSummary().getFuOutputBandwidthInMB();
+        double currentOutputBandwidthInGbps = daq.getBuSummary().getFuOutputBandwidthInMB() / 1024;
 
         boolean result = false;
-        if (max < outputBandwidth) {
-            context.registerForStatistics("BANDWIDTH", outputBandwidth, "MB/s", 1);
+        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps) {
+            context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
         return result;
@@ -48,8 +45,8 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
     public void parametrize(Properties properties) {
 
         try {
-            this.max = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + max + " MB/s";
+            this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s";
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

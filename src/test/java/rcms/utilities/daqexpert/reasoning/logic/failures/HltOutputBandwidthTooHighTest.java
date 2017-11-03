@@ -32,7 +32,7 @@ public class HltOutputBandwidthTooHighTest
 	{
 		Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.ALL);
 		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4000");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.0");
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
 		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
 		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);

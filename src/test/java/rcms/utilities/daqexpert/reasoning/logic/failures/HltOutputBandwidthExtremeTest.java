@@ -30,7 +30,7 @@ public class HltOutputBandwidthExtremeTest
 	{
 		Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.ALL);
 		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6000");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
 		Map<String, Boolean> results = new HashMap<>();
 		results.put(StableBeams.class.getSimpleName(), true);
 
@@ -40,7 +40,7 @@ public class HltOutputBandwidthExtremeTest
 
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
 		Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>26,140.4MB/s</strong> which is above the expected maximum 6000.0 MB/s", hltOutputBandwidthExtreme.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> which is above the expected maximum 6.0 GB/s", hltOutputBandwidthExtreme.getDescriptionWithContext());
 	}
 
 	@Test
@@ -48,8 +48,8 @@ public class HltOutputBandwidthExtremeTest
 	{
 		Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.ALL);
 		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6000");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4000");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.0");
 		Map<String, Boolean> results = new HashMap<>();
 		results.put(StableBeams.class.getSimpleName(), true);
 
@@ -62,10 +62,10 @@ public class HltOutputBandwidthExtremeTest
 
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
 		Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>26,140.4MB/s</strong> which is above the expected maximum 6000.0 MB/s", hltOutputBandwidthExtreme.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> which is above the expected maximum 6.0 GB/s", hltOutputBandwidthExtreme.getDescriptionWithContext());
 
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>26,140.4MB/s</strong> which is above the expected maximum 4000.0 MB/s", hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> which is above the expected maximum 4.0 GB/s", hltOutputBandwidthTooHigh.getDescriptionWithContext());
 
 
 

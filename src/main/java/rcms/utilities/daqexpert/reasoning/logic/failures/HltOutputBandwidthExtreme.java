@@ -20,7 +20,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
 
         this.action = new SimpleAction("You should not continue running in these conditions. " +
                 "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
-                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. " +
+                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. " ,
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }

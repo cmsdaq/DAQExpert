@@ -47,7 +47,7 @@ public class HltOutputBandwidthExtremeTest {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.ALL);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
-        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(), "4.0");
+        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(), "4.5");
         Map<String, Boolean> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), true);
 
@@ -65,7 +65,7 @@ public class HltOutputBandwidthExtremeTest {
 
         Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot, results));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
-                "which is above the threshold of 4.0 GB/s at which delays Rate Monitoring and Express streams can appear. " +
+                "which is above the threshold of 4.5 GB/s at which delays Rate Monitoring and Express streams can appear. " +
                 "DQM files may get truncated resulting in lower statistics", hltOutputBandwidthTooHigh.getDescriptionWithContext());
 
 

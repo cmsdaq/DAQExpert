@@ -63,7 +63,8 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
                 for (FED fed : ru.getFEDs(false)) {
 
 
-                    if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+                    //TODO: Later also check if the FED (or its pseudo-FED) has dead time above a threshold.
+                    if (!fed.isFrlMasked()) {
 
                         float backpressure = fed.getPercentBackpressure();
                         if (backpressure > fedBackpressureThreshold) {

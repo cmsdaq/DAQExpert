@@ -68,7 +68,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
 
         while (i.hasNext()) {
             FED fed = i.next();
-            if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+            if (!fed.isFrlMasked()) {
                 float backpressure = fed.getPercentBackpressure();
 
                 if (backpressure > fedBackpressureThreshold) {
@@ -94,7 +94,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
         for (RU ru : daq.getRus()) {
             if (ru.isEVM() && ru.getRequests() < evmRequestsThreshold) {
                 logger.trace("EVM has: " + ru.getRequests() + " requests");
-                context.registerForStatistics("", ru.getRequests(), "", 1);
+                context.registerForStatistics("EVMREQUESTS", ru.getRequests(), "", 1);
                 evmFewRequests = true;
             }
         }
@@ -108,7 +108,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
                 enabledBus++;
             }
         }
-        float fractionNotEnabled = (allBus - enabledBus) / allBus;
+        float fractionNotEnabled = ((float)(allBus - enabledBus)) / allBus;
 
         if (evmFewRequests && fractionNotEnabled > fractionBusEnabledThreshold) {
             context.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);
@@ -126,6 +126,6 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
         evmRequestsThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_EVM_FEW_EVENTS, this.getClass());
 
         String printableBusThreshold = Math.round(100 * fractionBusEnabledThreshold) + "%";
-        this.description = "DAQ backpressure coming from Filter Farm. EVM has few ({{EVMREQUESTS}}, the threshold is <" + evmRequestsThreshold + ") requests. Large fraction ({{BUSFRACTION}}, the threshold is >" + printableBusThreshold + ") of BUs not enabled";
+        this.description = "DAQ backpressure coming from Filter Farm. EVM has few ({{EVMREQUESTS}} requests, the threshold is <" + evmRequestsThreshold + ") requests. Large fraction ({{BUSFRACTION}}, the threshold is >" + printableBusThreshold + ") of BUs not enabled";
     }
 }

@@ -29,9 +29,9 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
     public BackpressureFromEventBuilding() {
         this.name = "Backpressure from Event Builder";
 
-        this.description = "Backpressure from Event Building (i.e. from RU but not from BUs)";
+        this.description = "Backpressure from Event Building (i.e. not from HLT)";
 
-        this.action = new SimpleAction("Call Remi or Andre.");
+        this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
 
     }
 
@@ -64,7 +64,8 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                 for (FED fed : ru.getFEDs(false)) {
 
 
-                    if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
+                    //TODO: LATER: looking at dead time of FED. need to take into account FED - pseudoFED relationship.
+                    if (!fed.isFrlMasked()) {
 
                         float backpressure = fed.getPercentBackpressure();
                         if (backpressure > fedBackpressureThreshold) {

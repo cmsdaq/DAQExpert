@@ -11,6 +11,8 @@ public enum Setting {
 
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
+	EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH("expert.hlt.output.bandwidth.high"),
+	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
 
 	EXPERT_LOGIC_DEADTIME_THESHOLD_FED("expert.logic.deadtime.threshold.fed"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION("expert.logic.deadtime.threshold.partition"),

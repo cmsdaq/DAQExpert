@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>ch.cern</groupId>
 			<artifactId>DAQAggregator</artifactId>
-			<version>1.17.4</version>
+			<version>1.17.6</version>
 		</dependency>
 
 		<!-- JSP -->

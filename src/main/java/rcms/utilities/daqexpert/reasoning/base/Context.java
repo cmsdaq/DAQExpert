@@ -30,7 +30,7 @@ public class Context extends Observable implements Serializable {
 
     public void register(String key, Object object) {
         if (!context.containsKey(key)) {
-            context.put(key, new HashSet<Object>());
+            context.put(key, new LinkedHashSet<Object>());
         }
 
         if (!context.get(key).contains(object)) {

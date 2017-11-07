@@ -31,6 +31,7 @@ public class DeadtimeFromReTriTest {
 
         module.parametrize(config);
         assertEquals(true, module.satisfied(snapshot, results));
+        assertEquals("A large contribution (<strong>9.1%</strong>, the threshold is 1.0%) of the deadtime comes from the resonant trigger protection (ReTri). This can happen in fills with only a few bunches.", module.getDescriptionWithContext());
     }
 
 }

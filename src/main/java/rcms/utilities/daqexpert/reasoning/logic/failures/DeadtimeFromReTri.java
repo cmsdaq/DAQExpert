@@ -70,7 +70,7 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
             this.contributionThresholdInPercent = Integer
                     .parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_RETRI.getKey()));
 
-            this.description = "A large contribution ({{RETRI_CONTRIBUTION}}, the contributionThresholdInPercent is " + contributionThresholdInPercent + "%) of the deadtime comes from the resonant trigger protection (ReTri). This can happen in fills with only a few bunches.";
+            this.description = "A large contribution ({{RETRI_CONTRIBUTION}}, the threshold is " + contributionThresholdInPercent + "%) of the deadtime comes from the resonant trigger protection (ReTri). This can happen in fills with only a few bunches.";
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
                     + this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());

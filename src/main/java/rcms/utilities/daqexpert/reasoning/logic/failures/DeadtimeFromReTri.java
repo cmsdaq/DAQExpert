@@ -20,7 +20,7 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
     private double contributionThresholdInPercent;
 
     public DeadtimeFromReTri() {
-        this.name = "Large ReTri contribution to deadtime";
+        this.name = "High ReTri deadtime";
         this.action = new SimpleAction(
                 "Adding random triggers may reduce the deadtime from ReTri. Discuss this with the shift leader.");
     }

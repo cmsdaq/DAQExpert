@@ -17,6 +17,8 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 
 	/** minimum above which this module fires */
 	private float threshold;
+	private float thresholdVeryHigh;
+
 
 	public HighTcdsInputRate() {
 		this.name = "High TCDS trigger input rate";
@@ -39,7 +41,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 		double inputTriggerRate = rates.getTrg_rate_total() + rates.getSup_trg_rate_total();
 
 		boolean result = false;
-		if (threshold < inputTriggerRate) {
+		if (threshold < inputTriggerRate && inputTriggerRate <= thresholdVeryHigh) {
 			context.registerForStatistics("TCDS_TRIGGER_INPUT_RATE", inputTriggerRate,"Hz",1);
 			result = true;
 		}
@@ -51,6 +53,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 
 		try {
 			this.threshold = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_HIGH.getKey()));
+			this.thresholdVeryHigh = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH.getKey()));
 			this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
 							"which is high (above " + threshold + " Hz). " +
 							"This may be a problem with the L1 trigger: wrong prescale column etc.";

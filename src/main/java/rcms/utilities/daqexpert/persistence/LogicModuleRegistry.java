@@ -93,6 +93,9 @@ public enum LogicModuleRegistry {
 
 	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       52,  3000),
 	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       53,  3001),
+
+	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       54,  3002),
+
 	
 
 	;

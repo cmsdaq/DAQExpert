@@ -4,29 +4,28 @@ import java.util.Map;
 import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 
-/** This class is similar to RateOutOfRange but is intended as a
- *  hotfix to display a warning and action to the DAQ shifter
- *  when the readout rate exceeds the expected maximum.
+/** This module fires in for very high TCDS trigger input rate.
  */
-public class RateTooHigh extends KnownFailure implements Parameterizable {
+public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizable {
 
-	/** upper end of range for expected readout rate */
-	private float max;
+	/** minimum above which this module fires */
+	private float threshold;
 
-	public RateTooHigh() {
-		this.name = "Readout rate too high";
-		this.max = 0;
+	public VeryHighTcdsInputRate() {
+		this.name = "Very high TCDS trigger input rate";
+		this.threshold = 0;
 
 		this.description = "failed to set description";
-    this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger",
-                                   "Make an e-log entry"
-			);
+		this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger (noisy towers, failed links)",
+		                               "Make an e-log entry"
+		                               );
 	}
 
 	@Override
@@ -35,11 +34,13 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 		// assign the priority based on whether we are in stable beams or not
 		assignPriority(results);
 
-		float readoutRate = daq.getFedBuilderSummary().getRate();
+		TCDSTriggerRates rates = daq.getTcdsGlobalInfo().getTriggerRatesInstant();
+
+		double inputTriggerRate = rates.getTrg_rate_total() + rates.getSup_trg_rate_total();
 
 		boolean result = false;
-		if (max < readoutRate) {
-			context.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"Hz",1);
+		if (threshold < inputTriggerRate) {
+			context.registerForStatistics("TCDS_TRIGGER_INPUT_RATE", inputTriggerRate,"Hz",1);
 			result = true;
 		}
 		return result;
@@ -49,8 +50,10 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 	public void parametrize(Properties properties) {
 
 		try {
-			this.max = Integer.parseInt(properties.getProperty(Setting.EXPERT_L1_RATE_MAX.getKey()));
-			this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
+			this.threshold = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH.getKey()));
+			this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
+							"which is very high (above " + threshold + " Hz). " +
+							"This may be a problem with the L1 trigger: noisy towers, failed links etc.";
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

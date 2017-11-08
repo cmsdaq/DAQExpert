@@ -12,14 +12,27 @@ public enum Setting {
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
 
+	/** thresholds for TCDS input rate checks */
+	EXPERT_TCDS_INPUT_RATE_HIGH("expert.tcds.input.rate.high"),
+	EXPERT_TCDS_INPUT_RATE_VERYHIGH("expert.tcds.input.rate.veryhigh"),
+	
 	EXPERT_LOGIC_DEADTIME_THESHOLD_FED("expert.logic.deadtime.threshold.fed"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION("expert.logic.deadtime.threshold.partition"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL("expert.logic.deadtime.threshold.total"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_TTS("expert.logic.deadtime.threshold.tts"),
+	EXPERT_LOGIC_DEADTIME_THESHOLD_RETRI("expert.logic.deadtime.threshold.retri"),
+
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT("expert.logic.continoussofterror.threshold.count"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD("expert.logic.continoussofterror.threshold.period"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP("expert.logic.continoussofterror.threshold.keep"),
 	EXPERT_LOGIC_LENGHTYFIXINGSOFTERROR_THESHOLD_PERIOD("expert.logic.lenghtyfixingsofterror.threshold.period"),
+
+	/** maximum fraction of FUs in cloud mode around stable beams */
+	EXPERT_LOGIC_CLOUDFUNUMBER_THRESHOLD_TOTAL_FRACTION("expert.logic.cloudfunumber.threshold.total.fraction"),
+
+	/** period in milliseconds after the appearance of the first non-cloud LHC beam mode
+	    after which a problem with too many FUs in cloud mode will be reported. */
+	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
 
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

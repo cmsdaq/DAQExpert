@@ -88,8 +88,8 @@ public enum LogicModuleRegistry {
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   			48,   106),
 	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49),
 
-	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		50,  2000),
-	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												51,  2001),
+	HltOutputBandwidthTooHigh (null, ConditionGroup.OTHER,				"",                                            		50,  2000),
+	HltOutputBandwidthExtreme (null, ConditionGroup.OTHER,         		"", 												51,  2001),
 
 	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       52,  3000),
 	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       53,  3001),

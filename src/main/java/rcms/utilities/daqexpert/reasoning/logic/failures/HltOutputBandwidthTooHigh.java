@@ -7,6 +7,7 @@ import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 import java.util.Map;
 import java.util.Properties;
@@ -14,10 +15,14 @@ import java.util.Properties;
 public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameterizable {
 
     private static final Logger logger = Logger.getLogger(HltOutputBandwidthTooHigh.class);
+
+    private String additionalNote = "Note that there is also backpressure from HLT.";
+
     /**
      * upper end of range for expected  rate
      */
     private double bandwidthThresholdInGbps;
+    private double extremeBandwidthThresholdInGbps;
 
     public HltOutputBandwidthTooHigh() {
         this.name = "Too high HLT output bandwidth";
@@ -37,10 +42,18 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         logger.trace("Current HLT output bandwidth is: " + currentOutputBandwidthInGbps);
 
         boolean result = false;
-        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps) {
+        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps && currentOutputBandwidthInGbps <= extremeBandwidthThresholdInGbps) {
             context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
+
+        if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+            //mention the fact that some modules are active
+            context.registerConditionalNote("NOTE", additionalNote);
+        } else{
+            context.unregisterConditionalNote("NOTE");
+        }
+
         return result;
     }
 
@@ -49,9 +62,10 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
 
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
+            this.extremeBandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
                     + bandwidthThresholdInGbps + " GB/s at which delays Rate Monitoring and Express streams can appear. " +
-                    "DQM files may get truncated resulting in lower statistics";
+                    "DQM files may get truncated resulting in lower statistics. [[NOTE]]";
 
             logger.debug("Parametrized: " + description);
 

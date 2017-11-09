@@ -6,6 +6,7 @@ import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 import java.util.Map;
 import java.util.Properties;
@@ -13,6 +14,7 @@ import java.util.Properties;
 public class HltOutputBandwidthExtreme extends KnownFailure implements Parameterizable {
 
     private double bandwidthThresholdInGbps;
+    private String additionalNote = "Note that there is also backpressure from HLT.";
 
     public HltOutputBandwidthExtreme() {
         this.name = "Extreme HLT output bandwidth";
@@ -20,7 +22,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
 
         this.action = new SimpleAction("You should not continue running in these conditions. " +
                 "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
-                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. " ,
+                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }
@@ -38,6 +40,14 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
             context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
+
+        if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+            //mention the fact that some modules are active
+            context.registerConditionalNote("NOTE", additionalNote);
+        } else{
+            context.unregisterConditionalNote("NOTE");
+        }
+
         return result;
     }
 
@@ -46,7 +56,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
 
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s";
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. [[NOTE]]";
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

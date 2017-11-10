@@ -128,8 +128,12 @@ public class LogicModuleManager {
         HashMap<String, Boolean> checkerResultMap = new HashMap<>();
 
         for (SimpleLogicModule checker : checkers) {
-            boolean result = checker.satisfied(daq, checkerResultMap);
-            postprocess(checkerResultMap, checker, result, daq, results);
+            try {
+                boolean result = checker.satisfied(daq, checkerResultMap);
+                postprocess(checkerResultMap, checker, result, daq, results);
+            } catch(RuntimeException e){
+                logger.error("Logic module " + checker.getClass().getSimpleName() + " failed with: " + e.getClass());
+            }
         }
 
         if (includeExperimental) {

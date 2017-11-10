@@ -43,7 +43,10 @@ public class HltOutputBandwidthExtremeTest {
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
         Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
-                "which is above the expected maximum 6.0 GB/s. ", hltOutputBandwidthExtreme.getDescriptionWithContext());
+                "which is above the expected maximum 6.0 GB/s. " +
+                "You should not continue running in these conditions. " +
+                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
+                hltOutputBandwidthExtreme.getDescriptionWithContext());
     }
 
     @Test
@@ -63,11 +66,15 @@ public class HltOutputBandwidthExtremeTest {
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
         Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
-                "which is above the expected maximum 6.0 GB/s. <strong>Note that there is also backpressure from HLT.</strong>", hltOutputBandwidthExtreme.getDescriptionWithContext());
+                "which is above the expected maximum 6.0 GB/s. " +
+                "You should not continue running in these conditions." +
+                " Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
+                "<strong>Note that there is also backpressure from HLT.</strong>",
+                hltOutputBandwidthExtreme.getDescriptionWithContext());
     }
 
     @Test
-    public void extremeSupressHighTest() throws URISyntaxException {
+    public void doNotSupressExtremeTest() throws URISyntaxException {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
@@ -87,9 +94,12 @@ public class HltOutputBandwidthExtremeTest {
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
         Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
-                "which is above the expected maximum 6.0 GB/s. ", hltOutputBandwidthExtreme.getDescriptionWithContext());
+                "which is above the expected maximum 6.0 GB/s. " +
+                "You should not continue running in these conditions. " +
+                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
+                hltOutputBandwidthExtreme.getDescriptionWithContext());
 
-        Assert.assertFalse(hltOutputBandwidthTooHigh.satisfied(snapshot, results));
+        Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot, results));
 
 
     }

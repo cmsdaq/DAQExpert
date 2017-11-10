@@ -22,8 +22,6 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
      * upper end of range for expected  rate
      */
     private double bandwidthThresholdInGbps;
-    private double extremeBandwidthThresholdInGbps;
-
     public HltOutputBandwidthTooHigh() {
         this.name = "Too high HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
@@ -42,7 +40,7 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         logger.trace("Current HLT output bandwidth is: " + currentOutputBandwidthInGbps);
 
         boolean result = false;
-        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps && currentOutputBandwidthInGbps <= extremeBandwidthThresholdInGbps) {
+        if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps) {
             context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
@@ -62,7 +60,6 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
 
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
-            this.extremeBandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
                     + bandwidthThresholdInGbps + " GB/s at which delays Rate Monitoring and Express streams can appear. " +
                     "DQM files may get truncated resulting in lower statistics. [[NOTE]]";

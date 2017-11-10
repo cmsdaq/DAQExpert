@@ -20,9 +20,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
         this.name = "Extreme HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
-        this.action = new SimpleAction("You should not continue running in these conditions. " +
-                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
-                "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
+        this.action = new SimpleAction( "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }
@@ -56,7 +54,10 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
 
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. [[NOTE]]";
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. " +
+                    "You should not continue running in these conditions. " +
+                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
+                    "[[NOTE]]";
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

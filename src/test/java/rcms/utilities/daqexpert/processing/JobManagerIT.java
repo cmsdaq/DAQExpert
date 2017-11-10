@@ -91,7 +91,7 @@ public class JobManagerIT {
 		List<Condition> result = null;
 
 		int retries = 15;
-		int expectedResult = 58;
+		int expectedResult = 59;
 		for (int i = 0; i < retries; i++) {
 			if (result == null || result.size() != expectedResult) {
 				Thread.sleep(1000);
@@ -127,7 +127,7 @@ public class JobManagerIT {
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
 		// verify 49 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(54)));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(55)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));

@@ -7,7 +7,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
@@ -22,22 +22,16 @@ import java.util.*;
 public class BackpressureFromHlt extends KnownFailure implements Parameterizable {
 
     private static final Logger logger = Logger.getLogger(BackpressureFromHlt.class);
-
+    private static Integer fedBackpressureThreshold;
     private Float fractionBusEnabledThreshold;
     private Integer evmRequestsThreshold;
-    private static Integer fedBackpressureThreshold;
 
     public BackpressureFromHlt() {
         this.name = "Backpressure from HLT";
 
-
-        ConditionalAction action = new ConditionalAction("Call the DAQ DOC");
-        action.addContextSteps("high-output-rate", "Are we running with the correct pre-scale column?", "Talk to the trigger shifter and shift leader.", "You may need to call HLT DOC.");
-        action.addContextSteps("cmssw-crashing", "Call the HLT DOC, mentioning the messages you see under HLT Alerts in F3 Mon.", "Call the DAQ DOC. He might need to clean up the Filter Farm.");
-        action.addContextSteps("hlt-cpu-high-usage", "Are we running with the correct pre-scale column?", "Talk to the trigger shifter and shift leader.", "You may need to call the HLT DOC.");
-
-        this.action = action;
-
+        this.action = new SimpleAction("Check if (more than a few) FUs are crashing by looking at the \"#FUs crash\" column in DAQView and by looking at the HLT Alerts in F3Mon. Contact the HLT DOC and DAQ DOC if you see crashes.",
+                "Check the HLT utilization by looking at the Microstates Time chart in F3 Mon. If the HLT is fully occupied, check with the shift crew whether we are running in the right pre-scale column. You may need to call the HLT DOC.",
+                "Check the HLT Output rate in F3Mon (There should be a separate warning message if it is too high. Follow the instructions in this separate message).");
     }
 
     @Override
@@ -108,7 +102,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
                 enabledBus++;
             }
         }
-        float fractionNotEnabled = ((float)(allBus - enabledBus)) / allBus;
+        float fractionNotEnabled = ((float) (allBus - enabledBus)) / allBus;
 
         if (evmFewRequests && fractionNotEnabled > fractionBusEnabledThreshold) {
             context.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);

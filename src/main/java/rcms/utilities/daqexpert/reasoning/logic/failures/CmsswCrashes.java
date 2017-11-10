@@ -40,6 +40,10 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
 
         assignPriority(results);
 
+        if(daq.getHltInfo() == null){
+            return false;
+        }
+
         int currentCrashes = daq.getHltInfo().getCrashes();
         long startTimestampOfSlidingWindow = daq.getLastUpdate() - slidingWindowPeriodInSeconds * 1000;
         long holdoffLimit = daq.getLastUpdate() - holdoffPeriodInSeconds * 1000;

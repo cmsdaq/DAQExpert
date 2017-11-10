@@ -98,6 +98,7 @@ public enum LogicModuleRegistry {
 
 	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		53,  2010),
 	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												54,  2011),
+	CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												55,  2012),
 	;
 
 	

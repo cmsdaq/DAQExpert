@@ -48,7 +48,6 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 			FED fed = i.next();
 			if (!fed.isFmmMasked() && !fed.isFrlMasked()) {
 				float deadPercentage = 0;
-				//deadPercentage += fed.getPercentBackpressure();
 				deadPercentage += fed.getPercentBusy();
 				deadPercentage += fed.getPercentWarning();
 

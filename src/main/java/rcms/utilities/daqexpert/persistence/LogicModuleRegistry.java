@@ -91,14 +91,23 @@ public enum LogicModuleRegistry {
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   			48,   106),
 	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49),
 
+	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		53,  2000),
+	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												54,  2001),
+
+	HighTcdsInputRate         (null,         ConditionGroup.OTHER,               "",                       55,  3000),
+	VeryHighTcdsInputRate     (null,     ConditionGroup.OTHER,               "",                       56,  3001),
+
+	DeadtimeFromReTri     (null,     ConditionGroup.OTHER,               "",                       57,  3002),
 
 	BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               50, 2000),
 	BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               51, 2001),
 	BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               52, 2002),
+	CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												58,  2012),
 
-	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		53,  2010),
-	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												54,  2011),
-	CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												55,  2012),
+
+
+
+
 	;
 
 	

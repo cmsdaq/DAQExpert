@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +23,11 @@ public class CmsswCrashesTest {
 
     CmsswCrashes module;
     Map<String, Boolean> results;
+    Logger logger = Logger.getLogger(CmsswCrashes.class);
 
     @Before
     public void prepare() {
-        Logger.getLogger(CmsswCrashes.class).setLevel(Level.DEBUG);
+        Logger.getLogger(CmsswCrashes.class).setLevel(Level.INFO);
         results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), true);
         module = new CmsswCrashes();
@@ -102,10 +104,15 @@ public class CmsswCrashesTest {
 
     }
 
+    @After
+    public void showDescription() {
+        logger.info(module.getDescriptionWithContext());
+    }
+
     private DAQ mockTestObject(long timestamp, int crashes) {
         DAQ snapshot = new DAQ();
 
-        snapshot.setLastUpdate(timestamp*1000);
+        snapshot.setLastUpdate(timestamp * 1000);
         snapshot.setHltInfo(new HltInfo());
         snapshot.getHltInfo().setCrashes(crashes);
 

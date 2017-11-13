@@ -63,6 +63,11 @@ public class JobManagerIT {
 		Thread.sleep(1000);
 	}
 
+    /**
+     * Note that in this test period there was bug in DAQAggregator.
+     * The output bandwidth in BUSummary object was not flushed between snapshots.
+     * This results in HLTOutputBandwidthExtreme and HLTOutputBandwidthTooHigh being fired in this test scenario.
+     */
 	@Test
 	public void test() throws InterruptedException {
 
@@ -86,7 +91,7 @@ public class JobManagerIT {
 		List<Condition> result = null;
 
 		int retries = 15;
-		int expectedResult = 57;
+		int expectedResult = 59;
 		for (int i = 0; i < retries; i++) {
 			if (result == null || result.size() != expectedResult) {
 				Thread.sleep(1000);
@@ -95,7 +100,6 @@ public class JobManagerIT {
 			}
 
 		}
-		Assert.assertEquals(expectedResult, result.size());
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("No rate when expected"))));
 		assertThat(result,
 				not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
@@ -103,6 +107,9 @@ public class JobManagerIT {
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition problem")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition disconnected")))));
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FED stuck"))));
+
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Too high HLT output bandwidth"))));
+
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
 				"TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING"))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
@@ -113,6 +120,9 @@ public class JobManagerIT {
 		assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
 				"Deadtime is <strong>6.3%</strong>, the threshold is 5.0%"))));
 
+
+		Assert.assertEquals(expectedResult, result.size());
+
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
 				DataResolution.Full);
@@ -122,7 +132,7 @@ public class JobManagerIT {
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
 		// verify 49 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(53)));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(55)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));

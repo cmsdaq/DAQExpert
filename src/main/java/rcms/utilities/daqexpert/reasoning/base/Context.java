@@ -16,6 +16,7 @@ public class Context extends Observable implements Serializable {
     private static final Logger logger = Logger.getLogger(Context.class);
 
     private Map<String, Set<Object>> context;
+    private Map<String, String> additionalNotes;
     private Map<String, CalculationContext> contextForCalculations;
 
     private Set<String> changeset;
@@ -24,13 +25,28 @@ public class Context extends Observable implements Serializable {
     public Context() {
         this.context = new HashMap<>();
         this.contextForCalculations = new HashMap<>();
+        this.additionalNotes = new HashMap<>();
         this.actionKey = new HashSet<>();
         this.changeset = new HashSet<>();
     }
 
+    public void registerConditionalNote(String key, String additionalNote){
+        if(!additionalNote.contains(key)){
+            additionalNotes.put(key,additionalNote);
+            changeset.add(key);
+        }
+    }
+
+    public void unregisterConditionalNote(String key){
+        if(additionalNotes.containsKey(key)) {
+            logger.debug("Unregistering conditional note with key: " + key);
+            additionalNotes.remove(key);
+        }
+    }
+
     public void register(String key, Object object) {
         if (!context.containsKey(key)) {
-            context.put(key, new HashSet<Object>());
+            context.put(key, new LinkedHashSet<Object>());
         }
 
         if (!context.get(key).contains(object)) {
@@ -200,8 +216,39 @@ public class Context extends Observable implements Serializable {
             }
         }
 
+        for (Map.Entry<String, String> entry : this.additionalNotes.entrySet()) {
+            boolean updated = false;
+            if (changeset.contains(entry.getKey())) {
+                updated = true;
+            }
+
+            String variableKeyNoRgx = "[[" + entry.getKey() + "]]";
+            String variableKeyRegex = "\\[\\[" + entry.getKey() + "\\]\\]";
+
+            if (output.contains(variableKeyNoRgx)) {
+
+                String replacement = "";
+                replacement = entry.getValue().toString();
+                if (updated && highlightMarkup) {
+                    replacement = "<strong>" + replacement + "</strong>";
+                }
+                output = output.replaceAll(variableKeyRegex, replacement);
+
+
+            } else {
+                logger.debug("No key " + variableKeyNoRgx + " in " + output);
+            }
+        }
+
+        output = clearOptionalReplacements(output);
 
         return output;
+    }
+
+    private String clearOptionalReplacements(String input){
+        logger.debug("Clearing optional replacements");
+        String variableKeyRegex = "\\[\\[\\b[A-Z]+\\b\\]\\]";
+        return input.replaceAll(variableKeyRegex, "");
     }
 
     public String getContentWithContext(String message) {

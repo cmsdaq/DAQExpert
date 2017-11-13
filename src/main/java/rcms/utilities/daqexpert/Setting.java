@@ -11,6 +11,8 @@ public enum Setting {
 
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
+	EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH("expert.hlt.output.bandwidth.high"),
+	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
 
 	/** thresholds for TCDS input rate checks */
 	EXPERT_TCDS_INPUT_RATE_HIGH("expert.tcds.input.rate.high"),
@@ -33,6 +35,10 @@ public enum Setting {
 	/** period in milliseconds after the appearance of the first non-cloud LHC beam mode
 	    after which a problem with too many FUs in cloud mode will be reported. */
 	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
+
+	EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED("expert.logic.deadtimeanalysis.fed.backpressure.threshold"),
+	EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS("expert.logic.backpressurefromhlt.bus.enabled.threshold.fraction"),
+	EXPERT_LOGIC_EVM_FEW_EVENTS("expert.logic.evm.requests.few.max"),
 
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

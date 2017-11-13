@@ -5,26 +5,22 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
+import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
@@ -34,6 +30,9 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromFerol;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -78,6 +77,10 @@ public class FlowchartCaseTestBase {
 	protected final KnownFailure b4 = new OnlyFedStoppedSendingData();
 	protected final KnownFailure ruStuck = new RuStuck();
 
+	protected final KnownFailure backpressureFromFerol = new BackpressureFromFerol();
+	protected final KnownFailure backpressureFromEventBuilding = new BackpressureFromEventBuilding();
+	protected final KnownFailure backpressureFromHlt = new BackpressureFromHlt();
+
 	protected final UnidentifiedFailure unidentified = new UnidentifiedFailure();
 
 	protected final List<SimpleLogicModule> allLMsUnderTest = new ArrayList<>();
@@ -85,6 +88,12 @@ public class FlowchartCaseTestBase {
 	private static final Logger logger = Logger.getLogger(FlowchartCaseTestBase.class);
 
 	public FlowchartCaseTestBase() {
+
+
+		Properties properties = new Properties();
+		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(),"2");
+		properties.setProperty(Setting.EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS.getKey(),".3");
+		properties.setProperty(Setting.EXPERT_LOGIC_EVM_FEW_EVENTS.getKey(),"100");
 
 		allLMsUnderTest.add(fc3);
 
@@ -104,12 +113,18 @@ public class FlowchartCaseTestBase {
 		allLMsUnderTest.add(ruStuckWaitingOther);
 		allLMsUnderTest.add(fc1);
 		allLMsUnderTest.add(fc2);
-		
+
 		allLMsUnderTest.add(legacyFc1);
 		allLMsUnderTest.add(legacyFc2);
-		
+
 		allLMsUnderTest.add(ferolFifoStuck);
 		allLMsUnderTest.add(ruFailed);
+
+
+		allLMsUnderTest.add(backpressureFromFerol);
+		allLMsUnderTest.add(backpressureFromEventBuilding);
+		allLMsUnderTest.add(backpressureFromHlt);
+
 
 		allLMsUnderTest.add(unidentified);
 
@@ -119,11 +134,26 @@ public class FlowchartCaseTestBase {
 			if (lm.getLogicModule() != null && lm.getLogicModule() instanceof KnownFailure) {
 				logicModules.add(lm.getLogicModule().getClass().getSimpleName());
 			}
+
+		}
+
+		for(LogicModule lm: allLMsUnderTest){
+			if (lm != null && lm instanceof Parameterizable) {
+				((Parameterizable) lm).parametrize(properties);
+			}
 		}
 		unidentified.setKnownFailureClasses(logicModules);
 	}
 
 	protected void assertSatisfiedLogicModules(DAQ snapshot, SimpleLogicModule... expected) {
+
+
+
+		for(RU ru: snapshot.getRus()){
+			if(ru.isEVM() && ru.getRate() > 0){
+				results.put(NoRateWhenExpected.class.getSimpleName(),false);
+			}
+		}
 
 		List<SimpleLogicModule> expectedList = Arrays.asList(expected);
 
@@ -198,7 +228,10 @@ public class FlowchartCaseTestBase {
 		// which introduces a dependency on other tests)
 		results.put("StableBeams", true);
 		results.put("NoRateWhenExpected", true);
-	}
+		results.put("Transition", false);
+		results.put("ExpectedRate", true);
+
+		}
 
 	/**
 	 * method to load a deserialize a snapshot given a file name

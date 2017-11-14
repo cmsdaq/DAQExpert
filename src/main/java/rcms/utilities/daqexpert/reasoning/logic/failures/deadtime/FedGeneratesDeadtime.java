@@ -38,9 +38,9 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
 
             if (deadPercentage > deadtimeThresholdInPercentage && backpressure < backpressureThresholdInPercentage) {
                 result = true;
-                context.register("FED",fed.getSrcIdExpected());
-                context.registerForStatistics("DEADTIME",deadPercentage,"%",1);
-                context.registerForStatistics("BACKPRESSURE",deadPercentage,"%",1);
+                context.register("FED", fed.getSrcIdExpected());
+                context.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
+                context.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
 
             }
 
@@ -52,7 +52,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     public void parametrize(Properties properties) {
         this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
-        this.description = "FED {{FED}} generates a deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure on this FED.";
+        this.description = "FED {{FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED.";
     }
 
 }

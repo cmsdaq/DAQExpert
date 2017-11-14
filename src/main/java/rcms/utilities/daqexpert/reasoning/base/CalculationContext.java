@@ -21,6 +21,11 @@ public class CalculationContext implements Serializable {
     private String unit;
     private DecimalFormat df;
 
+			
+		/** @param precision specifies the number of digits to include after the decimal
+		 *  point when converting the values to string format
+		 *  (see {@link java.text.DecimalFormat#setMaximumFractionDigits(int) })
+		 */
     public CalculationContext(String unit, int precision) {
 
         if (unit == null) {

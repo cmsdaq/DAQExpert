@@ -46,6 +46,10 @@ public class Context extends Observable implements Serializable {
         return registerForStatistics(key, value,"",1);
     }
 
+		/** @param precision specifies the number of digits to include after the decimal
+		 *   point when converting the values to string format
+		 *  (see {@link CalculationContext#CalculationContext(java.lang.String, int) })
+		 */
     public boolean registerForStatistics(String key, Number value, String unit, int precision) {
         if (!contextForCalculations.containsKey(key)) {
             contextForCalculations.put(key, new CalculationContext(unit, precision));

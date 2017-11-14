@@ -4,9 +4,12 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 import java.util.Map;
 import java.util.Properties;
@@ -14,7 +17,7 @@ import java.util.Properties;
 /**
  * This logic module identifies TTS deadtime
  */
-public class TTSDeadtime extends ContextLogicModule implements Parameterizable {
+public class TTSDeadtime extends KnownFailure implements Parameterizable {
 
     private float threshold;
 
@@ -23,6 +26,8 @@ public class TTSDeadtime extends ContextLogicModule implements Parameterizable {
 	public TTSDeadtime() {
         this.name = "TTS Deadtime";
 		this.priority = ConditionPriority.IMPORTANT;
+		this.action = new SimpleAction("Look at CPM page");
+
 	}
 
 	/**
@@ -72,19 +77,8 @@ public class TTSDeadtime extends ContextLogicModule implements Parameterizable {
 
     @Override
     public void parametrize(Properties properties) {
-        try {
-            this.threshold = Integer
-                    .parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TTS.getKey()));
-
-            this.description = "TTS Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%";
-        } catch (NumberFormatException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-                    "Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-        }
-
+		this.threshold = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TTS,this.getClass());
+		this.description = "TTS Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%";
     }
 
 }

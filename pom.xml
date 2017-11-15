@@ -310,6 +310,32 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- This plugin requires environment specific properties and credentials.
+			Below is the expample configuration for development server:
+
+			~/.m2/conf/setting.xml:
+			<servers>
+			    <server>
+			        <id>expert-dev</id>
+			        <url>http://daq-expert-dev.cms:8080/manager/text</url>
+			        <username><your username></username>
+			        <password><your password></password>
+			    </server>
+			</servers>
+
+			Then deploy with command:
+            mvn -Dserver=expert-dev tomcat7:deploy
+			-->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<server>${server}</server>
+					<path>/expert</path>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<packaging>war</packaging>

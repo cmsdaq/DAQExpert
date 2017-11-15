@@ -30,7 +30,8 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 
 	/** list of LHC beam modes in which the cloud is allowed to run
 	 */
-	private Set<LHCBeamMode> allowedBeamModes = new HashSet<LHCBeamMode>();
+	private Set<LHCBeamMode> allowedBeamModes = new HashSet<>();
+	private Set<LHCBeamMode> criticalBeamModes = new HashSet<>();
 
 	private HoldOffTimer holdOffTimer;
 
@@ -56,6 +57,11 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		allowedBeamModes.add(LHCBeamMode.RECOVER); // 'RECOVERY' in Diego's code
 		allowedBeamModes.add(LHCBeamMode.INJECT_AND_DUMP);
 		allowedBeamModes.add(LHCBeamMode.CIRCULATE_AND_DUMP);
+
+
+		criticalBeamModes.add(LHCBeamMode.STABLE_BEAMS);
+		criticalBeamModes.add(LHCBeamMode.ADJUST);
+		criticalBeamModes.add(LHCBeamMode.SQUEEZE);
 
 	}
 
@@ -121,9 +127,10 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		// update the holdoff timer
 		this.holdOffTimer.updateInput(shouldBeOff, now);
 
+		boolean inCriticalBeamMode = this.criticalBeamModes.contains(LHCBeamMode.getModeByCode(daq.getLhcBeamMode()));
 		// check if -- after taking into account the holdoff timer --
 		// we should not see any cloud FUs anymore
-		if (! this.holdOffTimer.getOutput(now)) {
+		if (!inCriticalBeamMode && !this.holdOffTimer.getOutput(now)) {
 			// the grace period to shut down the VMs has not yet finished,
 			// do not perform further checks yet
 			return false;

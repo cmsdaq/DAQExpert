@@ -20,7 +20,6 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
 
     private int crashesCountThreshold;
     private int slidingWindowPeriodInSeconds;
-    private int holdoffPeriodInSeconds;
 
     /* Time window of previous data and previous results. Contains timestamp, monitored value, and output of LM */
     private List<Triple<Long, Integer, Boolean>> timeWindow;
@@ -46,7 +45,6 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
 
         int currentCrashes = daq.getHltInfo().getCrashes();
         long startTimestampOfSlidingWindow = daq.getLastUpdate() - slidingWindowPeriodInSeconds * 1000;
-        long holdoffLimit = daq.getLastUpdate() - holdoffPeriodInSeconds * 1000;
 
         Triple<Long, Integer, Boolean> reference = timeWindow.stream().filter(e -> e.getLeft() >= startTimestampOfSlidingWindow).findFirst().orElse(null);
 
@@ -69,13 +67,9 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         timeWindow.add(Triple.of(daq.getLastUpdate(), currentCrashes, result));
 
         // update the sliding window - keep as less data as possible for next iteration
-        timeWindow = timeWindow.stream().filter(e -> e.getLeft() >= Math.min(startTimestampOfSlidingWindow, holdoffLimit)).collect(Collectors.toList());
+        timeWindow = timeWindow.stream().filter(e -> e.getLeft() >= startTimestampOfSlidingWindow).collect(Collectors.toList());
 
-        if (!result) {
-            logger.debug("Filtered: " + timeWindow.stream().filter(e -> e.getLeft() > holdoffLimit).collect(Collectors.toList()));
-            return timeWindow.stream().filter(e -> e.getLeft() > holdoffLimit).anyMatch(e -> e.getRight());
-        } else
-            return true;
+        return result;
 
 
     }
@@ -84,7 +78,6 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
     public void parametrize(Properties properties) {
         this.crashesCountThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_THRESHOLD, this.getClass());
         this.slidingWindowPeriodInSeconds = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_TIME_WINDOW, this.getClass());
-        this.holdoffPeriodInSeconds = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_HOLDOFF, this.getClass());
 
         this.description = "CMSSW crashes frequently, there are {{CRASHES}}, which exceeds the threshold of " + crashesCountThreshold + " crashes per " + slidingWindowPeriodInSeconds + "s";
 

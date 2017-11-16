@@ -36,7 +36,6 @@ public class CmsswCrashesTest {
         Properties config = new Properties();
         config.put(Setting.EXPERT_CMSSW_CRASHES_THRESHOLD.getKey(), "20");
         config.put(Setting.EXPERT_CMSSW_CRASHES_TIME_WINDOW.getKey(), "20");
-        config.put(Setting.EXPERT_CMSSW_CRASHES_HOLDOFF.getKey(), "30");
         module.parametrize(config);
     }
 
@@ -58,15 +57,6 @@ public class CmsswCrashesTest {
     }
 
     @Test
-    public void holdoffOverrunTest() throws URISyntaxException {
-
-        Assert.assertFalse(module.satisfied(mockTestObject(0, 10), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(19, 119), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(20, 121), results));
-
-    }
-
-    @Test
     public void slidingWindowThresholdNonOverrunTest() throws URISyntaxException {
 
         Assert.assertFalse(module.satisfied(mockTestObject(0, 10), results));
@@ -82,25 +72,6 @@ public class CmsswCrashesTest {
         Assert.assertFalse(module.satisfied(mockTestObject(15, 20), results));
         Assert.assertFalse(module.satisfied(mockTestObject(30, 30), results));
         Assert.assertTrue(module.satisfied(mockTestObject(35, 40), results));
-
-    }
-
-    @Test
-    public void holdoffFadesOverrunTest() throws URISyntaxException {
-
-        Assert.assertFalse(module.satisfied(mockTestObject(10, 10), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(20, 10), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(30, 20), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(40, 30), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(50, 45), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(60, 60), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(70, 70), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(80, 80), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(90, 85), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(100, 90), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(110, 95), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(120, 100), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(130, 105), results));
 
     }
 

@@ -15,7 +15,6 @@ public enum Setting {
 	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
 	EXPERT_CMSSW_CRASHES_THRESHOLD("expert.cmssw.crashes.increase"),
 	EXPERT_CMSSW_CRASHES_TIME_WINDOW("expert.cmssw.crashes.timewindow.seconds"),
-	EXPERT_CMSSW_CRASHES_HOLDOFF("expert.cmssw.crashes.holdoff.seconds"),
 
 	EXPERT_LOGIC_DEADTIME_THESHOLD_FED("expert.logic.deadtime.threshold.fed"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION("expert.logic.deadtime.threshold.partition"),

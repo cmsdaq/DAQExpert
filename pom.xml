@@ -31,6 +31,7 @@
 	</properties>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -198,6 +199,7 @@
 			<artifactId>mockserver-netty</artifactId>
 			<version>3.10.4</version>
 			<scope>test</scope>
+
 		</dependency>
 
 		<!-- Testing using mocks -->
@@ -299,13 +301,15 @@
 			<plugin>
 				<groupId>org.mock-server</groupId>
 				<artifactId>mockserver-maven-plugin</artifactId>
-				<version>3.10.4</version>
+				<version>3.10.8</version>
+
 				<configuration>
 					<serverPort>1080</serverPort>
 					<proxyPort>1090</proxyPort>
 					<logLevel>DEBUG</logLevel>
 					<initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>
 				</configuration>
+
 				<executions>
 					<execution>
 						<id>process-test-classes</id>

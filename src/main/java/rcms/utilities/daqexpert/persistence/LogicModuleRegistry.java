@@ -104,10 +104,11 @@ public enum LogicModuleRegistry {
 
 	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               50, 2001),
 	FedDeadtimeDueToDaq				(new FedDeadtimeDueToDaq(),               ConditionGroup.OTHER,   "",                               51, 2002),
+    CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												58,  2012),
 
 
     ;
-	
+
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
 		this(logicModule, group, description, runOrder, 1);
 

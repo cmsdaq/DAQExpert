@@ -13,6 +13,8 @@ public enum Setting {
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
 	EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH("expert.hlt.output.bandwidth.high"),
 	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
+	EXPERT_CMSSW_CRASHES_THRESHOLD("expert.cmssw.crashes.increase"),
+	EXPERT_CMSSW_CRASHES_TIME_WINDOW("expert.cmssw.crashes.timewindow.seconds"),
 
 	/** thresholds for TCDS input rate checks */
 	EXPERT_TCDS_INPUT_RATE_HIGH("expert.tcds.input.rate.high"),

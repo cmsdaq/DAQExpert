@@ -26,7 +26,8 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 	public TTSDeadtime() {
         this.name = "TTS Deadtime";
 		this.priority = ConditionPriority.IMPORTANT;
-		this.action = new SimpleAction("Look at CPM page");
+		this.action = new SimpleAction(
+				"Look at the CPMController page, on the 'Rates and deadtimes' tab, in the 'Latest deadtimes' box to identify the source of the deadtime.");
 
 	}
 

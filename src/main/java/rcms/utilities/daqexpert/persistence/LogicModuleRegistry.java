@@ -29,7 +29,7 @@ public enum LogicModuleRegistry {
 	BeamActive              (new BeamActive(),               ConditionGroup.BEAM_ACTIVE,           "",                                                    3),
 	RunOngoing              (new RunOngoing(),               ConditionGroup.RUN_ONGOING,           "",                                                    4,   100),
 	ExpectedRate            (new ExpectedRate(),             ConditionGroup.EXPECTED_RATE,         "",                                                    5),
-	Transition              (new Transition(),               ConditionGroup.TRANSITION,            "",                                                    6),
+	Transition              (null,               ConditionGroup.TRANSITION,            "",                                                    6),
 	LongTransition          (new LongTransition(),           ConditionGroup.HIDDEN,                "",                                                    7),
 	WarningInSubsystem      (new WarningInSubsystem(),       ConditionGroup.Warning,               "",                                                    8,  1004),
 	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED,       "",                                                    9,  1006),
@@ -97,9 +97,9 @@ public enum LogicModuleRegistry {
 
 	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       59,  3002),
 
-    BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               52, 2000),
-    BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               53, 2001),
-    BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               54, 2002),
+    BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               57, 2000),
+    BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               58, 2001),
+    BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               59, 2002),
 
 
 	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               50, 2001),

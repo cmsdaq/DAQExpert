@@ -9,7 +9,6 @@ import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
@@ -50,7 +49,6 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
 
         Map<String, Boolean> r = new HashMap<>();
         r.put(NoRateWhenExpected.class.getSimpleName(), false);
-        r.put(Transition.class.getSimpleName(), false);
         r.put(ExpectedRate.class.getSimpleName(), true);
         r.put(StableBeams.class.getSimpleName(), true);
         boolean result = module.satisfied(snapshot, r);

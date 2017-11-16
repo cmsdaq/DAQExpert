@@ -1,16 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
@@ -19,24 +11,26 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.BugInFilterfarm;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.HLTProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.LinkProblem;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OnlyFedStoppedSendingData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuck;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaiting;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.RuStuckWaitingOther;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromFerol;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.FedDeadtimeDueToDaq;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWithPi;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author holzner
@@ -226,10 +220,10 @@ public class FlowchartCaseTestBase {
 		// put results of prerequisite tests by hand
 		// (as opposed to get them from a series of snapshots
 		// which introduces a dependency on other tests)
-		results.put("StableBeams", true);
-		results.put("NoRateWhenExpected", true);
-		results.put("Transition", false);
-		results.put("ExpectedRate", true);
+		results.put(StableBeams.class.getSimpleName(), true);
+		results.put(NoRateWhenExpected.class.getSimpleName(), true);
+		results.put(ExpectedRate.class.getSimpleName(), true);
+		results.put(FedDeadtimeDueToDaq.class.getSimpleName(), true);
 
 		}
 

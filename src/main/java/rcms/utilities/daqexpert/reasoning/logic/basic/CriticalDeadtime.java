@@ -31,12 +31,9 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-        boolean transition;
-        boolean expectedRate;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName());
-        transition = results.get(Transition.class.getSimpleName());
+        boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
 
-        if (!(expectedRate && !transition)) {
+        if (!expectedRate) {
             return false;
         }
 

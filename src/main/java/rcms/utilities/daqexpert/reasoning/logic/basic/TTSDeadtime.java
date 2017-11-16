@@ -37,12 +37,9 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-        boolean transition;
         boolean expectedRate;
 		expectedRate = results.get(ExpectedRate.class.getSimpleName());
-        transition = results.get(Transition.class.getSimpleName());
-
-        if (!(expectedRate && !transition)) {
+        if (!expectedRate) {
             return false;
         }
 

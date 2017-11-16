@@ -5,10 +5,17 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
+import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Transition;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
-import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class BackpressureFromHltTest extends FlowchartCaseTestBase {
 
@@ -24,15 +31,30 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         Logger.getLogger(BackpressureFromHlt.class).setLevel(Level.ALL);
         DAQ snapshot = getSnapshot("1506881550007.json.gz");
         assertOnlyOneIsSatisified(backpressureFromHlt, snapshot);
-        Assert.assertEquals("DAQ backpressure coming from Filter Farm. EVM has few (<strong>0</strong> requests, the threshold is <100) requests. Large fraction (<strong>73.6%</strong>, the threshold is >30%) of BUs not enabled",backpressureFromHlt.getDescriptionWithContext());
+        Assert.assertEquals("DAQ backpressure coming from Filter Farm. EVM has few (<strong>0</strong> requests, the threshold is <100) requests. Large fraction (<strong>73.6%</strong>, the threshold is >30%) of BUs not enabled", backpressureFromHlt.getDescriptionWithContext());
     }
-
 
 
     @Test
     public void shouldNotFireTest01() throws URISyntaxException {
-        DAQ snapshot = getSnapshot("1480508609145.json.gz");
+
+        Properties properties = new Properties();
+        properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
+        properties.setProperty(Setting.EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS.getKey(), ".3");
+        properties.setProperty(Setting.EXPERT_LOGIC_EVM_FEW_EVENTS.getKey(), "100");
+
+        BackpressureFromHlt module = new BackpressureFromHlt();
+        module.parametrize(properties);
+        DAQ snapshot = getSnapshot("1480508609145.smile.gz");
         Logger.getLogger(BackpressureFromHlt.class).setLevel(Level.INFO);
-        assertSatisfiedLogicModules(snapshot, unidentified);
+
+        Map<String, Boolean> r = new HashMap<>();
+        r.put(NoRateWhenExpected.class.getSimpleName(), false);
+        r.put(Transition.class.getSimpleName(), false);
+        r.put(ExpectedRate.class.getSimpleName(), true);
+        r.put(StableBeams.class.getSimpleName(), true);
+        boolean result = module.satisfied(snapshot, r);
+        System.out.println(module.getDescriptionWithContext());
+        Assert.assertFalse(result);
     }
 }

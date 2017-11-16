@@ -1,20 +1,25 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.deadtime;
 
+import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable {
 
     private float deadtimeThresholdInPercentage;
     private float backpressureThresholdInPercentage;
+
+    private static final Logger logger = Logger.getLogger(FedDeadtimeDueToDaq.class);
 
     public FedDeadtimeDueToDaq() {
         this.name = "FED deadtime due to DAQ";
@@ -30,19 +35,60 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
         boolean result = false;
 
 
-        for (FED fed : daq.getFeds()) {
-            float deadPercentage = 0;
-            float backpressure = fed.getPercentBackpressure();
-            deadPercentage += fed.getPercentBusy();
-            deadPercentage += fed.getPercentWarning();
+        for (TTCPartition partition : daq.getTtcPartitions()) {
 
-            if (deadPercentage > deadtimeThresholdInPercentage && backpressure > backpressureThresholdInPercentage) {
-                result = true;
-                context.register("FED", fed.getSrcIdExpected());
-                context.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
-                context.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
+            Map<FED, Set<FED>> h = FEDHierarchyRetriever.getFEDHierarchy(partition);
 
+            logger.debug(partition.getName() + " has " + h.entrySet().size() + " FEDs (FED groups)");
+            for (Map.Entry<FED, Set<FED>> fedGroup : h.entrySet()) {
+
+                logger.debug("FED " + fedGroup.getKey());
+
+                float deadPercentage = 0;
+                float backpressure = 0;
+
+                FED topLevelFed = fedGroup.getKey();
+                Set<FED> problematicFedsBehindPseudoFed = null;
+
+                if (fedGroup.getValue()==null || fedGroup.getValue().size() == 0) {
+                    // flat hierarchy
+                    logger.debug("No FED hierachy: " + topLevelFed);
+                    backpressure = topLevelFed.getPercentBackpressure();
+                    deadPercentage += topLevelFed.getPercentBusy();
+                    deadPercentage += topLevelFed.getPercentWarning();
+
+                } else {
+                    logger.debug("A FED hierarchy: " + topLevelFed);
+                    // Exists pseudo feds
+                    deadPercentage += topLevelFed.getPercentBusy();
+                    deadPercentage += topLevelFed.getPercentWarning();
+                    Set<FED> feds = fedGroup.getValue();
+
+                    // get maximum backpressure value
+                    backpressure = feds.stream().max(
+                            Comparator.comparing(FED::getPercentBackpressure)).get().getPercentBackpressure();
+                    problematicFedsBehindPseudoFed = feds.stream().filter(
+                            f -> f.getPercentBackpressure() > backpressureThresholdInPercentage
+                    ).collect(Collectors.toSet());
+                }
+
+
+                if (deadPercentage > deadtimeThresholdInPercentage && backpressure > backpressureThresholdInPercentage) {
+                    result = true;
+
+                    if(problematicFedsBehindPseudoFed == null) {
+                        context.register("FED", topLevelFed.getSrcIdExpected());
+                    } else{
+                        for(FED fed: problematicFedsBehindPseudoFed){
+                            context.register("FED", fed.getSrcIdExpected());
+                        }
+                    }
+                    context.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
+                    context.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
+
+                }
             }
+
 
         }
         return result;

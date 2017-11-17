@@ -86,6 +86,7 @@ public class FlowchartCaseTestBase {
 
 		Properties properties = new Properties();
 		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(),"2");
+		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(),"2");
 		properties.setProperty(Setting.EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS.getKey(),".3");
 		properties.setProperty(Setting.EXPERT_LOGIC_EVM_FEW_EVENTS.getKey(),"100");
 
@@ -126,12 +127,17 @@ public class FlowchartCaseTestBase {
 
 		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
 			if (lm.getLogicModule() != null && lm.getLogicModule() instanceof KnownFailure) {
-				logicModules.add(lm.getLogicModule().getClass().getSimpleName());
+				//logicModules.add(lm.getLogicModule().getClass().getSimpleName());
 			}
 
 		}
 
 		for(LogicModule lm: allLMsUnderTest){
+
+			if(lm!= null &&!( lm instanceof UnidentifiedFailure)){
+				logicModules.add(lm.getClass().getSimpleName());
+			}
+
 			if (lm != null && lm instanceof Parameterizable) {
 				((Parameterizable) lm).parametrize(properties);
 			}
@@ -239,6 +245,10 @@ public class FlowchartCaseTestBase {
 		File file = new File(url.toURI());
 
 		return serializer.deserialize(file.getAbsolutePath());
+	}
+
+	public void print(KnownFailure lm){
+		System.out.println(">"+lm.getName() + ": \n>" + lm.getDescriptionWithContext());
 	}
 
 }

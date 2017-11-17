@@ -7,6 +7,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
+import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
@@ -41,18 +42,25 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         properties.setProperty(Setting.EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS.getKey(), ".3");
         properties.setProperty(Setting.EXPERT_LOGIC_EVM_FEW_EVENTS.getKey(), "100");
+        properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
 
-        BackpressureFromHlt module = new BackpressureFromHlt();
-        module.parametrize(properties);
         DAQ snapshot = getSnapshot("1480508609145.smile.gz");
         Logger.getLogger(BackpressureFromHlt.class).setLevel(Level.INFO);
 
         Map<String, Boolean> r = new HashMap<>();
-        r.put(NoRateWhenExpected.class.getSimpleName(), false);
-        r.put(ExpectedRate.class.getSimpleName(), true);
         r.put(StableBeams.class.getSimpleName(), true);
-        boolean result = module.satisfied(snapshot, r);
-        System.out.println(module.getDescriptionWithContext());
-        Assert.assertFalse(result);
+        r.put(ExpectedRate.class.getSimpleName(),true);
+        r.put(FEDDeadtime.class.getSimpleName(),true);
+
+
+        FedDeadtimeDueToDaq fd = new FedDeadtimeDueToDaq();
+        fd.parametrize(properties);
+        Assert.assertFalse(fd.satisfied(snapshot,r));
+
+        r.put(FedDeadtimeDueToDaq.class.getSimpleName(), false);
+
+        BackpressureFromHlt module = new BackpressureFromHlt();
+        module.parametrize(properties);
+        Assert.assertFalse(module.satisfied(snapshot, r));
     }
 }

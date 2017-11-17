@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 public class HLTProblemTest extends FlowchartCaseTestBase {
 
@@ -18,9 +19,10 @@ public class HLTProblemTest extends FlowchartCaseTestBase {
 		
 		DAQ snapshot = getSnapshot("1505394430084.json.gz");
 
-		// ensure that only HLTProblem fires
-		assertOnlyOneIsSatisified(b2, snapshot);
 
+		// Discussed issue #165, case 2
+		assertSatisfiedLogicModules(snapshot, b2, backpressureFromHlt);
 	}
+
 
 }

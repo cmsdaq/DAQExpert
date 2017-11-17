@@ -75,7 +75,7 @@ public enum LogicModuleRegistry {
 	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10010),
 	RuStuckWaitingOther		(new RuStuckWaitingOther(),		 ConditionGroup.FLOWCHART,             "",                                                   40, 10010),
 	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   41, 10010),
-	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 10010),
+	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 101),
 	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   43, 10010),
 	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
 	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
@@ -87,7 +87,7 @@ public enum LogicModuleRegistry {
     LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
 
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   			48,   106),
-	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49),
+	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49, 102),
 
 	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		57,  2000),
 	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												58,  2001),

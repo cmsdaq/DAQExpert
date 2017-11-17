@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -12,12 +13,12 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 public class BugInFilterfarm extends BackpressureAnalyzer {
 
 	public BugInFilterfarm() {
-		this.name = "Bug in filterfarm";
+		this.name = "Problem in filterfarm";
 
-		this.description = "No requests on RUs and exists Bus which are not Blocked or Cloud"
+		this.description = "No requests on RUs and all BUs are in other states than enabled. There are no crashes of HLT processes."
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
-		this.action = null;
+		this.action = new SimpleAction("Call the DAQ on-call.");
 
 	}
 

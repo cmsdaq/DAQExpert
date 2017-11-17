@@ -22,11 +22,14 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
     private static Integer fedBackpressureThreshold;
     private Integer evmFewRequestsThreshold;
+    private Integer deadtimeThresholdInPercentage;
 
     public BackpressureFromEventBuilding() {
         this.name = "Backpressure from Event Builder";
 
-        this.description = "Backpressure from Event Building (i.e. not from HLT)";
+        this.description = "Backpressure from Event Building (i.e. not from HLT). " +
+                "Exists FEDBuilders with backpressure to FEDs ({{P}}) and 0 requests on RU, 256 fragments in RU. " +
+                "EVM has few ({{EVM-REQUESTS}}, the threshold is <100) requests. All BUs are enabled.";
 
         this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
 
@@ -59,14 +62,18 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                     //TODO: LATER: looking at dead time of FED. need to take into account FED - pseudoFED relationship.
                     if (!fed.isFrlMasked()) {
 
-                        float backpressure = fed.getPercentBackpressure();
-                        if (backpressure > fedBackpressureThreshold) {
+                        //TODO: use the result of other LMs instead of repeating the job
+                        if(fed.getPercentWarning() + fed.getPercentBusy() > deadtimeThresholdInPercentage) {
 
-                            logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
-                            context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                            context.registerForStatistics("BACKPRESSURE", backpressure);
-                            problematicFeds.add(fed);
-                            foundProblematicFeds = true;
+                            float backpressure = fed.getPercentBackpressure();
+                            if (backpressure > fedBackpressureThreshold) {
+
+                                logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
+                                context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                                context.registerForStatistics("BACKPRESSURE", backpressure);
+                                problematicFeds.add(fed);
+                                foundProblematicFeds = true;
+                            }
                         }
 
                     }
@@ -87,6 +94,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
         for(RU ru : daq.getRus()){
             if(ru.isEVM() && ru.getRequests() < evmFewRequestsThreshold){
                 logger.trace("EVM has: " + ru.getRequests() + " requests");
+                context.registerForStatistics("EVM-REQUESTS", ru.getRequests());
                 evmFewRequests = true;
             }
         }
@@ -109,6 +117,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
     @Override
     public void parametrize(Properties properties) {
+        this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.fedBackpressureThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
         this.evmFewRequestsThreshold = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_LOGIC_EVM_FEW_EVENTS, this.getClass());
     }

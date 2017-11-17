@@ -89,22 +89,22 @@ public enum LogicModuleRegistry {
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   			48,   106),
 	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49),
 
-	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		55,  2000),
-	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												56,  2001),
+	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		57,  2000),
+	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												58,  2001),
 
-	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       57,  3000),
-	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       58,  3001),
+	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       59,  3000),
+	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       60,  3001),
 
-	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       59,  3002),
+	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       51,  3002),
 
-    BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               57, 2000),
-    BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               58, 2001),
-    BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               59, 2002),
+    BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               54, 2000),
+    BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               55, 2001),
+    BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               56, 2002),
 
 
-	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               50, 2001),
-	FedDeadtimeDueToDaq				(new FedDeadtimeDueToDaq(),               ConditionGroup.OTHER,   "",                               51, 2002),
-    CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												58,  2012),
+	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               52, 2001),
+	FedDeadtimeDueToDaq				(new FedDeadtimeDueToDaq(),               ConditionGroup.OTHER,   "",                               53, 2002),
+    CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												61,  2012),
 
 
     ;

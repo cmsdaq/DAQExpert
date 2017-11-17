@@ -100,18 +100,17 @@ public class JobManagerIT {
 			}
 
 		}
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("No rate when expected"))));
+		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Dataflow stuck"))));
 		assertThat(result,
 				not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Corrupted data received")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition problem")))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition disconnected")))));
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FED stuck"))));
 
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Too high HLT output bandwidth"))));
 
 		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
-				"TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING"))));
+				"TTCP <strong>TIBTID</strong> of <strong>TRACKER</strong> subsystem is blocking trigger, it's in <strong>WARNING</strong> TTS state, The problem is caused by FED <strong>101</strong> in <strong>WARNING</strong>"))));
 		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
 
         System.out.println(result.toString());

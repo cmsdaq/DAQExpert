@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.HltInfo;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 /**
  * Test for class HltCpuLoad
@@ -36,6 +37,7 @@ public class HltCpuLoadTest {
 
 		// needed for assigning priorities
 		results.put(StableBeams.class.getSimpleName(), true);
+		results.put(BackpressureFromHlt.class.getSimpleName(), true);
 
 		// ensure that the RateTooHighTest module fires
 		HltCpuLoad module = makeInstance();

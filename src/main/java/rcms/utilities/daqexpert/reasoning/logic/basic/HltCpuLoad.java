@@ -8,6 +8,7 @@ import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 /**
  * Logic module identifying high HLT cpu load.
@@ -17,6 +18,8 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	private static final Logger logger = Logger.getLogger(HltCpuLoad.class);
 
 	private Float maxCpuLoad;
+
+	private String additionalNote = "Note that there is also backpressure from HLT.";
 
 	public HltCpuLoad() {
 		this.name = "HLT CPU load";
@@ -40,12 +43,20 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 			return false;
 		}
 
+		boolean result = false;
 		if (cpuLoad > maxCpuLoad) {
 			context.registerForStatistics("HLT_CPU_LOAD", cpuLoad * 100, " %", 1);
-			return true;
-		} else {
-			return false;
+			result =  true;
 		}
+
+		if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+			//mention the fact that some modules are active
+			context.registerConditionalNote("NOTE", additionalNote);
+		} else{
+			context.unregisterConditionalNote("NOTE");
+		}
+
+		return result;
 
 	}
 

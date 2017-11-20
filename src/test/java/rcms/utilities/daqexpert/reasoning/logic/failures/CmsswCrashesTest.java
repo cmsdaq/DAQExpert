@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.HltInfo;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class CmsswCrashesTest {
         Logger.getLogger(CmsswCrashes.class).setLevel(Level.INFO);
         results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), true);
+        results.put(BackpressureFromHlt.class.getSimpleName(), true);
         module = new CmsswCrashes();
 
         // mock parameters

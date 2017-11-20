@@ -42,6 +42,9 @@ public enum Setting {
 	EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS("expert.logic.backpressurefromhlt.bus.enabled.threshold.fraction"),
 	EXPERT_LOGIC_EVM_FEW_EVENTS("expert.logic.evm.requests.few.max"),
 
+	/** threshold (range 0..1) above which the HLT CPU load is considered to be high */
+	EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD("expert.logic.hlt.cpu.load.threshold"),
+	
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),

@@ -6,10 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
@@ -51,13 +48,19 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         r.put(StableBeams.class.getSimpleName(), true);
         r.put(ExpectedRate.class.getSimpleName(),true);
         r.put(FEDDeadtime.class.getSimpleName(),true);
+        r.put(TTSDeadtime.class.getSimpleName(),true);
 
 
         FedDeadtimeDueToDaq fd = new FedDeadtimeDueToDaq();
         fd.parametrize(properties);
         Assert.assertFalse(fd.satisfied(snapshot,r));
-
         r.put(FedDeadtimeDueToDaq.class.getSimpleName(), false);
+
+        TmpUpgradedFedProblem tfd = new TmpUpgradedFedProblem();
+        tfd.parametrize(properties);
+        Assert.assertFalse(tfd.satisfied(snapshot,r));
+        r.put(TmpUpgradedFedProblem.class.getSimpleName(), false);
+
 
         BackpressureFromHlt module = new BackpressureFromHlt();
         module.parametrize(properties);

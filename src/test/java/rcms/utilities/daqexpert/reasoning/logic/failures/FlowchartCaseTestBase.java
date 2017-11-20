@@ -11,10 +11,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;
-import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
-import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromFerol;
@@ -230,6 +227,7 @@ public class FlowchartCaseTestBase {
 		results.put(NoRateWhenExpected.class.getSimpleName(), true);
 		results.put(ExpectedRate.class.getSimpleName(), true);
 		results.put(FedDeadtimeDueToDaq.class.getSimpleName(), true);
+		results.put(TmpUpgradedFedProblem.class.getSimpleName(), true);
 
 		}
 

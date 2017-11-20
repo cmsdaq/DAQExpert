@@ -8,6 +8,7 @@ import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.basic.TmpUpgradedFedProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 import java.util.*;
@@ -38,56 +39,59 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
     public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
         boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
+        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName());
 
-        if (!fedDeadtimeDueToDAQ) {
+
+        if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
+
+            assignPriority(results);
+            boolean result = false;
+
+            Iterator<RU> i = daq.getRus().iterator();
+            Set<RU> problematicRus = new HashSet<>();
+            Set<FED> problematicFeds = new HashSet<>();
+            while (i.hasNext()) {
+                RU ru = i.next();
+                if (ru.getRequests() > 0 && ru.getFragmentsInRU() < 256) {
+
+                    boolean foundProblematicFeds = false;
+                    for (FED fed : ru.getFEDs(false)) {
+
+
+                        //TODO: Later also check if the FED (or its pseudo-FED) has dead time above a threshold.
+                        if (!fed.isFrlMasked()) {
+
+                            float backpressure = fed.getPercentBackpressure();
+                            if (backpressure > fedBackpressureThreshold) {
+
+                                logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
+                                context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                                context.registerForStatistics("BACKPRESSURE", backpressure);
+                                problematicFeds.add(fed);
+                                foundProblematicFeds = true;
+                            }
+
+                        }
+                    }
+                    if (foundProblematicFeds) {
+                        context.register("PROBLEMATIC-RU", ru.getHostname());
+                        logger.debug("Found problematic RU: " + ru.getHostname());
+                        problematicRus.add(ru);
+                    }
+
+
+                }
+            }
+
+
+            if (problematicFeds.size() > 0 && problematicRus.size() > 0) {
+                result = true;
+            }
+
+            return result;
+        }else {
             return false;
         }
-
-        assignPriority(results);
-        boolean result = false;
-
-        Iterator<RU> i = daq.getRus().iterator();
-        Set<RU> problematicRus = new HashSet<>();
-        Set<FED> problematicFeds = new HashSet<>();
-        while (i.hasNext()) {
-            RU ru = i.next();
-            if (ru.getRequests() > 0 && ru.getFragmentsInRU() < 256) {
-
-                boolean foundProblematicFeds = false;
-                for (FED fed : ru.getFEDs(false)) {
-
-
-                    //TODO: Later also check if the FED (or its pseudo-FED) has dead time above a threshold.
-                    if (!fed.isFrlMasked()) {
-
-                        float backpressure = fed.getPercentBackpressure();
-                        if (backpressure > fedBackpressureThreshold) {
-
-                            logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
-                            context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                            context.registerForStatistics("BACKPRESSURE", backpressure);
-                            problematicFeds.add(fed);
-                            foundProblematicFeds = true;
-                        }
-
-                    }
-                }
-                if (foundProblematicFeds) {
-                    context.register("PROBLEMATIC-RU", ru.getHostname());
-                    logger.debug("Found problematic RU: " + ru.getHostname());
-                    problematicRus.add(ru);
-                }
-
-
-            }
-        }
-
-
-        if (problematicFeds.size() > 0 && problematicRus.size() > 0) {
-            result = true;
-        }
-
-        return result;
     }
 
     @Override

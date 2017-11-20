@@ -9,6 +9,7 @@ import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.basic.TmpUpgradedFedProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
 import java.util.*;
@@ -35,72 +36,76 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
     public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
         boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
+        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName());
 
-        if (!fedDeadtimeDueToDAQ) {
+
+        if (fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
+
+            assignPriority(results);
+            boolean result = false;
+
+
+            Set<RU> rusToCheck = new HashSet<>();
+            Set<RU> problematicRus = new HashSet<>();
+            Set<FED> problematicFeds = new HashSet<>();
+            boolean evmFewRequests = false;
+            boolean allBusEnabled = true;
+            Iterator<FED> i = daq.getFeds().iterator();
+
+            while (i.hasNext()) {
+                FED fed = i.next();
+                if (!fed.isFrlMasked()) {
+                    float backpressure = fed.getPercentBackpressure();
+
+                    if (backpressure > fedBackpressureThreshold) {
+                        logger.trace("Found problematic FED: " + fed.getSrcIdExpected());
+                        problematicFeds.add(fed);
+                        context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                        context.registerForStatistics("BACKPRESSURE", backpressure);
+                        rusToCheck.add(fed.getRu());
+                    }
+                }
+            }
+
+            if (rusToCheck.size() > 0) {
+                for (RU ru : rusToCheck) {
+                    if (ru.getRequests() == 0 && ru.getFragmentsInRU() == 256) {
+                        logger.trace("Found problematic RU: " + ru.getHostname());
+                        context.register("PROBLEMATIC-RU", ru.getHostname());
+                        problematicRus.add(ru);
+                    }
+                }
+            }
+
+            for (RU ru : daq.getRus()) {
+                if (ru.isEVM() && ru.getRequests() < evmRequestsThreshold) {
+                    logger.trace("EVM has: " + ru.getRequests() + " requests");
+                    context.registerForStatistics("EVMREQUESTS", ru.getRequests(), "", 1);
+                    evmFewRequests = true;
+                }
+            }
+
+
+            int enabledBus = 0;
+            int allBus = daq.getBus().size();
+            for (BU bu : daq.getBus()) {
+                logger.trace("Bu state: " + bu.getStateName());
+                if ("Enabled".equalsIgnoreCase(bu.getStateName())) {
+                    enabledBus++;
+                }
+            }
+            float fractionNotEnabled = ((float) (allBus - enabledBus)) / allBus;
+
+            if (evmFewRequests && fractionNotEnabled > fractionBusEnabledThreshold) {
+                context.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);
+                result = true;
+            }
+
+            return result;
+        } else {
             return false;
         }
 
-        assignPriority(results);
-        boolean result = false;
-
-
-        Set<RU> rusToCheck = new HashSet<>();
-        Set<RU> problematicRus = new HashSet<>();
-        Set<FED> problematicFeds = new HashSet<>();
-        boolean evmFewRequests = false;
-        boolean allBusEnabled = true;
-        Iterator<FED> i = daq.getFeds().iterator();
-
-        while (i.hasNext()) {
-            FED fed = i.next();
-            if (!fed.isFrlMasked()) {
-                float backpressure = fed.getPercentBackpressure();
-
-                if (backpressure > fedBackpressureThreshold) {
-                    logger.trace("Found problematic FED: " + fed.getSrcIdExpected());
-                    problematicFeds.add(fed);
-                    context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                    context.registerForStatistics("BACKPRESSURE", backpressure);
-                    rusToCheck.add(fed.getRu());
-                }
-            }
-        }
-
-        if (rusToCheck.size() > 0) {
-            for (RU ru : rusToCheck) {
-                if (ru.getRequests() == 0 && ru.getFragmentsInRU() == 256) {
-                    logger.trace("Found problematic RU: " + ru.getHostname());
-                    context.register("PROBLEMATIC-RU", ru.getHostname());
-                    problematicRus.add(ru);
-                }
-            }
-        }
-
-        for (RU ru : daq.getRus()) {
-            if (ru.isEVM() && ru.getRequests() < evmRequestsThreshold) {
-                logger.trace("EVM has: " + ru.getRequests() + " requests");
-                context.registerForStatistics("EVMREQUESTS", ru.getRequests(), "", 1);
-                evmFewRequests = true;
-            }
-        }
-
-
-        int enabledBus = 0;
-        int allBus = daq.getBus().size();
-        for (BU bu : daq.getBus()) {
-            logger.trace("Bu state: " + bu.getStateName());
-            if ("Enabled".equalsIgnoreCase(bu.getStateName())) {
-                enabledBus++;
-            }
-        }
-        float fractionNotEnabled = ((float) (allBus - enabledBus)) / allBus;
-
-        if (evmFewRequests && fractionNotEnabled > fractionBusEnabledThreshold) {
-            context.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);
-            result = true;
-        }
-
-        return result;
     }
 
     @Override

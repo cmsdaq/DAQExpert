@@ -71,8 +71,8 @@ public class JobManagerIT {
 	@Test
 	public void test() throws InterruptedException {
 
-		String startDateString = "2016-11-30T11:00:20Z";
-		String endDateString = "2016-11-30T14:00:30Z";
+		String startDateString = "2016-11-30T12:19:20Z";
+		String endDateString = "2016-11-30T12:27:30Z";
 
 		Application.initialize("src/test/resources/integration.properties");
 		HttpClient client = HttpClientBuilder.create().build();
@@ -91,7 +91,7 @@ public class JobManagerIT {
 		List<Condition> result = null;
 
 		int retries = 15;
-		int expectedResult = 61;
+		int expectedResult = 58; // short entries based on 1 snapshot that are displayed as filtered included
 		for (int i = 0; i < retries; i++) {
 			if (result == null || result.size() != expectedResult) {
 				Thread.sleep(1000);
@@ -116,27 +116,30 @@ public class JobManagerIT {
         System.out.println(result.toString());
         assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
                 "Deadtime is <strong>(<sub><sup> last: </sup></sub>100%, <sub><sup> avg: </sup></sub>98.8%, <sub><sup> min: </sup></sub>79.2%, <sub><sup> max: </sup></sub>100%)</strong>, the threshold is 5.0%"))));
-		assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
-				"Deadtime is <strong>6.3%</strong>, the threshold is 5.0%"))));
 
-
-		Assert.assertEquals(expectedResult, result.size());
+		int visibleConditions = 0;
+		for(Condition a: result){
+			if(a.isShow()){
+				visibleConditions++;
+			}
+		}
+		Assert.assertEquals(expectedResult, visibleConditions);
 
 		/* Verify Raw data produced in DB */
 		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
 				DataResolution.Full);
-		Assert.assertEquals(482, rawResult.size());
+		Assert.assertEquals(136, rawResult.size());
 
 		/* Verify generation of notifaications */
 		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
 		// verify 49 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(57)));
+		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(41)));
 
 		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: FED stuck")))));
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: Deadtime")))));
 		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: FED stuck")))));
+				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Deadtime")))));
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
 

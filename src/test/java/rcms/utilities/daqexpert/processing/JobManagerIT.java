@@ -1,291 +1,359 @@
 package rcms.utilities.daqexpert.processing;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.argThat;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.matchers.Times.exactly;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.model.Delay;
 import org.mockserver.model.Header;
-
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
+
+import javax.xml.bind.DatatypeConverter;
+import java.util.*;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.argThat;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.exactly;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 public class JobManagerIT {
 
-	@BeforeClass
-	public static void prepareNMStub() {
-		MockServerClient mockServer = startClientAndServer(18081);
-		mockServer.when(request().withMethod("POST").withPath("/nm/rest/events/"), exactly(1))
-				.respond(
-						response().withStatusCode(201)
-								.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
-										new Header("Cache-Control", "public, max-age=86400"))
-								.withDelay(new Delay(SECONDS, 1)));
+    private static final Logger logger = Logger.getLogger(JobManagerIT.class);
+    private List<Condition> conditionsYielded;
+    private EventSender eventSender;
 
-	}
+    @BeforeClass
+    public static void prepareNMStub() {
+        MockServerClient mockServer = startClientAndServer(18081);
+        mockServer.when(request().withMethod("POST").withPath("/nm/rest/events/"), exactly(1))
+                .respond(
+                        response().withStatusCode(201)
+                                .withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+                                        new Header("Cache-Control", "public, max-age=86400"))
+                                .withDelay(new Delay(SECONDS, 1)));
 
-	private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
-			throws InterruptedException {
+        ConditionProducer.enableMarkup = false;
 
-		Application.get().getProp().setProperty("processing.start", startDateString);
-		Application.get().getProp().setProperty("processing.end", endDateString);
-		DataManager dataManager = new DataManager();
-		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-		JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
-		jobManager.startJobs();
-		Thread.sleep(1000);
-	}
+    }
 
     /**
      * Note that in this test period there was bug in DAQAggregator.
      * The output bandwidth in BUSummary object was not flushed between snapshots.
      * This results in HLTOutputBandwidthExtreme and HLTOutputBandwidthTooHigh being fired in this test scenario.
      */
-	@Test
-	public void test() throws InterruptedException {
+    @Test
+    public void blackboxTest1() throws InterruptedException {
 
-		String startDateString = "2016-11-30T12:19:20Z";
-		String endDateString = "2016-11-30T12:27:30Z";
+        String startDateString = "2016-11-30T12:19:20Z";
+        String endDateString = "2016-11-30T12:27:30Z";
 
-		Application.initialize("src/test/resources/integration.properties");
-		HttpClient client = HttpClientBuilder.create().build();
 
-		EventSender eventSender = Mockito
-				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+        Set<String> expectedConditions = new HashSet<>();
+        expectedConditions.add("Dataflow stuck");
+        expectedConditions.add("FED stuck");
+        expectedConditions.add("Too high HLT output bandwidth");
+        expectedConditions.add("FED problem");
 
-		runOverTestPeriod(startDateString, endDateString, eventSender);
+        Set<String> expectedNotifications = new HashSet<>();
+        expectedNotifications.add("TCDS State: Running");
+        expectedNotifications.add("Started: FED stuck");
+        expectedNotifications.add("Ended: FED stuck");
 
-		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
-		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+        Set<String> expectedConditionDescriptions = new HashSet<>();
+        expectedConditionDescriptions.add("TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING");
+        expectedConditionDescriptions.add("Deadtime is ( last: 100%,  avg: 98.8%,  min: 79.2%,  max: 100%), the threshold is 5.0%");
+
+
+        runForBlackboxTest(startDateString, endDateString);
+        assertExpectedConditions(expectedConditions);
+        assertExpectedNotifications(expectedNotifications);
+        assertExpectedConditionDescriptions(expectedConditionDescriptions);
+    }
+
+    @Test
+    @Ignore
+    public void test2() throws InterruptedException {
+
+        String startDateString = "2017-06-12T09:15:00Z";
+        String endDateString = "2017-06-12T09:45:00Z";
+
+        Application.initialize("src/test/resources/integration.properties");
+        HttpClient client = HttpClientBuilder.create().build();
+
+        EventSender eventSender = Mockito
+                .spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+
+        runOverTestPeriod(startDateString, endDateString, eventSender);
+
+        Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
+        Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
 
 		/* Verify Conditions produced in DB */
-		long durationThreshold = 0;
-		boolean includeTinyEntriesMask = false;
-		List<Condition> result = null;
+        long durationThreshold = 0;
+        boolean includeTinyEntriesMask = false;
+        List<Condition> result = null;
 
-		int retries = 15;
-		int expectedResult = 58; // short entries based on 1 snapshot that are displayed as filtered included
-		for (int i = 0; i < retries; i++) {
-			if (result == null || result.size() != expectedResult) {
-				Thread.sleep(1000);
-				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
-						includeTinyEntriesMask);
-			}
+        int retries = 10;
+        int expectedResult = 63;
+        for (int i = 0; i < retries; i++) {
+            if (result == null || result.size() != expectedResult) {
+                Thread.sleep(1000);
+                result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+                        includeTinyEntriesMask);
+            }
 
-		}
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Dataflow stuck"))));
-		assertThat(result,
-				not(hasItem(Matchers.<Condition> hasProperty("title", is("Out of sequence data received")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Corrupted data received")))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Partition disconnected")))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FED stuck"))));
+        }
+        Assert.assertEquals(expectedResult, result.size());
 
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Too high HLT output bandwidth"))));
-
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
-				"TTCP <strong>TIBTID</strong> of <strong>TRACKER</strong> subsystem is blocking trigger, it's in <strong>WARNING</strong> TTS state, The problem is caused by FED <strong>101</strong> in <strong>WARNING</strong>"))));
-		assertThat(result, not(hasItem(Matchers.<Condition> hasProperty("title", is("Backpressure detected")))));
-
-        System.out.println(result.toString());
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Continous fixing-soft-error"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("FixingSoftError"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Running"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Run ongoing"))));
         assertThat(result, hasItem(Matchers.<Condition>hasProperty("description", is(
-                "Deadtime is <strong>(<sub><sup> last: </sup></sub>100%, <sub><sup> avg: </sup></sub>98.8%, <sub><sup> min: </sup></sub>79.2%, <sub><sup> max: </sup></sub>100%)</strong>, the threshold is 5.0%"))));
-
-		int visibleConditions = 0;
-		for(Condition a: result){
-			if(a.isShow()){
-				visibleConditions++;
-			}
-		}
-		Assert.assertEquals(expectedResult, visibleConditions);
+                "Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [\"ES 1 time(s)\",\"TRACKER 4 time(s)\"]"))));
 
 		/* Verify Raw data produced in DB */
-		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
-				DataResolution.Full);
-		Assert.assertEquals(136, rawResult.size());
+        List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
+                DataResolution.Full);
+        Assert.assertEquals(208, rawResult.size());
 
 		/* Verify generation of notifaications */
-		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+        Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
-		// verify 49 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(41)));
+        // verify 42 events if mature-event-collector is used
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(42)));
 
-		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Started: Deadtime")))));
-		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Deadtime")))));
-		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("TCDS State: Running")))));
+        // verify 43 events if regular event-collector is used
+        // Mockito.verify(eventSender).sendBatchEvents((List)
+        // argThat(IsCollectionWithSize.hasSize(43)));
 
-	}
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Started: Continous fixing-soft-error")))));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Ended: Continous fixing-soft-error")))));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Level Zero State: FixingSoftError")))));
+        Mockito.verify(eventSender).sendBatchEvents(
+                (List) argThat(hasItem(Matchers.<Condition>hasProperty("title", is("Level Zero State: Running")))));
 
-	@Test
-	@Ignore
-	public void test2() throws InterruptedException {
+    }
 
-		String startDateString = "2017-06-12T09:15:00Z";
-		String endDateString = "2017-06-12T09:45:00Z";
+    @Test
+    @Ignore
+    public void test3() throws InterruptedException {
 
-		Application.initialize("src/test/resources/integration.properties");
-		HttpClient client = HttpClientBuilder.create().build();
+        String startDateString = "2017-06-02T21:15:00Z";
+        String endDateString = "2017-06-02T21:30:00Z";
 
-		EventSender eventSender = Mockito
-				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+        Application.initialize("src/test/resources/integration.properties");
+        HttpClient client = HttpClientBuilder.create().build();
 
-		runOverTestPeriod(startDateString, endDateString, eventSender);
+        EventSender eventSender = Mockito
+                .spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
 
-		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
-		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+        runOverTestPeriod(startDateString, endDateString, eventSender);
+
+        Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
+        Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
 
 		/* Verify Conditions produced in DB */
-		long durationThreshold = 0;
-		boolean includeTinyEntriesMask = false;
-		List<Condition> result = null;
+        long durationThreshold = 0;
+        boolean includeTinyEntriesMask = false;
+        List<Condition> result = null;
 
-		int retries = 10;
-		int expectedResult = 63;
-		for (int i = 0; i < retries; i++) {
-			if (result == null || result.size() != expectedResult) {
-				Thread.sleep(1000);
-				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
-						includeTinyEntriesMask);
-			}
+        int retries = 10;
+        int expectedResult = 45;
+        for (int i = 0; i < retries; i++) {
+            if (result == null || result.size() != expectedResult) {
+                Thread.sleep(1000);
+                result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+                        includeTinyEntriesMask);
+            }
 
-		}
-		Assert.assertEquals(expectedResult, result.size());
+        }
+        Assert.assertEquals(expectedResult, result.size());
 
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Continous fixing-soft-error"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FixingSoftError"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Running"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Run ongoing"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description", is(
-				"Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [\"ES 1 time(s)\",\"TRACKER 4 time(s)\"]"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Stuck after fixing-soft-error"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("description",
+                is("Level zero is stuck after fixing soft error. This is caused by subsystem(s) ES"))));
+
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Lengthy fixing-soft-error"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("description",
+                is("Level zero in FixingSoftError longer than 30 sec. This is caused by subsystem(s) ES"))));
+
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("FixingSoftError"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Running"))));
+        assertThat(result, hasItem(Matchers.<Condition>hasProperty("title", is("Run ongoing"))));
 
 		/* Verify Raw data produced in DB */
-		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
-				DataResolution.Full);
-		Assert.assertEquals(208, rawResult.size());
+        List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
+                DataResolution.Full);
+        Assert.assertEquals(634, rawResult.size());
 
 		/* Verify generation of notifaications */
-		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+        Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
-		// verify 42 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(42)));
+        // verify 41 events if mature-event-collector is used
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(41)));
 
-		// verify 43 events if regular event-collector is used
-		// Mockito.verify(eventSender).sendBatchEvents((List)
-		// argThat(IsCollectionWithSize.hasSize(43)));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Started: Stuck after fixing-soft-error")))));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Ended: Stuck after fixing-soft-error")))));
 
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Started: Continous fixing-soft-error")))));
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Continous fixing-soft-error")))));
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: FixingSoftError")))));
-		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: Running")))));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Started: Lengthy fixing-soft-error")))));
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Ended: Lengthy fixing-soft-error")))));
 
-	}
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(
+                hasItem(Matchers.<Condition>hasProperty("title", is("Level Zero State: FixingSoftError")))));
+        Mockito.verify(eventSender).sendBatchEvents(
+                (List) argThat(hasItem(Matchers.<Condition>hasProperty("title", is("Level Zero State: Running")))));
 
-	@Test
-	@Ignore
-	public void test3() throws InterruptedException {
+    }
 
-		String startDateString = "2017-06-02T21:15:00Z";
-		String endDateString = "2017-06-02T21:30:00Z";
+    private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
+            throws InterruptedException {
 
-		Application.initialize("src/test/resources/integration.properties");
-		HttpClient client = HttpClientBuilder.create().build();
+        Application.get().getProp().setProperty(Setting.PROCESSING_START_DATETIME.getKey(), startDateString);
+        Application.get().getProp().setProperty(Setting.PROCESSING_END_DATETIME.getKey(), endDateString);
+        DataManager dataManager = new DataManager();
+        String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
+        JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+        jobManager.startJobs();
+        Thread.sleep(1000);
+    }
 
-		EventSender eventSender = Mockito
-				.spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+    /**
+     * Clean before blackbox test scenarios
+     */
+    @Before
+    public void clean() {
 
-		runOverTestPeriod(startDateString, endDateString, eventSender);
+        logger.info("Cleaning before blackbox testing");
+        eventSender = null;
+        conditionsYielded = null;
+    }
 
-		Date startDate = DatatypeConverter.parseDateTime(startDateString).getTime();
-		Date endDate = DatatypeConverter.parseDateTime(endDateString).getTime();
+
+    /**
+     * @param start start of the scenario timespan in ISO 8601 format, e.g. 2016-11-30T12:19:20Z
+     * @param end   end of the scenario timespan in ISO 8601 format, e.g. 2016-11-30T12:19:20Z
+     */
+    public void runForBlackboxTest(String start, String end) throws InterruptedException {
+
+        Date startDate = DatatypeConverter.parseDateTime(start).getTime();
+        Date endDate = DatatypeConverter.parseDateTime(end).getTime();
+
+        Application.initialize("src/test/resources/integration.properties");
+        HttpClient client = HttpClientBuilder.create().build();
+
+        eventSender = Mockito
+                .spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+
+        runOverTestPeriod(start, end, eventSender);
+
 
 		/* Verify Conditions produced in DB */
-		long durationThreshold = 0;
-		boolean includeTinyEntriesMask = false;
-		List<Condition> result = null;
+        long durationThreshold = 0;
+        boolean includeTinyEntriesMask = false;
 
-		int retries = 10;
-		int expectedResult = 45;
-		for (int i = 0; i < retries; i++) {
-			if (result == null || result.size() != expectedResult) {
-				Thread.sleep(1000);
-				result = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
-						includeTinyEntriesMask);
-			}
+        int retries = 15;
+        int last = 0;
+        Thread.sleep(1000);
+        for (int i = 0; i < retries; i++) {
+            logger.info("Waiting for results: " + (i + 1));
+            if (conditionsYielded == null || conditionsYielded.size() == 0 || conditionsYielded.size() != last) {
+                Thread.sleep(1000);
+                last = conditionsYielded != null ? conditionsYielded.size() : 0;
+                conditionsYielded = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+                        includeTinyEntriesMask);
+            }
 
-		}
-		Assert.assertEquals(expectedResult, result.size());
+        }
+        List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
+                DataResolution.Full);
 
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Stuck after fixing-soft-error"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description",
-				is("Level zero is stuck after fixing soft error. This is caused by subsystem(s) ES"))));
+        int visibleConditions = 0;
+        for (Condition a : conditionsYielded) {
+            if (a.isShow()) {
+                visibleConditions++;
+            }
+        }
 
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Lengthy fixing-soft-error"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("description",
-				is("Level zero in FixingSoftError longer than 30 sec. This is caused by subsystem(s) ES"))));
+		/* Verify that the number of visible conditions was greater than 0 */
+        Assert.assertTrue(0 < visibleConditions);
 
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("FixingSoftError"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Running"))));
-		assertThat(result, hasItem(Matchers.<Condition> hasProperty("title", is("Run ongoing"))));
+    }
 
-		/* Verify Raw data produced in DB */
-		List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
-				DataResolution.Full);
-		Assert.assertEquals(634, rawResult.size());
+    public void assertExpectedConditions(Collection<String> expectedConditions) {
 
-		/* Verify generation of notifaications */
-		Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+        logger.info("Asserting expected condition titles. Following results (filtered) has been yielded in blackbox test scenario:");
+        for (Condition c : conditionsYielded) {
+            if (c.getLogicModule() == null) {
+                logger.info("No LM condition: " + c.getTitle());
+                continue;
+            }
+            if (c.getLogicModule().getLogicModule() instanceof ActionLogicModule || c.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+                logger.info("    > " + c.getTitle());
+            }
+        }
 
-		// verify 41 events if mature-event-collector is used
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(41)));
+        for (String conditionTitle : expectedConditions) {
+            assertThat(conditionsYielded, hasItem(Matchers.<Condition>hasProperty("title", equalTo(conditionTitle))));
+        }
 
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Started: Stuck after fixing-soft-error")))));
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Stuck after fixing-soft-error")))));
+    }
 
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Started: Lengthy fixing-soft-error")))));
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Ended: Lengthy fixing-soft-error")))));
+    public void assertExpectedConditionDescriptions(Collection<String> expectedConditionDescriptions) {
 
-		Mockito.verify(eventSender).sendBatchEvents((List) argThat(
-				hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: FixingSoftError")))));
-		Mockito.verify(eventSender).sendBatchEvents(
-				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: Running")))));
+        logger.info("Asserting expected condition descriptions. Following results (filtered) has been yielded in blackbox test scenario:");
+        for (Condition c : conditionsYielded) {
+            if (c.getLogicModule() == null) {
+                logger.info("No LM condition: " + c.getTitle() + ": " + c.getDescription());
+                continue;
+            }
+            if (c.getLogicModule().getLogicModule() instanceof ActionLogicModule || c.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+                logger.info("    > " + String.format("%1$30s", c.getTitle())+ "\t" + c.getDescription());
+            }
+        }
 
-	}
+        for (String conditionDescription : expectedConditionDescriptions) {
+            assertThat(conditionsYielded, hasItem(Matchers.<Condition>hasProperty("description", equalTo(conditionDescription))));
+        }
 
+    }
+
+    public void assertExpectedNotifications(Collection<String> expectedNotifications) {
+        /* Verify that all notifications were sent in one batch */
+        Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
+
+		/* Verify that the number of notifications generated was greater than 0 */
+        Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(greaterThan(0))));
+
+
+        for (String notificationTitle : expectedNotifications) {
+            Mockito.verify(eventSender).sendBatchEvents(
+                    (List) argThat(hasItem(Matchers.<Condition>hasProperty("title", equalTo(notificationTitle)))));
+        }
+    }
 }

@@ -42,7 +42,7 @@ public class HltOutputBandwidthTooHighTest
 		results.put(StableBeams.class.getSimpleName(), true);
 		results.put(BackpressureFromHlt.class.getSimpleName(), false);
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. ",hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. ",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class HltOutputBandwidthTooHighTest
 		results.put(StableBeams.class.getSimpleName(), true);
 		results.put(BackpressureFromHlt.class.getSimpleName(), true);
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. <strong>Note that there is also backpressure from HLT.</strong>",hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. <strong>Note that there is also backpressure from HLT.</strong>",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
 }

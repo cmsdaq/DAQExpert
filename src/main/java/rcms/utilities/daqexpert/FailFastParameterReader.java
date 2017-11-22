@@ -44,4 +44,16 @@ public class FailFastParameterReader {
                     + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as int from property " + setting.getKey() + " number parsing problem: " + e.getMessage());
         }
     }
+
+    public static Boolean getBooleanParameter(Properties properties, Setting setting, Class logicModuleClass) {
+        String value = null;
+        try {
+            value = getStringParameter(properties, setting, logicModuleClass);
+            return Boolean.parseBoolean(value);
+
+        } catch (NumberFormatException e) {
+            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
+                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as boolean from property " + setting.getKey() + " number parsing problem: " + e.getMessage());
+        }
+    }
 }

@@ -105,7 +105,7 @@ public enum LogicModuleRegistry {
 	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               52, 2001),
 	FedDeadtimeDueToDaq				(new FedDeadtimeDueToDaq(),               ConditionGroup.OTHER,   "",                               53, 2002),
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												62,  2012),
-	TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER,         		"", 												54,  2012),
+	TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER,         		"", 												54,  102),
 	HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER,"",63, 2013),
 
 

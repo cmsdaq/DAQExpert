@@ -46,7 +46,7 @@ public class HltOutputBandwidthExtremeTest {
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions. " +
                 "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
-                hltOutputBandwidthExtreme.getDescriptionWithContext());
+                hltOutputBandwidthExtreme.getDescriptionWithContext(true));
     }
 
     @Test

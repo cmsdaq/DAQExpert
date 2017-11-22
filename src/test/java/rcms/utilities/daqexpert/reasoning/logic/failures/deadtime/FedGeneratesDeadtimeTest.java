@@ -1,5 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.deadtime;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -7,8 +9,15 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
+import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.logic.failures.HltOutputBandwidthExtreme;
+import rcms.utilities.daqexpert.reasoning.logic.failures.HltOutputBandwidthTooHigh;
+import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class FedGeneratesDeadtimeTest {
@@ -29,6 +38,7 @@ public class FedGeneratesDeadtimeTest {
         Assert.assertFalse(module.satisfied(mockTestObject(3,3), r));
 
     }
+
 
     @Test
     public void pseudoFedHierarchyTest() throws Exception {
@@ -77,6 +87,33 @@ public class FedGeneratesDeadtimeTest {
         Assert.assertTrue(module.satisfied(snapshot, r));
 
     }
+
+
+    @Test
+    public void test() throws URISyntaxException {
+        Logger.getLogger(FedGeneratesDeadtime.class).setLevel(Level.INFO);
+        Properties properties = new Properties();
+        properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
+        properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
+
+        Map<String, Boolean> results = new HashMap<>();
+        results.put(StableBeams.class.getSimpleName(), true);
+        results.put(FEDDeadtime.class.getSimpleName(), true);
+
+
+        KnownFailure fedGeneratesDeadtime = new FedGeneratesDeadtime();
+        ((Parameterizable) fedGeneratesDeadtime).parametrize(properties);
+
+
+
+        DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510723561771.json.gz");
+        Assert.assertTrue(fedGeneratesDeadtime.satisfied(snapshot, results));
+        Assert.assertEquals("FED 106 generates deadtime 7.5%, the threshold is 2.0%. There is no backpressure from DAQ on this FED.",
+                fedGeneratesDeadtime.getDescriptionWithContext(false));
+
+
+    }
+
 
     private DAQ mockTestObject(float deadtime, float backpressure) {
         DAQ snapshot = new DAQ();

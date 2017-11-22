@@ -42,10 +42,10 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
         for (TTCPartition partition : daq.getTtcPartitions()) {
 
             Map<FED, Set<FED>> h = FEDHierarchyRetriever.getFEDHierarchy(partition);
-            float deadPercentage = 0;
-            float backpressure = 0;
 
             for (Map.Entry<FED, Set<FED>> fedGroup : h.entrySet()) {
+                float deadPercentage = 0;
+                float backpressure = 0;
 
                 FED topLevelFed = fedGroup.getKey();
                 Set<FED> problematicFedsBehindPseudoFed = null;
@@ -77,9 +77,11 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
 
                     if(problematicFedsBehindPseudoFed == null) {
                         context.register("FED", topLevelFed.getSrcIdExpected());
+                        logger.trace("Registering regular FED" + topLevelFed.getSrcIdExpected());
                     } else{
                         for(FED fed: problematicFedsBehindPseudoFed){
                             context.register("FED", fed.getSrcIdExpected());
+                            logger.trace("Registering FED behind pseudo " + topLevelFed.getSrcIdExpected());
                         }
                     }
                     context.registerForStatistics("DEADTIME", deadPercentage, "%", 1);

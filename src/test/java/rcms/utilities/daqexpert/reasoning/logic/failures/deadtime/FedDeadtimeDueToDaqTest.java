@@ -9,6 +9,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
@@ -30,7 +31,7 @@ public class FedDeadtimeDueToDaqTest {
     /**
      * outputs of other LMs used by LM under test
      */
-    Map<String, Boolean> results;
+    Map<String, Output> results;
 
     Logger logger = Logger.getLogger(FedDeadtimeDueToDaqTest.class);
 
@@ -39,7 +40,7 @@ public class FedDeadtimeDueToDaqTest {
     public void prepareForTest() {
         module = new FedDeadtimeDueToDaq();
         results = new HashMap<>();
-        results.put(FEDDeadtime.class.getSimpleName(), true);
+        results.put(FEDDeadtime.class.getSimpleName(), new Output(true));
 
         Properties config = new Properties();
         config.put(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
@@ -67,8 +68,8 @@ public class FedDeadtimeDueToDaqTest {
 
         FedDeadtimeDueToDaq module = new FedDeadtimeDueToDaq();
         Properties p = new Properties();
-        Map<String, Boolean> r = new HashMap<>();
-        r.put(FEDDeadtime.class.getSimpleName(), true);
+        Map<String, Output> r = new HashMap<>();
+        r.put(FEDDeadtime.class.getSimpleName(), new Output(true));
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
         module.parametrize(p);
@@ -97,8 +98,8 @@ public class FedDeadtimeDueToDaqTest {
 
         FedDeadtimeDueToDaq module = new FedDeadtimeDueToDaq();
         Properties p = new Properties();
-        Map<String, Boolean> r = new HashMap<>();
-        r.put(FEDDeadtime.class.getSimpleName(), true);
+        Map<String, Output> r = new HashMap<>();
+        r.put(FEDDeadtime.class.getSimpleName(), new Output(true));
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
         module.parametrize(p);

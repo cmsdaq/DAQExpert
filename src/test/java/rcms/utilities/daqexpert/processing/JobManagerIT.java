@@ -91,7 +91,7 @@ public class JobManagerIT {
 		List<Condition> result = null;
 
 		int retries = 15;
-		int expectedResult = 58; // short entries based on 1 snapshot that are displayed as filtered included
+		int expectedResult = 54; // short entries based on 1 snapshot that are displayed as filtered included
 		for (int i = 0; i < retries; i++) {
 			if (result == null || result.size() != expectedResult) {
 				Thread.sleep(1000);

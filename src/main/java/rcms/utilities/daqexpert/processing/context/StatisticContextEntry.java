@@ -1,12 +1,13 @@
-package rcms.utilities.daqexpert.reasoning.base;
+package rcms.utilities.daqexpert.processing.context;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import rcms.utilities.daqexpert.processing.context.ContextEntry;
 
 /**
- * @implNote Note that the only reason why the Serializable interface is implemented is that the Context needs to be cloneable, @see ConditionProducer for implementation details.
+ * @implNote Note that the only reason why the Serializable interface is implemented is that the ContextHandler needs to be cloneable, @see ConditionProducer for implementation details.
  */
-public class CalculationContext implements Serializable {
+public class StatisticContextEntry implements ContextEntry, Serializable {
 
     private Float min;
     private Float max;
@@ -21,7 +22,7 @@ public class CalculationContext implements Serializable {
     private String unit;
     private DecimalFormat df;
 
-    public CalculationContext(String unit, int precision) {
+    public StatisticContextEntry(String unit, int precision) {
 
         if (unit == null) {
             this.unit = "";
@@ -120,7 +121,11 @@ public class CalculationContext implements Serializable {
         return df.format(value);
     }
 
-    public String toString(boolean highlightMakrup) {
+
+    @Override
+    public String getTextRepresentation() {
+        boolean highlightMakrup = ContextHandler.highlightMarkup;
+
         if (allTheSame) {
             return new StringBuilder().append(getValueWithPrecision(current)).append(unit).toString();
         }
@@ -151,9 +156,7 @@ public class CalculationContext implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return toString(true);
-
-
+    public Object getValue() {
+        return this;
     }
 }

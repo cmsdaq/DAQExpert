@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class ProblemWithPiTest extends FlowchartCaseTestBase {
@@ -19,11 +20,11 @@ public class ProblemWithPiTest extends FlowchartCaseTestBase {
 		System.out.println(piProblem.getDescriptionWithContext());
 		assertOnlyOneIsSatisified(piProblem, snapshot);
 
-		assertEquals(1, piProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
-		assertEquals("ECAL", piProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
+		assertEquals(1, ((SimpleContextEntry<String>)piProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM")).getObjectSet().size());
+		assertEquals("ECAL", ((SimpleContextEntry<String>)piProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM")).getObjectSet().iterator().next());
 
-		assertEquals(1, piProblem.getContext().getContext().get("PROBLEM-PARTITION").size());
-		assertEquals("EB+", piProblem.getContext().getContext().get("PROBLEM-PARTITION").iterator().next());
+		assertEquals(1, ((SimpleContextEntry<String>)piProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-PARTITION")).getObjectSet().size());
+		assertEquals("EB+", ((SimpleContextEntry<String>)piProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-PARTITION")).getObjectSet().iterator().next());
 
 	}
 

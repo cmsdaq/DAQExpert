@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
@@ -38,9 +39,9 @@ public class HltOutputBandwidthTooHighTest
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
 		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
 		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);
-		Map<String, Boolean> results = new HashMap<>();
-		results.put(StableBeams.class.getSimpleName(), true);
-		results.put(BackpressureFromHlt.class.getSimpleName(), false);
+		Map<String, Output> results = new HashMap<>();
+		results.put(StableBeams.class.getSimpleName(), new Output(true));
+		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
 		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. ",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
@@ -55,9 +56,9 @@ public class HltOutputBandwidthTooHighTest
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
 		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
 		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);
-		Map<String, Boolean> results = new HashMap<>();
-		results.put(StableBeams.class.getSimpleName(), true);
-		results.put(BackpressureFromHlt.class.getSimpleName(), true);
+		Map<String, Output> results = new HashMap<>();
+		results.put(StableBeams.class.getSimpleName(), new Output(true));
+		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
 		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. <strong>Note that there is also backpressure from HLT.</strong>",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}

@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 
@@ -30,7 +31,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		// assign the priority based on whether we are in stable beams or not
 		assignPriority(results);
@@ -39,7 +40,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 		boolean result = false;
 		if (max < readoutRate) {
-			context.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"Hz",1);
+			contextHandler.registerForStatistics("ACTUAL_READOUT_RATE", readoutRate,"Hz",1);
 			result = true;
 		}
 		return result;

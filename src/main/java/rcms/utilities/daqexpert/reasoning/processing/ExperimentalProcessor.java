@@ -21,6 +21,7 @@ import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 
 /**
  * Loads and uses experimental Logic Modules
@@ -74,7 +75,7 @@ public class ExperimentalProcessor {
 	 * @return returns results of all logic modules as list of pairs
 	 *         [LM;satisfied]
 	 */
-	public List<Pair<LogicModule, Boolean>> runLogicModules(DAQ daq, Map<String, Boolean> checkerResultMap) {
+	public List<Pair<LogicModule, Boolean>> runLogicModules(DAQ daq, Map<String, Output> checkerResultMap) {
 
 		List<Pair<LogicModule, Boolean>> result = new ArrayList<>();
 		if (scriptInstances == null) {
@@ -165,7 +166,7 @@ public class ExperimentalProcessor {
 		return groovyScriptEngine.loadScriptByName(file.getName());
 	}
 
-	protected Pair<LogicModule, Boolean> runExperimental(DAQ daq, Map<String, Boolean> checkerResultMap,
+	protected Pair<LogicModule, Boolean> runExperimental(DAQ daq, Map<String, Output> checkerResultMap,
 			Class<LogicModule> scriptClass, LogicModule scriptInstance) {
 		try {
 			Object gresult = scriptClass.getDeclaredMethod("satisfied", DAQ.class, Map.class).invoke(scriptInstance,

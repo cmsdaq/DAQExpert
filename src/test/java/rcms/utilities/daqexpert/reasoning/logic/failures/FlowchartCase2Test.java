@@ -10,7 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedDataTest;
 
 /**
@@ -50,7 +50,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
-		Context context = fc2.getContext();
+		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(644)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB+")), context.getContext().get("TTCP"));
@@ -81,7 +81,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
-		Context context = fc2.getContext();
+		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
@@ -118,7 +118,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
-		Context context = fc2.getContext();
+		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));
@@ -148,11 +148,11 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
-		Context context = fc2.getContext();
+		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(841, 843)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
 		// assertEquals(new HashSet(Arrays.asList("CSC+")),
-		// context.getContext().get("TTCP"));
+		// contextHandler.getContextHandler().get("TTCP"));
 
 		assertEquals(3, fc2.getActionWithContext().size());
 	}
@@ -178,7 +178,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
-		Context context = fc2.getContext();
+		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));

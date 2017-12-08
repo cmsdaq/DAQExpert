@@ -9,6 +9,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.HltInfo;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
@@ -23,15 +24,15 @@ public class CmsswCrashesTest {
 
 
     CmsswCrashes module;
-    Map<String, Boolean> results;
+    Map<String, Output> results;
     Logger logger = Logger.getLogger(CmsswCrashes.class);
 
     @Before
     public void prepare() {
         Logger.getLogger(CmsswCrashes.class).setLevel(Level.INFO);
         results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), true);
-        results.put(BackpressureFromHlt.class.getSimpleName(), true);
+        results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
         module = new CmsswCrashes();
 
         // mock parameters

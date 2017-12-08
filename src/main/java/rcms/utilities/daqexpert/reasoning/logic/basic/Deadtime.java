@@ -8,7 +8,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -27,15 +29,20 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 		this.threshold = 0;
 	}
 
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.BeamActive);
+	}
+
 	/**
 	 * Dead time when greater than a threshold%
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		double deadtime = getDeadtime(daq, results);
 		if (deadtime > threshold){
-			context.registerForStatistics("DEADTIME", deadtime,"%",1);
+			contextHandler.registerForStatistics("DEADTIME", deadtime,"%",1);
 			return true;
 		}
 		else
@@ -43,9 +50,9 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 	}
 
 
-	private double getDeadtime(DAQ daq, Map<String, Boolean> results){
+	private double getDeadtime(DAQ daq, Map<String, Output> results){
 		try {
-			if (results.get(BeamActive.class.getSimpleName())) {
+			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
 				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
 						.get("beamactive_total");
 
@@ -54,7 +61,7 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 			}
 		} catch (NullPointerException e) {
 			logger.warn("Instantaneous deadtime value is not available. Using per lumi section.");
-			if (results.get(BeamActive.class.getSimpleName())) {
+			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
 				return daq.getTcdsGlobalInfo().getDeadTimes()
 						.get("beamactive_total");
 

@@ -4,6 +4,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
@@ -26,7 +28,12 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.BackpressureFromHlt);
+    }
+
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);
@@ -35,15 +42,15 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
 
         boolean result = false;
         if (bandwidthThresholdInGbps < currentOutputBandwidthInGbps) {
-            context.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
+            contextHandler.registerForStatistics("BANDWIDTH", currentOutputBandwidthInGbps, "GB/s", 1);
             result = true;
         }
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
             //mention the fact that some modules are active
-            context.registerConditionalNote("NOTE", additionalNote);
+            contextHandler.registerConditionalNote("NOTE", additionalNote);
         } else{
-            context.unregisterConditionalNote("NOTE");
+            contextHandler.unregisterConditionalNote("NOTE");
         }
 
         return result;

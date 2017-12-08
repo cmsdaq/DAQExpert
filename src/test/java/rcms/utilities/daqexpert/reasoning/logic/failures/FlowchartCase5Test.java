@@ -9,7 +9,7 @@ import java.util.HashSet;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 
 /**
  *
@@ -22,7 +22,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 	public void case1Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1479614378467.smile");
 		assertOnlyOneIsSatisified(fc5, snapshot);
-		Context context = fc5.getContext();
+		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TEC-")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(169)), context.getContext().get("FED"));
@@ -40,7 +40,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1498440505470.smile");
 
 		assertOnlyOneIsSatisified(fc5, snapshot);
-		Context context = fc5.getContext();
+		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(149)), context.getContext().get("FED"));
@@ -70,7 +70,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		System.out.println(fc5.getDescriptionWithContext());
 
-		Context context = fc5.getContext();
+		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(838)), context.getContext().get("FED"));
@@ -92,7 +92,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		System.out.println(fc5.getDescriptionWithContext());
 
-		Context context = fc5.getContext();
+		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HBHEC")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(11114)), context.getContext().get("FED"));
@@ -108,7 +108,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1497513136376.smile");
 
 		assertOnlyOneIsSatisified(fc5, snapshot);
-		Context context = fc5.getContext();
+		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 		assertEquals(new HashSet(Arrays.asList(83)), context.getContext().get("FED"));

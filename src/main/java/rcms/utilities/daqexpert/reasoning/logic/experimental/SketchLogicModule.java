@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.experimental;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -26,7 +27,7 @@ public class SketchLogicModule extends SimpleLogicModule {
 	 * otherwise returns false.
 	 */
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
 
 		/* TODO: 2. implement your condition here */
 		return false;

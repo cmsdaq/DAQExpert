@@ -9,6 +9,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
@@ -42,18 +44,25 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 
 
 		this.action = action;
+
+	}
+
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
+		require(LogicModuleRegistry.CorruptedData);
 	}
 
 	private static Logger logger = Logger.getLogger(LegacyFlowchartCase2.class);
 	private final String ERROR_STATE = "ERROR";
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 		
-		if(results.get(CorruptedData.class.getSimpleName()))
+		if(results.get(CorruptedData.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -76,7 +85,7 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 				for (RU ru : failedRus) {
 
 					i++;
-					context.register("PROBLEM-RU", ru.getHostname());
+					contextHandler.register("PROBLEM-RU", ru.getHostname());
 
 				}
 
@@ -94,10 +103,10 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 								if (ttcp.getSubsystem() != null)
 									subsystemName = ttcp.getSubsystem().getName();
 							}
-							context.register("PROBLEM-FED", fed.getSrcIdExpected());
-							context.register("PROBLEM-TTCP", ttcpName);
-							context.register("PROBLEM-SUBSYSTEM", subsystemName);
-							context.setActionKey(subsystemName);
+							contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
+							contextHandler.register("PROBLEM-TTCP", ttcpName);
+							contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
+							contextHandler.setActionKey(subsystemName);
 							i++;
 
 							result = true;

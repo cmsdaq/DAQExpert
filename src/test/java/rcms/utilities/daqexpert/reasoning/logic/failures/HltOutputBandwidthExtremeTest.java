@@ -11,7 +11,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
@@ -29,12 +30,12 @@ public class HltOutputBandwidthExtremeTest {
     @Test
     public void test01() throws URISyntaxException {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
-        Logger.getLogger(Context.class).setLevel(Level.INFO);
+        Logger.getLogger(ContextHandler.class).setLevel(Level.INFO);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
-        Map<String, Boolean> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), true);
-        results.put(BackpressureFromHlt.class.getSimpleName(), false);
+        Map<String, Output> results = new HashMap<>();
+        results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
@@ -52,12 +53,12 @@ public class HltOutputBandwidthExtremeTest {
     @Test
     public void testWithAdditionalNote() throws URISyntaxException {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
-        Logger.getLogger(Context.class).setLevel(Level.INFO);
+        Logger.getLogger(ContextHandler.class).setLevel(Level.INFO);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
-        Map<String, Boolean> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), true);
-        results.put(BackpressureFromHlt.class.getSimpleName(), true);
+        Map<String, Output> results = new HashMap<>();
+        results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
@@ -79,9 +80,9 @@ public class HltOutputBandwidthExtremeTest {
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(), "4.5");
-        Map<String, Boolean> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), true);
-        results.put(BackpressureFromHlt.class.getSimpleName(), false);
+        Map<String, Output> results = new HashMap<>();
+        results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();

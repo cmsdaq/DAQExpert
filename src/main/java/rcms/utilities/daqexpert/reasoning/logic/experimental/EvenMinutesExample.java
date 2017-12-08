@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -23,7 +24,7 @@ public class EvenMinutesExample extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
 
 		Date snapshotDate = new Date(snapshot.getLastUpdate());
 		if (snapshotDate.getMinutes() % 2 == 0) {

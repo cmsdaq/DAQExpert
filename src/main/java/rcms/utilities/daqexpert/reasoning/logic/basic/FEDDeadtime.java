@@ -9,7 +9,10 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.processing.context.functions.FedPrinter;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -26,9 +29,14 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public void declareRequired(){
+		require(LogicModuleRegistry.ExpectedRate);
+	}
 
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
+	@Override
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
 		if (!expectedRate)
 			return false;
 
@@ -45,9 +53,9 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 
 				if (deadPercentage > threshold) {
 					result = true;
-					context.register("FED", fed.getSrcIdExpected());
-					context.register("SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
-					context.registerForStatistics("DEADTIME",deadPercentage,"%",1);
+					contextHandler.registerObject("FED", fed, new FedPrinter());
+					contextHandler.registerObject("SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
+					contextHandler.registerForStatistics("DEADTIME",deadPercentage,"%",1);
 				}
 			}
 		}

@@ -13,9 +13,10 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.context.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
@@ -116,10 +117,10 @@ public class ConditionProducer {
         String content = logicModule.getName();
         ConditionPriority eventClass = logicModule.getPriority();
 
-        Context context = null;
+        ContextHandler context = null;
 
         if (logicModule instanceof ContextLogicModule) {
-            context = ((ContextLogicModule) logicModule).getContext();
+            context = ((ContextLogicModule) logicModule).getContextHandler();
         }
 
         Boolean leftResult = false;
@@ -151,27 +152,27 @@ public class ConditionProducer {
 
         if (value) {
 
-			/* put context into description */
+			/* put contextHandler into description */
             if (logicModule instanceof ContextLogicModule) {
                 ContextLogicModule clm = (ContextLogicModule) logicModule;
-                logger.debug("Putting message into context: " + logicModule.getDescription());
+                logger.debug("Putting message into contextHandler: " + logicModule.getDescription());
 
 				/* Description never set */
                 if (result.getDescription() == null) {
-                    result.setDescription(clm.getContext().getContentWithContext(logicModule.getDescription()));
+                    result.setDescription(clm.getContextHandler().getContentWithContext(logicModule.getDescription()));
                 }
             } else {
                 result.setDescription(logicModule.getDescription());
             }
 
-			/* put context into action */
+			/* put contextHandler into action */
             if (logicModule instanceof ActionLogicModule) {
                 ActionLogicModule alm = (ActionLogicModule) logicModule;
-                logger.debug("Putting action into context: " + alm.getAction());
+                logger.debug("Putting action into contextHandler: " + alm.getAction());
 
                 if (result.getActionSteps() == null) {
                     result.setActionSteps(
-                            alm.getContext().getActionWithContext(((ActionLogicModule) logicModule).getAction()));
+                            alm.getContextHandler().getActionWithContext(((ActionLogicModule) logicModule).getAction()));
                 }
 
             } else {
@@ -192,7 +193,7 @@ public class ConditionProducer {
     }
 
     protected Condition finishOldAddNew(LogicModule logicModule, String content, Boolean value, Date date,
-                                        ConditionPriority eventClass, Context context) {
+                                        ConditionPriority eventClass, ContextHandler contextHandler) {
 
         String logicModuleName = logicModule.getClass().getSimpleName();
 
@@ -202,10 +203,10 @@ public class ConditionProducer {
             toFinish.setState(EntryState.FINISHED);
             toFinish.setEnd(date);
             toFinish.calculateDuration();
-            if(context != null) {
-                Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(context);
+            if(contextHandler != null && contextHandler.getContext() != null) {
+                Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(contextHandler.getContext());
                 toFinish.setFinishedContext(clone);
-                context.deleteObserver(toFinish);
+                contextHandler.getContextNotifier().deleteObserver(toFinish);
             }
             if (!toFinish.getStart().equals(toFinish.getEnd())) {
                 logger.debug("Finishing entry " + toFinish.getTitle() + " with id: " + toFinish.getId());
@@ -223,8 +224,8 @@ public class ConditionProducer {
         condition.setTitle(content);
         condition.setShow(value);
         condition.setStart(date);
-        if (context != null && value) {
-            context.addObserver(condition);
+        if (contextHandler != null && value) {
+            contextHandler.getContextNotifier().addObserver(condition);
         }
 
         if (logicModule instanceof SimpleLogicModule) {

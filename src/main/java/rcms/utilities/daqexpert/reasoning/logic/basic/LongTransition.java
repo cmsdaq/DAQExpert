@@ -3,6 +3,8 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -16,6 +18,12 @@ public class LongTransition extends SimpleLogicModule {
 		this.name = "LongTransition";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Transition for new run (long)";
+
+	}
+
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.ExpectedRate);
 	}
 
 	/**
@@ -26,9 +34,9 @@ public class LongTransition extends SimpleLogicModule {
 	private long started;
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
 
 		// first check
 		if (started == 0) {

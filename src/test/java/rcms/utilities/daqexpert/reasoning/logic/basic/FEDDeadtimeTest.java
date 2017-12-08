@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
 
@@ -22,12 +23,12 @@ public class FEDDeadtimeTest {
     @Test
     public void test01() throws URISyntaxException {
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510239315441.json.gz");
-        Map<String, Boolean> results = new HashMap<>();
+        Map<String, Output> results = new HashMap<>();
 
 
-        results.put(ExpectedRate.class.getSimpleName(), true);
-        results.put(StableBeams.class.getSimpleName(), true);
-        results.put(LongTransition.class.getSimpleName(), false);
+        results.put(ExpectedRate.class.getSimpleName(), new Output(true));
+        results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(LongTransition.class.getSimpleName(), new Output(false));
 
         FEDDeadtime module = new FEDDeadtime();
 

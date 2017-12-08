@@ -18,11 +18,7 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.LogicModule;
-import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.*;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
@@ -53,33 +49,37 @@ public class LogicModuleManager {
 
         this.conditionProducer = conditionProducer;
 
-        HashSet<String> knownFailureClasses = new HashSet<String>();
+        HashSet<LogicModule> knownFailureClasses = new HashSet<>();
 
-        for (LogicModuleRegistry lm : LogicModuleRegistry.getModulesInRunOrder()) {
-            if (lm.getLogicModule() != null) {
-                lm.getLogicModule().setLogicModuleRegistry(lm);
-                if (lm.getLogicModule() instanceof SimpleLogicModule) {
-                    SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm.getLogicModule();
+        for(LogicModuleRegistry lmr: LogicModuleRegistry.values()){
+            if(lmr.getLogicModule() != null){
+                lmr.getLogicModule().setLogicModuleRegistry(lmr);
+            }
+        }
+
+        for (LogicModule lm : LogicModuleRegistry.getModulesInRunOrder()) {
+
+                lm.declareRequired();
+                if (lm instanceof SimpleLogicModule) {
+                    SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm;
                     checkers.add(simpleLogicModule);
-                } else if (lm.getLogicModule() instanceof ComparatorLogicModule) {
-                    ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm.getLogicModule();
+                } else if (lm instanceof ComparatorLogicModule) {
+                    ComparatorLogicModule comparatorLogicModule = (ComparatorLogicModule) lm;
                     comparators.add(comparatorLogicModule);
                 }
 
-                if (lm.getLogicModule() instanceof Parameterizable) {
-                    Parameterizable updatable = (Parameterizable) lm.getLogicModule();
+                if (lm instanceof Parameterizable) {
+                    Parameterizable updatable = (Parameterizable) lm;
 
                     updatable.parametrize(Application.get().getProp());
                     logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
                 }
 
-                if (lm.getLogicModule() instanceof KnownFailure) {
-                    knownFailureClasses.add(lm.getLogicModule().getClass().getSimpleName());
+                if (lm instanceof KnownFailure) {
+                    knownFailureClasses.add(lm);
                 }
 
-            } else {
-                logger.info("This is not used: " + lm);
-            }
+
         }
 
         logger.info("Registering " + knownFailureClasses.size()
@@ -125,11 +125,12 @@ public class LogicModuleManager {
      */
     private List<Condition> runCheckers(DAQ daq, boolean includeExperimental) {
         List<Condition> results = new ArrayList<>();
-        HashMap<String, Boolean> checkerResultMap = new HashMap<>();
+        HashMap<String, Output> checkerResultMap = new HashMap<>();
 
         for (SimpleLogicModule checker : checkers) {
             try {
                 boolean result = checker.satisfied(daq, checkerResultMap);
+
                 postprocess(checkerResultMap, checker, result, daq, results);
             } catch(RuntimeException e){
                 logger.error("Logic module " + checker.getClass().getSimpleName() + " failed with: " + e.getClass());
@@ -162,10 +163,16 @@ public class LogicModuleManager {
      * @param daq
      * @param results
      */
-    private void postprocess(Map<String, Boolean> checkerResultMap, LogicModule checker, boolean result, DAQ daq,
+    private void postprocess(Map<String, Output> checkerResultMap, LogicModule checker, boolean result, DAQ daq,
                              List<Condition> results) {
         Date curr = null;
-        checkerResultMap.put(checker.getClass().getSimpleName(), result);
+        Output lmOutput = new Output(result);
+
+        if(checker instanceof ContextLogicModule){
+            lmOutput.setContext(((ContextLogicModule) checker).getContextHandler().getContext());
+        }
+
+        checkerResultMap.put(checker.getClass().getSimpleName(), lmOutput);
         curr = new Date(daq.getLastUpdate());
 
         if (checker instanceof SimpleLogicModule) {
@@ -181,16 +188,16 @@ public class LogicModuleManager {
 
 
 			/*
-             * The event finishes (result = false), Context to be cleared for
+             * The event finishes (result = false), ContextHandler to be cleared for
 			 * next events. Note that this is performed after
-			 * EventProducer.produce so that context can be used to close the
+			 * EventProducer.produce so that contextHandler can be used to close the
 			 * event
 			 */
             if (checker instanceof ContextLogicModule) {
                 ContextLogicModule contextLogicModule = ((ContextLogicModule) checker);
-                contextLogicModule.getContext().triggerReady();
+                contextLogicModule.getContextHandler().getContextNotifier().triggerReady();
                 if (!result) {
-                    contextLogicModule.getContext().clearContext();
+                    contextLogicModule.getContextHandler().clearContext();
                 }
                 produceResult.getRight().publishUpdate();
             }

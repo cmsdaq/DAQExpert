@@ -17,7 +17,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
 
 public class ContinouslySoftErrorTest {
 
@@ -49,7 +49,7 @@ public class ContinouslySoftErrorTest {
 
 		// TODO: check list of previous occ
 
-		Assert.assertNull(lm.getContext().getContext().get("SUBSYSTEM"));
+		Assert.assertNull(lm.getContextHandler().getContext().get("SUBSYSTEM"));
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
 
-		Set<Object> problematicSubsystems = lm.getContext().getContext().get("SUBSYSTEM");
+		Set<String> problematicSubsystems = ((SimpleContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
 		Assert.assertEquals(2, problematicSubsystems.size());
 		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));

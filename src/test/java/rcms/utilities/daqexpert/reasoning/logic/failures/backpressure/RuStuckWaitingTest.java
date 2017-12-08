@@ -6,11 +6,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class RuStuckWaitingTest extends FlowchartCaseTestBase {
@@ -29,44 +28,58 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(ruStuckWaiting, snapshot);
 
 		/* Assert problem FEDs */
-		assertEquals(8, ruStuckWaiting.getContext().getContext().get("PROBLEM-FED").size());
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(724));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(725));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(726));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(727));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(728));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(729));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(730));
-		assertThat(ruStuckWaiting.getContext().getContext().get("PROBLEM-FED"), hasItem(731));
+		SimpleContextEntry<Integer> problemFeds = (SimpleContextEntry<Integer>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED");
+		SimpleContextEntry<Integer> problemPartitions = (SimpleContextEntry<Integer>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-TTCP");
+		SimpleContextEntry<Integer> problemSubsystems = (SimpleContextEntry<Integer>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM");
+		SimpleContextEntry<Integer> problemFedBuilder = (SimpleContextEntry<Integer>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED-BUILDER");
+
+		assertEquals(8, problemFeds.getObjectSet().size());
+		assertThat(problemFeds.getObjectSet(), hasItem(724));
+		assertThat(problemFeds.getObjectSet(), hasItem(725));
+		assertThat(problemFeds.getObjectSet(), hasItem(726));
+		assertThat(problemFeds.getObjectSet(), hasItem(727));
+		assertThat(problemFeds.getObjectSet(), hasItem(728));
+		assertThat(problemFeds.getObjectSet(), hasItem(729));
+		assertThat(problemFeds.getObjectSet(), hasItem(730));
+		assertThat(problemFeds.getObjectSet(), hasItem(731));
 
 		/* Assert problem partition and subsystem */
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("PROBLEM-TTCP").size());
-		assertEquals("HO", ruStuckWaiting.getContext().getContext().get("PROBLEM-TTCP").iterator().next());
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
-		assertEquals("HCAL", ruStuckWaiting.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
+		assertEquals(1, problemPartitions.getObjectSet().size());
+		assertEquals("HO", problemPartitions.getObjectSet().iterator().next());
+		assertEquals(1, problemSubsystems.getObjectSet().size());
+		assertEquals("HCAL", problemSubsystems.getObjectSet().iterator().next());
 
 		/* Assert problem fedBuilder */
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("PROBLEM-FED-BUILDER").size());
-		assertEquals("HOSCAL", ruStuckWaiting.getContext().getContext().get("PROBLEM-FED-BUILDER").iterator().next());
+		assertEquals(1, problemFedBuilder.getObjectSet().size());
+		assertEquals("HOSCAL", problemFedBuilder.getObjectSet().iterator().next());
 
+
+		SimpleContextEntry<Long> minFragmentCount = (SimpleContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-COUNT");
+		SimpleContextEntry<Long> maxFragmentCount = (SimpleContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-COUNT");
+		SimpleContextEntry<Long> minFragmentPartition = (SimpleContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-PARTITION");
+		SimpleContextEntry<Long> maxFragmentPartition = (SimpleContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-PARTITION");
 		/* Assert trigger count info */
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("MIN-FRAGMENT-COUNT").size());
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("MAX-FRAGMENT-COUNT").size());
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("MIN-FRAGMENT-PARTITION").size());
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("MAX-FRAGMENT-PARTITION").size());
-		assertEquals(4731L, ruStuckWaiting.getContext().getContext().get("MAX-FRAGMENT-COUNT").iterator().next());
-		assertEquals(0L, ruStuckWaiting.getContext().getContext().get("MIN-FRAGMENT-COUNT").iterator().next());
-		assertEquals("SCAL", ruStuckWaiting.getContext().getContext().get("MAX-FRAGMENT-PARTITION").iterator().next());
-		assertEquals("HO", ruStuckWaiting.getContext().getContext().get("MIN-FRAGMENT-PARTITION").iterator().next());
+		assertEquals(1, minFragmentCount.getObjectSet().size());
+		assertEquals(1, maxFragmentCount.getObjectSet().size());
+		assertEquals(1, minFragmentPartition.getObjectSet().size());
+		assertEquals(1, maxFragmentPartition.getObjectSet().size());
+		assertEquals(4731L, maxFragmentCount.getObjectSet().iterator().next().longValue());
+		assertEquals(0L, minFragmentCount.getObjectSet().iterator().next().longValue());
+		assertEquals("SCAL", maxFragmentPartition.getObjectSet().iterator().next());
+		assertEquals("HO", minFragmentPartition.getObjectSet().iterator().next());
 
+
+
+		SimpleContextEntry<String> affectedRu = (SimpleContextEntry<String>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-RU");
 		/* Assert affected RUs */
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("AFFECTED-RU").size());
+		assertEquals(1, affectedRu.getObjectSet().size());
 		assertEquals("ru-c2e15-13-01.cms",
-				ruStuckWaiting.getContext().getContext().get("AFFECTED-RU").iterator().next());
+				affectedRu.getObjectSet().iterator().next());
 
+		SimpleContextEntry<String> affectedFed = (SimpleContextEntry<String>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-FED");
 		/* Assert affected FEDs */
-		assertEquals(1, ruStuckWaiting.getContext().getContext().get("AFFECTED-FED").size());
-		assertEquals(735, ruStuckWaiting.getContext().getContext().get("AFFECTED-FED").iterator().next());
+		assertEquals(1, affectedFed.getObjectSet().size());
+		assertEquals(735, affectedFed.getObjectSet().iterator().next());
 	}
 
 }

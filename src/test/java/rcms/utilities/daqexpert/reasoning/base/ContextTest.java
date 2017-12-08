@@ -2,12 +2,14 @@ package rcms.utilities.daqexpert.reasoning.base;
 
 import org.junit.Assert;
 import org.junit.Test;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 
 public class ContextTest {
 
 	@Test
 	public void risingAverageGenerateSignalTest() {
-		Context c = new Context();
+		ContextHandler c = new ContextHandler();
+		c.setHighlightMarkup(false);
 
 		Assert.assertFalse("First change will not generate anything", c.registerForStatistics("x", 100));
 		Assert.assertFalse(c.registerForStatistics("x", 105));
@@ -23,7 +25,8 @@ public class ContextTest {
 
 	@Test
 	public void fallingAverageGenerateSignalTest() {
-		Context c = new Context();
+		ContextHandler c = new ContextHandler();
+		c.setHighlightMarkup(false);
 
 		Assert.assertFalse("First change will not generate anything", c.registerForStatistics("x", 100));
 		Assert.assertFalse(c.registerForStatistics("x", 95));
@@ -39,7 +42,8 @@ public class ContextTest {
 
 	@Test
 	public void secondSignalTest() {
-		Context c = new Context();
+		ContextHandler c = new ContextHandler();
+		c.setHighlightMarkup(false);
 
 		Assert.assertFalse("First change will not generate anything", c.registerForStatistics("x", 100));
 		Assert.assertFalse(c.registerForStatistics("x", 105));
@@ -66,11 +70,13 @@ public class ContextTest {
 
 	@Test
 	public void resettingTest(){
-		Context c = new Context();
+		ContextHandler c = new ContextHandler();
+		c.setHighlightMarkup(false);
+
 		c.registerForStatistics("x",1);
 		c.registerForStatistics("x",2);
 		c.registerForStatistics("x",3);
-		Assert.assertEquals("( last: 3,  avg: 2,  min: 1,  max: 3)",c.putContext("{{x}}",false));
+		Assert.assertEquals("( last: 3,  avg: 2,  min: 1,  max: 3)",c.putContext("{{x}}"));
 
 
 		c.clearContext();
@@ -78,7 +84,7 @@ public class ContextTest {
 		c.registerForStatistics("x",4);
 		c.registerForStatistics("x",5);
 		c.registerForStatistics("x",6);
-		Assert.assertEquals("( last: 6,  avg: 5,  min: 4,  max: 6)",c.putContext("{{x}}",false));
+		Assert.assertEquals("( last: 6,  avg: 5,  min: 4,  max: 6)",c.putContext("{{x}}"));
 
 
 

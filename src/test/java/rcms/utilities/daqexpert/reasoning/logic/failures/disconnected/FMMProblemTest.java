@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class FMMProblemTest extends FlowchartCaseTestBase {
@@ -20,18 +21,18 @@ public class FMMProblemTest extends FlowchartCaseTestBase {
 		System.out.println(fmmProblem.getDescriptionWithContext());
 		assertOnlyOneIsSatisified(fmmProblem, snapshot);
 
-		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").size());
-		assertEquals("TRACKER", fmmProblem.getContext().getContext().get("PROBLEM-SUBSYSTEM").iterator().next());
+		assertEquals(1, ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM")).getObjectSet().size());
+		assertEquals("TRACKER", ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM")).getObjectSet().iterator().next());
 
-		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-PARTITION").size());
-		assertEquals("TEC-", fmmProblem.getContext().getContext().get("PROBLEM-PARTITION").iterator().next());
+		assertEquals(1, ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-PARTITION")).getObjectSet().size());
+		assertEquals("TEC-", ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-PARTITION")).getObjectSet().iterator().next());
 
-		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-FMM-URL").size());
+		assertEquals(1, ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FMM-URL")).getObjectSet().size());
 		assertEquals("http://fmmpc-s1d12-07-01.cms:11100",
-				fmmProblem.getContext().getContext().get("PROBLEM-FMM-URL").iterator().next());
+				((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FMM-URL")).getObjectSet().iterator().next());
 
-		assertEquals(1, fmmProblem.getContext().getContext().get("PROBLEM-FMM-GEOSLOT").size());
-		assertEquals(3, fmmProblem.getContext().getContext().get("PROBLEM-FMM-GEOSLOT").iterator().next());
+		assertEquals(1, ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FMM-GEOSLOT")).getObjectSet().size());
+		assertEquals(3, ((SimpleContextEntry<String>)fmmProblem.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FMM-GEOSLOT")).getObjectSet().iterator().next());
 	}
 
 }

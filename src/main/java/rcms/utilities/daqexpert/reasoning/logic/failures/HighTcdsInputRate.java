@@ -5,10 +5,9 @@ import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 
@@ -46,7 +45,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		// assign the priority based on whether we are in stable beams or not
 		assignPriority(results);
@@ -57,7 +56,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 
 		boolean result = false;
 		if (threshold < inputTriggerRate && inputTriggerRate <= thresholdVeryHigh) {
-			context.registerForStatistics("TCDS_TRIGGER_INPUT_RATE", inputTriggerRate,"Hz",1);
+			contextHandler.registerForStatistics("TCDS_TRIGGER_INPUT_RATE", inputTriggerRate,"Hz",1);
 			result = true;
 		}
 		return result;

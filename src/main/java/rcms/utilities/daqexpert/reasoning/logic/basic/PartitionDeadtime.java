@@ -6,11 +6,11 @@ import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**
@@ -26,14 +26,19 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
         this.threshold = 0;
     }
 
+    @Override
+    public void declareRequired(){
+        require(LogicModuleRegistry.ExpectedRate);
+    }
+
     /**
      * Dead time when greater than 5%
      */
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         boolean expectedRate = false;
-        expectedRate = results.get(ExpectedRate.class.getSimpleName());
+        expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
         if (!expectedRate)
             return false;
 
@@ -50,9 +55,9 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
 
                 if (deadPercentage > threshold) {
                     result = true;
-                    context.register("TTCP", partition.getName());
-                    context.register("SUBSYSTEM", partition.getSubsystem().getName());
-                    context.registerForStatistics("VALUE", deadPercentage, "%", 1);
+                    contextHandler.register("TTCP", partition.getName());
+                    contextHandler.register("SUBSYSTEM", partition.getSubsystem().getName());
+                    contextHandler.registerForStatistics("VALUE", deadPercentage, "%", 1);
                 }
             }
         }

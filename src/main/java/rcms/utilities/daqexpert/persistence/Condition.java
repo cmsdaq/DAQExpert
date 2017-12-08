@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Index;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.processing.context.ContextNotifier;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -58,6 +60,9 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @Column(name = "group_name")
     private ConditionGroup group;
 
+    /**
+     * TODO: this will be persisted
+     */
     @JsonIgnore
     @Transient
     private Context finishedContext;
@@ -190,9 +195,6 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
         this.logicModule = eventFinder;
     }
 
-    public Context getFinishedContext() {
-        return finishedContext;
-    }
 
     public void setFinishedContext(Context finishedContext) {
         this.finishedContext = finishedContext;
@@ -307,15 +309,15 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @Override
     public void update(Observable o, Object arg) {
 
-        if (o instanceof Context) {
+        if (o instanceof ContextNotifier) {
             if (logicModule.getLogicModule() instanceof ContextLogicModule) {
                 description = ((ContextLogicModule) logicModule.getLogicModule()).getDescriptionWithContext();
 
-                logger.debug("Condition '" + title + "' received update from it's context, now description is: " + description);
+                logger.debug("Condition '" + title + "' received update from it's contextHandler, now description is: " + description);
             }
-            ((Context) o).clearChangeset();
+            ((ContextNotifier) o).clearChangeset();
             setChanged();
-            logger.debug("Condition '" + title + "' received update from it's context, " + this.start);
+            logger.debug("Condition '" + title + "' received update from it's contextHandler, " + this.start);
         }
 
     }

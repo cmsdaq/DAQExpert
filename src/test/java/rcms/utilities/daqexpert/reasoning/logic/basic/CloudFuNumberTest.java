@@ -13,6 +13,7 @@ import rcms.utilities.daqaggregator.data.BUSummary;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
@@ -41,7 +42,7 @@ public class CloudFuNumberTest
 	public void criticalBeamModeTest() throws URISyntaxException
 	{
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510706999513.json.gz");
-		Map<String, Boolean> results = new HashMap<>();
+		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();
 		assertTrue(module.satisfied(snapshot, results));
 	}
@@ -50,7 +51,7 @@ public class CloudFuNumberTest
 	@Test
 	public void generatedSnapshotSequenceTest(){
 
-		Map<String, Boolean> results = new HashMap<>();
+		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();
 
 		/* Do not fire in allowed LHC beam modes */
@@ -114,7 +115,7 @@ public class CloudFuNumberTest
 					String expectedMessage) throws URISyntaxException {
 
 
-		Map<String, Boolean> results = new HashMap<>();
+		Map<String, Output> results = new HashMap<>();
 
 		boolean result = instance.satisfied(daq, results);
 		assertEquals("result after taking into account holdoff for snapshot " + daq.getLastUpdate(),

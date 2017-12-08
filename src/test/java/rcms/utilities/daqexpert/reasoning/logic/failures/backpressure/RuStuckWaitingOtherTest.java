@@ -12,7 +12,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
@@ -33,7 +35,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		assertSatisfiedLogicModules(snapshot, ruStuckWaitingOther);
 		System.out.println(ruStuckWaitingOther.getActionWithContext());
 
-		Context context = ruStuckWaitingOther.getContext();
+		ContextHandler context = ruStuckWaitingOther.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(1122)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("HF")), context.getContext().get("AFFECTED-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HF")), context.getContext().get("AFFECTED-TTCP"));
@@ -42,7 +44,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		assertEquals(
 				108,
-				context.getContext().get("PROBLEM-FED").size());
+				((SimpleContextEntry)context.getContext().getContextEntryMap().get("PROBLEM-FED")).getObjectSet().size());
 		assertEquals(new HashSet(Arrays.asList(1122)), context.getContext().get("AFFECTED-FED"));
 
 	}
@@ -58,7 +60,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1498067296082.smile");
 
 		assertSatisfiedLogicModules(snapshot, ruStuckWaitingOther);
-		Context context = ruStuck.getContext();
+		ContextHandler context = ruStuck.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(1386)), context.getContext().get("AFFECTED-FED"));
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("AFFECTED-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("AFFECTED-TTCP"));
@@ -86,7 +88,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		// check the subsystem reported as being at the origin of the problem
 		// (whose FEDs stopped sending data)
-		Context context = ruStuck.getContext();
+		ContextHandler context = ruStuck.getContextHandler();
 
 		assertEquals(new HashSet(Arrays.asList(1404)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("AFFECTED-SUBSYSTEM"));

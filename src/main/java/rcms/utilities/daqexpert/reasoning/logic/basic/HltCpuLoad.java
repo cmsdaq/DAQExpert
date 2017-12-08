@@ -5,6 +5,8 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
@@ -27,7 +29,12 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public void declareRequired(){
+		require(LogicModuleRegistry.BackpressureFromHlt);
+	}
+
+	@Override
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		assignPriority(results);
 
@@ -45,15 +52,15 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 
 		boolean result = false;
 		if (cpuLoad > maxCpuLoad) {
-			context.registerForStatistics("HLT_CPU_LOAD", cpuLoad * 100, " %", 1);
+			contextHandler.registerForStatistics("HLT_CPU_LOAD", cpuLoad * 100, " %", 1);
 			result =  true;
 		}
 
-		if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+		if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
 			//mention the fact that some modules are active
-			context.registerConditionalNote("NOTE", additionalNote);
+			contextHandler.registerConditionalNote("NOTE", additionalNote);
 		} else{
-			context.unregisterConditionalNote("NOTE");
+			contextHandler.unregisterConditionalNote("NOTE");
 		}
 
 		return result;
@@ -63,7 +70,7 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	@Override
 	public void parametrize(Properties properties) {
 		this.maxCpuLoad = FailFastParameterReader.getFloatParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD, this.getClass());
-		this.description = String.format("HLT CPU load is high ({{HLT_CPU_LOAD}}, which exceeds the threshold of %.1f%%", maxCpuLoad * 100);
+		this.description = String.format("HLT CPU load is high ({{HLT_CPU_LOAD}}, which exceeds the threshold of %.1f%%. [[NOTE]]", maxCpuLoad * 100);
 	}
 
 }

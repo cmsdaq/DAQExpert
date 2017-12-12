@@ -55,9 +55,9 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
 
                 if (deadPercentage > threshold) {
                     result = true;
-                    contextHandler.register("TTCP", partition.getName());
-                    contextHandler.register("SUBSYSTEM", partition.getSubsystem().getName());
-                    contextHandler.registerForStatistics("VALUE", deadPercentage, "%", 1);
+                    contextHandler.registerObject("PROBLEM-PARTITION", partition, p->p.getName());
+                    contextHandler.registerObject("PROBLEM-SUBSYSTEM", partition.getSubsystem(), s->s.getName());
+                    contextHandler.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
                 }
             }
         }
@@ -69,7 +69,7 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
     public void parametrize(Properties properties) {
 
         this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION, this.getClass());
-        this.description = "Deadtime of partition(s) {{TTCP}} in subsystem(s) {{SUBSYSTEM}} is {{VALUE}} the threshold is "
+        this.description = "Deadtime of partition(s) {{PROBLEM-PARTITION}} in subsystem(s) {{PROBLEM-SUBSYSTEM}} is {{DEADTIME}} the threshold is "
                 + threshold + "%";
 
     }

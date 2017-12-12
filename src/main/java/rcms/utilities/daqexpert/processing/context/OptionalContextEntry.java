@@ -1,6 +1,9 @@
 package rcms.utilities.daqexpert.processing.context;
 
-public class OptionalContextEntry implements ContextEntry<String> {
+import javax.persistence.Entity;
+
+public class OptionalContextEntry extends ContextEntry<String> {
+
 
     String value;
 

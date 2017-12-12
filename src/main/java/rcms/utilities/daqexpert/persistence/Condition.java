@@ -3,8 +3,10 @@ package rcms.utilities.daqexpert.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Index;
 import rcms.utilities.daqexpert.processing.context.Context;
+import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.processing.context.ContextNotifier;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
@@ -13,10 +15,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 /**
  * Base object of analysis result. Shows LM results in time
@@ -60,12 +59,13 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @Column(name = "group_name")
     private ConditionGroup group;
 
+
     /**
-     * TODO: this will be persisted
+     * Map of contextHandler elements
      */
-    @JsonIgnore
-    @Transient
-    private Context finishedContext;
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinTable(name="condition_context_map")
+    private Map<String, ContextEntry> context;
 
     @JsonIgnore
     @ElementCollection
@@ -196,8 +196,12 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     }
 
 
-    public void setFinishedContext(Context finishedContext) {
-        this.finishedContext = finishedContext;
+    public Map<String, ContextEntry> getContext() {
+        return context;
+    }
+
+    public void setContext(Map<String, ContextEntry>  context) {
+        this.context = context;
     }
 
     public String getDescription() {
@@ -236,7 +240,7 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @Override
     public String toString() {
         return "Condition [id=" + id + ", duration=" + duration + ", show=" + show + ", state=" + state
-                + ", logicModule=" + logicModule + ", group=" + group + ", finishedContext=" + finishedContext
+                + ", logicModule=" + logicModule + ", group=" + group
                 + ", title=" + title + ", description=" + description + ", start=" + start + ", end=" + end
                 + ", priority=" + priority + "]";
     }

@@ -53,8 +53,8 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 
 				if (deadPercentage > threshold) {
 					result = true;
-					contextHandler.registerObject("FED", fed, new FedPrinter());
-					contextHandler.registerObject("SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
+					contextHandler.registerObject("PROBLEM-FED", fed, new FedPrinter());
+					contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
 					contextHandler.registerForStatistics("DEADTIME",deadPercentage,"%",1);
 				}
 			}
@@ -69,7 +69,7 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 			this.threshold = Integer
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey()));
 
-			this.description = "Deadtime of fed(s) {{FED}} in subsystem(s) {{SUBSYSTEM}} is {{DEADTIME}} , the threshold is " + threshold
+			this.description = "Deadtime of fed(s) {{PROBLEM-FED}} in subsystem(s) {{PROBLEM-SUBSYSTEM}} is {{DEADTIME}} , the threshold is " + threshold
 					+ "%";
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

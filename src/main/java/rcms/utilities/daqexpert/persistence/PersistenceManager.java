@@ -21,13 +21,11 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hibernate.transform.Transformers;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
@@ -67,8 +65,10 @@ public class PersistenceManager {
 		tx.begin();
 		for (Condition point : entries) {
 
-			if (point.isShow())
+			if (point.isShow()) {
+				logger.info("Persisting condition: " + point.getTitle() + " with context: " + point.getContext());
 				entityManager.persist(point);
+			}
 		}
 		tx.commit();
 		//entityManager.close();
@@ -165,7 +165,7 @@ public class PersistenceManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Condition> getEntries(Date startDate, Date endDate, long durationThreshold,
-			boolean includeTinyEntriesMask) {
+			boolean includeTinyEntriesMask, boolean withDescription) {
 		// TODO: close session?
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
@@ -193,7 +193,23 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", ConditionGroup.HIDDEN));
 
-		List<Condition> result = elementsCriteria.list();
+		ProjectionList projection = Projections.projectionList()
+				.add(Projections.property("id"),"id")
+				.add(Projections.property("title"), "title")
+				.add(Projections.property("start"),"start")
+				.add(Projections.property("end"),"end")
+				.add(Projections.property("group"),"group")
+				.add(Projections.property("mature"),"mature")
+				.add(Projections.property("priority"),"priority")
+				.add(Projections.property("duration"),"duration");
+
+		if(withDescription){
+				projection.add(Projections.property("description"),"description");
+		}
+
+		List<Condition> result = elementsCriteria.setProjection(projection)
+				.setResultTransformer(Transformers.aliasToBean(Condition.class)).list();
+
 		entityManager.close();
 
 		return result;
@@ -380,7 +396,7 @@ public class PersistenceManager {
 	 * @return
 	 */
 	public List<Condition> getEntriesPlain(Date startDate, Date endDate) {
-		return getEntries(startDate, endDate, 0, false);
+		return getEntries(startDate, endDate, 0, false, false);
 	}
 
 	/**
@@ -392,7 +408,7 @@ public class PersistenceManager {
 	 * @return
 	 */
 	public List<Condition> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
-		return getEntries(startDate, endDate, threshold, false);
+		return getEntries(startDate, endDate, threshold, false,false);
 	}
 
 	public Condition getEntryById(Long id) {

@@ -44,7 +44,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
 
         boolean result = false;
 
-        ReusableContextEntry<FED> reusableContextEntry = fedDeadtimeOutput.getContext().getReusableContextEntry("FED");
+        ReusableContextEntry<FED> reusableContextEntry = fedDeadtimeOutput.getContext().getReusableContextEntry("PROBLEM-FED");
 
         if(reusableContextEntry == null){
             return false;
@@ -71,10 +71,10 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
                 result = true;
 
                 if(problematicFedsBehindPseudoFed == null) {
-                    contextHandler.registerObject("FED", fedWithDeadtime, new FedPrinter());
+                    contextHandler.registerObject("PROBLEM-FED", fedWithDeadtime, new FedPrinter());
                 } else{
                     for(FED fed: problematicFedsBehindPseudoFed){
-                        contextHandler.registerObject("FED", fed, f -> "FED" + f.getSrcIdExpected());
+                        contextHandler.registerObject("PROBLEM-FED", fed, f -> "FED" + f.getSrcIdExpected());
                     }
                 }
                 contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
@@ -89,7 +89,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     public void parametrize(Properties properties) {
         this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
-        this.description = "FED {{FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED.";
+        this.description = "FED {{PROBLEM-FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED.";
     }
 
 }

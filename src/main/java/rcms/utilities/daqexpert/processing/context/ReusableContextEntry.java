@@ -1,5 +1,10 @@
 package rcms.utilities.daqexpert.processing.context;
 
+import org.hibernate.annotations.CollectionOfElements;
+import rcms.utilities.daqexpert.persistence.StringListConverter;
+
+import javax.persistence.*;
+import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,23 +14,37 @@ import java.util.stream.Collectors;
 /**
  * Register objects and ignore duplicates by text representation
  */
-public class ReusableContextEntry<T> implements ContextEntry<Set<T>>{
+@Entity
+@Table(name="condition_context_reusable")
+public class ReusableContextEntry<T> extends ContextEntry<Set<T>>{
+
+
+    private String objectType;
 
     /**
      * ContextHandler objects - e.g Subsystem object, FED object etc
      */
-    private Set<T> objectSet;
+    @Transient
+    private transient Set<T> objectSet;
 
+    //@Convert(converter = StringListConverter.class)
+    @ElementCollection
+    @CollectionTable(name = "condition_context_reusable_value")
+    @Column(name="value")
     private Set<String> textRepresentationSet;
 
 
     public ReusableContextEntry(){
         this.objectSet = new LinkedHashSet<>();
         this.textRepresentationSet = new LinkedHashSet<>();
+        this.type = "O";
     }
 
 
     public void update(T object, String textRepresentation){
+        if(objectType == null){
+            objectType = object.getClass().getSimpleName();
+        }
         if(!textRepresentationSet.contains(textRepresentation)){
             objectSet.add(object);
             textRepresentationSet.add(textRepresentation);
@@ -58,7 +77,7 @@ public class ReusableContextEntry<T> implements ContextEntry<Set<T>>{
 
     @Override
     public Set<T> getValue() {
-        return null;
+        return this.objectSet;
     }
 
 

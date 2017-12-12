@@ -60,7 +60,7 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 				return daq.getTcdsGlobalInfo().getDeadTimesInstant().get("total");
 			}
 		} catch (NullPointerException e) {
-			logger.warn("Instantaneous deadtime value is not available. Using per lumi section.");
+			logger.debug("Instantaneous deadtime value is not available. Using per lumi section.");
 			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
 				return daq.getTcdsGlobalInfo().getDeadTimes()
 						.get("beamactive_total");

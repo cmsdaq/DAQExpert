@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.processing.context;
 
 import org.apache.log4j.Logger;
+import org.mockito.internal.matchers.Null;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
@@ -53,8 +54,13 @@ public class ContextHandler {
      * @param function function to generate textual representation from the object
      */
     public <T> void registerObject(String key, T object, Function<T, String> function) {
-
-        String s = function.apply(object);
+        String s;
+        try {
+            s = function.apply(object);
+        } catch(NullPointerException e){
+            logger.warn("Could not get text representation fo object " + object + " given function " + function);
+            s = "unavailable";
+        }
 
         if (!context.getContextEntryMap().containsKey(key)) {
             context.getContextEntryMap().put(key, new ReusableContextEntry());
@@ -68,17 +74,23 @@ public class ContextHandler {
         contextNotifier.registerChange(key);
     }
 
+
     public <T> void register(String key, T value) {
 
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new SimpleContextEntry());
-        } else {
-            verifyNoContextMismatch(key, SimpleContextEntry.class);
+        if(value == null){
+            logger.warn("Cannot register null value, trying to register the key: " + key);
+            return;
         }
 
-        SimpleContextEntry simpleContextEntry = (SimpleContextEntry) context.getContextEntryMap().get(key);
+        if (!context.getContextEntryMap().containsKey(key)) {
+            context.getContextEntryMap().put(key, new ReusableContextEntry());
+        } else {
+            verifyNoContextMismatch(key, ReusableContextEntry.class);
+        }
 
-        simpleContextEntry.update(value);
+        ReusableContextEntry simpleContextEntry = (ReusableContextEntry) context.getContextEntryMap().get(key);
+
+        simpleContextEntry.update(value, value.toString());
         contextNotifier.registerChange(key);
     }
 

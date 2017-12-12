@@ -65,7 +65,7 @@ public class FedGeneratesDeadtimeTest {
         fd.parametrize(p);
 
         ContextHandler ch = new ContextHandler();
-        daq.getFeds().stream().filter(predicate).forEach(f -> ch.registerObject("FED", f, new FedPrinter()));
+        daq.getFeds().stream().filter(predicate).forEach(f -> ch.registerObject("PROBLEM-FED", f, new FedPrinter()));
         Output o = new Output(true);
         o.setContext(ch.getContext());
 
@@ -120,7 +120,7 @@ public class FedGeneratesDeadtimeTest {
 
         Output fedDeadtimeOutput = new Output(true);
         ContextHandler ch = new ContextHandler();
-        ch.registerObject("FED", pseudoFed, new FedPrinter());
+        ch.registerObject("PROBLEM-FED", pseudoFed, new FedPrinter());
         fedDeadtimeOutput.setContext(ch.getContext());
         r.put(FEDDeadtime.class.getSimpleName(), fedDeadtimeOutput);
 

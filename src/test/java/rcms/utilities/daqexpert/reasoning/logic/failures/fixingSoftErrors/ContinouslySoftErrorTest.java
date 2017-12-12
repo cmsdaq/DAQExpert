@@ -1,23 +1,21 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 
 public class ContinouslySoftErrorTest {
 
@@ -63,7 +61,7 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
 
-		Set<String> problematicSubsystems = ((SimpleContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet() ;
+		Set<String> problematicSubsystems = ((ReusableContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
 		Assert.assertEquals(2, problematicSubsystems.size());
 		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));

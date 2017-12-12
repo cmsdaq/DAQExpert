@@ -4,22 +4,37 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import rcms.utilities.daqexpert.processing.context.ContextEntry;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
  * @implNote Note that the only reason why the Serializable interface is implemented is that the ContextHandler needs to be cloneable, @see ConditionProducer for implementation details.
  */
-public class StatisticContextEntry implements ContextEntry, Serializable {
+@Entity
+@Table(name="condition_context_statistic")
+public class StatisticContextEntry extends ContextEntry {
 
     private Float min;
     private Float max;
     private Float avg;
+
+    @Transient
     private Float lastReportedAvg;
+    @Transient
     private Float sum;
+    @Transient
     private Float current;
+    @Transient
     private int count;
+    @Transient
     private boolean report;
+    @Transient
     private boolean allTheSame;
 
     private String unit;
+    @Transient
     private DecimalFormat df;
 
     public StatisticContextEntry(String unit, int precision) {
@@ -31,6 +46,7 @@ public class StatisticContextEntry implements ContextEntry, Serializable {
         }
         this.df = new DecimalFormat();
         this.df.setMaximumFractionDigits(precision);
+        this.type = "S";
     }
 
     public void update(Float n) {

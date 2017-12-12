@@ -81,7 +81,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 											logger.debug("Found FED in busy/warning: " + fed.getKey().getSrcIdExpected()
 													+ ": " + fed.getKey().getPercentBackpressure());
 
-											contextHandler.register("FED", dep.getSrcIdExpected());
+											contextHandler.registerObject("FED", dep, f->Integer.toString(f.getSrcIdExpected()));
 											contextHandler.register("FEDSTATE", "(" + currentFedState.name() + " seen on FED"
 													+ fed.getKey().getSrcIdExpected() + ")");
 
@@ -96,7 +96,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 											+ " is individual, has both TTS and slink");
 
 									if (fed.getKey().getPercentBackpressure() > 0F) {
-										contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+										contextHandler.registerObject("FED", fed.getKey(), f->Integer.toString(f.getSrcIdExpected()));
 										contextHandler.register("FEDSTATE", currentFedState.name());
 
 										return foundFedInBusy(daq, fed.getKey());
@@ -177,9 +177,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 		combinedTtsState += ttsStateAtAPV != null ? ttsStateAtAPV + "@APV" : "";
 		combinedTtsState += ttsStateAtPM != null ? ttsStateAtPM + "@PM" : "";
 
-		contextHandler.register("AFFECTED-TTCP", ttcp.getName());
-		contextHandler.register("AFFECTED-SUBSYSTEM", subSystem.getName());
-		contextHandler.register("AFFECTED-FED", fed.getSrcIdExpected());
+		contextHandler.registerObject("AFFECTED-TTCP", ttcp, p->p.getName());
+		contextHandler.registerObject("AFFECTED-SUBSYSTEM", subSystem,s->s.getName());
+		contextHandler.registerObject("AFFECTED-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
 
 		contextHandler.register("AFFECTED-TTCP-STATE", combinedTtsState);
 		contextHandler.register("AFFECTED-FED-STATE", currentFedState.name());
@@ -239,9 +239,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			for (FED fed : notMaskedFedsOfRelatedRU) {
 				if (fed.isRuFedWithoutFragments()) {
 					waitingForOtherFedsInFB = true;
-					contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
-					contextHandler.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
-					contextHandler.register("PROBLEM-TTCP", fed.getTtcp().getName());
+					contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
+					contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
+					contextHandler.registerObject("PROBLEM-TTCP", fed.getTtcp(), p->p.getName());
 				}
 			}
 
@@ -258,8 +258,8 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 
 			if (waitingForOtherFedsInFB) {
 				logger.debug("#FOUND: ru is waiting for other feds in same fb");
-				contextHandler.register("PROBLEM-FED-BUILDER",
-						relatedRu.getFedBuilder() != null ? relatedRu.getFedBuilder().getName() : "not found");
+				contextHandler.registerObject("PROBLEM-FED-BUILDER",
+						relatedRu.getFedBuilder(), fb->fb.getName());
 				contextHandler.register("MIN-FRAGMENT-COUNT", minTrigger);
 				contextHandler.register("MIN-FRAGMENT-PARTITION",
 						minSFB != null ? minSFB.getTtcPartition().getName() : "not found");
@@ -373,13 +373,13 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 											// dont count masked feds
 											if (fed.getNumTriggers() < sfb.getMaxTrig() || fed.getNumTriggers() == 0) {
 												foundFedInOtherRuThatDidNotSendData = true;
-												contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
-												contextHandler.register("PROBLEM-TTCP", sfb.getTtcPartition().getName());
-												contextHandler.register("PROBLEM-FED-BUILDER", sfb.getFedBuilder().getName());
-												contextHandler.register("PROBLEM-SUBSYSTEM",
-														sfb.getTtcPartition().getSubsystem().getName());
-												contextHandler.register("AFFECTED-FED-BUILDER", affectedFed.getFrl()
-														.getSubFedbuilder().getFedBuilder().getName());
+												contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
+												contextHandler.registerObject("PROBLEM-TTCP", sfb.getTtcPartition(), p->p.getName());
+												contextHandler.registerObject("PROBLEM-FED-BUILDER", sfb.getFedBuilder(), fb->fb.getName());
+												contextHandler.registerObject("PROBLEM-SUBSYSTEM",
+														sfb.getTtcPartition().getSubsystem(), s->s.getName());
+												contextHandler.registerObject("AFFECTED-FED-BUILDER", affectedFed.getFrl()
+														.getSubFedbuilder().getFedBuilder(), fb->fb.getName());
 											}
 										}
 									}
@@ -468,9 +468,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				if (fed.getRuFedDataCorruption() > 0) {
 					logger.trace(">FED " + fed.getSrcIdExpected() + " has sent corrupted data "
 							+ fed.getRuFedDataCorruption());
-					contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
-					contextHandler.register("PROBLEM-TTCP", fed.getTtcp().getName());
-					contextHandler.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+					contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
+					contextHandler.registerObject("PROBLEM-TTCP", fed.getTtcp(), p->p.getName());
+					contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
 					contextHandler.setActionKey(fed.getTtcp().getSubsystem().getName());
 					result = true;
 				}
@@ -504,9 +504,9 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				}
 			}
 			if (fed != null) {
-				contextHandler.register("PROBLEM-TTCP", fed.getTtcp().getName());
-				contextHandler.register("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem().getName());
-				contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
+				contextHandler.registerObject("PROBLEM-TTCP", fed.getTtcp(), p->p.getName());
+				contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
+				contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
 				if (fed.getSrcIdExpected() == 1111 || fed.getSrcIdExpected() == 1109) {
 					// exists specific instructions for some fedsD
 					contextHandler.setActionKey("FED1111or1109");

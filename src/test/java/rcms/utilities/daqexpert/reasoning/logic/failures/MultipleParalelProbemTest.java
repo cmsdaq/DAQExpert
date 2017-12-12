@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.processing.context.SimpleContextEntry;
+import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
 
 public class MultipleParalelProbemTest extends FlowchartCaseTestBase {
 	/*
@@ -27,8 +27,8 @@ public class MultipleParalelProbemTest extends FlowchartCaseTestBase {
 		assertSatisfiedLogicModules(snapshot, fc3, legacyFc1);
 
 		ContextHandler contextHandler = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), ((SimpleContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet());
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), ((SimpleContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("TTCP")).getObjectSet());
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), ((ReusableContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet());
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), ((ReusableContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("TTCP")).getObjectSet());
 
 	}
 

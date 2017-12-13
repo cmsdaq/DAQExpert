@@ -18,7 +18,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**

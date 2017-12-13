@@ -2,7 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.*;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
@@ -29,10 +29,10 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(ruStuckWaiting, snapshot);
 
 		/* Assert problem FEDs */
-		ReusableContextEntry<FED> problemFeds = (ReusableContextEntry<FED>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED");
-		ReusableContextEntry<TTCPartition> problemPartitions = (ReusableContextEntry<TTCPartition>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-TTCP");
-		ReusableContextEntry<SubSystem> problemSubsystems = (ReusableContextEntry<SubSystem>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM");
-		ReusableContextEntry<FEDBuilder> problemFedBuilder = (ReusableContextEntry<FEDBuilder>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED-BUILDER");
+		ObjectContextEntry<FED> problemFeds = (ObjectContextEntry<FED>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED");
+		ObjectContextEntry<TTCPartition> problemPartitions = (ObjectContextEntry<TTCPartition>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-TTCP");
+		ObjectContextEntry<SubSystem> problemSubsystems = (ObjectContextEntry<SubSystem>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM");
+		ObjectContextEntry<FEDBuilder> problemFedBuilder = (ObjectContextEntry<FEDBuilder>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED-BUILDER");
 
 		assertEquals(8, problemFeds.getObjectSet().size());
 		List<Integer> r = problemFeds.getObjectSet().stream().map(f -> ((FED) f).getSrcIdExpected()).collect(Collectors.toList());
@@ -56,10 +56,10 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertEquals("HOSCAL", problemFedBuilder.getObjectSet().iterator().next().getName());
 
 
-		ReusableContextEntry<Long> minFragmentCount = (ReusableContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-COUNT");
-		ReusableContextEntry<Long> maxFragmentCount = (ReusableContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-COUNT");
-		ReusableContextEntry<Long> minFragmentPartition = (ReusableContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-PARTITION");
-		ReusableContextEntry<Long> maxFragmentPartition = (ReusableContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-PARTITION");
+		ObjectContextEntry<Long> minFragmentCount = (ObjectContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-COUNT");
+		ObjectContextEntry<Long> maxFragmentCount = (ObjectContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-COUNT");
+		ObjectContextEntry<Long> minFragmentPartition = (ObjectContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MIN-FRAGMENT-PARTITION");
+		ObjectContextEntry<Long> maxFragmentPartition = (ObjectContextEntry<Long>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("MAX-FRAGMENT-PARTITION");
 		/* Assert trigger count info */
 		assertEquals(1, minFragmentCount.getObjectSet().size());
 		assertEquals(1, maxFragmentCount.getObjectSet().size());
@@ -72,13 +72,13 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 
 
 
-		ReusableContextEntry<String> affectedRu = (ReusableContextEntry<String>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-RU");
+		ObjectContextEntry<String> affectedRu = (ObjectContextEntry<String>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-RU");
 		/* Assert affected RUs */
 		assertEquals(1, affectedRu.getObjectSet().size());
 		assertEquals("ru-c2e15-13-01.cms",
 				affectedRu.getObjectSet().iterator().next());
 
-		ReusableContextEntry<FED> affectedFed = (ReusableContextEntry<FED>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-FED");
+		ObjectContextEntry<FED> affectedFed = (ObjectContextEntry<FED>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("AFFECTED-FED");
 		/* Assert affected FEDs */
 		assertEquals(1, affectedFed.getObjectSet().size());
 		assertEquals(735, affectedFed.getObjectSet().iterator().next().getSrcIdExpected());

@@ -9,7 +9,7 @@
 		<class>rcms.utilities.daqexpert.persistence.Condition</class>
 		<class>rcms.utilities.daqexpert.persistence.Point</class>
 		<class>rcms.utilities.daqexpert.processing.context.ContextEntry</class>
-		<class>rcms.utilities.daqexpert.processing.context.ReusableContextEntry</class>
+		<class>rcms.utilities.daqexpert.processing.context.ObjectContextEntry</class>
 		<class>rcms.utilities.daqexpert.processing.context.StatisticContextEntry</class>
 
 

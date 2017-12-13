@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 
 /**
  *
@@ -106,7 +106,7 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 				"most frequent error message did not match expected regex," + " got instead: " + mostFreqErrorMessage,
 				Pattern.matches(expectedMostFrequentErrorMessagePattern, mostFreqErrorMessage));
 
-		Integer actualMostFrequentErrorCount = ((ReusableContextEntry<Integer>)ruFailed.getContextHandler().getContext().getContextEntryMap().get("MOSTFREQUENTERRORCOUNT")).getObjectSet()
+		Integer actualMostFrequentErrorCount = ((ObjectContextEntry<Integer>)ruFailed.getContextHandler().getContext().getContextEntryMap().get("MOSTFREQUENTERRORCOUNT")).getObjectSet()
 				.iterator().next();
 
 		assertTrue("did not find at least one most abundant error message", actualMostFrequentErrorCount >= 1);

@@ -63,12 +63,12 @@ public class ContextHandler {
         }
 
         if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new ReusableContextEntry());
+            context.getContextEntryMap().put(key, new ObjectContextEntry());
         } else {
-            verifyNoContextMismatch(key, ReusableContextEntry.class);
+            verifyNoContextMismatch(key, ObjectContextEntry.class);
         }
 
-        ReusableContextEntry reusableContextEntry = (ReusableContextEntry) context.getContextEntryMap().get(key);
+        ObjectContextEntry reusableContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
 
         reusableContextEntry.update(object, s);
         contextNotifier.registerChange(key);
@@ -83,12 +83,12 @@ public class ContextHandler {
         }
 
         if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new ReusableContextEntry());
+            context.getContextEntryMap().put(key, new ObjectContextEntry());
         } else {
-            verifyNoContextMismatch(key, ReusableContextEntry.class);
+            verifyNoContextMismatch(key, ObjectContextEntry.class);
         }
 
-        ReusableContextEntry simpleContextEntry = (ReusableContextEntry) context.getContextEntryMap().get(key);
+        ObjectContextEntry simpleContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
 
         simpleContextEntry.update(value, value.toString());
         contextNotifier.registerChange(key);

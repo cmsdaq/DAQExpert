@@ -9,7 +9,7 @@ import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.processing.context.functions.FedPrinter;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.ExpectedRate;

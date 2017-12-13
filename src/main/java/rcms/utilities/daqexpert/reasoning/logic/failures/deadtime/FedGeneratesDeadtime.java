@@ -7,7 +7,7 @@ import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.Context;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.processing.context.functions.FedPrinter;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
@@ -44,7 +44,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
 
         boolean result = false;
 
-        ReusableContextEntry<FED> reusableContextEntry = fedDeadtimeOutput.getContext().getReusableContextEntry("PROBLEM-FED");
+        ObjectContextEntry<FED> reusableContextEntry = fedDeadtimeOutput.getContext().getReusableContextEntry("PROBLEM-FED");
 
         if(reusableContextEntry == null){
             return false;

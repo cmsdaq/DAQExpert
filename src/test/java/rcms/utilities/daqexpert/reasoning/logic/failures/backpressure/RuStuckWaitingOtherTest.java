@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.*;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.processing.context.ReusableContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
@@ -45,7 +45,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		assertEquals(
 				108,
-				((ReusableContextEntry)context.getContext().getContextEntryMap().get("PROBLEM-FED")).getObjectSet().size());
+				((ObjectContextEntry)context.getContext().getContextEntryMap().get("PROBLEM-FED")).getObjectSet().size());
 		assertEquals(new HashSet(Arrays.asList(1122)), context.getContext().getReusableContextEntry("AFFECTED-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 
 	}

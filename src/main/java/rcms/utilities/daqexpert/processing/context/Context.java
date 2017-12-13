@@ -45,10 +45,10 @@ public class Context implements Serializable{
     }
 
 
-    public ReusableContextEntry getReusableContextEntry(String key) {
+    public ObjectContextEntry getReusableContextEntry(String key) {
         ContextEntry contextEntry = contextEntryMap.get(key);
-        if (contextEntry instanceof ReusableContextEntry) {
-            return (ReusableContextEntry) contextEntry;
+        if (contextEntry instanceof ObjectContextEntry) {
+            return (ObjectContextEntry) contextEntry;
         }
         return null;
     }

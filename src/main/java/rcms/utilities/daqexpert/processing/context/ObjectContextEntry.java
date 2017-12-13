@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  * Register objects and ignore duplicates by text representation
  */
 @Entity
-@Table(name="condition_context_reusable")
-public class ReusableContextEntry<T> extends ContextEntry<Set<T>>{
+@Table(name="condition_context_object")
+public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
 
 
     private String objectType;
@@ -28,12 +28,12 @@ public class ReusableContextEntry<T> extends ContextEntry<Set<T>>{
 
     //@Convert(converter = StringListConverter.class)
     @ElementCollection
-    @CollectionTable(name = "condition_context_reusable_value")
+    @CollectionTable(name = "condition_context_object_value", joinColumns=@JoinColumn(name="context_object_id"))
     @Column(name="value")
     private Set<String> textRepresentationSet;
 
 
-    public ReusableContextEntry(){
+    public ObjectContextEntry(){
         this.objectSet = new LinkedHashSet<>();
         this.textRepresentationSet = new LinkedHashSet<>();
         this.type = "O";

@@ -189,6 +189,10 @@ public class JobManager {
 		readerRaskController.fireRealTimeReaderTask();
 	}
 
+	public boolean working(){
+		return !futureDataPrepareJob.isWaiting();
+	}
+
 	public Future fireOnDemandJob(long startTime, long endTime, Set<Condition> destination, String scriptName) {
 
 		ConditionDashboard conditionDashboard = Application.get().getDashboard();

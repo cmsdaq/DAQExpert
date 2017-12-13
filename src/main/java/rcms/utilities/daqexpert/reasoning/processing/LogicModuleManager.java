@@ -130,6 +130,7 @@ public class LogicModuleManager {
         for (SimpleLogicModule checker : checkers) {
             try {
                 boolean result = checker.satisfied(daq, checkerResultMap);
+                logger.debug(checker.getName() + ": " + result);
 
                 postprocess(checkerResultMap, checker, result, daq, results);
             } catch(RuntimeException e){

@@ -1,7 +1,6 @@
 package rcms.utilities.daqexpert.processing.context;
 
 import org.hibernate.annotations.CollectionOfElements;
-import rcms.utilities.daqexpert.persistence.StringListConverter;
 
 import javax.persistence.*;
 import java.lang.reflect.ParameterizedType;

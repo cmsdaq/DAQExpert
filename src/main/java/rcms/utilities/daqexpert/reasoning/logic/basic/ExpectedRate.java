@@ -62,11 +62,9 @@ public class ExpectedRate extends SimpleLogicModule {
 
 		if (expectedRate) {
 			if (duration < transitionTime)
-				// transition time
-				return true;
-			else {
-				// transition time passed but run is still ongoing
 				return false;
+			else {
+				return true;
 			}
 		} else {
 			// run is not ongoing, reset the checker

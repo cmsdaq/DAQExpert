@@ -22,6 +22,7 @@ import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.CleanStartupVerifier;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
@@ -77,7 +78,7 @@ public class ServletListener implements ServletContextListener {
 			HttpClient client = HttpClientBuilder.create().build();
 			EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
 
-			jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+			jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifier(Application.get().getPersistenceManager()));
 			jobManager.startJobs();
 
 			Application.get().setJobManager(jobManager);

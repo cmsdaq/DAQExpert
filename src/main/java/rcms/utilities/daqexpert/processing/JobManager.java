@@ -68,9 +68,12 @@ public class JobManager {
 	
 	protected final EventSender eventSender;
 
-	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender) {
+	private final CleanStartupVerifier cleanStartupVerifier;
+
+	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender, CleanStartupVerifier cleanStartupVerifier) {
 		
 		this.eventSender = eventSender;
+		this.cleanStartupVerifier = cleanStartupVerifier;
 
 		int realTimeReaderPeriod = 2000;
 		int batchSnapshotRead = 2000;
@@ -99,6 +102,8 @@ public class JobManager {
 
 		logger.info("Data will be processed from: " + startDate + (endDate != null ? ", to: " + endDate : ""));
 		Application.get().getDataManager().setLastUpdate(startDate);
+
+		cleanStartupVerifier.ensureSafeStartupProcedure();
 		persistVersion(startDate, endDate);
 
 		mainExecutor = new ThreadPoolExecutor(NUMBER_OF_MAIN_THREADS, NUMBER_OF_MAIN_THREADS, 0L, TimeUnit.MILLISECONDS,
@@ -147,6 +152,8 @@ public class JobManager {
 
 		getRecentSuggestions();
 	}
+
+
 
 	private void persistVersion(Date startDate, Date endDate) {
 

@@ -34,6 +34,7 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
@@ -58,7 +59,8 @@ public class JobManagerIT {
 		Application.get().getProp().setProperty("processing.end", endDateString);
 		DataManager dataManager = new DataManager();
 		String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-		JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
+
+		JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifierStub(null));
 		jobManager.startJobs();
 		Thread.sleep(1000);
 	}
@@ -286,6 +288,17 @@ public class JobManagerIT {
 		Mockito.verify(eventSender).sendBatchEvents(
 				(List) argThat(hasItem(Matchers.<Condition> hasProperty("title", is("Level Zero State: Running")))));
 
+	}
+
+	class CleanStartupVerifierStub extends CleanStartupVerifier {
+
+		public CleanStartupVerifierStub(PersistenceManager persistenceManager) {
+			super(persistenceManager);
+		}
+
+		@Override
+		public void ensureSafeStartupProcedure() {
+		}
 	}
 
 }

@@ -94,6 +94,14 @@ public class PersistenceManager {
 		//entityManager.close();
 	}
 
+	public void update(Condition condition){
+		ensureConditionEntityManagerOpen();
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
+		entityManager.merge(condition);
+		tx.commit();
+	}
+
 	public void persist(Point test) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		EntityTransaction tx = entityManager.getTransaction();
@@ -423,6 +431,28 @@ public class PersistenceManager {
 		entityManager.getTransaction().commit();
 		entityManager.close();
 		return result;
+	}
+
+	public Condition getLastVersionEntry(){
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+
+		elementsCriteria.add(Restrictions.eq("group", ConditionGroup.EXPERT_VERSION));
+		elementsCriteria.addOrder(Order.desc("start"));
+		elementsCriteria.setMaxResults(1);
+
+		List<Condition> result = elementsCriteria.list();
+
+		entityManager.close();
+
+		if(result.size() != 0){
+			return result.iterator().next();
+		} else {
+			return  null;
+		}
+
 	}
 
 	public Date getLastFinish() {

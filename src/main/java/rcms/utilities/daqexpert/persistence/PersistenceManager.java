@@ -26,6 +26,8 @@ import org.hibernate.criterion.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hibernate.transform.Transformers;
+import rcms.utilities.daqexpert.processing.context.OptionalContextEntry;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
@@ -54,6 +56,17 @@ public class PersistenceManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
+	private void avoidPersistingOptionalContext(Condition c){
+		if(c.getContext() != null){
+			c.getContext().forEach((key, value) -> {
+				if(value instanceof OptionalContextEntry){
+					logger.info("Avoiding persistence of optional context for condition " + c.getTitle() + " under key; " + key);
+					c.getContext().remove(key);
+				}
+			});
+		}
+	}
+
 	/**
 	 * Persiste multipe entries in one transaction
 	 * 
@@ -63,10 +76,22 @@ public class PersistenceManager {
 		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
+		Condition latest = null;
+		for (Condition e : entries) {
+			if(e.getStart() != null){
+				if(latest == null || latest.getStart().getTime() < e.getStart().getTime()){
+					latest = e;
+				}
+			}
+		}
+		if(latest != null) {
+			logger.info("Most recent condition to persist: " + latest.getStart().toString());
+		}
+
 		for (Condition point : entries) {
 
+			avoidPersistingOptionalContext(point);
 			if (point.isShow()) {
-				logger.info("Persisting condition: " + point.getTitle() + " with context: " + point.getContext());
 				entityManager.persist(point);
 			}
 		}
@@ -86,6 +111,7 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
+		avoidPersistingOptionalContext(entry);
 		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();

@@ -206,7 +206,7 @@ public class ConditionProducer {
             if(contextHandler != null && contextHandler.getContext() != null) {
                 Context clone = (Context) org.apache.commons.lang.SerializationUtils.clone(contextHandler.getContext());
                 toFinish.setContext(clone.getContextEntryMap());
-                logger.info("Setting cloned context for condition: " + toFinish.getTitle() + ": " + clone.getContextEntryMap());
+                logger.debug("Setting cloned context for condition: " + toFinish.getTitle() + ": " + clone.getContextEntryMap());
                 contextHandler.getContextNotifier().deleteObserver(toFinish);
             }
             if (!toFinish.getStart().equals(toFinish.getEnd())) {

@@ -90,7 +90,14 @@ public class ContextHandler {
 
         ObjectContextEntry simpleContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
 
-        simpleContextEntry.update(value, value.toString());
+        String stringRepresentation = value.toString();
+        if(stringRepresentation.length() > 255){
+            String oldValue = stringRepresentation;
+            stringRepresentation = stringRepresentation.substring(0,252) + "...";
+            logger.warn("Trimming context value from: " + oldValue + " to " + stringRepresentation);
+        }
+
+        simpleContextEntry.update(value, stringRepresentation);
         contextNotifier.registerChange(key);
     }
 
@@ -222,7 +229,13 @@ public class ContextHandler {
             List<String> actionStepsWithContext = new ArrayList<>();
 
             for (String step : actionSteps) {
-                actionStepsWithContext.add(putContext(step));
+                String stepWithContext = putContext(step);
+                if(stepWithContext.length() > 255){
+                    String oldValue = stepWithContext;
+                    stepWithContext = stepWithContext.substring(0,252) + "...";
+                    logger.warn("Trimming action step " + oldValue + " to: " + stepWithContext );
+                }
+                actionStepsWithContext.add(stepWithContext);
             }
 
             return actionStepsWithContext;

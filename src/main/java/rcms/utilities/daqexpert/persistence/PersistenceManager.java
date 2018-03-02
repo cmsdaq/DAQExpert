@@ -1,13 +1,7 @@
 package rcms.utilities.daqexpert.persistence;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -58,12 +52,14 @@ public class PersistenceManager {
 
 	private void avoidPersistingOptionalContext(Condition c){
 		if(c.getContext() != null){
+			Set<String> keysToRemove = new HashSet<>();
 			c.getContext().forEach((key, value) -> {
 				if(value instanceof OptionalContextEntry){
 					logger.info("Avoiding persistence of optional context for condition " + c.getTitle() + " under key; " + key);
-					c.getContext().remove(key);
+					keysToRemove.add(key);
 				}
 			});
+			keysToRemove.forEach(key -> c.getContext().remove(key));
 		}
 	}
 

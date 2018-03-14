@@ -52,6 +52,7 @@ public class JobManagerIT {
                                 .withDelay(new Delay(SECONDS, 1)));
 
         ConditionProducer.enableMarkup = false;
+    }
 
 
     private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)

@@ -15,6 +15,7 @@ import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
@@ -51,7 +52,19 @@ public class JobManagerIT {
                                 .withDelay(new Delay(SECONDS, 1)));
 
         ConditionProducer.enableMarkup = false;
+    }
 
+
+    private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
+            throws InterruptedException {
+
+        Application.get().getProp().setProperty(Setting.PROCESSING_START_DATETIME.getKey(), startDateString);
+        Application.get().getProp().setProperty(Setting.PROCESSING_END_DATETIME.getKey(), endDateString);
+        DataManager dataManager = new DataManager();
+        String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
+        JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifierStub(null));
+        jobManager.startJobs();
+        Thread.sleep(1000);
     }
 
     /**
@@ -231,17 +244,7 @@ public class JobManagerIT {
 
     }
 
-    private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
-            throws InterruptedException {
 
-        Application.get().getProp().setProperty(Setting.PROCESSING_START_DATETIME.getKey(), startDateString);
-        Application.get().getProp().setProperty(Setting.PROCESSING_END_DATETIME.getKey(), endDateString);
-        DataManager dataManager = new DataManager();
-        String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-        JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender);
-        jobManager.startJobs();
-        Thread.sleep(1000);
-    }
 
     /**
      * Clean before blackbox test scenarios
@@ -354,6 +357,17 @@ public class JobManagerIT {
         for (String notificationTitle : expectedNotifications) {
             Mockito.verify(eventSender).sendBatchEvents(
                     (List) argThat(hasItem(Matchers.<Condition>hasProperty("title", equalTo(notificationTitle)))));
+        }
+    }
+
+    class CleanStartupVerifierStub extends CleanStartupVerifier {
+
+        public CleanStartupVerifierStub(PersistenceManager persistenceManager) {
+            super(persistenceManager);
+        }
+
+        @Override
+        public void ensureSafeStartupProcedure() {
         }
     }
 }

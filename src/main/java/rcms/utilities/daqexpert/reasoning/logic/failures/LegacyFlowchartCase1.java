@@ -8,6 +8,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
@@ -66,25 +68,31 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 		this.action = action;
 	}
 
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
+		require(LogicModuleRegistry.OutOfSequenceData);
+	}
+
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
 
 	/** sets keys FED, TTCP and SUBSYSTEM to the given string */
 	private void setContextValues(String text) {
 
-		context.register("PROBLEM-FED", text);
-		context.register("PROBLEM-TTCP", text);
-		context.register("PROBLEM-SUBSYSTEM", text);
-		context.register("ORIGERRMSG", "-");
+		contextHandler.register("PROBLEM-FED", text);
+		contextHandler.register("PROBLEM-TTCP", text);
+		contextHandler.register("PROBLEM-SUBSYSTEM", text);
+		contextHandler.register("ORIGERRMSG", "-");
 
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
-		if (results.get(OutOfSequenceData.class.getSimpleName()))
+		if (results.get(OutOfSequenceData.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -105,7 +113,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 			for (RU ru : daq.getRus()) {
 				if ("SyncLoss".equalsIgnoreCase(ru.getStateName())) {
-					context.register("RU", ru.getHostname());
+					contextHandler.register("RU", ru.getHostname());
 					syncLossRU = ru;
 					break;
 				}
@@ -137,7 +145,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 					}
 				}
 
-				context.register("ORIGERRMSG", trimmedMessage);
+				contextHandler.register("ORIGERRMSG", trimmedMessage);
 
 				// find the FED from the exception message
 				//
@@ -152,7 +160,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 				Matcher mo = syncLossPattern.matcher(syncLossRU.getErrorMsg());
 				if (mo.find()) {
 					int fedId = Integer.parseInt(mo.group(1));
-					context.register("PROBLEM-FED", mo.group(1));
+					contextHandler.register("PROBLEM-FED", mo.group(1));
 
 					// get the FED object
 					FED problematicFED = daq.getFEDbySrcId(fedId);
@@ -168,13 +176,13 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 								subsystemName = ttcp.getSubsystem().getName();
 							}
 						}
-						context.register("PROBLEM-TTCP", ttcpName);
-						context.register("PROBLEM-SUBSYSTEM", subsystemName);
+						contextHandler.register("PROBLEM-TTCP", ttcpName);
+						contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
 
 						if (problematicFED.getSrcIdExpected() == 1111 || problematicFED.getSrcIdExpected() == 1109) {
-							context.setActionKey("FED1111or1109");
+							contextHandler.setActionKey("FED1111or1109");
 						} else {
-							context.setActionKey(subsystemName);
+							contextHandler.setActionKey(subsystemName);
 						}
 					} else {
 						setContextValues("(FED not found)");

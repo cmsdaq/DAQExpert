@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.base;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.Requiring;
 
 /**
  * Simple type of Logic Module. It checks if the condition is satisfied.
@@ -25,7 +26,7 @@ public abstract class SimpleLogicModule extends LogicModule {
 	 * @return condition satisfied, <code>true</code> when satisfied,
 	 *         <code>false</code> otherwise.
 	 */
-	public abstract boolean satisfied(DAQ daq, Map<String, Boolean> results);
+	public abstract boolean satisfied(DAQ daq, Map<String, Output> results);
 
 	/**
 	 * Is condition stable i.e. is condition lasting for some time or it's only

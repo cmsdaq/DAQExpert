@@ -2,11 +2,10 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
@@ -31,14 +30,20 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 
 	}
 
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.ExpectedRate);
+		require(LogicModuleRegistry.BeamActive);
+	}
+
 	/**
 	 * Dead time during running
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         boolean expectedRate;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
         if (!expectedRate) {
             return false;
         }
@@ -46,15 +51,15 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
         double deadtime = getDeadtime(daq, results);
 
         if (deadtime > threshold) {
-            context.registerForStatistics("DEADTIME", deadtime, "%", 1);
+            contextHandler.registerForStatistics("DEADTIME", deadtime, "%", 1);
 			return true;
         } else
 		return false;
 	}
 
-	private double getDeadtime(DAQ daq, Map<String, Boolean> results){
+	private double getDeadtime(DAQ daq, Map<String, Output> results){
 		try {
-			if (results.get(BeamActive.class.getSimpleName())) {
+			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
 				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
 						.get("beamactive_tts");
 
@@ -63,7 +68,7 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 			}
 		} catch (NullPointerException e) {
 			logger.warn("Instantaneous TTS deadtime value is not available. Using per lumi section.");
-			if (results.get(BeamActive.class.getSimpleName())) {
+			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
 				return daq.getTcdsGlobalInfo().getDeadTimes()
 						.get("beamactive_tts");
 

@@ -9,6 +9,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FRL;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.data.SubFEDBuilder;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.LogicModuleHelper;
@@ -43,12 +45,17 @@ public class FEROLFifoStuck extends KnownFailure {
 
 	}
 
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
+	}
+
 	private static final Logger logger = Logger.getLogger(FEROLFifoStuck.class);
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -114,22 +121,22 @@ public class FEROLFifoStuck extends KnownFailure {
 						// we found a FRL with this problem
 						FRL frl = fed.getFrl();
 
-						context.register("FEDID", fed.getSrcIdExpected());
-						context.register("FRLPC", frl.getFrlPc().getHostname());
-						context.register("FRLIO", fed.getFrlIO());
+						contextHandler.register("FEDID", fed.getSrcIdExpected());
+						contextHandler.register("FRLPC", frl.getFrlPc().getHostname());
+						contextHandler.register("FRLIO", fed.getFrlIO());
 
 						// this is only the URL of the XDAQ process, not of the
 						// FRL instance
-						context.register("FRLURL", frl.getUrl());
+						contextHandler.register("FRLURL", frl.getUrl());
 
 						// LID of the instance of FEROL/FEROL40 controller controlling
 						// this FED
 						final int lid = 100 + frl.getGeoSlot();
-						context.register("FRLLID", lid);
+						contextHandler.register("FRLLID", lid);
 
 						// register also the full URL for the dump button
 						String fullURL = frl.getUrl() + "/urn:xdaq-application:lid=" + lid + "/expertDebugPage";
-						context.register("FRLFULLURL", fullURL);
+						contextHandler.register("FRLFULLURL", fullURL);
 
 						result = true;
 					} // if problem in this FRL

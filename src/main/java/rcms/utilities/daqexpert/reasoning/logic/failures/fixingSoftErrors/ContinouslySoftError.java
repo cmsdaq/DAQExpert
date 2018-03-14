@@ -20,6 +20,7 @@ import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
@@ -86,7 +87,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 	private List<String> problemStates = Arrays.asList("FixingSoftError", "RunningSoftErrorDetected");
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 		boolean currentResult = false;
 		String currentState = daq.getLevelZeroState();
 
@@ -149,7 +150,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				logger.debug("Registering " + problematicSubsystems);
 
 				for (String problematicSubsystem : problematicSubsystems) {
-					context.register("SUBSYSTEM", problematicSubsystem);
+					contextHandler.register("SUBSYSTEM", problematicSubsystem);
 				}
 			}
 

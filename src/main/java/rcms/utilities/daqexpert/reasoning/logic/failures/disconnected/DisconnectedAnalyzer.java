@@ -36,8 +36,8 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 						TTSState pmTTSState = getParitionState(ttcp);
 						if (pmTTSState == TTSState.DISCONNECTED) {
 
-							context.register("PROBLEM-SUBSYSTEM", subSystem.getName());
-							context.register("PROBLEM-PARTITION", ttcp.getName());
+							contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
+							contextHandler.register("PROBLEM-PARTITION", ttcp.getName());
 							return detectSubcase(daq, ttcp);
 
 						}
@@ -62,9 +62,9 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 				FMM disconnectedFMM = disconnectedTtcp.getFmm();
 				logger.trace("Disconnected fmm: " + disconnectedFMM.getUrl() + " geoslot " + disconnectedFMM.getGeoslot()+ " has feds: " + disconnectedFMM.getFeds().size());
 
-				context.register("PROBLEM-FMM-GEOSLOT", disconnectedFMM.getGeoslot());
-				context.register("PROBLEM-FMM-URL", disconnectedFMM.getUrl());
-				context.register("PROBLEM-FMM-SERVICE", disconnectedFMM.getServiceName());
+				contextHandler.register("PROBLEM-FMM-GEOSLOT", disconnectedFMM.getGeoslot());
+				contextHandler.register("PROBLEM-FMM-URL", disconnectedFMM.getUrl());
+				contextHandler.register("PROBLEM-FMM-SERVICE", disconnectedFMM.getServiceName());
 				Set<FED> disconnectedFEDs = new HashSet<>();
 				for (FED fed : disconnectedTtcp.getFeds()) {
 					logger.trace("Checkign FED " + fed.getSrcIdExpected() + ": " + fed.getTtsState());
@@ -78,7 +78,7 @@ public abstract class DisconnectedAnalyzer extends KnownFailure {
 				}
 				if (disconnectedFEDs.size() > 0) {
 					for (FED disconnectedFED : disconnectedFEDs) {
-						context.register("PROBLEM-FED", disconnectedFED.getSrcIdExpected());
+						contextHandler.register("PROBLEM-FED", disconnectedFED.getSrcIdExpected());
 					}
 					return DisconnectedSubcase.FEDDisconnected;
 				} else {

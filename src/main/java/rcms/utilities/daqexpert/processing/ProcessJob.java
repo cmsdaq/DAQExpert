@@ -1,24 +1,18 @@
 package rcms.utilities.daqexpert.processing;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * Job processing the retrieved data (snapshots)

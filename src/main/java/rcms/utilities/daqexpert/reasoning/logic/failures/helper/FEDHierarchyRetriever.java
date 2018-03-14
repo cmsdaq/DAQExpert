@@ -97,4 +97,11 @@ public class FEDHierarchyRetriever {
 
 		return revertedDependencyTree;
 	}
+
+	public static Set<FED> getFedsBehindPseudo(FED pseudofed){
+
+		Map<FED, Set<FED>> map = getFEDHierarchy(pseudofed.getTtcp());
+		return map.get(pseudofed);
+
+	}
 }

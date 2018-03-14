@@ -3,13 +3,11 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
-import static rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase.getSnapshot;
-import scala.util.matching.Regex;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 
 /**
  *
@@ -57,17 +55,17 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 				"ru-c2e13-17-01.cms", "ru-c2e13-16-01.cms", "ru-c2e13-13-01.cms", "ru-c2e12-13-01.cms",
 				"ru-c2e13-24-01.cms", "ru-c2e13-39-01.cms", "ru-c2e13-19-01.cms" };
 
-		// TODO: should we introduce named constants for the context keys ?
+		// TODO: should we introduce named constants for the contextHandler keys ?
 		assertEquals(new HashSet<>(Arrays.asList(expectedMostFrequentErrorMessage)),
-				ruFailed.getContext().getContext().get("MOSTFREQUENTERROR"));
+				ruFailed.getContextHandler().getContext().get("MOSTFREQUENTERROR"));
 
 		assertEquals(new HashSet<>(Arrays.asList(expectedMostFrequentErrorCount)),
-				ruFailed.getContext().getContext().get("MOSTFREQUENTERRORCOUNT"));
+				ruFailed.getContextHandler().getContext().get("MOSTFREQUENTERRORCOUNT"));
 
 		assertEquals(new HashSet<>(Arrays.asList(expectedRUs.length)),
-				ruFailed.getContext().getContext().get("NUMFAILEDRUS"));
+				ruFailed.getContextHandler().getContext().get("NUMFAILEDRUS"));
 
-		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), ruFailed.getContext().getContext().get("RU"));
+		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), ruFailed.getContextHandler().getContext().get("RU"));
 
 		// ----------
 
@@ -102,22 +100,21 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 
 		// note that there are no guarantees on which message we actually
 		// get so we match with a pattern
-		String mostFreqErrorMessage = (String) ruFailed.getContext().getContext().get("MOSTFREQUENTERROR").iterator()
-				.next();
+		String mostFreqErrorMessage = ruFailed.getContextHandler().getContext().getContextEntryMap().get("MOSTFREQUENTERROR").getTextRepresentation();
 
 		assertTrue(
 				"most frequent error message did not match expected regex," + " got instead: " + mostFreqErrorMessage,
 				Pattern.matches(expectedMostFrequentErrorMessagePattern, mostFreqErrorMessage));
 
-		Integer actualMostFrequentErrorCount = (Integer) ruFailed.getContext().getContext()
-				.get("MOSTFREQUENTERRORCOUNT").iterator().next();
+		Integer actualMostFrequentErrorCount = ((ObjectContextEntry<Integer>)ruFailed.getContextHandler().getContext().getContextEntryMap().get("MOSTFREQUENTERRORCOUNT")).getObjectSet()
+				.iterator().next();
 
 		assertTrue("did not find at least one most abundant error message", actualMostFrequentErrorCount >= 1);
 
 		assertEquals(new HashSet<>(Arrays.asList(expectedRUs.length)),
-				ruFailed.getContext().getContext().get("NUMFAILEDRUS"));
+				ruFailed.getContextHandler().getContext().get("NUMFAILEDRUS"));
 
-		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), ruFailed.getContext().getContext().get("RU"));
+		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), ruFailed.getContextHandler().getContext().get("RU"));
 
 		// ----------
 

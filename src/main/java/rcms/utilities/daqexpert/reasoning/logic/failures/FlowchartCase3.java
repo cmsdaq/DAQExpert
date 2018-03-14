@@ -5,6 +5,8 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -28,12 +30,18 @@ public class FlowchartCase3 extends KnownFailure {
 				"Problem still not fixed after recover: Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}})",
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
+
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
+	}
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+	@Override
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 		assignPriority(results);
 		
@@ -50,9 +58,9 @@ public class FlowchartCase3 extends KnownFailure {
 						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
-							context.register("SUBSYSTEM", subSystem.getName());
-							context.register("TTCP", ttcp.getName());
-							context.register("STATE", currentState.name());
+							contextHandler.register("SUBSYSTEM", subSystem.getName());
+							contextHandler.register("TTCP", ttcp.getName());
+							contextHandler.register("STATE", currentState.name());
 							result = true;
 						}
 					}

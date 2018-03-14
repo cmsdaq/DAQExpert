@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
@@ -44,22 +45,22 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         DAQ snapshot = getSnapshot("1480508609145.smile.gz");
         Logger.getLogger(BackpressureFromHlt.class).setLevel(Level.INFO);
 
-        Map<String, Boolean> r = new HashMap<>();
-        r.put(StableBeams.class.getSimpleName(), true);
-        r.put(ExpectedRate.class.getSimpleName(),true);
-        r.put(FEDDeadtime.class.getSimpleName(),true);
-        r.put(TTSDeadtime.class.getSimpleName(),true);
+        Map<String, Output> r = new HashMap<>();
+        r.put(StableBeams.class.getSimpleName(), new Output(true));
+        r.put(ExpectedRate.class.getSimpleName(),new Output(true));
+        r.put(FEDDeadtime.class.getSimpleName(),new Output(true));
+        r.put(TTSDeadtime.class.getSimpleName(),new Output(true));
 
 
         FedDeadtimeDueToDaq fd = new FedDeadtimeDueToDaq();
         fd.parametrize(properties);
         Assert.assertFalse(fd.satisfied(snapshot,r));
-        r.put(FedDeadtimeDueToDaq.class.getSimpleName(), false);
+        r.put(FedDeadtimeDueToDaq.class.getSimpleName(), new Output(false));
 
         TmpUpgradedFedProblem tfd = new TmpUpgradedFedProblem();
         tfd.parametrize(properties);
         Assert.assertFalse(tfd.satisfied(snapshot,r));
-        r.put(TmpUpgradedFedProblem.class.getSimpleName(), false);
+        r.put(TmpUpgradedFedProblem.class.getSimpleName(), new Output(false));
 
 
         BackpressureFromHlt module = new BackpressureFromHlt();

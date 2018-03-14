@@ -10,7 +10,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
 /**
@@ -36,7 +37,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("622")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
@@ -60,7 +61,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-TTCP"));
@@ -79,7 +80,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
@@ -98,7 +99,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
@@ -117,7 +118,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
@@ -137,7 +138,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1499843690396.json.gz");
 
 		/* Fake that OutOfSequenceData LM did not found the problem... */
-		results.put(OutOfSequenceData.class.getSimpleName(), false);
+		results.put(OutOfSequenceData.class.getSimpleName(), new Output(false));
 		
 		/* ... to give a chance to legacy LM*/
 		assertEqualsAndUpdateResults(true, legacyFc1, snapshot);
@@ -145,12 +146,12 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		System.out.println(legacyFc1.getDescriptionWithContext());
 		System.out.println(legacyFc1.getActionWithContext());
 
-		Context context = legacyFc1.getContext();
+		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1111")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
 
-		assertEquals("FED1111or1109",legacyFc1.getContext().getActionKey());
+		assertEquals("FED1111or1109",legacyFc1.getContextHandler().getActionKey());
 		assertEquals(3,legacyFc1.getActionWithContext().size());
 
   }

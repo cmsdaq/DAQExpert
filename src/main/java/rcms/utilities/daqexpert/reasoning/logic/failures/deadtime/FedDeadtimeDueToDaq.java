@@ -6,6 +6,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
@@ -26,9 +28,14 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.FEDDeadtime);
+    }
 
-        boolean fedDeadtime = results.get(FEDDeadtime.class.getSimpleName());
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        boolean fedDeadtime = results.get(FEDDeadtime.class.getSimpleName()).getResult();
         if (!fedDeadtime) {
             return false;
         }
@@ -77,14 +84,14 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
                     result = true;
 
                     if(problematicFedsBehindPseudoFed == null) {
-                        context.register("FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.register("FED", topLevelFed.getSrcIdExpected());
                     } else{
                         for(FED fed: problematicFedsBehindPseudoFed){
-                            context.register("FED", fed.getSrcIdExpected());
+                            contextHandler.register("FED", fed.getSrcIdExpected());
                         }
                     }
-                    context.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
-                    context.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
+                    contextHandler.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
+                    contextHandler.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
 
                 }
             }

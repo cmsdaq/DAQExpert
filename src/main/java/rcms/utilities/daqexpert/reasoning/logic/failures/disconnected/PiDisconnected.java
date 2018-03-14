@@ -3,6 +3,8 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.disconnected;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
@@ -22,8 +24,13 @@ public class PiDisconnected extends DisconnectedAnalyzer {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
+	}
+
+	@Override
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);

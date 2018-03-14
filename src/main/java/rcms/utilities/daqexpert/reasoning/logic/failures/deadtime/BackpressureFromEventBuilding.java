@@ -4,14 +4,14 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.*;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.TmpUpgradedFedProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
-import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Logic module identifying the reason behind deadtime
@@ -36,10 +36,16 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.FedDeadtimeDueToDaq);
+        require(LogicModuleRegistry.TmpUpgradedFedProblem);
+    }
 
-        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
-        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName());
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName()).getResult();
+        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName()).getResult();
 
 
         if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
@@ -68,8 +74,8 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                                 if (backpressure > fedBackpressureThreshold) {
 
                                     logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
-                                    context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                                    context.registerForStatistics("BACKPRESSURE", backpressure);
+                                    contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
                                     problematicFeds.add(fed);
                                     foundProblematicFeds = true;
                                 }
@@ -78,7 +84,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         }
                     }
                     if (foundProblematicFeds) {
-                        context.register("PROBLEMATIC-RU", ru.getHostname());
+                        contextHandler.register("PROBLEMATIC-RU", ru.getHostname());
                         logger.debug("Found problematic RU: " + ru.getHostname());
                         problematicRus.add(ru);
                     }
@@ -93,7 +99,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
             for (RU ru : daq.getRus()) {
                 if (ru.isEVM() && ru.getRequests() < evmFewRequestsThreshold) {
                     logger.trace("EVM has: " + ru.getRequests() + " requests");
-                    context.registerForStatistics("EVM-REQUESTS", ru.getRequests());
+                    contextHandler.registerForStatistics("EVM-REQUESTS", ru.getRequests());
                     evmFewRequests = true;
                 }
             }

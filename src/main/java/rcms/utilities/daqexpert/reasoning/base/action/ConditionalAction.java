@@ -38,7 +38,7 @@ public class ConditionalAction implements Action {
 				return this.action.get(DEFAULT_KEY);
 			}
 		} else {
-			logger.warn("No action key for context action, using default action");
+			logger.warn("No action key for contextHandler action, using default action");
 			return getSteps();
 		}
 

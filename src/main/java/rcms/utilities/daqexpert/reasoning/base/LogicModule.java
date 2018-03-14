@@ -1,7 +1,12 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.processing.Requiring;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Elementary part of expert knowledge. Logic Module (abbreviated LM) is a piece
@@ -34,7 +39,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public abstract class LogicModule {
+public abstract class LogicModule implements Requiring {
 
 	/**
 	 * Name of the condition found
@@ -59,6 +64,15 @@ public abstract class LogicModule {
 	 */
 	protected boolean holdNotifications;
 
+	/**
+	 * Set of required logic modules
+	 */
+	protected Set<Requiring> required;
+
+
+	public LogicModule(){
+		this.required = new LinkedHashSet<>();
+	}
 	/**
 	 * Get name of the condition
 	 * 
@@ -120,5 +134,16 @@ public abstract class LogicModule {
 	public void setHoldNotifications(boolean holdNotifications) {
 		this.holdNotifications = holdNotifications;
 	}
+
+
+	public Set<Requiring> getRequired(){
+		return required;
+	}
+
+	protected void require(LogicModuleRegistry logicModuleRegistry){
+
+		required.add(logicModuleRegistry.getLogicModule());
+	}
+
 
 }

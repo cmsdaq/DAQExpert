@@ -6,11 +6,10 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 
 /**
  *
@@ -23,7 +22,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	public void case1Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1478748186297.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
-		Context context = fc3.getContext();
+		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
 	}
@@ -33,7 +32,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	public void case2Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1480813540739.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
-		Context context = fc3.getContext();
+		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 	}
@@ -43,7 +42,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 	public void ttsAtTopFMMNullButPmOutOfSyncTest() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1491576714151.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
-		Context context = fc3.getContext();
+		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("TTCP"));
 	}
@@ -56,7 +55,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1496647349638.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
 
-		Context context = fc3.getContext();
+		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
 	}
@@ -79,7 +78,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		// FIXME: ru failed redundant
 		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
 
-		Context context = fc3.getContext();
+		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
 

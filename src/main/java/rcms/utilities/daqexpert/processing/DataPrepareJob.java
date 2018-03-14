@@ -47,6 +47,11 @@ public class DataPrepareJob implements Runnable {
 
 	/** flag to do demo run */
 	private final boolean demoRun;
+	private boolean waiting;
+
+	public boolean isWaiting(){
+		return waiting;
+	}
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
@@ -78,6 +83,7 @@ public class DataPrepareJob implements Runnable {
 				snapshots = readerJob.read();
 
 				if (snapshots.getRight().size() > 0) {
+					waiting = false;
 
 					if (priority == Integer.MAX_VALUE)
 						priority = 0;
@@ -95,6 +101,7 @@ public class DataPrepareJob implements Runnable {
 						logger.info("No result this round");
 						return;
 					}
+
 
 					try {
 
@@ -133,6 +140,9 @@ public class DataPrepareJob implements Runnable {
 						logger.error(e);
 						e.printStackTrace();
 					}
+				} else{
+
+					waiting=true;
 				}
 
 			}

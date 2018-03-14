@@ -3,6 +3,8 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
@@ -14,6 +16,11 @@ public class ExpectedRate extends SimpleLogicModule {
 		this.description = "Expecting rate";
 	}
 
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.RunOngoing);
+	}
+
 
 	/**
 	 * Transition time in ms
@@ -23,11 +30,11 @@ public class ExpectedRate extends SimpleLogicModule {
 	private long started;
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		boolean expectedRate = false;
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
+		boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
 
 		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
 		boolean dcsPauseResume = daq.getLevelZeroState().equalsIgnoreCase("PerformingDCSPauseResume") ? true : false;
@@ -55,10 +62,8 @@ public class ExpectedRate extends SimpleLogicModule {
 
 		if (expectedRate) {
 			if (duration < transitionTime)
-				// transition time
 				return false;
 			else {
-				// transition time passed but run is still ongoing
 				return true;
 			}
 		} else {

@@ -1,10 +1,10 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.BeamActive;
 import rcms.utilities.daqexpert.reasoning.logic.basic.CriticalDeadtime;
@@ -24,13 +24,20 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
         this.name = "High ReTri deadtime";
         this.action = new SimpleAction(
                 "Adding random triggers may reduce the deadtime from ReTri. Discuss this with the shift leader.");
+
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.CriticalDeadtime);
+        require(LogicModuleRegistry.BeamActive);
+    }
+
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         boolean result = false;
-        if (!results.get(CriticalDeadtime.class.getSimpleName()))
+        if (!results.get(CriticalDeadtime.class.getSimpleName()).getResult())
             return false;
 
         assignPriority(results);
@@ -38,16 +45,16 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
         double retriContributionToDeadtime = getReTriDeadtime(daq, results);
 
         if (retriContributionToDeadtime > contributionThresholdInPercent) {
-            context.registerForStatistics("RETRI_CONTRIBUTION", retriContributionToDeadtime, "%", 1);
+            contextHandler.registerForStatistics("RETRI_CONTRIBUTION", retriContributionToDeadtime, "%", 1);
             result = true;
         }
 
         return result;
     }
 
-    private double getReTriDeadtime(DAQ daq, Map<String, Boolean> results) {
+    private double getReTriDeadtime(DAQ daq, Map<String, Output> results) {
         try {
-            if (results.get(BeamActive.class.getSimpleName())) {
+            if (results.get(BeamActive.class.getSimpleName()).getResult()) {
                 return daq.getTcdsGlobalInfo().getDeadTimesInstant()
                         .get("beamactive_retri");
 
@@ -55,7 +62,7 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
                 return daq.getTcdsGlobalInfo().getDeadTimesInstant().get("retri");
             }
         } catch (NullPointerException e) {
-            if (results.get(BeamActive.class.getSimpleName())) {
+            if (results.get(BeamActive.class.getSimpleName()).getResult()) {
                 return daq.getTcdsGlobalInfo().getDeadTimes()
                         .get("beamactive_retri");
 

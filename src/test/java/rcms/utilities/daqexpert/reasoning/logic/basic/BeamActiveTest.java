@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
 /**
@@ -38,7 +39,7 @@ public class BeamActiveTest
 			LHCBeamMode.STABLE_BEAMS
 		}));
 
-		Map<String, Boolean> results = new HashMap<String, Boolean>();
+		Map<String, Output> results = new HashMap<>();
 
 		BeamActive instance = new BeamActive();
 

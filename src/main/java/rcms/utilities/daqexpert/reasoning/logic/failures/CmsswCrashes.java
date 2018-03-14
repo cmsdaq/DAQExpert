@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
@@ -35,10 +37,16 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         this.action = new SimpleAction("Call the HLT DOC, mentioning the messages under you see under HLT Alerts in F3 Mon. ",
                 "Call the DAQ DOC. He might need to clean up the Filter Farm.");
 
+
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.BackpressureFromHlt);
+    }
+
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         assignPriority(results);
 
@@ -61,7 +69,7 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
 
             if (crashesCountThreshold <= currentCrashIncrement) {
                 float crashesPerSecond = currentCrashIncrement / (0.001f*currentTimeIncrement);
-                context.registerForStatistics("CRASHES", crashesPerSecond, " crashes/s", 1);
+                contextHandler.registerForStatistics("CRASHES", crashesPerSecond, " crashes/s", 1);
                 result = true;
             }
 
@@ -72,11 +80,11 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         // update the sliding window - keep as less data as possible for next iteration
         timeWindow = timeWindow.stream().filter(e -> e.getLeft() >= startTimestampOfSlidingWindow).collect(Collectors.toList());
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName())) {
+        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
             //mention the fact that some modules are active
-            context.registerConditionalNote("NOTE", additionalNote);
+            contextHandler.registerConditionalNote("NOTE", additionalNote);
         } else{
-            context.unregisterConditionalNote("NOTE");
+            contextHandler.unregisterConditionalNote("NOTE");
         }
 
         return result;

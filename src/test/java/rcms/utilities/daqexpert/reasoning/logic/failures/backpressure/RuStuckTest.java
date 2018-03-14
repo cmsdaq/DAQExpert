@@ -6,13 +6,11 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.Context;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 public class RuStuckTest extends FlowchartCaseTestBase {
@@ -74,7 +72,7 @@ public class RuStuckTest extends FlowchartCaseTestBase {
 
 		assertOnlyOneIsSatisified(ruStuck, snapshot);
 
-		Context context = ruStuck.getContext();
+		ContextHandler context = ruStuck.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().get("FED"));
 		assertEquals(new HashSet(Arrays.asList("DT")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().get("TTCP"));

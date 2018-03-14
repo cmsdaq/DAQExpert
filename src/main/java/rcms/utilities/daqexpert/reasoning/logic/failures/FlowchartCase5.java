@@ -8,6 +8,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -45,15 +47,21 @@ public class FlowchartCase5 extends KnownFailure {
 				"Call the DOC for the TRACKER");
 
 		this.action = action;
+
+	}
+
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	// add triggers info (behind or the same
 	// number)
 	// TODO: add hierarchy of FEDS (pseudo feds)
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -84,10 +92,10 @@ public class FlowchartCase5 extends KnownFailure {
 										for (FED dep : fed.getValue()) {
 											if (dep.getPercentBackpressure() == 0F) {
 												result = true;
-												context.register("FED",
+												contextHandler.register("FED",
 														"(" + dep.getSrcIdExpected() + " behind pseudo FED "
 																+ fed.getKey().getSrcIdExpected() + ")");
-												context.register("FEDSTATE",
+												contextHandler.register("FEDSTATE",
 														"(" + (dep.getTtsState() != null ? dep.getTtsState()
 																: "FED has no individual TTS state, ")
 																+ currentFedState.name() + " @ its pseudo FED)");
@@ -100,8 +108,8 @@ public class FlowchartCase5 extends KnownFailure {
 									else {
 										if (fed.getKey().getPercentBackpressure() == 0F) {
 											result = true;
-											context.register("FED", fed.getKey().getSrcIdExpected());
-											context.register("FEDSTATE", currentFedState.name());
+											contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+											contextHandler.register("FEDSTATE", currentFedState.name());
 										} else {
 											existsAtLeaseOneFedBackpressured = true;
 										}
@@ -109,15 +117,15 @@ public class FlowchartCase5 extends KnownFailure {
 									}
 
 									if (result) {
-										context.register("TTCP", ttcp.getName());
-										context.register("TTCPSTATE", currentState.name());
-										context.register("SUBSYSTEM", subSystem.getName());
+										contextHandler.register("TTCP", ttcp.getName());
+										contextHandler.register("TTCPSTATE", currentState.name());
+										contextHandler.register("SUBSYSTEM", subSystem.getName());
 										
 										if(currentState == TTSState.WARNING && "TRACKER".equalsIgnoreCase(subSystem.getName())){
-											context.setActionKey("TRACKER-WARNING");
+											contextHandler.setActionKey("TRACKER-WARNING");
 										} else{
 
-											context.setActionKey(subSystem.getName());
+											contextHandler.setActionKey(subSystem.getName());
 										}
 									}
 								}

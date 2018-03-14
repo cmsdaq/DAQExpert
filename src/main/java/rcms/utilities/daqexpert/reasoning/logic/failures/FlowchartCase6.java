@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -41,9 +42,9 @@ public class FlowchartCase6 extends KnownFailure {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -80,8 +81,8 @@ public class FlowchartCase6 extends KnownFailure {
 
 											if (dep.getPercentBackpressure() > 0F) {
 
-												context.register("FED", dep.getSrcIdExpected());
-												context.register("FEDSTATE", "(" + currentFedState.name()
+												contextHandler.register("FED", dep.getSrcIdExpected());
+												contextHandler.register("FEDSTATE", "(" + currentFedState.name()
 														+ " seen on FED" + fed.getKey().getSrcIdExpected() + ")");
 												fedsBackpressuredByDaq.add(fed.getKey());
 												victimSubsystems.add(subSystem);
@@ -93,8 +94,8 @@ public class FlowchartCase6 extends KnownFailure {
 									} else {
 
 										if (fed.getKey().getPercentBackpressure() > 0F) {
-											context.register("FED", fed.getKey().getSrcIdExpected());
-											context.register("FEDSTATE", currentFedState.name());
+											contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+											contextHandler.register("FEDSTATE", currentFedState.name());
 											fedsBackpressuredByDaq.add(fed.getKey());
 											result = true;
 										}
@@ -105,9 +106,9 @@ public class FlowchartCase6 extends KnownFailure {
 							}
 
 							if (result) {
-								context.register("TTCP", ttcp.getName());
-								context.register("TTCPSTATE", currentState.name());
-								context.register("SUBSYSTEM", subSystem.getName());
+								contextHandler.register("TTCP", ttcp.getName());
+								contextHandler.register("TTCPSTATE", currentState.name());
+								contextHandler.register("SUBSYSTEM", subSystem.getName());
 							}
 						}
 					}
@@ -131,10 +132,10 @@ public class FlowchartCase6 extends KnownFailure {
 						if (!victimSubsystems.contains(fed.getTtcp().getSubsystem())) {
 							/*
 							 * this FED stopped sending data for no apparent
-							 * reason (note that context.register() ignores
+							 * reason (note that contextHandler.register() ignores
 							 * duplicate entries)
 							 */
-							context.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
+							contextHandler.register("FROZENSUBSYSTEM", fed.getTtcp().getSubsystem().getName());
 						}
 					}
 				} // loop over FEDs

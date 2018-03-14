@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
@@ -53,7 +53,7 @@ public class StuckAfterSoftError extends KnownFailure {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         boolean result = false;
         String currentState = daq.getLevelZeroState();
@@ -79,7 +79,7 @@ public class StuckAfterSoftError extends KnownFailure {
 
             for (SubSystem subsystem : daq.getSubSystems()) {
                 if (problemStates.contains(subsystem.getStatus())) {
-                    context.register("SUBSYSTEM", subsystem.getName());
+                    contextHandler.register("SUBSYSTEM", subsystem.getName());
                 }
             }
 

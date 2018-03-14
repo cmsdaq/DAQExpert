@@ -19,7 +19,6 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		boolean stableBeams = false;
 		boolean expectedRate = false;
 		boolean noRate = false;
-		boolean transition = false;
 
 		stableBeams = results.get(StableBeams.class.getSimpleName());
 		expectedRate = results.get(ExpectedRate.class.getSimpleName());

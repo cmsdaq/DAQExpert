@@ -11,6 +11,8 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import rcms.utilities.daqexpert.FailFastParameterReader;
+import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
@@ -32,10 +34,17 @@ public class ConditionProducer {
 
     public EventRegister eventRegister;
 
+    /** Flag indicating whether to generate descirption/action with markup or plain text */
+    public static Boolean enableMarkup;
+
     public ConditionProducer() {
         unfinished = new HashMap<>();
         states = new HashMap<>();
         finishedThisRound = new ArrayList<>();
+        if(enableMarkup == null){
+            enableMarkup = true;
+        }
+        System.out.println("ConditionProducer markup: " + enableMarkup);
     }
 
     /**
@@ -158,7 +167,7 @@ public class ConditionProducer {
 
 				/* Description never set */
                 if (result.getDescription() == null) {
-                    result.setDescription(clm.getContext().getContentWithContext(logicModule.getDescription()));
+                    result.setDescription(clm.getContext().getContentWithContext(logicModule.getDescription(), enableMarkup));
                 }
             } else {
                 result.setDescription(logicModule.getDescription());

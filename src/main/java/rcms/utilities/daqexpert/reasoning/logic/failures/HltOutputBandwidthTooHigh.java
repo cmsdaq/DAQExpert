@@ -61,8 +61,8 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         try {
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
-                    + bandwidthThresholdInGbps + " GB/s at which delays Rate Monitoring and Express streams can appear. " +
-                    "DQM files may get truncated resulting in lower statistics. [[NOTE]]";
+                    + bandwidthThresholdInGbps + " GB/s at which delays to Rate Monitoring and Express streams can appear. " +
+                    "DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. [[NOTE]]";
 
             logger.debug("Parametrized: " + description);
 

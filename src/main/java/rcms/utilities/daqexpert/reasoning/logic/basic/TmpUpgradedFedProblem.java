@@ -21,7 +21,7 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     private float threshold;
 
     public TmpUpgradedFedProblem() {
-        this.name = "";
+        this.name = "Backpressure on upgraded FED";
         this.priority = ConditionPriority.DEFAULTT;
         this.threshold = 0;
     }

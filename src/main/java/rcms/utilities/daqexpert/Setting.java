@@ -57,6 +57,7 @@ public enum Setting {
 	DATABASE_DRIVER("hibernate.connection.driver_class"),
 	DATABASE_MODE("hibernate.hbm2ddl.auto"),
 
+	MARKUP_ENABLED("markup.enabled",false),
 	;
 
 	private final String key;
@@ -68,6 +69,10 @@ public enum Setting {
 		this.required = true;
 	}
 
+	private Setting(String key, Boolean required) {
+		this.key = key;
+		this.required = required;
+	}
 	public boolean isRequired() {
 		return required;
 	}

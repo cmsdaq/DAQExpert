@@ -128,7 +128,7 @@ public class Context extends Observable implements Serializable {
             List<String> actionStepsWithContext = new ArrayList<>();
 
             for (String step : actionSteps) {
-                actionStepsWithContext.add(putContext(step));
+                actionStepsWithContext.add(putContext(step,true));
             }
 
             return actionStepsWithContext;
@@ -136,9 +136,6 @@ public class Context extends Observable implements Serializable {
         return null;
     }
 
-    protected String putContext(String input){
-        return putContext(input, true);
-    }
 
     /**
      * Put collected context into given text. All variables {{VARIABLE_NAME}}
@@ -251,12 +248,13 @@ public class Context extends Observable implements Serializable {
         return input.replaceAll(variableKeyRegex, "");
     }
 
-    public String getContentWithContext(String message) {
+
+    public String getContentWithContext(String message, boolean markup) {
 
         logger.debug("Putting context into message: " + message);
         logger.debug("Context to be used: " + context);
 
-        String newMessage = putContext(message);
+        String newMessage = putContext(message, markup);
 
         logger.debug("Message with context: " + newMessage);
 

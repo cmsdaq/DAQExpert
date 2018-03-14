@@ -8,6 +8,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.comparators.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
+import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FEDDisconnected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.FMMProblem;
 import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.PiDisconnected;
@@ -28,7 +29,7 @@ public enum LogicModuleRegistry {
 	BeamActive              (new BeamActive(),               ConditionGroup.BEAM_ACTIVE,           "",                                                    3),
 	RunOngoing              (new RunOngoing(),               ConditionGroup.RUN_ONGOING,           "",                                                    4,   100),
 	ExpectedRate            (new ExpectedRate(),             ConditionGroup.EXPECTED_RATE,         "",                                                    5),
-	Transition              (new Transition(),               ConditionGroup.TRANSITION,            "",                                                    6),
+	Transition              (null,               ConditionGroup.TRANSITION,            "",                                                    6),
 	LongTransition          (new LongTransition(),           ConditionGroup.HIDDEN,                "",                                                    7),
 	WarningInSubsystem      (new WarningInSubsystem(),       ConditionGroup.Warning,               "",                                                    8,  1004),
 	SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED,       "",                                                    9,  1006),
@@ -74,7 +75,7 @@ public enum LogicModuleRegistry {
 	RuStuck					(new RuStuck(),					 ConditionGroup.FLOWCHART,             "",                                                   39, 10010),
 	RuStuckWaitingOther		(new RuStuckWaitingOther(),		 ConditionGroup.FLOWCHART,             "",                                                   40, 10010),
 	HLTProblem				(new HLTProblem(),				 ConditionGroup.FLOWCHART,             "",                                                   41, 10010),
-	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 10010),
+	BugInFilterfarm			(new BugInFilterfarm(),			 ConditionGroup.FLOWCHART,             "",                                                   42, 101),
 	OnlyFedStoppedSendingData(new OnlyFedStoppedSendingData(),ConditionGroup.FLOWCHART,            "",                                                   43, 10010),
 	OutOfSequenceData       (new OutOfSequenceData(),        ConditionGroup.FLOWCHART,             "",                                                   19, 10010),
 	CorruptedData           (new CorruptedData(),            ConditionGroup.FLOWCHART,            "",                                                    20, 10010),
@@ -86,20 +87,30 @@ public enum LogicModuleRegistry {
     LengthyFixingSoftError 	(new LengthyFixingSoftError(),   ConditionGroup.OTHER,                 "",                                                  47,  1012),
 
 	TTSDeadtime        (new TTSDeadtime(),         ConditionGroup.CRITICAL_DEADTIME,     "",                                                   			48,   106),
-	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49),
+	CloudFuNumber          (new CloudFuNumber(),             ConditionGroup.OTHER,                  "Number of cloud FUs",                              49, 102),
 
-	HltOutputBandwidthTooHigh (null, ConditionGroup.OTHER,				"",                                            		50,  2000),
-	HltOutputBandwidthExtreme (null, ConditionGroup.OTHER,         		"", 												51,  2001),
+	HltOutputBandwidthTooHigh (new HltOutputBandwidthTooHigh(), ConditionGroup.OTHER,				"",                                            		58,  2000),
+	HltOutputBandwidthExtreme (new HltOutputBandwidthExtreme(), ConditionGroup.OTHER,         		"", 												59,  2001),
 
-	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       52,  3000),
-	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       53,  3001),
+	HighTcdsInputRate         (new HighTcdsInputRate(),         ConditionGroup.OTHER,               "",                       60,  3000),
+	VeryHighTcdsInputRate     (new VeryHighTcdsInputRate(),     ConditionGroup.OTHER,               "",                       61,  3001),
 
-	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       54,  3002),
+	DeadtimeFromReTri     (new DeadtimeFromReTri(),     ConditionGroup.OTHER,               "",                       51,  3002),
 
-	
+    BackpressureFromFerol          (new BackpressureFromFerol(),             ConditionGroup.OTHER,   "",                               55, 2000),
+    BackpressureFromEventBuilding  (new BackpressureFromEventBuilding(),     ConditionGroup.OTHER,   "",                               56, 2001),
+    BackpressureFromHlt            (new BackpressureFromHlt(),               ConditionGroup.OTHER,   "",                               57, 2002),
 
-	;
-	
+
+	FedGeneratesDeadtime			(new FedGeneratesDeadtime(),     ConditionGroup.OTHER,   "",                               52, 2001),
+	FedDeadtimeDueToDaq				(new FedDeadtimeDueToDaq(),               ConditionGroup.OTHER,   "",                               53, 2002),
+    CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER,         		"", 												62,  2012),
+	TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER,         		"", 												54,  102),
+	HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER,"",63, 2013),
+
+
+    ;
+
 	private LogicModuleRegistry(LogicModule logicModule, ConditionGroup group, String description, int runOrder) {
 		this(logicModule, group, description, runOrder, 1);
 

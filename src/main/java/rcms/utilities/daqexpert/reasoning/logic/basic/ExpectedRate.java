@@ -14,8 +14,18 @@ public class ExpectedRate extends SimpleLogicModule {
 		this.description = "Expecting rate";
 	}
 
+
+	/**
+	 * Transition time in ms
+	 */
+	private final int transitionTime = 10000;
+	private int duration;
+	private long started;
+
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+
+		boolean expectedRate = false;
 
 		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
 
@@ -34,7 +44,29 @@ public class ExpectedRate extends SimpleLogicModule {
 
 		if (runOngoing && !fixingSoftError && !dcsPauseResume && !pausing && !paused && !resuming
 				&& !ttcHardResettingFromRunning && !ttcResyncingFromRunning && !ttcHardResetting && !ttcResyncing)
-			return true;
-		return false;
+			expectedRate = true;
+
+		// first check
+		if (started == 0) {
+			started = daq.getLastUpdate();
+		} else {
+			duration = (int) (daq.getLastUpdate() - started);
+		}
+
+		if (expectedRate) {
+			if (duration < transitionTime)
+				// transition time
+				return false;
+			else {
+				// transition time passed but run is still ongoing
+				return true;
+			}
+		} else {
+			// run is not ongoing, reset the checker
+			started = 0;
+			duration = 0;
+			return false;
+		}
+
 	}
 }

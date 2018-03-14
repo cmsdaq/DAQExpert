@@ -12,14 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import rcms.utilities.daqaggregator.data.BU;
-import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.data.FED;
-import rcms.utilities.daqaggregator.data.FRL;
-import rcms.utilities.daqaggregator.data.RU;
-import rcms.utilities.daqaggregator.data.SubFEDBuilder;
-import rcms.utilities.daqaggregator.data.SubSystem;
-import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqaggregator.data.*;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
@@ -307,6 +300,12 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 
 						if (daq.getBuSummary().getNumFUsCrashed() > 0) {
 							// at least one filter unit in crashed state
+							BUSummary b = daq.getBuSummary();
+							int fusCrashed = daq.getBuSummary().getNumFUsCrashed();
+							int allFus = b.getNumFUsHLT() +  b.getNumFUsCrashed() + b.getNumFUsCloud() + b.getNumFUsStale();
+							float fusPercentCrashed = (100.0f * fusCrashed)/ (1.0f * allFus);
+							context.registerForStatistics("FUS-QUARANTINED-PERCENTAGE", fusPercentCrashed,"%",1);
+
 							return Subcase.HltProblem;
 
 						} else {

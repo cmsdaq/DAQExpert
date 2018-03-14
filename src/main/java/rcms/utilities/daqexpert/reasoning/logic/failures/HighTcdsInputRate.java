@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
@@ -30,6 +31,20 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 		                               );
 	}
 
+
+	@Override
+	public void parametrize(Properties properties) {
+
+		this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_TCDS_INPUT_RATE_HIGH, this.getClass());
+		this.thresholdVeryHigh = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH, this.getClass());
+
+		// TODO: add note when there is backpressure from hlt
+		this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
+				"which is high (above " + threshold + " Hz). " +
+				"This may be a problem with the L1 trigger: wrong prescale column etc.";
+
+	}
+
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
@@ -48,23 +63,5 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 		return result;
 	}
 
-	@Override
-	public void parametrize(Properties properties) {
-
-		try {
-			this.threshold = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_HIGH.getKey()));
-			this.thresholdVeryHigh = Integer.parseInt(properties.getProperty(Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH.getKey()));
-			this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
-							"which is high (above " + threshold + " Hz). " +
-							"This may be a problem with the L1 trigger: wrong prescale column etc.";
-
-		} catch (NumberFormatException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-		} catch (NullPointerException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-		}
-	}
 
 }

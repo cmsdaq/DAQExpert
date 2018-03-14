@@ -25,19 +25,11 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 		this.threshold = 0;
 	}
 
-	/**
-	 * Dead time when greater than 5%
-	 */
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
 
-		boolean transition = false;
-		boolean expectedRate = false;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
 		if (!expectedRate)
-			return false;
-		transition = results.get(LongTransition.class.getSimpleName());
-		if (transition)
 			return false;
 
 		boolean result = false;

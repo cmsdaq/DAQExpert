@@ -42,7 +42,9 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 
 		DAQ snapshot = getSnapshot("1497021716430.smile");
 
-		assertSatisfiedLogicModules(snapshot, ruFailed);
+		// Discussed issue #165, case 6
+		assertSatisfiedLogicModules(snapshot, ruFailed, backpressureFromEventBuilding);
+
 
 		// check the error message from ruFailed
 		// 9 RUs had the same error message, one had a slightly different one

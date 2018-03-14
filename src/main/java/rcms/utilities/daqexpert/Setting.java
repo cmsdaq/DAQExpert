@@ -11,6 +11,10 @@ public enum Setting {
 
 	EXPERT_L1_RATE_MIN("expert.l1.rate.min"),
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
+	EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH("expert.hlt.output.bandwidth.high"),
+	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
+	EXPERT_CMSSW_CRASHES_THRESHOLD("expert.cmssw.crashes.increase"),
+	EXPERT_CMSSW_CRASHES_TIME_WINDOW("expert.cmssw.crashes.timewindow.seconds"),
 
 	/** thresholds for TCDS input rate checks */
 	EXPERT_TCDS_INPUT_RATE_HIGH("expert.tcds.input.rate.high"),
@@ -34,6 +38,13 @@ public enum Setting {
 	    after which a problem with too many FUs in cloud mode will be reported. */
 	EXPERT_LOGIC_CLOUDFUNUMBER_HOLDOFF_PERIOD("expert.logic.cloudfunumber.holdoff.period"),
 
+	EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED("expert.logic.deadtimeanalysis.fed.backpressure.threshold"),
+	EXPERT_LOGIC_BACKPRESSUREFROMHLT_THRESHOLD_BUS("expert.logic.backpressurefromhlt.bus.enabled.threshold.fraction"),
+	EXPERT_LOGIC_EVM_FEW_EVENTS("expert.logic.evm.requests.few.max"),
+
+	/** threshold (range 0..1) above which the HLT CPU load is considered to be high */
+	EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD("expert.logic.hlt.cpu.load.threshold"),
+	
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),
 	SNAPSHOTS_DIR("snapshots"),
@@ -46,6 +57,7 @@ public enum Setting {
 	DATABASE_DRIVER("hibernate.connection.driver_class"),
 	DATABASE_MODE("hibernate.hbm2ddl.auto"),
 
+	MARKUP_ENABLED("markup.enabled",false),
 	;
 
 	private final String key;
@@ -57,6 +69,10 @@ public enum Setting {
 		this.required = true;
 	}
 
+	private Setting(String key, Boolean required) {
+		this.key = key;
+		this.required = required;
+	}
 	public boolean isRequired() {
 		return required;
 	}

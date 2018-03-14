@@ -9,6 +9,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -309,7 +310,7 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
         if (o instanceof Context) {
             if (logicModule.getLogicModule() instanceof ContextLogicModule) {
-                description = ((ContextLogicModule) logicModule.getLogicModule()).getDescriptionWithContext();
+                description = ((ContextLogicModule) logicModule.getLogicModule()).getDescriptionWithContext(ConditionProducer.enableMarkup);
 
                 logger.debug("Condition '" + title + "' received update from it's context, now description is: " + description);
             }

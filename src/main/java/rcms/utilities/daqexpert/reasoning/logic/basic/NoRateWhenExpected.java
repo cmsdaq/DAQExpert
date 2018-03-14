@@ -9,9 +9,9 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 public class NoRateWhenExpected extends SimpleLogicModule {
 
 	public NoRateWhenExpected() {
-		this.name = "No rate when expected";
+		this.name = "Dataflow stuck";
 		this.priority = ConditionPriority.WARNING;
-		this.description = "No rate when expected";
+		this.description = "There is no rate when expected. The Data flow is stuck.";
 	}
 
 	@Override
@@ -19,19 +19,17 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 		boolean stableBeams = false;
 		boolean expectedRate = false;
 		boolean noRate = false;
-		boolean transition = false;
 
 		stableBeams = results.get(StableBeams.class.getSimpleName());
 		expectedRate = results.get(ExpectedRate.class.getSimpleName());
 		noRate = results.get(NoRate.class.getSimpleName());
-		transition = results.get(Transition.class.getSimpleName());
 
 		if (stableBeams)
 			this.priority = ConditionPriority.CRITICAL;
 		else
 			this.priority = ConditionPriority.WARNING;
 
-		if (expectedRate && noRate && !transition)
+		if (expectedRate && noRate)
 			return true;
 		return false;
 	}

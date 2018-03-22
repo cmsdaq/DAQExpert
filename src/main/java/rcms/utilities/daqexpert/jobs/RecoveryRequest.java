@@ -7,6 +7,8 @@ import java.util.Set;
 public class RecoveryRequest {
 
 
+    boolean withInterrupt;
+
     @JsonIgnore
     Long id;
 
@@ -97,6 +99,14 @@ public class RecoveryRequest {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isWithInterrupt() {
+        return withInterrupt;
+    }
+
+    public void setWithInterrupt(boolean withInterrupt) {
+        this.withInterrupt = withInterrupt;
     }
 
     @Override

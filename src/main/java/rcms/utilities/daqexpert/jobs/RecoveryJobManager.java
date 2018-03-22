@@ -13,9 +13,14 @@ public class RecoveryJobManager {
 
     private static final Logger logger = Logger.getLogger(RecoveryJobManager.class);
     private final InternalConditionProducer producer;
+
     private Pair<RecoveryRequest, Condition> currentlyRunningJob;
+    private Pair<RecoveryRequest, Condition> preemptedJob;
+
     private RecoveryJobPerformer recoveryJobPerformer;
     private Condition recoveryCondition;
+
+
 
     private long threshold = 2000; // dont send jobs older than 2 seconds;
 
@@ -50,6 +55,12 @@ public class RecoveryJobManager {
 
             if (interupt(topRequest)) {
                 logger.info("Found job " + topRequest + " that will interrupt currently running one " + currentlyRunningJob);
+
+                topRequest.getLeft().setWithInterrupt(true);
+                preemptedJob = currentlyRunningJob;
+                fireRecovery(topRequest);
+                checkRecoveryStatus();
+
             } else {
                 logger.info("Current job will NOT be interrupted");
             }
@@ -59,6 +70,13 @@ public class RecoveryJobManager {
 
     private void fireRecovery(Pair<RecoveryRequest, Condition> request) {
         currentlyRunningJob = request;
+
+        if(preemptedJob != null){
+            recoveryCondition.setDescription("Job preempted by condition " + request.getLeft().getProblemDescription());
+            recoveryCondition.setEnd(new Date());
+            producer.updateCondition(recoveryCondition);
+        }
+
         recoveryCondition = producer.persistCondition("Recovery", new Date(), null, ConditionGroup.LHC_BEAM);
         Long id = recoveryJobPerformer.sendRequest(request.getLeft());
         currentlyRunningJob.getLeft().setId(id);
@@ -74,12 +92,13 @@ public class RecoveryJobManager {
 
         if ("finished".equalsIgnoreCase(status)) {
             currentlyRunningJob = null;
-            recoveryCondition.setDescription("Sucessfully finished");
+            recoveryCondition.setDescription("Successfully finished");
             recoveryCondition.setEnd(new Date());
             producer.updateCondition(recoveryCondition);
             logger.info("Job finished");
         } else if ("accepted".equalsIgnoreCase(status)) {
             recoveryCondition.setDescription("Accepted by operator");
+            producer.updateCondition(recoveryCondition);
             logger.info("Job accepted");
         } else if ("rejected".equalsIgnoreCase(status)) {
             currentlyRunningJob = null;

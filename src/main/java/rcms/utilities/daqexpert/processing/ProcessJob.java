@@ -5,14 +5,20 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.jobs.RecoveryBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Job processing the retrieved data (snapshots)
@@ -26,16 +32,19 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 	private final static Logger logger = Logger.getLogger(ProcessJob.class);
 
 	private final DataManager dataManager;
+	private final RecoveryJobManager recoveryJobManager;
 
 	private final int priority;
 	private final boolean includeExperimental;
 	private final List<File> entries;
 
-	public ProcessJob(int priority, List<File> entries, DataManager dataManager, SnapshotProcessor snapshotProcessor) {
+
+	public ProcessJob(int priority, List<File> entries, DataManager dataManager, SnapshotProcessor snapshotProcessor, RecoveryJobManager recoveryManager) {
 		this.priority = priority;
 		this.entries = entries;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
+		this.recoveryJobManager = recoveryManager;
 		if (dataManager == null) {
 			includeExperimental = true;
 		} else {
@@ -63,6 +72,8 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 
 		Long firstSnapshot = null;
 		Long lastSnapshot = null;
+
+		recoveryJobManager.checkRecoveryStatus();
 
 		for (File file : entries) {
 
@@ -95,12 +106,38 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 						Long endProcessing = System.currentTimeMillis();
 						processingTime += (endProcessing - startProcessing);
 
+						for(Condition logicResult: logicResults){
+							if(logicResult.getState() == EntryState.FINISHED){
+								continue;
+							}
+							if(!logicResult.isShow()){
+								continue;
+							}
+							if(logicResult.getTitle().equalsIgnoreCase("TEST LM")){
+								logger.info("Found TEST LM results: " + logicResult.toString());
+							}
+							if(logicResult.getLogicModule().getLogicModule() instanceof ActionLogicModule){
+								ActionLogicModule alm = (ActionLogicModule) logicResult.getLogicModule().getLogicModule();
+								RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
+								List<RecoveryRequest> recoveries = recoveryBuilder.getRecoveries(alm.getActionWithContext(), alm.getDescriptionWithContext());
+
+								if(recoveries.size() > 0) {
+
+									logger.info("Exist automatic recoveries: " + recoveries);
+									List<Pair<RecoveryRequest, Condition>> recoveriesWithCondition = recoveries.stream().map(r -> Pair.of(r, logicResult)).collect(Collectors.toList());
+									recoveryJobManager.runRecoveryJob(recoveriesWithCondition);
+									logger.info("Automatic recovery finished successfully");
+								}
+
+							}
+						}
+
 						result.addAll(logicResults);
 					} else {
 						logger.error("Snapshot not deserialized " + file.getAbsolutePath());
 					}
 				} catch (Exception e) {
-					logger.error("Snapshot not desierialized: " + e);
+					logger.error("Snapshot not deserialized: ", e);
 
 				}
 
@@ -121,7 +158,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		int time = (int) (end - start);
 
 		if (entries.size() > 0) {
-			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
+			logger.debug(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
 			logger.debug("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));

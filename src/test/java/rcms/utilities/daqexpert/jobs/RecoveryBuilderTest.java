@@ -54,7 +54,7 @@ public class RecoveryBuilderTest {
     public void testRecoveriy(){
         RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
         List<String> steps = new ArrayList<String>(){{add("D <<RedRecycle::ECAL>> to fix");}};
-        List<RecoveryRequest> recovery = recoveryBuilder.getRecoveries(steps,"");
+        List<RecoveryRequest> recovery = recoveryBuilder.getRecoveries(steps,"",0L);
 
         Assert.assertEquals(1, recovery.size());
         RecoveryRequest rr = recovery.iterator().next();
@@ -67,7 +67,7 @@ public class RecoveryBuilderTest {
     public void multipleContextTest(){
         RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
         List<String> steps = new ArrayList<String>(){{add("D <<RedRecycle::[ECAL,TRACKER]>> to fix");}};
-        List<RecoveryRequest> recovery = recoveryBuilder.getRecoveries(steps,"");
+        List<RecoveryRequest> recovery = recoveryBuilder.getRecoveries(steps,"",0L);
 
         Assert.assertEquals(1, recovery.size());
         RecoveryRequest rr = recovery.iterator().next();

@@ -126,7 +126,9 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     }
 
     public void calculateDuration() {
-        this.duration = this.getEnd().getTime() - this.getStart().getTime();
+        if(this.getEnd()!= null && this.getStart() != null) {
+            this.duration = this.getEnd().getTime() - this.getStart().getTime();
+        }
     }
 
     public Long getId() {

@@ -12,6 +12,8 @@ public class RecoveryRequest {
     @JsonIgnore
     Long id;
 
+    Long problemId;
+
     /**
      * Description of the problem that will be recovered
      */
@@ -108,6 +110,16 @@ public class RecoveryRequest {
     public void setWithInterrupt(boolean withInterrupt) {
         this.withInterrupt = withInterrupt;
     }
+
+
+    public Long getProblemId() {
+        return problemId;
+    }
+
+    public void setProblemId(Long problemId) {
+        this.problemId = problemId;
+    }
+
 
     @Override
     public String toString() {

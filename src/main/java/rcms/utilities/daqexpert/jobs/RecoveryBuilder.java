@@ -20,7 +20,7 @@ public class RecoveryBuilder {
 
     private static final Logger logger = Logger.getLogger(RecoveryBuilder.class);
 
-    public List<RecoveryRequest> getRecoveries(List<String> steps, String problemDescription) {
+    public List<RecoveryRequest> getRecoveries(List<String> steps, String problemDescription, Long problemId) {
 
         if(steps == null || steps.size() == 0){
             return new ArrayList<>();
@@ -42,6 +42,7 @@ public class RecoveryBuilder {
                 recoveryRequest.setReset(new HashSet<>());
                 recoveryRequest.setFault(new HashSet<>());
                 recoveryRequest.setProblemDescription(problemDescription);
+                recoveryRequest.setProblemId(problemId);
 
                 Jobs recoverJob = job.getLeft();
                 List<String> subsystems = job.getRight();

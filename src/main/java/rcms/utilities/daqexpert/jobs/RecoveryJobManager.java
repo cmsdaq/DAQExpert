@@ -22,7 +22,7 @@ public class RecoveryJobManager {
 
 
 
-    private long threshold = 2000; // dont send jobs older than 2 seconds;
+    private long threshold = 15000; // dont send jobs older than 2 seconds;
 
     public RecoveryJobManager(InternalConditionProducer producer) {
         this.recoveryJobPerformer = new RecoveryJobPerformer();
@@ -75,6 +75,7 @@ public class RecoveryJobManager {
             recoveryCondition.setDescription("Job preempted by condition " + request.getLeft().getProblemDescription());
             recoveryCondition.setEnd(new Date());
             producer.updateCondition(recoveryCondition);
+            preemptedJob = null;
         }
 
         recoveryCondition = producer.persistCondition("Recovery", new Date(), null, ConditionGroup.LHC_BEAM);
@@ -96,7 +97,9 @@ public class RecoveryJobManager {
             recoveryCondition.setEnd(new Date());
             producer.updateCondition(recoveryCondition);
             logger.info("Job finished");
-        } else if ("accepted".equalsIgnoreCase(status)) {
+        } else if ("approved".equalsIgnoreCase(status)) {
+
+            logger.info("Updating accepted job");
             recoveryCondition.setDescription("Accepted by operator");
             producer.updateCondition(recoveryCondition);
             logger.info("Job accepted");

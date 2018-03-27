@@ -34,15 +34,16 @@ public class RecoveryBuilder {
 
         for (List<Pair<Jobs,List<String>>> jobs : stepsOfJobs) {
 
-            for (Pair<Jobs,List<String>> job : jobs) {
+            RecoveryRequest recoveryRequest = new RecoveryRequest();
+            recoveryRequest.setRedRecycle(new HashSet<>());
+            recoveryRequest.setGreenRecycle(new HashSet<>());
+            recoveryRequest.setReset(new HashSet<>());
+            recoveryRequest.setFault(new HashSet<>());
+            recoveryRequest.setProblemDescription(problemDescription);
+            recoveryRequest.setProblemId(problemId);
+            boolean add = false;
 
-                RecoveryRequest recoveryRequest = new RecoveryRequest();
-                recoveryRequest.setRedRecycle(new HashSet<>());
-                recoveryRequest.setGreenRecycle(new HashSet<>());
-                recoveryRequest.setReset(new HashSet<>());
-                recoveryRequest.setFault(new HashSet<>());
-                recoveryRequest.setProblemDescription(problemDescription);
-                recoveryRequest.setProblemId(problemId);
+            for (Pair<Jobs,List<String>> job : jobs) {
 
                 Jobs recoverJob = job.getLeft();
                 List<String> subsystems = job.getRight();
@@ -50,16 +51,22 @@ public class RecoveryBuilder {
                 switch (recoverJob) {
                     case RedRecycle:
                         subsystems.forEach(s-> recoveryRequest.getRedRecycle().add(s));
+                        add =true;
                         break;
                     case GreenRecycle:
                         subsystems.forEach(s-> recoveryRequest.getGreenRecycle().add(s));
+                        add =true;
+                        break;
+                    case StopAndStartTheRun:
+                        add =true;
                         break;
                     default:
                         break;
                 }
 
+            }
+            if(add) {
                 requests.add(recoveryRequest);
-
             }
         }
 
@@ -83,36 +90,41 @@ public class RecoveryBuilder {
 
     private List<Pair<Jobs,List<String>> > getJobsFromStep(String step) {
         List<Pair<Jobs,List<String>>> jobs = new ArrayList<>();
-        Pattern pattern = Pattern.compile(".*\\<\\<[\\w]*\\:\\:[\\w\\]\\[\\,\\s]*\\>\\>.*");
+        Pattern pattern = Pattern.compile(".*\\<\\<[\\w]*\\:?\\:?[\\w\\]\\[\\,\\s]*\\>\\>.*");
         Matcher matcher = pattern.matcher(step);
 
 
-        int startIndex = 0;
         while (matcher.matches()) {
 
-            int start = step.indexOf("<<", startIndex);
-            int delimiter = step.indexOf("::", startIndex);
+            int start = step.indexOf("<<");
+            int delimiter = step.indexOf("::");
 
             int end = step.indexOf(">>", start);
-            String operation = step.substring(start + 2, delimiter);
-            String subsystem = step.substring(delimiter + 2, end);
 
             List<String> subsystems = new ArrayList<>();
-            if(subsystem.startsWith("[") && subsystem.endsWith("]")){
-                String listOfSubsystems = subsystem.substring(1, subsystem.length()-1);
-                String[] splited = listOfSubsystems.split(",");
+            String operation = null;
+            if(delimiter > 0 && delimiter < end){
+                operation = step.substring(start + 2, delimiter);
+                logger.info("Delimiters: start:" + start + ", end:" + end + ", delimiter:" + delimiter);
+                String subsystem = step.substring(delimiter + 2, end);
+                if(subsystem.startsWith("[") && subsystem.endsWith("]")){
+                    String listOfSubsystems = subsystem.substring(1, subsystem.length()-1);
+                    String[] splited = listOfSubsystems.split(",");
 
-                subsystems.addAll(Arrays.stream(splited).map(s->s.trim()).collect(Collectors.toList()));
-            } else{
-                subsystems.add(subsystem);
+                    subsystems.addAll(Arrays.stream(splited).map(s->s.trim()).collect(Collectors.toList()));
+                } else{
+                    subsystems.add(subsystem);
+                }
+            } else {
+                operation = step.substring(start + 2, end);
             }
 
-            logger.info("Found runnable step " + operation + " to subsystem "+ subsystem+" in " + step);
+            logger.info("Found runnable step " + operation + " to subsystem "+ subsystems+" in " + step);
 
             jobs.add( Pair.of( Jobs.valueOf(operation), subsystems ) ) ;
 
-            matcher = pattern.matcher(step.substring(end, step.length()));
-            startIndex = end;
+            step = step.substring(end+2, step.length());
+            matcher = pattern.matcher(step);
 
         }
         return jobs;

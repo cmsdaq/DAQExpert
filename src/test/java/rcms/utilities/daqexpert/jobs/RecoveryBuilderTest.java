@@ -2,11 +2,21 @@ package rcms.utilities.daqexpert.jobs;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockserver.client.server.MockServerClient;
+import org.mockserver.model.Delay;
+import org.mockserver.model.Header;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.matchers.Times.exactly;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 public class RecoveryBuilderTest {
 
@@ -20,6 +30,19 @@ public class RecoveryBuilderTest {
         Assert.assertEquals(1, jobs.iterator().next().size());
         Assert.assertEquals(Jobs.RedRecycle, jobs.iterator().next().iterator().next().getLeft());
         Assert.assertEquals("[ECAL]", jobs.iterator().next().iterator().next().getRight().toString());
+
+    }
+
+    @Test
+    public void testNoArgs(){
+
+        RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
+        List<String> steps = new ArrayList<String>(){{add("D <<StopAndStartTheRun>> to fix");}};
+        List<List<Pair<Jobs,List<String>>>> jobs = recoveryBuilder.getJobs(steps);
+        Assert.assertEquals(1, jobs.size());
+        Assert.assertEquals(1, jobs.iterator().next().size());
+        Assert.assertEquals(Jobs.StopAndStartTheRun, jobs.iterator().next().iterator().next().getLeft());
+
 
     }
 

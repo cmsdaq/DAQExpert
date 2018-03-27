@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.processing.context;
 
 import org.apache.log4j.Logger;
 import org.mockito.internal.matchers.Null;
+import rcms.utilities.daqexpert.jobs.Jobs;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
@@ -9,6 +10,8 @@ import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ContextHandler {
 
@@ -212,8 +215,25 @@ public class ContextHandler {
         return text;
     }
 
-    public List<String> getActionWithContext(Action action) {
+    public String putAutomaticAction(String text) {
 
+        Pattern pattern = Pattern.compile(".*\\<\\<.*\\>\\>.*");
+        Matcher matcher = pattern.matcher(text);
+
+        if(matcher.matches()){
+
+            for(Jobs job: Jobs.values()){
+                text = text.replaceAll(job.name(), job.getReadable());
+            }
+            text = text.replaceAll("<<","");
+            text = text.replaceAll(">>", "");
+            text = text.replaceAll("::", " of subsystem ");
+
+        }
+        return text;
+    }
+
+    public List<String> getRawAction(Action action){
         List<String> actionSteps = null;
 
         if (action instanceof ConditionalAction) {
@@ -222,6 +242,17 @@ public class ContextHandler {
         } else if (action instanceof SimpleAction) {
             actionSteps = action.getSteps();
         }
+        return actionSteps;
+    }
+
+
+    public List<String> getActionWithContext(Action action ) {
+        return this.getActionWithContext(action, true);
+    }
+    public List<String> getActionWithContext(Action action, boolean replaceRecovery) {
+
+        List<String> actionSteps = getRawAction(action);
+
         logger.debug("Putting contextHandler into action: " + actionSteps);
         logger.debug("ContextHandler to be used: " + context.getContextEntryMap());
 
@@ -230,6 +261,9 @@ public class ContextHandler {
 
             for (String step : actionSteps) {
                 String stepWithContext = putContext(step);
+                if(replaceRecovery) {
+                    stepWithContext = putAutomaticAction(stepWithContext);
+                }
                 if(stepWithContext.length() > 255){
                     String oldValue = stepWithContext;
                     stepWithContext = stepWithContext.substring(0,252) + "...";

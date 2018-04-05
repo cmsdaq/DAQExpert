@@ -4,12 +4,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 /**

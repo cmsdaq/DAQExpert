@@ -26,6 +26,8 @@ public enum Setting {
 	EXPERT_LOGIC_DEADTIME_THESHOLD_TTS("expert.logic.deadtime.threshold.tts"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_RETRI("expert.logic.deadtime.threshold.retri"),
 
+	EXPERT_LOGIC_NO_TRIGGER_RATE_THRESHOLD("expert.logic.norate.threshold"),
+	
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT("expert.logic.continoussofterror.threshold.count"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD("expert.logic.continoussofterror.threshold.period"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP("expert.logic.continoussofterror.threshold.keep"),

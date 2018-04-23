@@ -1,6 +1,6 @@
 package rcms.utilities.daqexpert.jobs;
 
-public enum Jobs {
+public enum RecoveryJob {
 
 
     StopAndStartTheRun("Stop and start the run"),
@@ -8,7 +8,7 @@ public enum Jobs {
     GreenRecycle("Green recycle"),
     TTCHardReset("Issue TTC hard reset");
 
-    Jobs(String readable){
+    RecoveryJob(String readable){
         this.readable = readable;
     }
 

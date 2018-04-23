@@ -1,82 +1,58 @@
 package rcms.utilities.daqexpert.jobs;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import rcms.utilities.daqexpert.persistence.Condition;
 
+import javax.persistence.Transient;
+import java.util.List;
 import java.util.Set;
 
+/**
+ * Recovery request. Sent to the controller to request automated recovery procedure.
+ */
 public class RecoveryRequest {
-
-
-    boolean withInterrupt;
 
     @JsonIgnore
     Long id;
 
-    Long problemId;
+
+    @JsonIgnore
+    Condition condition;
+    /**
+     * Id of the condition in DAQExpert. Used to match automatic recovery with current problem
+     */
+    private Long problemId;
+
+
+    /**
+     * Status of the recovery request
+     */
+    private String status;
+
+
+    /**
+     * Indicates that this request should preempt current recovery
+     */
+    private boolean withInterrupt;
+
+
+    /**
+     * Indicates that this request should continue current recovery
+     */
+    private boolean isSameProblem;
+
+    /**
+     * Indicates that this request is less important that current one and should be postponed
+     */
+    private boolean withPostponement;
+
+    @Transient
+    private List<RecoveryStep> recoverySteps;
 
     /**
      * Description of the problem that will be recovered
      */
     String problemDescription;
-
-    /**
-     * Steps that cannot be automatized and must be done manually
-     */
-    Set<String> manualSteps;
-
-
-    /**
-     * Subsystems to red recycle
-     */
-    Set<String> redRecycle;
-
-    /**
-     * Subsystems to green recycle
-     */
-    Set<String> greenRecycle;
-
-    /**
-     * Subsystems to blame
-     */
-    Set<String> fault;
-
-    /**
-     * Subsystems to reset. Some schedules could have been planned by shifter. This will reset that actions.
-     */
-    Set<String> reset;
-
-    public Set<String> getGreenRecycle() {
-        return greenRecycle;
-    }
-
-    public void setGreenRecycle(Set<String> greenRecycle) {
-        this.greenRecycle = greenRecycle;
-    }
-
-    public Set<String> getFault() {
-        return fault;
-    }
-
-    public void setFault(Set<String> fault) {
-        this.fault = fault;
-    }
-
-    public Set<String> getReset() {
-        return reset;
-    }
-
-    public void setReset(Set<String> reset) {
-        this.reset = reset;
-    }
-
-
-    public Set<String> getRedRecycle() {
-        return redRecycle;
-    }
-
-    public void setRedRecycle(Set<String> redRecycle) {
-        this.redRecycle = redRecycle;
-    }
 
     public String getProblemDescription() {
         return problemDescription;
@@ -86,21 +62,20 @@ public class RecoveryRequest {
         this.problemDescription = problemDescription;
     }
 
-    public Set<String> getManualSteps() {
-        return manualSteps;
-    }
-
-    public void setManualSteps(Set<String> manualSteps) {
-        this.manualSteps = manualSteps;
-    }
-
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getProblemId() {
+        return problemId;
+    }
+
+    public void setProblemId(Long problemId) {
+        this.problemId = problemId;
     }
 
     public boolean isWithInterrupt() {
@@ -112,22 +87,54 @@ public class RecoveryRequest {
     }
 
 
-    public Long getProblemId() {
-        return problemId;
+    public List<RecoveryStep> getRecoverySteps() {
+        return recoverySteps;
     }
 
-    public void setProblemId(Long problemId) {
-        this.problemId = problemId;
+    public void setRecoverySteps(List<RecoveryStep> recoverySteps) {
+        this.recoverySteps = recoverySteps;
     }
 
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+
+    public boolean isSameProblem() {
+        return isSameProblem;
+    }
+
+    public void setSameProblem(boolean sameProblem) {
+        isSameProblem = sameProblem;
+    }
+
+    public boolean isWithPostponement() {
+        return withPostponement;
+    }
+
+    public void setWithPostponement(boolean withPostponement) {
+        this.withPostponement = withPostponement;
+    }
 
     @Override
     public String toString() {
         return "RecoveryRequest{" +
-                "redRecycle=" + redRecycle +
-                ", greenRecycle=" + greenRecycle +
-                ", fault=" + fault +
-                ", reset=" + reset +
+                "condition=" + condition.getStart() +
+                ", problemId=" + problemId +
                 '}';
     }
 }

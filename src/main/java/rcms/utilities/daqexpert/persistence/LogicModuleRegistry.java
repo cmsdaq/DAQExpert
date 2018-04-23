@@ -103,7 +103,10 @@ public enum LogicModuleRegistry {
     FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 2002),
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER, "", 2012),
     TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER, "", 2012),
-    HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),;
+    HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),
+    AutoLM(new AutoLM(), ConditionGroup.FLOWCHART, "", 3000),
+    AutoLM2(new AutoLM2(), ConditionGroup.FLOWCHART, "", 3001),
+    AutoLM3(new AutoLM3(), ConditionGroup.FLOWCHART, "", 3002),;
 
     private final LogicModule logicModule;
     private final String description;

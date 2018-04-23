@@ -14,6 +14,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 
 /**
@@ -53,54 +54,7 @@ public class ConditionDashboard implements Observer{
 	}
 
 	public void compareWithCurrentlyDominating(Condition condition){
-		// exists some unfinished
-		// TODO: add some threshold
-		if (condition.getEnd() == null) {
-
-			// no condition at the moment
-			if (dominatingCondition == null) {
-				this.dominatingCondition = condition;
-			}
-
-			// exists other condition at the moemnt
-			else {
-
-				// current is more important than old
-				if (condition.getPriority().ordinal() > dominatingCondition.getPriority().ordinal()) {
-					this.dominatingCondition = condition;
-				}
-
-				// current is less important than old
-				else if (condition.getPriority().ordinal() < dominatingCondition.getPriority().ordinal()) {
-					// nothing to do
-				}
-
-				// both are equally important
-				else {
-
-					// current is more useful than old
-					if (condition.getLogicModule().getUsefulness() > dominatingCondition.getLogicModule()
-							.getUsefulness()) {
-						this.dominatingCondition = condition;
-
-					}
-					// current is less useful than old
-					else if (condition.getLogicModule().getUsefulness() < dominatingCondition.getLogicModule()
-							.getUsefulness()) {
-						// nothing to do
-					}
-					// both are equally useful
-					else {
-						// newest will be displayed
-						if (condition.getStart().after(dominatingCondition.getStart())) {
-							this.dominatingCondition = condition;
-						}
-					}
-
-				}
-			}
-		}
-
+		this.dominatingCondition =DominatingConditionSelector.findDominating(dominatingCondition,condition);
 	}
 
 	public void update(Set<Condition> conditionsProduced) {

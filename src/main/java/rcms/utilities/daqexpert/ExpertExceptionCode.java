@@ -8,6 +8,7 @@ public enum ExpertExceptionCode {
 	MissingProperty(102, "Required configuration property missing"),
 	CannotParseProcessingEndDate(103, "Canot parse end date of expert processing, should be ISO8601"),
 	LogicModuleMisconfiguration(104,"Misconfiguration of logic modules detected"),
+	AutomaticRecoveryProblem(105, "Automatic recovery problem"),
 
 	/* Reasoning errors */
 	ReasoningProblem(200, "Reasoning problem"),

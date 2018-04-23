@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
@@ -18,11 +16,10 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.jobs.RecoveryBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
-import rcms.utilities.daqexpert.processing.context.Context;
+import rcms.utilities.daqexpert.jobs.RecoveryStep;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 /**
@@ -72,12 +69,12 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 				"Problem fixed: Make an e-log entry.Call the DOC CTPPS_TOT (subsystem that caused the SyncLoss) to inform about the problem"
 		), legacyFc1.getActionWithContext());
 
-		RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
-		List<RecoveryRequest> recoveryRequests = recoveryBuilder.getRecoveries(legacyFc1.getActionWithContextRawRecovery(), legacyFc1.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequests.size());
-		RecoveryRequest recoveryRequest = recoveryRequests.iterator().next();
-		assertEquals(1, recoveryRequest.getRedRecycle().size());
-		assertEquals(1, recoveryRequest.getGreenRecycle().size());
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(legacyFc1.getActionWithContextRawRecovery(), legacyFc1.getDescriptionWithContext(), 0L);
+		assertEquals(1, recoveryRequest.getRecoverySteps().size());
+		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
+		assertEquals(1, recoveryStep.getRedRecycle().size());
+		assertEquals(1, recoveryStep.getGreenRecycle().size());
 
 	}
 
@@ -157,23 +154,22 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		
 
 		assertEquals("DT",fc1.getContextHandler().getActionKey());
-		assertEquals(4,fc1.getActionWithContext().size());
+		assertEquals(3,fc1.getActionWithContext().size());
 
 
 		System.out.println(fc1.getDescriptionWithContext());
 		System.out.println(fc1.getActionWithContext());
 
 		assertEquals(Arrays.asList(
-				"Try to recover (try up to 2 times)",
-				"Stop and start the run with Red recycle of subsystem DT & Green recycle of subsystem DT",
+				"Stop and start the run with Red recycle of subsystem DT & Green recycle of subsystem DT using L0 Automator",
 				"Problem not fixed: Call the DOC of DT (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry.Call the DOC DT (subsystem that caused the SyncLoss) to inform about the problem"
 		), fc1.getActionWithContext());
 
 
-		RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
-		List<RecoveryRequest> recoveryRequests = recoveryBuilder.getRecoveries(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequests.size());
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+		assertEquals(1, recoveryRequest.getRecoverySteps().size());
 	}
 
 	/**
@@ -201,9 +197,9 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 				"Problem not fixed: Call the DOC of ECAL (subsystem that sent out-of-sync data data)"
 				), fc1.getActionWithContext());
 
-		RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
-		List<RecoveryRequest> recoveryRequests = recoveryBuilder.getRecoveries(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
-		assertEquals(0, recoveryRequests.size());
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+		assertEquals(0, recoveryRequest.getRecoverySteps().size());
 
 
 	}
@@ -295,12 +291,12 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 				"Problem not fixed: Call the DOC of HCAL (subsystem that caused the SyncLoss)" ,
 				"Problem fixed: Make an e-log entry.Call the DOC HCAL (subsystem that caused the SyncLoss) to inform about the problem"), fc1.getActionWithContext());
 
- 		RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
- 		List<RecoveryRequest> recoveryRequests = recoveryBuilder.getRecoveries(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
- 		assertEquals(1, recoveryRequests.size());
- 		RecoveryRequest recoveryRequest = recoveryRequests.iterator().next();
- 		assertEquals(0, recoveryRequest.getRedRecycle().size());
-		assertEquals(0, recoveryRequest.getGreenRecycle().size());
+ 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+ 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+ 		assertEquals(1, recoveryRequest.getRecoverySteps().size());
+ 		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
+ 		assertEquals(0, recoveryStep.getRedRecycle().size());
+		assertEquals(0, recoveryStep.getGreenRecycle().size());
   }
 
 }

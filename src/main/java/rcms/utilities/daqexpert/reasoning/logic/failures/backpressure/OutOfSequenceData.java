@@ -26,8 +26,8 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
 		/* Default action */
-		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> & <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>>",
+		ConditionalAction action = new ConditionalAction(
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> & <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>> using L0 Automator",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");

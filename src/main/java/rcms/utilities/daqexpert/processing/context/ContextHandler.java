@@ -1,13 +1,11 @@
 package rcms.utilities.daqexpert.processing.context;
 
 import org.apache.log4j.Logger;
-import org.mockito.internal.matchers.Null;
-import rcms.utilities.daqexpert.jobs.Jobs;
+import rcms.utilities.daqexpert.jobs.RecoveryJob;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -73,8 +71,12 @@ public class ContextHandler {
 
         ObjectContextEntry reusableContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValues = reusableContextEntry.getTextRepresentation();
         reusableContextEntry.update(object, s);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValues, reusableContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
     }
 
 
@@ -100,8 +102,24 @@ public class ContextHandler {
             logger.warn("Trimming context value from: " + oldValue + " to " + stringRepresentation);
         }
 
+        String oldValue = simpleContextEntry.getTextRepresentation();
         simpleContextEntry.update(value, stringRepresentation);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValue, stringRepresentation)) {
+            contextNotifier.registerChange(key);
+        }
+    }
+
+
+    public boolean verifyChanged(String oldValues, String newValues){
+
+        if(oldValues == null) {
+            return true;
+        } else if(oldValues.equalsIgnoreCase(newValues)){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -124,8 +142,13 @@ public class ContextHandler {
 
         StatisticContextEntry statisticContextEntry = (StatisticContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValues = statisticContextEntry.getTextRepresentation();
+
         statisticContextEntry.update(value.floatValue());
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValues, statisticContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
 
 
         // TODO handle significant changes
@@ -150,10 +173,15 @@ public class ContextHandler {
             verifyNoContextMismatch(key, OptionalContextEntry.class);
         }
 
+
         OptionalContextEntry optionalContextEntry = (OptionalContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValue = optionalContextEntry.getTextRepresentation();
         optionalContextEntry.setValue(value);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValue, optionalContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
     }
 
     public void unregisterConditionalNote(String key) {
@@ -222,7 +250,7 @@ public class ContextHandler {
 
         if(matcher.matches()){
 
-            for(Jobs job: Jobs.values()){
+            for(RecoveryJob job: RecoveryJob.values()){
                 text = text.replaceAll(job.name(), job.getReadable());
             }
             text = text.replaceAll("<<","");

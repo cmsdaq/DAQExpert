@@ -5,20 +5,15 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
-import rcms.utilities.daqexpert.jobs.RecoveryBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
-import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 /**
  * Job processing the retrieved data (snapshots)
@@ -73,8 +68,6 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		Long firstSnapshot = null;
 		Long lastSnapshot = null;
 
-		recoveryJobManager.checkRecoveryStatus();
-
 		for (File file : entries) {
 
 			try {
@@ -105,32 +98,6 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 						Set<Condition> logicResults = snapshotProcessor.process(daq, includeExperimental);
 						Long endProcessing = System.currentTimeMillis();
 						processingTime += (endProcessing - startProcessing);
-
-						for(Condition logicResult: logicResults){
-							if(logicResult.getState() == EntryState.FINISHED){
-								continue;
-							}
-							if(!logicResult.isShow()){
-								continue;
-							}
-							if(logicResult.getTitle().equalsIgnoreCase("TEST LM")){
-								logger.info("Found TEST LM results: " + logicResult.toString());
-							}
-							if(logicResult.getLogicModule().getLogicModule() instanceof ActionLogicModule){
-								ActionLogicModule alm = (ActionLogicModule) logicResult.getLogicModule().getLogicModule();
-								RecoveryBuilder recoveryBuilder = new RecoveryBuilder();
-								List<RecoveryRequest> recoveries = recoveryBuilder.getRecoveries(alm.getActionWithContext(), alm.getDescriptionWithContext());
-
-								if(recoveries.size() > 0) {
-
-									logger.info("Exist automatic recoveries: " + recoveries);
-									List<Pair<RecoveryRequest, Condition>> recoveriesWithCondition = recoveries.stream().map(r -> Pair.of(r, logicResult)).collect(Collectors.toList());
-									recoveryJobManager.runRecoveryJob(recoveriesWithCondition);
-									logger.info("Automatic recovery finished successfully");
-								}
-
-							}
-						}
 
 						result.addAll(logicResults);
 					} else {

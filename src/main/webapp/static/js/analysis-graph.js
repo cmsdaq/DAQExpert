@@ -168,6 +168,12 @@ var groupsList = [ {
 	name : 'Ver.',
 	title : 'Software version',
 	primary : true
+}, {
+    id : 'rec',
+    content : 'Rec. (0)',
+    name : 'Rec.',
+    title : 'Recovery',
+    primary : true
 } ];
 
 var options = {
@@ -182,6 +188,10 @@ var options = {
 	zoomMax : 1000 * 60 * 60 * 24 * 31 * 12// about 12 months in
 // milliseconds
 };
+
+
+
+var countPerGroup = {};
 
 var initAnalysisGraph = function() {
 
@@ -273,6 +283,61 @@ function getData(start, end, mode) {
 
 };
 
+function getControllerEntries(start, end, mode) {
+
+    parameters = {};
+    parameters['start'] = moment(start).toISOString(true);
+    parameters['end'] = moment(end).toISOString(true);
+
+    //console.log("Getting controller entries with params: " + JSON.stringify(parameters));
+
+    var controllerSocketAddress = document.getElementById(
+        "controller-socket-address").getAttribute("url");
+
+    $.getJSON(
+        controllerSocketAddress,
+        parameters,
+        function(data) {
+            //console.log("raw data from controller" + JSON.stringify(data));
+
+            var converted = [];
+            var items = timeline['itemsData'];
+
+            $.each(data, function(index, value) {
+
+            	var entry = {};
+            	entry.content = value.name;
+            	entry.id = "rec-" + value.id;
+				entry.group = "rec";
+				entry.className = "default";
+            	entry.start = value.start;
+				entry.end = value.end;
+				if(!entry.end){
+					entry.end = moment();
+				}
+
+				converted.push(entry);
+				//console.log("Converted endry: " + JSON.stringify(entry));
+				items.update(entry);
+
+
+            });
+
+            countPerGroup['rec'] = data.length;
+            countEventsPerGroup();
+
+
+
+        }).error(function(jqXHR, textStatus, errorThrown) {
+        console.log("error " + textStatus);
+        console.log("errorThrown " + errorThrown);
+        console.log("incoming Text " + jqXHR.responseText);
+    });
+
+};
+
+
+
 function getDatap(parameters) {
 	$.getJSON(
 			"reasons",
@@ -290,6 +355,8 @@ function getDatap(parameters) {
 		console.log("errorThrown " + errorThrown);
 		console.log("incoming Text " + jqXHR.responseText);
 	});
+
+
 }
 
 /** Load new data on event */
@@ -298,23 +365,69 @@ function loadNewData(event, properties) {
 			mode);
 	getRawData(properties["start"].toISOString(), properties["end"]
 			.toISOString());
+
+
+	//TODO: this needs to be resolved
+    function callback(){
+        return function(){
+            getControllerEntries(properties["start"].toISOString(true), properties["end"]
+                .toISOString(true));
+        }
+    }
+    setTimeout(callback(), 500);
+
+
 };
+
+function countEventsPerGroup(){
+
+    var groups = timeline['groupsData'];
+
+    /* Update groups content */
+    $.each(countPerGroup, function(index, value) {
+        // console.log("Current: " + JSON.stringify(index));
+        var current = groups.get(index);
+        // console.log("Current: " + JSON.stringify(current));
+
+        var newContent = "";
+
+        if (filtering == false) {
+            newContent = current['name'] + " (" + value + ")";
+        } else {
+            if (current && current['primary'] && current['primary'] == true)
+                newContent = current['name'] + " (" + value + ")";
+        }
+
+        groups.update({
+            id : index,
+            content : newContent
+        });
+
+    });
+}
 
 function load(data, fakeEnd) {
 	var visibleData = [];
-	countPerGroup = {};
-
 	var groups = timeline['groupsData'];
 	var items = timeline['itemsData'];
 
 	// console.log(data);
+
+
+	// reset counters
+    $.each(groupsList, function(index, value) {
+    	if(value['id'] != 'rec'){
+            countPerGroup[value['id']] = 0;
+		}
+    });
+
 
 	/* Traverse new data to count events per group */
 	$.each(data, function(index, value) {
 		var groupName = value['group'];
 		var currCount = 0;
 
-		// for (prop in timeline) {
+        // for (prop in timeline) {
 		// console.log("groups: " + prop);
 		// }
 
@@ -373,27 +486,8 @@ function load(data, fakeEnd) {
 
 	// console.log(JSON.stringify(data));
 
-	/* Update groups content */
-	$.each(countPerGroup, function(index, value) {
-		// console.log("Current: " + JSON.stringify(index));
-		var current = groups.get(index);
-		// console.log("Current: " + JSON.stringify(current));
 
-		var newContent = "";
-
-		if (filtering == false) {
-			newContent = current['name'] + " (" + value + ")";
-		} else {
-			if (current['primary'] == true)
-				newContent = current['name'] + " (" + value + ")";
-		}
-
-		groups.update({
-			id : index,
-			content : newContent
-		});
-
-	});
+	countEventsPerGroup();
 
 	items.clear();
 

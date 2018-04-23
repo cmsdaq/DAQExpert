@@ -9,6 +9,7 @@ public enum Setting {
 
 	CONTROLLER_ENABLED("controller.enabled"),
 	CONTROLLER_URL("controller.address"),
+	CONTROLLER_SOCKET("controller.socket"),
 
 	DAQVIEW_LINK("daqview.link"),
 	DAQVIEW_SETUP("daqview.setup"),

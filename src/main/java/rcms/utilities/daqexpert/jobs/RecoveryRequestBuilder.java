@@ -2,9 +2,6 @@ package rcms.utilities.daqexpert.jobs;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.h2.tools.Recover;
-import rcms.utilities.daqexpert.persistence.Condition;
-import rcms.utilities.daqexpert.reasoning.base.action.Action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,46 +12,56 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class RecoveryBuilder {
+/**
+ * Responsible for preparing recovery requests
+ */
+public class RecoveryRequestBuilder {
 
 
-    private static final Logger logger = Logger.getLogger(RecoveryBuilder.class);
+    private static final Logger logger = Logger.getLogger(RecoveryRequestBuilder.class);
 
-    public List<RecoveryRequest> getRecoveries(List<String> steps, String problemDescription, Long problemId) {
+    /**
+     * Build recovery request from given recovery steps
+     * @return recovery request
+     */
+    public RecoveryRequest buildRecoveryRequest(List<String> steps, String problemDescription, Long problemId) {
 
         if(steps == null || steps.size() == 0){
-            return new ArrayList<>();
+            return null;
         }
 
         logger.debug("Building jobs from action steps " + steps);
 
-        List<List<Pair<Jobs,List<String>>>> stepsOfJobs = getJobs(steps);
+        List<List<Pair<RecoveryJob,List<String>>>> stepsOfJobs = getJobs(steps);
 
-        List<RecoveryRequest> requests = new ArrayList<>();
+        RecoveryRequest recoveryRequest = new RecoveryRequest();
+        recoveryRequest.setProblemDescription(problemDescription);
+        recoveryRequest.setProblemId(problemId);
+        recoveryRequest.setRecoverySteps(new ArrayList<RecoveryStep>());
 
-        for (List<Pair<Jobs,List<String>>> jobs : stepsOfJobs) {
+        for (List<Pair<RecoveryJob,List<String>>> jobs : stepsOfJobs) {
 
-            RecoveryRequest recoveryRequest = new RecoveryRequest();
-            recoveryRequest.setRedRecycle(new HashSet<>());
-            recoveryRequest.setGreenRecycle(new HashSet<>());
-            recoveryRequest.setReset(new HashSet<>());
-            recoveryRequest.setFault(new HashSet<>());
-            recoveryRequest.setProblemDescription(problemDescription);
-            recoveryRequest.setProblemId(problemId);
+            RecoveryStep recoveryStep = new RecoveryStep();
+            recoveryStep.setRedRecycle(new HashSet<>());
+            recoveryStep.setGreenRecycle(new HashSet<>());
+            recoveryStep.setReset(new HashSet<>());
+            recoveryStep.setFault(new HashSet<>());
+
+            recoveryStep.setStepIndex(stepsOfJobs.indexOf(jobs));
             boolean add = false;
 
-            for (Pair<Jobs,List<String>> job : jobs) {
+            for (Pair<RecoveryJob,List<String>> job : jobs) {
 
-                Jobs recoverJob = job.getLeft();
+                RecoveryJob recoverJob = job.getLeft();
                 List<String> subsystems = job.getRight();
 
                 switch (recoverJob) {
                     case RedRecycle:
-                        subsystems.forEach(s-> recoveryRequest.getRedRecycle().add(s));
+                        subsystems.forEach(s-> recoveryStep.getRedRecycle().add(s));
                         add =true;
                         break;
                     case GreenRecycle:
-                        subsystems.forEach(s-> recoveryRequest.getGreenRecycle().add(s));
+                        subsystems.forEach(s-> recoveryStep.getGreenRecycle().add(s));
                         add =true;
                         break;
                     case StopAndStartTheRun:
@@ -66,20 +73,25 @@ public class RecoveryBuilder {
 
             }
             if(add) {
-                requests.add(recoveryRequest);
+                recoveryRequest.getRecoverySteps().add(recoveryStep);
             }
         }
 
-        return requests;
+        return recoveryRequest;
     }
 
-    public List<List<Pair<Jobs,List<String>>>> getJobs(List<String> steps) {
+    /**
+     * Extract recovery jobs from given steps
+     * @param steps recovery steps
+     * @return list of jobs with context for each step
+     */
+    public List<List<Pair<RecoveryJob,List<String>>>> getJobs(List<String> steps) {
 
-        List<List<Pair<Jobs,List<String>>>> stepsOfJobs = new ArrayList<>();
+        List<List<Pair<RecoveryJob,List<String>>>> stepsOfJobs = new ArrayList<>();
 
         for (String step : steps) {
 
-            List<Pair<Jobs,List<String>>> jobs = getJobsFromStep(step);
+            List<Pair<RecoveryJob,List<String>>> jobs = getJobsFromStep(step);
 
             logger.trace("JOBS: " + jobs);
             stepsOfJobs.add(jobs);
@@ -88,8 +100,13 @@ public class RecoveryBuilder {
         return stepsOfJobs;
     }
 
-    private List<Pair<Jobs,List<String>> > getJobsFromStep(String step) {
-        List<Pair<Jobs,List<String>>> jobs = new ArrayList<>();
+    /**
+     * Extract job and its context from given recovery step
+     * @param step recovery step
+     * @return list of jobs with context
+     */
+    private List<Pair<RecoveryJob,List<String>> > getJobsFromStep(String step) {
+        List<Pair<RecoveryJob,List<String>>> jobs = new ArrayList<>();
         Pattern pattern = Pattern.compile(".*\\<\\<[\\w]*\\:?\\:?[\\w\\]\\[\\,\\s]*\\>\\>.*");
         Matcher matcher = pattern.matcher(step);
 
@@ -121,7 +138,7 @@ public class RecoveryBuilder {
 
             logger.info("Found runnable step " + operation + " to subsystem "+ subsystems+" in " + step);
 
-            jobs.add( Pair.of( Jobs.valueOf(operation), subsystems ) ) ;
+            jobs.add( Pair.of( RecoveryJob.valueOf(operation), subsystems ) ) ;
 
             step = step.substring(end+2, step.length());
             matcher = pattern.matcher(step);

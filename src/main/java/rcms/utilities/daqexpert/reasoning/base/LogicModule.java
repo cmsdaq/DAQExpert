@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.base;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.Requiring;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.causality.Causing;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,7 +40,7 @@ import java.util.Set;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public abstract class LogicModule implements Requiring {
+public abstract class LogicModule implements Requiring, Causing {
 
 	/**
 	 * Name of the condition found

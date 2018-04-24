@@ -71,6 +71,12 @@ public abstract class LogicModule implements Requiring, Causing {
 	protected Set<Requiring> required;
 
 
+	/**
+	 * Set of required logic modules
+	 */
+	protected Set<Causing> causingSet;
+
+
 	public LogicModule(){
 		this.required = new LinkedHashSet<>();
 	}

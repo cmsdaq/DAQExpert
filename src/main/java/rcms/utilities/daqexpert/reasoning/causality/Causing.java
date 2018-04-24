@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface Causing {
 
-    Set<Causing> getCausing();
+    Set<Causing> getCausedBy();
 
-    default void declareCausing() {return;}
+    default void declareCausedBy() {return;}
 }

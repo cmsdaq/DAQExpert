@@ -163,18 +163,18 @@ var groupsList = [ {
 	title : 'Experimental LM',
 	primary : false
 }, {
-	id : 'ver',
-	content : 'Ver. (0)',
-	name : 'Ver.',
-	title : 'Software version',
-	primary : true
-}, {
     id : 'rec',
     content : 'Rec. (0)',
     name : 'Rec.',
     title : 'Recovery',
     primary : true
-} ];
+} , {
+	id : 'ver',
+	content : 'Ver. (0)',
+	name : 'Ver.',
+	title : 'Software version',
+	primary : true
+}];
 
 var options = {
 	editable : false,

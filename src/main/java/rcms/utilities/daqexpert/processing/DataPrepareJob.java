@@ -31,7 +31,7 @@ import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 /**
  * This job manages reading and processing the snapshots
- * 
+ *
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
@@ -162,7 +162,12 @@ public class DataPrepareJob implements Runnable {
 							if(logicResult.getLogicModule().getLogicModule() instanceof ActionLogicModule){
 								ActionLogicModule alm = (ActionLogicModule) logicResult.getLogicModule().getLogicModule();
 								RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-								RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(alm.getActionWithContextRawRecovery(), alm.getDescriptionWithContext(), logicResult.getId());
+								RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
+										alm.getActionWithContextRawRecovery(),
+										alm.getActionWithContext(),
+                                        alm.getName(),
+                                        alm.getDescriptionWithContext(),
+                                        logicResult.getId());
 
 								if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
 									recoveryRequest.setCondition(logicResult);

@@ -70,7 +70,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		), legacyFc1.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(legacyFc1.getActionWithContextRawRecovery(), legacyFc1.getDescriptionWithContext(), 0L);
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(legacyFc1.getActionWithContextRawRecovery(), legacyFc1.getName(),legacyFc1.getDescriptionWithContext(), 0L);
 		assertEquals(1, recoveryRequest.getRecoverySteps().size());
 		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
 		assertEquals(1, recoveryStep.getRedRecycle().size());
@@ -168,7 +168,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(),fc1.getName(), fc1.getDescriptionWithContext(), 0L);
 		assertEquals(1, recoveryRequest.getRecoverySteps().size());
 	}
 
@@ -198,7 +198,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 				), fc1.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getName(),fc1.getDescriptionWithContext(), 0L);
 		assertEquals(0, recoveryRequest.getRecoverySteps().size());
 
 
@@ -292,7 +292,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 				"Problem fixed: Make an e-log entry.Call the DOC HCAL (subsystem that caused the SyncLoss) to inform about the problem"), fc1.getActionWithContext());
 
  		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
- 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getDescriptionWithContext(), 0L);
+ 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getName(),fc1.getDescriptionWithContext(), 0L);
  		assertEquals(1, recoveryRequest.getRecoverySteps().size());
  		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
  		assertEquals(0, recoveryStep.getRedRecycle().size());

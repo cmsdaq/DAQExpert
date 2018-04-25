@@ -13,6 +13,9 @@ public class RecoveryStep {
      */
     int stepIndex;
 
+    String humanReadable;
+
+
     /**
      * Subsystems to red recycle
      */
@@ -108,6 +111,13 @@ public class RecoveryStep {
         this.stepIndex = stepIndex;
     }
 
+    public String getHumanReadable() {
+        return humanReadable;
+    }
+
+    public void setHumanReadable(String humanReadable) {
+        this.humanReadable = humanReadable;
+    }
 
     @Override
     public String toString() {

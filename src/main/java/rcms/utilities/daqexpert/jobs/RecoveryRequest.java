@@ -50,9 +50,14 @@ public class RecoveryRequest {
     private List<RecoveryStep> recoverySteps;
 
     /**
+     * Short title of the problem
+     */
+    private String problemTitle;
+
+    /**
      * Description of the problem that will be recovered
      */
-    String problemDescription;
+    private String problemDescription;
 
     public String getProblemDescription() {
         return problemDescription;
@@ -130,11 +135,27 @@ public class RecoveryRequest {
         this.withPostponement = withPostponement;
     }
 
+    public String getProblemTitle() {
+        return problemTitle;
+    }
+
+    public void setProblemTitle(String problemTitle) {
+        this.problemTitle = problemTitle;
+    }
+
     @Override
     public String toString() {
         return "RecoveryRequest{" +
-                "condition=" + condition.getStart() +
+                "id=" + id +
+                ", condition=" + condition +
                 ", problemId=" + problemId +
+                ", status='" + status + '\'' +
+                ", withInterrupt=" + withInterrupt +
+                ", isSameProblem=" + isSameProblem +
+                ", withPostponement=" + withPostponement +
+                ", recoverySteps=" + recoverySteps +
+                ", problemTitle='" + problemTitle + '\'' +
+                ", problemDescription='" + problemDescription + '\'' +
                 '}';
     }
 }

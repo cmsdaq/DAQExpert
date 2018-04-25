@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.jobs;
 
+import com.google.common.collect.EvictingQueue;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
@@ -26,7 +27,7 @@ public class RecoveryJobManager {
      *  recovery request. With the rejection the id of current condition being the reason to do recovery is returned.
      *  Expert will see whether this condition should be preempted, continued or postponed depending on the .
      */
-    private final Queue<Condition> recentRecoveryConditions = new LinkedBlockingQueue(20);
+    private final Queue<Condition> recentRecoveryConditions = EvictingQueue.create(5);
 
 
     /**

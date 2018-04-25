@@ -261,6 +261,8 @@ var initAnalysisGraph = function() {
 				console.log("error " + textStatus);
 				console.log("errorThrown " + errorThrown);
 				console.log("incoming Text " + jqXHR.responseText);
+
+				getControllerDetails(parameters['id']);
 			});
 
 		} else {
@@ -270,6 +272,38 @@ var initAnalysisGraph = function() {
 
 	});
 	return timeline;
+}
+
+function getControllerDetails(id){
+
+
+	if(id.startsWith("rec-")){
+		id = id.substr(4);
+	}
+
+	console.log("Looking for the recovery with id  " + id + " in " + JSON.stringify(lastRecoveryEntries));
+	var found = null;
+    $.each(lastRecoveryEntries, function(index, value) {
+    	if(value['id'] == id){
+    		console.log("Found: " + JSON.stringify(value));
+    		found = value;
+		}
+
+    });
+
+    if(found){
+
+        $("#raport-name").html(found['name']);
+        $("#raport-description").html(found['description']);
+        $("#raport-duration").html("")
+        $("#raport-duration-humanized").html("");
+
+        $("#action-section").addClass("hidden");
+        $(".immature-information").hide();
+        $("#raport-body").html("");
+
+    }
+
 }
 
 function getData(start, end, mode) {
@@ -282,6 +316,9 @@ function getData(start, end, mode) {
 	getDatap(parameters);
 
 };
+
+// If this is too much than needs to be solved with separate request
+var lastRecoveryEntries;
 
 function getControllerEntries(start, end, mode) {
 
@@ -325,6 +362,7 @@ function getControllerEntries(start, end, mode) {
 
             countPerGroup['rec'] = data.length;
             countEventsPerGroup();
+            lastRecoveryEntries = data;
 
 
 

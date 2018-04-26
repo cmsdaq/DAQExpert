@@ -24,6 +24,7 @@ public class ContextNotifier extends Observable{
 
     public void registerChange(String key){
         if(!changeset.contains(key)) {
+            logger.debug("Registering changeset key " + key);
             this.changeset.add(key);
             setChanged();
         }

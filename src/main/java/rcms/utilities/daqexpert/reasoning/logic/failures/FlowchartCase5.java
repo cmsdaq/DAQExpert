@@ -31,19 +31,20 @@ public class FlowchartCase5 extends KnownFailure {
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 
 		/* default action */
-		ConditionalAction action = new ConditionalAction("Stop the run",
-				"Red & green recycle the subsystem {{SUBSYSTEM}}.", "Start new run (try up to 2 times)",
+		ConditionalAction action = new ConditionalAction("Try following up to 2 times",
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{SUBSYSTEM}}>> and <<GreenRecycle::{{SUBSYSTEM}}>>",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Stop the run", "Start new run (try up to 2 times)",
+		action.addContextSteps("ECAL", "Try following up to 2 times", "<<StopAndStartTheRun>>",
 				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
 				"Call the DOC for the ECAL");
 
+		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
 		/* tracker specific case only when warning state */
 		action.addContextSteps("TRACKER-WARNING", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Stop the run", "Problem still not fixed: Red recycle TRACKER",
+				"Problem not fixed: Stop the run, start a new run", "Problem still not fixed: Stop the run, red recycle TRACKER, start a new run",
 				"Call the DOC for the TRACKER");
 
 		this.action = action;
@@ -57,7 +58,6 @@ public class FlowchartCase5 extends KnownFailure {
 
 	// add triggers info (behind or the same
 	// number)
-	// TODO: add hierarchy of FEDS (pseudo feds)
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 

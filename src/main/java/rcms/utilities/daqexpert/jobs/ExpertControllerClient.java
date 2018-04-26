@@ -41,6 +41,7 @@ public class ExpertControllerClient {
             logger.info("Recovery request id: " + recoveryResponse);
             return recoveryResponse;
         }catch(Exception e){
+            logger.error("Requests to " + postJobUri + " failed");
             logger.error(e);
             throw new ExpertException(ExpertExceptionCode.AutomaticRecoveryProblem,"Request to controller failed with message :" + e.getMessage());
         }

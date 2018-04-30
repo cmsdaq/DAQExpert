@@ -4,6 +4,7 @@ import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -23,7 +24,7 @@ public class NoRate extends SimpleLogicModule {
 	 * No rate when sum of FedBuilders rate equals 0 Hz
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 		if (daq.getFedBuilderSummary().getRate() == 0)
 			return true;
 		else

@@ -46,11 +46,11 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, unidentified, snapshot);
 
 		/*
-		 * Context context = fc6.getContext(); assertEquals(new HashSet(Arrays.asList(773)),
-		 * context.getContext().get("FED")); assertEquals(new HashSet(Arrays.asList("DT")),
-		 * context.getContext().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("DT+")),
-		 * context.getContext().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("DT")),
-		 * context.getContext().get("FROZENSUBSYSTEM"));
+		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(773)),
+		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("DT")),
+		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("DT+")),
+		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("DT")),
+		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 	}
 
@@ -89,11 +89,11 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		// check the subsystem reported as being at the origin of the problem
 		// (whose FEDs stopped sending data)
 		/*
-		 * Context context = fc6.getContext(); assertEquals(new HashSet(Arrays.asList(1404)),
-		 * context.getContext().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
-		 * context.getContext().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("GTUP")),
-		 * context.getContext().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("PIXEL")),
-		 * context.getContext().get("FROZENSUBSYSTEM"));
+		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1404)),
+		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
+		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("GTUP")),
+		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("PIXEL")),
+		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 
 	}
@@ -106,11 +106,11 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		assertLmsOutput(snapshot);
 
 		/*
-		 * Context context = fc6.getContext(); assertEquals(new HashSet(Arrays.asList(1386)),
-		 * context.getContext().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
-		 * context.getContext().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
-		 * context.getContext().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("TRG", "HF", "PIXEL")),
-		 * context.getContext().get("FROZENSUBSYSTEM"));
+		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1386)),
+		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
+		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
+		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("TRG", "HF", "PIXEL")),
+		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 
 	}
@@ -137,11 +137,11 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
 		/*
-		 * Context context = fc6.getContext(); assertEquals(new HashSet(Arrays.asList(1386)),
-		 * context.getContext().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
-		 * context.getContext().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
-		 * context.getContext().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("HF")),
-		 * context.getContext().get("FROZENSUBSYSTEM"));
+		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1386)),
+		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
+		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
+		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("HF")),
+		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 	}
 }

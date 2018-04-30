@@ -8,6 +8,8 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
@@ -29,31 +31,37 @@ public class FlowchartCase5 extends KnownFailure {
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 
 		/* default action */
-		ConditionalAction action = new ConditionalAction("Stop the run",
-				"Red & green recycle the subsystem {{SUBSYSTEM}}.", "Start new run (try up to 2 times)",
+		ConditionalAction action = new ConditionalAction("Try following up to 2 times",
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{SUBSYSTEM}}>> and <<GreenRecycle::{{SUBSYSTEM}}>>",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Stop the run", "Start new run (try up to 2 times)",
+		action.addContextSteps("ECAL", "Try following up to 2 times", "<<StopAndStartTheRun>>",
 				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
 				"Call the DOC for the ECAL");
 
+		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
 		/* tracker specific case only when warning state */
 		action.addContextSteps("TRACKER-WARNING", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Stop the run", "Problem still not fixed: Red recycle TRACKER",
+				"Problem not fixed: Stop the run, start a new run", "Problem still not fixed: Stop the run, red recycle TRACKER, start a new run",
 				"Call the DOC for the TRACKER");
 
 		this.action = action;
+
+	}
+
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	// add triggers info (behind or the same
 	// number)
-	// TODO: add hierarchy of FEDS (pseudo feds)
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -84,10 +92,10 @@ public class FlowchartCase5 extends KnownFailure {
 										for (FED dep : fed.getValue()) {
 											if (dep.getPercentBackpressure() == 0F) {
 												result = true;
-												context.register("FED",
+												contextHandler.register("FED",
 														"(" + dep.getSrcIdExpected() + " behind pseudo FED "
 																+ fed.getKey().getSrcIdExpected() + ")");
-												context.register("FEDSTATE",
+												contextHandler.register("FEDSTATE",
 														"(" + (dep.getTtsState() != null ? dep.getTtsState()
 																: "FED has no individual TTS state, ")
 																+ currentFedState.name() + " @ its pseudo FED)");
@@ -100,8 +108,8 @@ public class FlowchartCase5 extends KnownFailure {
 									else {
 										if (fed.getKey().getPercentBackpressure() == 0F) {
 											result = true;
-											context.register("FED", fed.getKey().getSrcIdExpected());
-											context.register("FEDSTATE", currentFedState.name());
+											contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+											contextHandler.register("FEDSTATE", currentFedState.name());
 										} else {
 											existsAtLeaseOneFedBackpressured = true;
 										}
@@ -109,15 +117,15 @@ public class FlowchartCase5 extends KnownFailure {
 									}
 
 									if (result) {
-										context.register("TTCP", ttcp.getName());
-										context.register("TTCPSTATE", currentState.name());
-										context.register("SUBSYSTEM", subSystem.getName());
+										contextHandler.register("TTCP", ttcp.getName());
+										contextHandler.register("TTCPSTATE", currentState.name());
+										contextHandler.register("SUBSYSTEM", subSystem.getName());
 										
 										if(currentState == TTSState.WARNING && "TRACKER".equalsIgnoreCase(subSystem.getName())){
-											context.setActionKey("TRACKER-WARNING");
+											contextHandler.setActionKey("TRACKER-WARNING");
 										} else{
 
-											context.setActionKey(subSystem.getName());
+											contextHandler.setActionKey(subSystem.getName());
 										}
 									}
 								}

@@ -2,11 +2,12 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
-import rcms.utilities.daqaggregator.data.FMMType;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
@@ -21,17 +22,22 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     private float threshold;
 
     public TmpUpgradedFedProblem() {
-        this.name = "Backpressure on upgraded FED";
+        this.name = "Upgraded FED problem (TMP)";
         this.priority = ConditionPriority.DEFAULTT;
         this.threshold = 0;
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.TTSDeadtime);
+    }
 
-        boolean expectedRate = false;
-        expectedRate = results.get(TTSDeadtime.class.getSimpleName());
-        if (!expectedRate)
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        boolean ttsDeadtime = false;
+        ttsDeadtime = results.get(TTSDeadtime.class.getSimpleName()).getResult();
+        if (!ttsDeadtime)
             return false;
 
         boolean result = false;
@@ -66,18 +72,18 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
 
                 if (backpressure > threshold) {
                     result = true;
-                    context.registerForStatistics("VALUE", backpressure, "%", 1);
+                    contextHandler.registerForStatistics("VALUE", backpressure, "%", 1);
                     if (problematicFedsBehindPseudoFed == null) {
-                        context.register("FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.register("FED", topLevelFed.getSrcIdExpected());
                     } else {
                         for (FED fed : problematicFedsBehindPseudoFed) {
-                            context.register("FED", fed.getSrcIdExpected());
+                            contextHandler.register("FED", fed.getSrcIdExpected());
                         }
                     }
                     TTCPartition p = topLevelFed.getTtcp();
 
-                    context.register("PARTITION", p != null ? p.getName() : "null");
-                    context.register("SUBSYSTEM", p != null ?
+                    contextHandler.register("PARTITION", p != null ? p.getName() : "null");
+                    contextHandler.register("SUBSYSTEM", p != null ?
                             p.getSubsystem() != null ? p.getSubsystem().getName() : "null"
                             : "null");
                 }

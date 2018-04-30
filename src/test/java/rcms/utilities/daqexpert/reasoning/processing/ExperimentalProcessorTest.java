@@ -15,6 +15,7 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 
 @Ignore
 public class ExperimentalProcessorTest {
@@ -30,7 +31,7 @@ public class ExperimentalProcessorTest {
 		daq.setLhcBeamMode("AA");
 
 		DAQ daqSpy = Mockito.spy(daq);
-		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
+		HashMap<String, Output> checkerResultMap = new HashMap<>();
 		experimentalProcessor.runLogicModules(daqSpy, checkerResultMap);
 		Mockito.verify(daqSpy, Mockito.times(2)).getLhcBeamMode();
 	}
@@ -43,7 +44,7 @@ public class ExperimentalProcessorTest {
 		DAQ daq = Mockito.spy(new DAQ());
 		daq.setLhcBeamMode("STABLE BEAMS");
 
-		HashMap<String, Boolean> checkerResultMap = new HashMap<>();
+		HashMap<String, Output> checkerResultMap = new HashMap<>();
 		List<Pair<LogicModule, Boolean>> a = experimentalProcessor.runLogicModules(daq, checkerResultMap);
 
 		Assert.assertEquals(2, a.size());

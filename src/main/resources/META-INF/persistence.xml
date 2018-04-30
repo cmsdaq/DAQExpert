@@ -8,6 +8,11 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>rcms.utilities.daqexpert.persistence.Condition</class>
 		<class>rcms.utilities.daqexpert.persistence.Point</class>
+		<class>rcms.utilities.daqexpert.processing.context.ContextEntry</class>
+		<class>rcms.utilities.daqexpert.processing.context.ObjectContextEntry</class>
+		<class>rcms.utilities.daqexpert.processing.context.StatisticContextEntry</class>
+
+
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
@@ -16,19 +21,19 @@
 			<property name="hibernate.format_sql" value="false" />
 
 			<!-- Configuring Connection Pool with C3P0 - is the project good choice? -->
-			<property name="hibernate.c3p0.min_size" value="5" />
-			<property name="hibernate.c3p0.max_size" value="20" />
+			<property name="hibernate.c3p0.min_size" value="2" />
+			<property name="hibernate.c3p0.max_size" value="3" />
 
 			<property name="hibernate.c3p0.max_statements" value="50" />
 
 			<!-- When an idle connection is removed from the pool (in second) Let's do 1h -->
 			<property name="hibernate.c3p0.timeout" value="3600" />
-			<!-- The database server may close a connection on its side after a certain 
-				amount of time - causing some error in this application, because it'll attempt 
-				to send a query on a connection which is no longer available on the server 
-				side. In order to avoid this you can let the pool periodically check a connection 
+			<!-- The database server may close a connection on its side after a certain
+				amount of time - causing some error in this application, because it'll attempt
+				to send a query on a connection which is no longer available on the server
+				side. In order to avoid this you can let the pool periodically check a connection
 				(Think of a ping) for it's validity -->
-			<!-- This value must never exceed that of hibernate.c3p0.timeout. Otherwise 
+			<!-- This value must never exceed that of hibernate.c3p0.timeout. Otherwise
 				C3P0 will never detect connections that has been closed -->
 			<!-- Value is in seconds: Let's keep it around 5 minutes -->
 			<property name="hibernate.c3p0.idle_test_period" value="300" />

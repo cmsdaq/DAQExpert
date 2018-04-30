@@ -6,6 +6,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.FMM;
 import rcms.utilities.daqaggregator.data.FMMApplication;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -18,7 +19,7 @@ public class NotEqualTriggersInFed extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 		boolean result = false;
 
 		Long fedTriggers = null;

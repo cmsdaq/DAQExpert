@@ -3,9 +3,7 @@ package rcms.utilities.daqexpert.servlets;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.Set;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -21,7 +19,9 @@ import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.ExpertPersistorManager;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.events.EventSender;
-import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.jobs.ExpertControllerClient;
+import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
+import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.CleanStartupVerifier;
 import rcms.utilities.daqexpert.processing.JobManager;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
@@ -75,10 +75,21 @@ public class ServletListener implements ServletContextListener {
 
 			DataManager dataManager = Application.get().getDataManager();
 
+			/* Notification manager client initialization */
 			HttpClient client = HttpClientBuilder.create().build();
 			EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
 
-			jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifier(Application.get().getPersistenceManager()));
+			/* Clean startup verifier initialization */
+			PersistenceManager persistenceManager = Application.get().getPersistenceManager();
+			CleanStartupVerifier cleanStartupVerifier = new CleanStartupVerifier(persistenceManager);
+
+
+			/* Expert controller client initialization */
+			String controllerUrl = Application.get().getProp(Setting.CONTROLLER_URL);
+			ExpertControllerClient expertControllerClient = new ExpertControllerClient(controllerUrl);
+			RecoveryJobManager recoveryJobManager = new RecoveryJobManager(expertControllerClient);
+
+			jobManager = new JobManager(sourceDirectory, dataManager, eventSender, cleanStartupVerifier, recoveryJobManager);
 			jobManager.startJobs();
 
 			Application.get().setJobManager(jobManager);

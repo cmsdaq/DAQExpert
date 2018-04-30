@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
@@ -23,7 +24,7 @@ public class RateOutOfRange extends SimpleLogicModule implements Parameterizable
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 		float a = daq.getFedBuilderSummary().getRate();
 
 		boolean result = false;

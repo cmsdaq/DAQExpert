@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
@@ -21,7 +22,7 @@ public class StableBeams extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
 
 		if (LHCBeamMode.STABLE_BEAMS == LHCBeamMode.getModeByCode(snapshot.getLhcBeamMode()))
 			return true;

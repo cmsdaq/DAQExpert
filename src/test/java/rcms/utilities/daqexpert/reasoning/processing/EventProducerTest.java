@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Context;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -63,7 +63,7 @@ public class EventProducerTest {
 
 		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
 				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
-				Mockito.notNull(ConditionPriority.class), Mockito.isNull(Context.class));
+				Mockito.notNull(ConditionPriority.class), Mockito.isNull(ContextHandler.class));
 	}
 
 	@Test
@@ -114,7 +114,7 @@ public class EventProducerTest {
 
 		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
 				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
-				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
+				Mockito.notNull(ConditionPriority.class), Mockito.any(ContextHandler.class));
 
 		// this should not change anything
 		Pair<Boolean, Condition> b = eventProducer.produce(checker, false, t3);
@@ -130,7 +130,7 @@ public class EventProducerTest {
 		Assert.assertEquals(1, eventProducer.getUnfinished().size());
 		Mockito.verify(eventProducer, Mockito.times(2)).finishOldAddNew(Mockito.notNull(LogicModule.class),
 				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
-				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
+				Mockito.notNull(ConditionPriority.class), Mockito.any(ContextHandler.class));
 
 		// this should change
 		Pair<Boolean, Condition> c = eventProducer.produce(checker, true, t4);
@@ -148,7 +148,7 @@ public class EventProducerTest {
 
 		Mockito.verify(eventProducer, Mockito.times(4)).finishOldAddNew(Mockito.notNull(LogicModule.class),
 				Mockito.anyString(), Mockito.anyBoolean(), Mockito.notNull(Date.class),
-				Mockito.notNull(ConditionPriority.class), Mockito.any(Context.class));
+				Mockito.notNull(ConditionPriority.class), Mockito.any(ContextHandler.class));
 	}
 
 	@Test

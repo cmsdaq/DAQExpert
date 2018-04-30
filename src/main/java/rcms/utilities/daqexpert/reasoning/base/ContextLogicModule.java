@@ -1,33 +1,36 @@
 package rcms.utilities.daqexpert.reasoning.base;
 
+import rcms.utilities.daqexpert.processing.Requiring;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+
 public abstract class ContextLogicModule extends SimpleLogicModule {
 
-    /**
-     * Context is used to parameterize action and description fields with
-     * specific context information. Variables will be replaced with values from
-     * this context
-     */
-    protected final Context context;
+	/**
+	 * ContextHandler is used to parameterize action and description fields with
+	 * specific contextHandler information. Variables will be replaced with values from
+	 * this contextHandler
+	 */
+	protected final ContextHandler contextHandler;
 
-    public ContextLogicModule() {
-        this.context = new Context();
-    }
 
-    public Context getContext() {
-        return context;
-    }
+	public ContextLogicModule() {
+		this.contextHandler = new ContextHandler();
+	}
 
-    /**
-     *
-     * @deprecated please use getDescriptionWithContext specifying whether to enable markup
-     */
-    @Deprecated
-    public String getDescriptionWithContext() {
-        return this.getContext().getContentWithContext(this.description, true);
-    }
+	public ContextHandler getContextHandler() {
+		return contextHandler;
+	}
 
-    public String getDescriptionWithContext(boolean markup) {
-        return this.getContext().getContentWithContext(this.description, markup);
-    }
+	public String getDescriptionWithContext() {
+		String result = this.getContextHandler().putContext(this.description);
+
+		for(Requiring requiring: required){
+			if(requiring instanceof  ContextLogicModule){
+				result  = ((ContextLogicModule) requiring).getContextHandler().putContext(result);
+			}
+		}
+
+		return result;
+	}
 
 }

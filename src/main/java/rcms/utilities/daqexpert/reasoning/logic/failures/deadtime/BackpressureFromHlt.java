@@ -7,6 +7,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.TmpUpgradedFedProblem;
@@ -30,13 +32,20 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
         this.action = new SimpleAction("Check if (more than a few) FUs are crashing by looking at the \"#FUs crash\" column in DAQView and by looking at the HLT Alerts in F3Mon. Contact the HLT DOC and DAQ DOC if you see crashes.",
                 "Check the HLT utilization by looking at the Microstates Time chart in F3 Mon. If the HLT is fully occupied, check with the shift crew whether we are running in the right pre-scale column. You may need to call the HLT DOC.",
                 "Check the HLT Output rate in F3Mon (There should be a separate warning message if it is too high. Follow the instructions in this separate message).");
+
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.FedDeadtimeDueToDaq);
+        require(LogicModuleRegistry.TmpUpgradedFedProblem);
+    }
 
-        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
-        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName());
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName()).getResult();
+        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName()).getResult();
 
 
         if (fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
@@ -60,8 +69,8 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
                     if (backpressure > fedBackpressureThreshold) {
                         logger.trace("Found problematic FED: " + fed.getSrcIdExpected());
                         problematicFeds.add(fed);
-                        context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                        context.registerForStatistics("BACKPRESSURE", backpressure);
+                        contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                        contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
                         rusToCheck.add(fed.getRu());
                     }
                 }
@@ -71,7 +80,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
                 for (RU ru : rusToCheck) {
                     if (ru.getRequests() == 0 && ru.getFragmentsInRU() == 256) {
                         logger.trace("Found problematic RU: " + ru.getHostname());
-                        context.register("PROBLEMATIC-RU", ru.getHostname());
+                        contextHandler.register("PROBLEMATIC-RU", ru.getHostname());
                         problematicRus.add(ru);
                     }
                 }
@@ -80,7 +89,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
             for (RU ru : daq.getRus()) {
                 if (ru.isEVM() && ru.getRequests() < evmRequestsThreshold) {
                     logger.trace("EVM has: " + ru.getRequests() + " requests");
-                    context.registerForStatistics("EVMREQUESTS", ru.getRequests(), "", 1);
+                    contextHandler.registerForStatistics("EVMREQUESTS", ru.getRequests(), "", 1);
                     evmFewRequests = true;
                 }
             }
@@ -97,7 +106,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
             float fractionNotEnabled = ((float) (allBus - enabledBus)) / allBus;
 
             if (evmFewRequests && fractionNotEnabled > fractionBusEnabledThreshold) {
-                context.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);
+                contextHandler.registerForStatistics("BUSFRACTION", 100 * fractionNotEnabled, "%", 1);
                 result = true;
             }
 

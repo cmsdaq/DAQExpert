@@ -6,6 +6,8 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.TmpUpgradedFedProblem;
@@ -33,13 +35,20 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
 
         this.action = new SimpleAction("Call the DAQ on-call and mention this message");
 
+
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public void declareRequired(){
+        require(LogicModuleRegistry.FedDeadtimeDueToDaq);
+        require(LogicModuleRegistry.TmpUpgradedFedProblem);
+    }
 
-        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
-        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName());
+    @Override
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName()).getResult();
+        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName()).getResult();
 
 
         if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
@@ -65,8 +74,8 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
                             if (backpressure > fedBackpressureThreshold) {
 
                                 logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
-                                context.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                                context.registerForStatistics("BACKPRESSURE", backpressure);
+                                contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
+                                contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
                                 problematicFeds.add(fed);
                                 foundProblematicFeds = true;
                             }
@@ -74,7 +83,7 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
                         }
                     }
                     if (foundProblematicFeds) {
-                        context.register("PROBLEMATIC-RU", ru.getHostname());
+                        contextHandler.register("PROBLEMATIC-RU", ru.getHostname());
                         logger.debug("Found problematic RU: " + ru.getHostname());
                         problematicRus.add(ru);
                     }

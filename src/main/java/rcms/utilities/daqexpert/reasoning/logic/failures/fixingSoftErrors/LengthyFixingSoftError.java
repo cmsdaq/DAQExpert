@@ -8,6 +8,7 @@ import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
@@ -42,7 +43,7 @@ public class LengthyFixingSoftError extends KnownFailure implements Parameteriza
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+    public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
         boolean result = false;
 
@@ -57,7 +58,7 @@ public class LengthyFixingSoftError extends KnownFailure implements Parameteriza
                     result = true;
                     for (SubSystem subsystem : daq.getSubSystems()) {
                         if (levelZeroProblematicState.equalsIgnoreCase(subsystem.getStatus())) {
-                            context.register("SUBSYSTEM", subsystem.getName());
+                            contextHandler.register("SUBSYSTEM", subsystem.getName());
                         }
                     }
                 }

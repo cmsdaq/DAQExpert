@@ -6,6 +6,11 @@ public enum Setting {
 	NM_ARCHIVE("nm.archive"),
 	NM_API_CREATE("nm.api"),
 	NM_OFFSET("nm.offset"),
+
+	CONTROLLER_ENABLED("controller.enabled"),
+	CONTROLLER_URL("controller.address"),
+	CONTROLLER_SOCKET("controller.socket"),
+
 	DAQVIEW_LINK("daqview.link"),
 	DAQVIEW_SETUP("daqview.setup"),
 

@@ -10,6 +10,7 @@ import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
@@ -36,7 +37,7 @@ import java.util.*;
  */
 public class FlowchartCaseTestBase {
 
-	protected Map<String, Boolean> results = new HashMap<String, Boolean>();
+	protected Map<String, Output> results = new HashMap<>();
 
 	protected final KnownFailure fc1 = new OutOfSequenceData();
 	protected final KnownFailure legacyFc1 = new LegacyFlowchartCase1();
@@ -120,7 +121,7 @@ public class FlowchartCaseTestBase {
 
 		allLMsUnderTest.add(unidentified);
 
-		HashSet<String> logicModules = new HashSet<>();
+		HashSet<LogicModule> logicModules = new HashSet<>();
 
 		for (LogicModuleRegistry lm : LogicModuleRegistry.values()) {
 			if (lm.getLogicModule() != null && lm.getLogicModule() instanceof KnownFailure) {
@@ -132,7 +133,7 @@ public class FlowchartCaseTestBase {
 		for(LogicModule lm: allLMsUnderTest){
 
 			if(lm!= null &&!( lm instanceof UnidentifiedFailure)){
-				logicModules.add(lm.getClass().getSimpleName());
+				logicModules.add(lm);
 			}
 
 			if (lm != null && lm instanceof Parameterizable) {
@@ -148,7 +149,7 @@ public class FlowchartCaseTestBase {
 
 		for(RU ru: snapshot.getRus()){
 			if(ru.isEVM() && ru.getRate() > 0){
-				results.put(NoRateWhenExpected.class.getSimpleName(),false);
+				results.put(NoRateWhenExpected.class.getSimpleName(),new Output(false));
 			}
 		}
 
@@ -213,7 +214,7 @@ public class FlowchartCaseTestBase {
 		}
 		Assert.assertEquals(logicModule.getClass().getSimpleName() + " is expected to return " + expected, expected,
 				result);
-		results.put(logicModule.getClass().getSimpleName(), result);
+		results.put(logicModule.getClass().getSimpleName(), new Output(result));
 	}
 
 	@Before
@@ -223,11 +224,11 @@ public class FlowchartCaseTestBase {
 		// put results of prerequisite tests by hand
 		// (as opposed to get them from a series of snapshots
 		// which introduces a dependency on other tests)
-		results.put(StableBeams.class.getSimpleName(), true);
-		results.put(NoRateWhenExpected.class.getSimpleName(), true);
-		results.put(ExpectedRate.class.getSimpleName(), true);
-		results.put(FedDeadtimeDueToDaq.class.getSimpleName(), true);
-		results.put(TmpUpgradedFedProblem.class.getSimpleName(), true);
+		results.put(StableBeams.class.getSimpleName(), new Output(true));
+		results.put(NoRateWhenExpected.class.getSimpleName(), new Output(true));
+		results.put(ExpectedRate.class.getSimpleName(), new Output(true));
+		results.put(FedDeadtimeDueToDaq.class.getSimpleName(), new Output(true));
+		results.put(TmpUpgradedFedProblem.class.getSimpleName(), new Output(true));
 
 		}
 

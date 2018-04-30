@@ -1,13 +1,7 @@
 package rcms.utilities.daqexpert.persistence;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -21,13 +15,13 @@ import javax.persistence.criteria.Root;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hibernate.transform.Transformers;
+import rcms.utilities.daqexpert.processing.context.OptionalContextEntry;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
@@ -56,6 +50,19 @@ public class PersistenceManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
+	private void avoidPersistingOptionalContext(Condition c){
+		if(c.getContext() != null){
+			Set<String> keysToRemove = new HashSet<>();
+			c.getContext().forEach((key, value) -> {
+				if(value instanceof OptionalContextEntry){
+					logger.info("Avoiding persistence of optional context for condition " + c.getTitle() + " under key; " + key);
+					keysToRemove.add(key);
+				}
+			});
+			keysToRemove.forEach(key -> c.getContext().remove(key));
+		}
+	}
+
 	/**
 	 * Persiste multipe entries in one transaction
 	 * 
@@ -65,10 +72,24 @@ public class PersistenceManager {
 		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
+		Condition latest = null;
+		for (Condition e : entries) {
+			if(e.getStart() != null){
+				if(latest == null || latest.getStart().getTime() < e.getStart().getTime()){
+					latest = e;
+				}
+			}
+		}
+		if(latest != null) {
+			logger.info("Most recent condition to persist: " + latest.getStart().toString());
+		}
+
 		for (Condition point : entries) {
 
-			if (point.isShow())
+			avoidPersistingOptionalContext(point);
+			if (point.isShow()) {
 				entityManager.persist(point);
+			}
 		}
 		tx.commit();
 		//entityManager.close();
@@ -86,6 +107,7 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
+		avoidPersistingOptionalContext(entry);
 		ensureConditionEntityManagerOpen();
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
@@ -173,7 +195,7 @@ public class PersistenceManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Condition> getEntries(Date startDate, Date endDate, long durationThreshold,
-			boolean includeTinyEntriesMask) {
+			boolean includeTinyEntriesMask, boolean withDescription) {
 		// TODO: close session?
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Session session = entityManager.unwrap(Session.class);
@@ -201,7 +223,23 @@ public class PersistenceManager {
 		// Events not hidden
 		elementsCriteria.add(Restrictions.ne("group", ConditionGroup.HIDDEN));
 
-		List<Condition> result = elementsCriteria.list();
+		ProjectionList projection = Projections.projectionList()
+				.add(Projections.property("id"),"id")
+				.add(Projections.property("title"), "title")
+				.add(Projections.property("start"),"start")
+				.add(Projections.property("end"),"end")
+				.add(Projections.property("group"),"group")
+				.add(Projections.property("mature"),"mature")
+				.add(Projections.property("priority"),"priority")
+				.add(Projections.property("duration"),"duration");
+
+		if(withDescription){
+				projection.add(Projections.property("description"),"description");
+		}
+
+		List<Condition> result = elementsCriteria.setProjection(projection)
+				.setResultTransformer(Transformers.aliasToBean(Condition.class)).list();
+
 		entityManager.close();
 
 		return result;
@@ -388,7 +426,7 @@ public class PersistenceManager {
 	 * @return
 	 */
 	public List<Condition> getEntriesPlain(Date startDate, Date endDate) {
-		return getEntries(startDate, endDate, 0, false);
+		return getEntries(startDate, endDate, 0, false, false);
 	}
 
 	/**
@@ -400,7 +438,7 @@ public class PersistenceManager {
 	 * @return
 	 */
 	public List<Condition> getEntriesThreshold(Date startDate, Date endDate, long threshold) {
-		return getEntries(startDate, endDate, threshold, false);
+		return getEntries(startDate, endDate, threshold, false,false);
 	}
 
 	public Condition getEntryById(Long id) {

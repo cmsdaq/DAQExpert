@@ -1,24 +1,19 @@
 package rcms.utilities.daqexpert.processing;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqaggregator.persistence.PersistenceFormat;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
+import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * Job processing the retrieved data (snapshots)
@@ -32,16 +27,19 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 	private final static Logger logger = Logger.getLogger(ProcessJob.class);
 
 	private final DataManager dataManager;
+	private final RecoveryJobManager recoveryJobManager;
 
 	private final int priority;
 	private final boolean includeExperimental;
 	private final List<File> entries;
 
-	public ProcessJob(int priority, List<File> entries, DataManager dataManager, SnapshotProcessor snapshotProcessor) {
+
+	public ProcessJob(int priority, List<File> entries, DataManager dataManager, SnapshotProcessor snapshotProcessor, RecoveryJobManager recoveryManager) {
 		this.priority = priority;
 		this.entries = entries;
 		this.dataManager = dataManager;
 		this.snapshotProcessor = snapshotProcessor;
+		this.recoveryJobManager = recoveryManager;
 		if (dataManager == null) {
 			includeExperimental = true;
 		} else {
@@ -106,7 +104,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 						logger.error("Snapshot not deserialized " + file.getAbsolutePath());
 					}
 				} catch (Exception e) {
-					logger.error("Snapshot not desierialized: " + e);
+					logger.error("Snapshot not deserialized: ", e);
 
 				}
 
@@ -127,7 +125,7 @@ public class ProcessJob implements Callable<Pair<Set<Condition>, List<Point>>> {
 		int time = (int) (end - start);
 
 		if (entries.size() > 0) {
-			logger.info(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
+			logger.debug(entries.size() + " files processed this round in " + time + "ms, " + "Deserialization time: "
 					+ deserializingTime + ", segmenting time: " + segmentingTime + ", processing time: "
 					+ processingTime);
 			logger.debug("Snapshots processed: " + new Date(firstSnapshot) + " - " + new Date(lastSnapshot));

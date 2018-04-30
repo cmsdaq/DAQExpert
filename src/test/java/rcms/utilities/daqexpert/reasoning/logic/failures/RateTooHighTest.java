@@ -17,6 +17,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
@@ -31,9 +32,9 @@ public class RateTooHighTest
 	{
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1503256889057.json.gz");
 
-		Map<String, Boolean> results = new HashMap<String, Boolean>();
+		Map<String, Output> results = new HashMap<>();
 
-		results.put(StableBeams.class.getSimpleName(), true);
+		results.put(StableBeams.class.getSimpleName(), new Output(true));
 
 		// ensure that the RateTooHighTest module fires
 		RateTooHigh module = new RateTooHigh();

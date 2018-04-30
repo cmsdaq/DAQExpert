@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.RU;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.Counter;
@@ -25,14 +27,20 @@ public class RuFailed extends KnownFailure {
 		this.action = new SimpleAction(
 				"Try to recover: Stop the run. Red & green recycle the DAQ. Start a new Run. (Try up to 2 times)",
 				"Make an e-log entry.");
+
+	}
+
+	@Override
+	public void declareRequired(){
+		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	private final String ERROR_STATE = "ERROR";
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()))
+		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 
 		assignPriority(results);
@@ -54,16 +62,16 @@ public class RuFailed extends KnownFailure {
 
 					for (RU ru : failedRus) {
 
-						context.register("RU", ru.getHostname());
+						contextHandler.register("RU", ru.getHostname());
 						stateCounter.add(ru.getErrorMsg());
 
 					}
 
-					context.register("NUMFAILEDRUS", failedRus.size());
+					contextHandler.register("NUMFAILEDRUS", failedRus.size());
 
 					Map.Entry<String, Integer> mostFreqError = stateCounter.getMaximumEntry();
-					context.register("MOSTFREQUENTERROR", mostFreqError.getKey());
-					context.register("MOSTFREQUENTERRORCOUNT", mostFreqError.getValue());
+					contextHandler.register("MOSTFREQUENTERROR", mostFreqError.getKey());
+					contextHandler.register("MOSTFREQUENTERRORCOUNT", mostFreqError.getValue());
 
 					result = true;
 

@@ -11,6 +11,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 import rcms.utilities.daqexpert.reasoning.logic.basic.helper.HoldOffTimer;
@@ -117,7 +118,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		// check the LHC beam mode
 		boolean shouldBeOff = ! this.cloudCanBeOn(daq);
@@ -142,7 +143,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		double cloudFraction = this.calculateCloudFraction(daq);
 		
 		if (cloudFraction > this.maxCloudModeFraction){
-			context.registerForStatistics("FRACTIONFUSCLOUDMODE", cloudFraction * 100,"%",1);
+			contextHandler.registerForStatistics("FRACTIONFUSCLOUDMODE", cloudFraction * 100,"%",1);
 			return true;
 		}
 		else

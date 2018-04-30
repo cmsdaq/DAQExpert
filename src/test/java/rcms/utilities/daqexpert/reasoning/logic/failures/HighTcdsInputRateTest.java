@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSGlobalInfo;
 import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
@@ -42,9 +43,9 @@ public class HighTcdsInputRateTest
 
 		//-----
 
-		Map<String, Boolean> results = new HashMap<>();
+		Map<String, Output> results = new HashMap<>();
 
-		results.put(StableBeams.class.getSimpleName(), true);
+		results.put(StableBeams.class.getSimpleName(), new Output(true));
 
 		// ensure that the VeryHighTcdsInputRate module fires
 		HighTcdsInputRate module = new HighTcdsInputRate();
@@ -64,7 +65,7 @@ public class HighTcdsInputRateTest
 		// module.getContext().
 		// We could either compare the string with get from
 		// module.getContext().getContentWithContext("{{TCDS_TRIGGER_INPUT_RATE}}"));
-		// add a getter for contextForCalculations in class Context
+		// add a getter for contextForCalculations in class ContextHandler
 	}
 
 }

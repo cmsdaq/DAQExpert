@@ -5,9 +5,9 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 public class WarningInSubsystem extends ContextLogicModule {
@@ -19,17 +19,25 @@ public class WarningInSubsystem extends ContextLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Boolean> results) {
+	public void declareRequired(){
+		require(LogicModuleRegistry.RunOngoing);
+		require(LogicModuleRegistry.ExpectedRate);
+		require(LogicModuleRegistry.LongTransition);
+	}
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName());
+
+	@Override
+	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+		boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
 		if (!runOngoing)
 			return false;
 		
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName());
+		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
 		if (!expectedRate)
 			return false;
 		
-		boolean transition = results.get(LongTransition.class.getSimpleName());
+		boolean transition = results.get(LongTransition.class.getSimpleName()).getResult();
 		if (transition)
 			return false;
 
@@ -40,9 +48,9 @@ public class WarningInSubsystem extends ContextLogicModule {
 			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
 				if (ttcp.getPercentWarning() > 50F) {
-					context.register("TTCP", ttcp.getName());
-					context.register("SUBSYSTEM", subSystem.getName());
-					context.registerForStatistics("WARNING", ttcp.getPercentWarning(),"%",1);
+					contextHandler.register("TTCP", ttcp.getName());
+					contextHandler.register("SUBSYSTEM", subSystem.getName());
+					contextHandler.registerForStatistics("WARNING", ttcp.getPercentWarning(),"%",1);
 					result = true;
 				}
 			}

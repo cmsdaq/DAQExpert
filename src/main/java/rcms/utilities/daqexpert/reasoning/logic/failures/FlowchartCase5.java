@@ -27,17 +27,17 @@ public class FlowchartCase5 extends KnownFailure {
 
 	public FlowchartCase5() {
 		this.name = "FED stuck";
-		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking trigger, it's in {{TTCPSTATE}} TTS state, "
+		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking triggers, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
 
 		/* default action */
-		ConditionalAction action = new ConditionalAction("Try following up to 2 times",
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{SUBSYSTEM}}>> and <<GreenRecycle::{{SUBSYSTEM}}>>",
+		ConditionalAction action = new ConditionalAction(
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{SUBSYSTEM}}>> and <<GreenRecycle::{{SUBSYSTEM}}>> (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Try following up to 2 times", "<<StopAndStartTheRun>>",
+		action.addContextSteps("ECAL", "<<StopAndStartTheRun>> (try up to 2 times)",
 				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
 				"Call the DOC for the ECAL");
 

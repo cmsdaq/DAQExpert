@@ -11,7 +11,7 @@
 	<repositories>
 		<repository>
 			<id>libs-release-local</id>
-			<url>http://dev-daq-expert.cern.ch/artifactory/libs-release-local</url>
+			<url>http://dev-daq-expert.cern.ch:8080/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -19,7 +19,7 @@
 
 		<repository>
 			<id>ext-release-local</id>
-			<url>http://dev-daq-expert.cern.ch/artifactory/ext-release-local</url>
+			<url>http://dev-daq-expert.cern.ch:8080/artifactory/ext-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

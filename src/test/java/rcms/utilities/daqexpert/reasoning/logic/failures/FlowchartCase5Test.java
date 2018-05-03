@@ -34,7 +34,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals("TRACKER", context.getActionKey());
 		assertEquals(4,fc5.getActionWithContext().size());
 
 		assertEquals(Arrays.asList("Issue a TTCResync once",
@@ -61,7 +61,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals("TRACKER", context.getActionKey());
 		assertEquals(4,fc5.getActionWithContext().size());
 
 		assertEquals(Arrays.asList("Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
@@ -164,7 +164,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
+		assertEquals("TRACKER", context.getActionKey());
 		assertEquals(4,fc5.getActionWithContext().size());
 
 		assertEquals(Arrays.asList("Issue a TTCResync once",

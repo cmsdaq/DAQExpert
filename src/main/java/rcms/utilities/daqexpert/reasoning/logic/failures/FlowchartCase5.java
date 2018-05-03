@@ -43,7 +43,7 @@ public class FlowchartCase5 extends KnownFailure {
 
 		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
 		/* tracker specific case only when warning state */
-		action.addContextSteps("TRACKER-WARNING", "Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
+		action.addContextSteps("TRACKER", "Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
 				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",
 				"Problem still not fixed: Call the DOC for the TRACKER");
 
@@ -120,13 +120,8 @@ public class FlowchartCase5 extends KnownFailure {
 										contextHandler.register("TTCP", ttcp.getName());
 										contextHandler.register("TTCPSTATE", currentState.name());
 										contextHandler.register("SUBSYSTEM", subSystem.getName());
-										
-										if(currentState == TTSState.WARNING && "TRACKER".equalsIgnoreCase(subSystem.getName())){
-											contextHandler.setActionKey("TRACKER-WARNING");
-										} else{
 
-											contextHandler.setActionKey(subSystem.getName());
-										}
+										contextHandler.setActionKey(subSystem.getName());
 									}
 								}
 							}

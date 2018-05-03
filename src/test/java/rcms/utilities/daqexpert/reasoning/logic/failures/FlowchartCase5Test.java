@@ -34,12 +34,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
 
-		assertEquals(Arrays.asList("Issue a TTCHardReset once",
-				"Problem fixed: Make an e-log entry." , "Problem not fixed: Stop the run, start a new run",
-				"Problem still not fixed: Stop the run, red recycle TRACKER, start a new run","Call the DOC for the TRACKER"), fc5.getActionWithContext());
+		assertEquals(Arrays.asList("Issue a TTCResync once",
+				"Problem fixed: Make an e-log entry." ,
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run","Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(), fc5.getName(), fc5.getDescriptionWithContext(), 0L);
@@ -61,11 +61,11 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
 
-		assertEquals(Arrays.asList("Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Stop the run, start a new run" ,"Problem still not fixed: Stop the run, red recycle TRACKER, start a new run",  "Call the DOC for the TRACKER"), fc5.getActionWithContext());
+		assertEquals(Arrays.asList("Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",  "Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
@@ -164,12 +164,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
 
-		assertEquals(Arrays.asList("Issue a TTCHardReset once",
+		assertEquals(Arrays.asList("Issue a TTCResync once",
 				"Problem fixed: Make an e-log entry." ,
-				"Problem not fixed: Stop the run, start a new run", "Problem still not fixed: Stop the run, red recycle TRACKER, start a new run","Call the DOC for the TRACKER"), fc5.getActionWithContext());
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run","Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);

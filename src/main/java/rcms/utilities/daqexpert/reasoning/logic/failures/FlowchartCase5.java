@@ -44,8 +44,8 @@ public class FlowchartCase5 extends KnownFailure {
 		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
 		/* tracker specific case only when warning state */
 		action.addContextSteps("TRACKER-WARNING", "Issue a TTCHardReset once", "Problem fixed: Make an e-log entry.",
-				"Problem not fixed: Stop the run, start a new run", "Problem still not fixed: Stop the run, red recycle TRACKER, start a new run",
-				"Call the DOC for the TRACKER");
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",
+				"Problem still not fixed: Call the DOC for the TRACKER");
 
 		this.action = action;
 

@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.junit.Test;
 
-import rcms.fm.resource.qualifiedresource.Subsystem;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;

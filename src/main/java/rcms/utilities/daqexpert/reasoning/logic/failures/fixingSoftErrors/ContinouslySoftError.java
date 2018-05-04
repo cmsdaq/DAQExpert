@@ -42,6 +42,10 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				"If problem in DCS (sectors turned off) ask DCS shifter to call Pixel DOC",
 				"If no problem in DCS call Pixel DOC immediately");
 
+		/* CTPPS specific instructions */
+		action.addContextSteps("CTPPS", "<<RedRecycle::{{SUBSYSTEM}}>>",
+				"Call DOC of subsystem {{SUBSYSTEM}}");
+
 		this.action = action;
 
 		this.pastOccurrences = new ArrayList<>();

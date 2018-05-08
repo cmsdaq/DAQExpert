@@ -206,4 +206,107 @@ public class ContinouslySoftErrorTest {
 		return daq;
 	}
 
+	/** generates a sequence found in production where two subsystems
+	 * had multiple fixing soft error transitions but only one
+	 * of them crossed the threshold.
+	 */
+	private SubsystemStateSequenceGenerator generateMultipleSubsystemsSequence() {
+		
+		SubsystemStateSequenceGenerator generator = new SubsystemStateSequenceGenerator();
+		
+		generator.addPointInTime(1525297072570L);
+		
+		generator.addNewState(1525297074958L, "CTPPS", "Running");
+		generator.addNewState(1525297074958L, "PIXEL", "RunningSoftErrorDetected");
+		generator.addNewState(1525297074958L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297080113L, "PIXEL", "FixingSoftError");
+
+		generator.addNewState(1525297083378L, "PIXEL", "Running");
+
+		generator.addNewState(1525297086415L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297119886L, "PIXEL", "FixingSoftError");
+		generator.addNewState(1525297119886L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297127837L, "PIXEL", "Running");
+
+		generator.addNewState(1525297130307L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297162102L, "PIXEL", "RunningSoftErrorDetected");
+		generator.addNewState(1525297162102L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297164718L, "PIXEL", "FixingSoftError");
+
+		generator.addNewState(1525297169807L, "PIXEL", "Running");
+
+		generator.addNewState(1525297177621L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297366508L, "CTPPS", "FixingSoftError");
+		generator.addNewState(1525297366508L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297371563L, "CTPPS", "Running");
+
+		generator.addNewState(1525297374058L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297376721L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297376721L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297379313L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297382180L, "CTPPS", "Running");
+
+		generator.addNewState(1525297387419L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297392860L, "CTPPS", "Running");
+		generator.addNewState(1525297392860L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297396337L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297396337L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297399136L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297401848L, "CTPPS", "Running");
+
+		generator.addNewState(1525297404741L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		// fourth time CTPPS goes into FixingSoftError or RunningSoftErrorDetected
+		// should fire according to the currently implemented logic
+		// (which also counts transitions between RunningSoftErrorDetected and
+		// FixingSoftError)
+		generator.addNewState(1525297407394L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297407394L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297410082L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297413310L, "CTPPS", "Running");
+		generator.addNewState(1525297413310L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297416491L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297416491L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297419166L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297422117L, "CTPPS", "Running");
+
+		generator.addNewState(1525297424856L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297427474L, "CTPPS", "FixingSoftError");
+		generator.addNewState(1525297427474L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297433457L, "CTPPS", "Running");
+		generator.addNewState(1525297433457L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297436424L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297436424L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297439432L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297442171L, "CTPPS", "Running");
+
+		generator.addNewState(1525297444861L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		return generator;
+	}
+
 }

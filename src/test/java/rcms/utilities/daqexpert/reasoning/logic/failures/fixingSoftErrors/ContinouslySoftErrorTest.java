@@ -187,6 +187,55 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 122), null));
 	}
 
+	/** Tests a case where two subsystems went several times into
+	 *  fixing soft error state within the time window but only one
+	 *  of them exceeded the threshold. The error message should only
+	 *  contain the latter subsystem (see issue #175).
+	 */
+	@Test
+	public void multipleSubsystemsTest() {
+	
+		// configure the logic module with the parameters used in production
+		// (the ones used in before() are too short
+		lm = new ContinouslySoftError();
+		Properties p = new Properties();
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey(), Integer.toString(3));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey(), Integer.toString(600000));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey(), Integer.toString(15000));
+		lm.parametrize(p);
+
+		List<DAQ> snapshots = generateMultipleSubsystemsSequence().makeSnapshots();
+		
+		for (DAQ snapshot : snapshots) {
+
+			// clear any previous messages
+			lm.getContextHandler().clearContext();
+
+			// run the test
+			boolean actualResult = lm.satisfied(snapshot, null);
+			
+			// module should fire only from a certain point in time on
+			boolean expectedResult = (snapshot.getLastUpdate() >= 1525297407394L);
+			
+			Assert.assertEquals(expectedResult, actualResult);
+
+			
+			if (actualResult) {
+				// module did fire, ensure that it complains only about CTPPS
+				// but not about PIXEL
+
+				// note that due to merging we can have messages == null
+				// but still a true result from lm.satisfied() (TODO: is this wanted ?)
+			  Set<String> messages = (Set<String>)(lm.getContextHandler().getContext().get("SUBSYSTEM"));
+
+				if (messages != null) {
+					Assert.assertEquals(1, messages.size());
+					Assert.assertTrue(messages.iterator().next().startsWith("CTPPS"));
+				}
+			}
+		}
+	}
+	
 	private DAQ generateSnapshot(String levelZeroState, long lastUpdate) {
 		DAQ daq = new DAQ();
 		SubSystem subsystem1 = new SubSystem();

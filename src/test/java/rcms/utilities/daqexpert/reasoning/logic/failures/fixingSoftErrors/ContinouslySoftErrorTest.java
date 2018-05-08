@@ -16,6 +16,10 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryStep;
 
 public class ContinouslySoftErrorTest {
 
@@ -241,6 +245,50 @@ public class ContinouslySoftErrorTest {
 					Assert.assertTrue(messages.iterator().next().startsWith("CTPPS"));
 				}
 			}
+		}
+	}
+	
+	/** test to check that we get the expected message for CTPPS (including
+	    action objects) */
+	@Test
+	public void checkCTPPSmessage() {
+	
+		// configure the logic module with the parameters used in production
+		// (the ones used in before() are too short
+		setLmProductionThresholds();
+
+		List<DAQ> snapshots = generateMultipleSubsystemsSequence().makeSnapshots();
+		
+		for (DAQ snapshot : snapshots) {
+
+			// clear any previous messages
+			lm.getContextHandler().clearContext();
+
+			if (! lm.satisfied(snapshot, null)) {
+				continue;
+			}
+							
+			// check that there is a recovery request
+			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+			RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(
+							lm.getActionWithContextRawRecovery(),
+							lm.getName(),
+							lm.getDescriptionWithContext(),
+							0L);
+			
+			assertEquals(1, recoveryRequests.getRecoverySteps().size());
+			
+			RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
+			
+			// ensure that we have exactly one recovery step
+			assertEquals(1, recoveryStep.getRedRecycle().size());
+			
+			// ensure that this is a red recycle
+			assertEquals("CTPPS", recoveryStep.getRedRecycle().iterator().next());
+			
+			// just check the first occurrence. Some of the later occurrences
+			// do not have a subsystem due to the merging mechanism.
+			return;
 		}
 	}
 	

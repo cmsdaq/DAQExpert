@@ -144,7 +144,9 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 				Set<String> problematicSubsystems = new HashSet<>();
 				for (Entry<String, Integer> count : coutsPerSubsystem.entrySet()) {
-					problematicSubsystems.add(count.getKey() + " " + count.getValue() + " time(s)");
+					if (count.getValue() > occurrencesThreshold) {
+						problematicSubsystems.add(count.getKey() + " " + count.getValue() + " time(s)");
+					}
 				}
 
 				logger.debug("Registering " + problematicSubsystems);

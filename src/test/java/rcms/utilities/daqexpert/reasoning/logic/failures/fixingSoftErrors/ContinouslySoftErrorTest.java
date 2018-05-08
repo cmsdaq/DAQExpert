@@ -65,7 +65,7 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
 
-		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet() ;
+		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM_WITH_COUNTS")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
 		Assert.assertEquals(2, problematicSubsystems.size());
 		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));

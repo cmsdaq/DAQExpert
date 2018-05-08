@@ -187,6 +187,19 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 122), null));
 	}
 
+	/** configures the ContinouslySoftError module with thresholds used in/closer to
+	 *  production such that the tests work on snapshots generated based
+	 *  on behaviour seen in production.
+	 */
+	private void setLmProductionThresholds() {
+		Properties p = new Properties();
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey(), Integer.toString(3));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey(), Integer.toString(600000));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey(), Integer.toString(15000));
+		lm.parametrize(p);
+	}
+
+
 	/** Tests a case where two subsystems went several times into
 	 *  fixing soft error state within the time window but only one
 	 *  of them exceeded the threshold. The error message should only
@@ -197,12 +210,7 @@ public class ContinouslySoftErrorTest {
 	
 		// configure the logic module with the parameters used in production
 		// (the ones used in before() are too short
-		lm = new ContinouslySoftError();
-		Properties p = new Properties();
-		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey(), Integer.toString(3));
-		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey(), Integer.toString(600000));
-		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey(), Integer.toString(15000));
-		lm.parametrize(p);
+		setLmProductionThresholds();
 
 		List<DAQ> snapshots = generateMultipleSubsystemsSequence().makeSnapshots();
 		

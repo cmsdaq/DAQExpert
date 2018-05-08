@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -42,6 +40,10 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				"If problem in DCS (sectors turned off) ask DCS shifter to call Pixel DOC",
 				"If no problem in DCS call Pixel DOC immediately");
 
+		/* CTPPS specific instructions */
+		action.addContextSteps("CTPPS", "<<RedRecycle::{{SUBSYSTEM}}>>",
+				"Call DOC of subsystem {{SUBSYSTEM}}");
+
 		this.action = action;
 
 		this.pastOccurrences = new ArrayList<>();
@@ -61,7 +63,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 			this.occurrencesThreshold = Integer
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
 			this.description = "Level zero in FixingSoftError more than 3 times in past "
-					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM}}";
+					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
@@ -142,17 +144,22 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				currentResult = true;
 				lastFinish = new Date(daq.getLastUpdate());
 
-				Set<String> problematicSubsystems = new HashSet<>();
 				for (Entry<String, Integer> count : coutsPerSubsystem.entrySet()) {
 					if (count.getValue() > occurrencesThreshold) {
-						problematicSubsystems.add(count.getKey() + " " + count.getValue() + " time(s)");
+
+						String problematicSubsystem = count.getKey();
+
+						logger.debug("Registering " + count.getValue());
+
+						contextHandler.register("SUBSYSTEM", problematicSubsystem);
+
+						// this is used for displaying information about the number
+						// of fixing soft error cycles
+						contextHandler.register("SUBSYSTEM_WITH_COUNTS",
+										problematicSubsystem + " " + count.getValue() + " time(s)");
+
+						contextHandler.setActionKey(problematicSubsystem);
 					}
-				}
-
-				logger.debug("Registering " + problematicSubsystems);
-
-				for (String problematicSubsystem : problematicSubsystems) {
-					contextHandler.register("SUBSYSTEM", problematicSubsystem);
 				}
 			}
 

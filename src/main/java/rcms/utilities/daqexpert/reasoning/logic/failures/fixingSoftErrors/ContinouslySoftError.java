@@ -157,6 +157,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 				for (String problematicSubsystem : problematicSubsystems) {
 					contextHandler.register("SUBSYSTEM", problematicSubsystem);
+					contextHandler.setActionKey(problematicSubsystem);
 				}
 			}
 

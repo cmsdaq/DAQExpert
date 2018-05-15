@@ -33,6 +33,7 @@ public class RuFailed extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+
 	}
 
 	private final String ERROR_STATE = "ERROR";

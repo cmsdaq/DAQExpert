@@ -53,6 +53,8 @@ public class FlowchartCase5 extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);declareCausing(LogicModuleRegistry.VeryHighTcdsInputRate);
+
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
 	}
 
 	// add triggers info (behind or the same

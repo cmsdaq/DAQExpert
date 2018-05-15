@@ -21,14 +21,38 @@ public class DominatingSelector {
 
     public Condition selectDominating(Set<Condition> conditions) {
 
-        return null;
+        if(conditions.size() > 1){
+            logger.info("Requirement graph will be applied to select dominating condition");
+        } else{
+            return conditions.iterator().next();
+        }
+
+        Set<Condition> subResult1 = getLeafsFromUsageGraph(conditions);
+
+        if(subResult1.size() > 1){
+            logger.info("Causality graph will be applied to select dominating condition");
+        } else{
+            return subResult1.iterator().next();
+        }
+
+        Set<Condition> subResult2 = getLeafsFromCausality(subResult1);
+
+        if(subResult2.size() > 1){
+            logger.info("Scoring will be applied to select dominating condition");
+        } else{
+            return subResult2.iterator().next();
+        }
+
+        logger.warn("Could not find dominating condition "+ subResult2);
+        logger.warn("Selecting the first "+ subResult2.iterator().next());
+        return subResult2.iterator().next();
 
     }
 
     public Set<Condition> getLeafsFromUsageGraph(Set<Condition> conditions) {
 
 
-        logger.info("Initial:" );
+        logger.info("Initial set of conditions (before usage graph):" );
         conditions.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::info);
 
         // choose nodes that are not required by anything
@@ -41,7 +65,7 @@ public class DominatingSelector {
         Set<Condition> filtered = conditions.stream().filter(c -> !requiredByOther.contains(c.getLogicModule().getLogicModule())).collect(Collectors.toSet());
 
 
-        logger.info("Filtered:" );
+        logger.info("Filtered set of conditions (after usage graph):" );
         filtered.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::info);
 
         return filtered;
@@ -50,19 +74,19 @@ public class DominatingSelector {
 
     public Set<Condition> getLeafsFromCausality(Set<Condition> conditions){
 
-        logger.info("Initial:" );
+        logger.info("Initial (before causality graph):" );
         conditions.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::info);
 
 
-        Set<Causing> causedByOther = new HashSet<>();
+        Set<CausalityNode> causedByOther = new HashSet<>();
 
         for(Condition condition: conditions){
             causedByOther.addAll(condition.getLogicModule().getLogicModule().getCausing());
         }
 
-        Set<Condition> filtered = conditions.stream().filter(c -> !causedByOther.contains(c.getLogicModule().getLogicModule())).collect(Collectors.toSet());
+        Set<Condition> filtered = conditions.stream().filter(c -> causedByOther.contains(c.getLogicModule().getLogicModule())).collect(Collectors.toSet());
 
-        logger.info("Filtered:" );
+        logger.info("Filtered (after causality graph):" );
         filtered.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::info);
 
 

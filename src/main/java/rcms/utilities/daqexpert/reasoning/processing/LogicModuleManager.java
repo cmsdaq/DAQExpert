@@ -1,12 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -18,7 +13,10 @@ import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.LogicModuleVisualizer;
 import rcms.utilities.daqexpert.reasoning.base.*;
+import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
+import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
@@ -50,6 +48,7 @@ public class LogicModuleManager {
         this.conditionProducer = conditionProducer;
 
         HashSet<LogicModule> knownFailureClasses = new HashSet<>();
+        Set<CausalityNode> causalityNodes = new HashSet<>();
 
         for(LogicModuleRegistry lmr: LogicModuleRegistry.values()){
             if(lmr.getLogicModule() != null){
@@ -57,9 +56,13 @@ public class LogicModuleManager {
             }
         }
 
+
+
         for (LogicModule lm : LogicModuleRegistry.getModulesInRunOrder()) {
 
-                lm.declareRequired();
+                lm.declareRelations();
+                causalityNodes.add(lm);
+
                 if (lm instanceof SimpleLogicModule) {
                     SimpleLogicModule simpleLogicModule = (SimpleLogicModule) lm;
                     checkers.add(simpleLogicModule);
@@ -81,6 +84,15 @@ public class LogicModuleManager {
 
 
         }
+
+        CausalityManager causalityManager = new CausalityManager();
+        causalityManager.verifyNoCycle(causalityNodes);
+
+        LogicModuleVisualizer logicModuleVisualizer = new LogicModuleVisualizer();
+
+        logicModuleVisualizer.generateGraph(causalityNodes);
+
+
 
         logger.info("Registering " + knownFailureClasses.size()
                 + " known-failure logic modules to covering unidentified-failure logic module");

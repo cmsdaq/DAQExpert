@@ -24,7 +24,7 @@ public class RuStuck extends BackpressureAnalyzer {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

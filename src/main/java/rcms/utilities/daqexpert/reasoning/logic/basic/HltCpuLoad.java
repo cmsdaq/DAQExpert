@@ -29,7 +29,7 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.BackpressureFromHlt);
 	}
 

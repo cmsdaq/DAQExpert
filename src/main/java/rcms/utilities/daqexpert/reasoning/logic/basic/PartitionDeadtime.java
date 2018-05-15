@@ -27,7 +27,7 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.ExpectedRate);
     }
 

@@ -22,7 +22,7 @@ public class LongTransition extends SimpleLogicModule {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 	}
 

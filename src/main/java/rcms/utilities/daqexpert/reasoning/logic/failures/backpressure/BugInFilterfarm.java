@@ -25,7 +25,7 @@ public class BugInFilterfarm extends BackpressureAnalyzer {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

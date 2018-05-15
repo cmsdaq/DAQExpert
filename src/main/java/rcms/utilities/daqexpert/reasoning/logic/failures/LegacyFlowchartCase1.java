@@ -69,7 +69,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		require(LogicModuleRegistry.OutOfSequenceData);
 	}

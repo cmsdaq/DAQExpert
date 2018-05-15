@@ -3,7 +3,7 @@ package rcms.utilities.daqexpert.reasoning.base;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.Requiring;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
-import rcms.utilities.daqexpert.reasoning.causality.Causing;
+import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Elementary part of expert knowledge. Logic Module (abbreviated LM) is a piece
  * of knowledge focusing on one aspect. E.g.:
- * 
+ *
  * <ul>
  * <li>NoRate LM - this Logic Module identifies when there is no rate in DAQ
  * system</li>
@@ -22,25 +22,25 @@ import java.util.Set;
  * <li>FED backpressured LM - identifies failure case when FED is backpressured
  * by DAQ system</li>
  * </ul>
- * 
+ *
  * Note that each Logic Module should focus on one aspect, and one aspect only.
  * Results of a Logic Modules can be used in other Logic Modules so that there
  * is no duplication of code. It is recommended to reuse results from Logic
  * Modules for better performance.
- * 
+ *
  * Please follow the
  * <a href="http://daq-expert.cern.ch/contributing.html">step-by-step guide</a>
  * before adding new Logic Modules.
- * 
- * 
+ *
+ *
  * @see <a href="http://daq-expert.cern.ch/contributing.html">step-by-step
  *      guide</a>
- * 
- * 
+ *
+ *
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public abstract class LogicModule implements Requiring, Causing {
+public abstract class LogicModule implements Requiring, CausalityNode {
 
 	/**
 	 * Name of the condition found
@@ -70,19 +70,19 @@ public abstract class LogicModule implements Requiring, Causing {
 	 */
 	protected Set<Requiring> required;
 
+	protected Set<CausalityNode> affected;
 
-	/**
-	 * Set of required logic modules
-	 */
-	protected Set<Causing> causingSet;
+	protected Set<CausalityNode> causing;
 
 
 	public LogicModule(){
 		this.required = new LinkedHashSet<>();
+		this.causing = new LinkedHashSet<>();
+		this.affected = new LinkedHashSet<>();
 	}
 	/**
 	 * Get name of the condition
-	 * 
+	 *
 	 * @return name of the condition
 	 */
 	public String getName() {
@@ -91,7 +91,7 @@ public abstract class LogicModule implements Requiring, Causing {
 
 	/**
 	 * Set name of the condition
-	 * 
+	 *
 	 * @param name
 	 *            name of the condition
 	 */
@@ -101,7 +101,7 @@ public abstract class LogicModule implements Requiring, Causing {
 
 	/**
 	 * Get priority of the condition
-	 * 
+	 *
 	 * @return priority of the condition
 	 */
 	public ConditionPriority getPriority() {
@@ -110,7 +110,7 @@ public abstract class LogicModule implements Requiring, Causing {
 
 	/**
 	 * Set the priority of the condition
-	 * 
+	 *
 	 * @param priority
 	 *            priority of the condition
 	 */
@@ -152,5 +152,41 @@ public abstract class LogicModule implements Requiring, Causing {
 		required.add(logicModuleRegistry.getLogicModule());
 	}
 
+	protected void declareCausing(LogicModuleRegistry logicModuleRegistry){
+		declareCausing(logicModuleRegistry.getLogicModule());
+	}
 
+	protected void declareAffected(LogicModuleRegistry logicModuleRegistry){
+		declareAffected(logicModuleRegistry.getLogicModule());
+	}
+
+	@Override
+	public Set<CausalityNode> getCausing() {
+		return causing;
+	}
+
+	@Override
+	public Set<CausalityNode> getAffected() {
+		return affected;
+	}
+
+	private int level;
+
+	@Override
+	public int getLevel() {
+		return level;
+	}
+
+	@Override
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	@Override
+	public String getNodeName() {
+		return getLogicModuleRegistry().name();
+	}
+
+
+	public void declareRelations() {return;}
 }

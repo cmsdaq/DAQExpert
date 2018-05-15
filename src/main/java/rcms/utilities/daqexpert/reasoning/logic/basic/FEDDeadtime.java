@@ -29,7 +29,7 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 	}
 

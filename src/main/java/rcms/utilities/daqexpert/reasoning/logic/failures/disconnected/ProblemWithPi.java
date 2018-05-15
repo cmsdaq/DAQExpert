@@ -24,7 +24,7 @@ public class ProblemWithPi extends DisconnectedAnalyzer {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

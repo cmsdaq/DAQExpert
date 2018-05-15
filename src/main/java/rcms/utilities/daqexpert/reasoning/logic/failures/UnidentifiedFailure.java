@@ -68,7 +68,7 @@ public class UnidentifiedFailure extends ActionLogicModule {
     }
 
     @Override
-    public void declareRequired() {
+    public void declareRelations() {
         Arrays.stream(LogicModuleRegistry.values())
                 .filter(l->l.getLogicModule() != null)
                 .filter(l->l.getLogicModule() instanceof ActionLogicModule)

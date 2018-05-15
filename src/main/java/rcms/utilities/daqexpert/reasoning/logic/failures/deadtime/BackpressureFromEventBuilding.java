@@ -36,7 +36,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.FedDeadtimeDueToDaq);
         require(LogicModuleRegistry.TmpUpgradedFedProblem);
     }

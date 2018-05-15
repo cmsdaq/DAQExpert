@@ -19,7 +19,7 @@ public class WarningInSubsystem extends ContextLogicModule {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.RunOngoing);
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.LongTransition);

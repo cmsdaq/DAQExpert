@@ -28,7 +28,7 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.CriticalDeadtime);
         require(LogicModuleRegistry.BeamActive);
     }

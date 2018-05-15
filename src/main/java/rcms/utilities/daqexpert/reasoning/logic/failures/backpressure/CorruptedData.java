@@ -42,7 +42,7 @@ public class CorruptedData extends BackpressureAnalyzer {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

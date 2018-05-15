@@ -36,7 +36,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.FedDeadtimeDueToDaq);
         require(LogicModuleRegistry.TmpUpgradedFedProblem);
     }

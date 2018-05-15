@@ -32,7 +32,7 @@ public abstract class ActionLogicModule extends ContextLogicModule {
 	}
 
 	@Override
-	public void declareRequired() {
+	public void declareRelations() {
 		require(LogicModuleRegistry.StableBeams);
 	}
 

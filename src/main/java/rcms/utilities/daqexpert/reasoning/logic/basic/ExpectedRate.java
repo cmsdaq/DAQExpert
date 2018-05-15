@@ -17,7 +17,7 @@ public class ExpectedRate extends SimpleLogicModule {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.RunOngoing);
 	}
 

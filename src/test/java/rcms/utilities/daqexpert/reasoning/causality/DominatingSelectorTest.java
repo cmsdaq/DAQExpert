@@ -20,7 +20,7 @@ public class DominatingSelectorTest {
         Condition c2 = generateCondition(LogicModuleRegistry.RuFailed);
         conditionList.add(c1);
         conditionList.add(c2);
-        conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRequired());
+        conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRelations());
         Set<Condition> result = ds.getLeafsFromUsageGraph(conditionList);
         assertThat(result, hasItem(c2));
         assertThat(result, not(hasItem(c1)));
@@ -39,7 +39,7 @@ public class DominatingSelectorTest {
         Condition c2 = generateCondition(LogicModuleRegistry.RuFailed);
         conditionList.add(c1);
         conditionList.add(c2);
-        conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRequired());
+        conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRelations());
         Set<Condition> result = ds.getLeafsFromUsageGraph(conditionList);
         assertThat(result, hasItem(c2));
         assertThat(result, not(hasItem(c1)));

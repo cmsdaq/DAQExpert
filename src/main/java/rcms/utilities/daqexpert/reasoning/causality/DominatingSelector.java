@@ -21,32 +21,39 @@ public class DominatingSelector {
 
         // ignore conditions that has end date
         Set<Condition> filtered = conditions.stream().filter(c->c.getEnd() ==null).collect(Collectors.toSet());
+        if(filtered.size() == 1)
+            return filtered.iterator().next();
 
-        if(conditions.size() > 1){
-            logger.info("Requirement graph will be applied to select dominating condition");
-        } else{
-            return conditions.iterator().next();
-        }
-
+        logger.info("Requirement graph will be applied to select dominating condition");
         Set<Condition> subResult1 = getLeafsFromUsageGraph(filtered);
-
-        if(subResult1.size() > 1){
-            logger.info("Causality graph will be applied to select dominating condition");
-        } else{
+        if(subResult1.size() == 1)
             return subResult1.iterator().next();
-        }
 
+        logger.info("Causality graph will be applied to select dominating condition");
         Set<Condition> subResult2 = getLeafsFromCausality(subResult1);
-
-        if(subResult2.size() > 1){
-            logger.info("Scoring will be applied to select dominating condition");
-        } else{
+        if(subResult2.size() == 1)
             return subResult2.iterator().next();
-        }
 
-        logger.warn("Could not find dominating condition "+ subResult2);
-        logger.warn("Selecting the first "+ subResult2.iterator().next());
-        return subResult2.iterator().next();
+        logger.info("Start date will be applied to select dominating condition");
+        Date earliest = null;
+        for(Condition condition: subResult2){
+            if(earliest == null) {
+                earliest = condition.getStart();
+            }
+            if(earliest.getTime() > condition.getStart().getTime()){
+                earliest = condition.getStart();
+            }
+        }
+        final Date earliestFinal = earliest;
+
+        Set<Condition> subResult3 = conditions.stream().filter(c->c.getStart() == earliestFinal).collect(Collectors.toSet());
+
+        if(subResult3.size() == 1)
+            return subResult3.iterator().next();
+
+        logger.warn("Could not find dominating condition "+ subResult3);
+        logger.warn("Selecting the first randomly "+ subResult3.iterator().next());
+        return subResult3.iterator().next();
 
     }
 
@@ -72,6 +79,8 @@ public class DominatingSelector {
         return filtered;
 
     }
+
+
 
     public Set<Condition> getLeafsFromCausality(Set<Condition> conditions){
 

@@ -17,12 +17,15 @@ import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 
 public class ConditionDashboardTest {
 
+	static Date t1 = DatatypeConverter.parseDateTime("2017-03-09T10:00:00Z").getTime();
+	static Date t2 = DatatypeConverter.parseDateTime("2017-03-09T10:00:01Z").getTime();
+
 	private static Long id = 0L;
 
-	static Condition c1 = generateCondition("c1", LogicModuleRegistry.VeryHighTcdsInputRate);
-	static Condition c2 = generateCondition("c2", LogicModuleRegistry.RateTooHigh);
-	static Condition c3 = generateCondition("c3", LogicModuleRegistry.FlowchartCase5);
-	static Condition c4 = generateCondition("c4", LogicModuleRegistry.NoRateWhenExpected);
+	static Condition c1 = generateCondition("c1", LogicModuleRegistry.VeryHighTcdsInputRate, t1);
+	static Condition c2 = generateCondition("c2", LogicModuleRegistry.RateTooHigh, t1);
+	static Condition c3 = generateCondition("c3", LogicModuleRegistry.FlowchartCase5, t2);
+	static Condition c4 = generateCondition("c4", LogicModuleRegistry.NoRateWhenExpected, t2);
 
 	@BeforeClass
 	public static void prepare(){
@@ -111,14 +114,14 @@ public class ConditionDashboardTest {
 
 	}
 
-	public static Condition generateCondition(String title, LogicModuleRegistry lm) {
+	public static Condition generateCondition(String title, LogicModuleRegistry lm, Date t) {
 		Condition condition = new Condition();
 		condition.setId(id++);
 		condition.setTitle(title);
 		condition.setPriority(ConditionPriority.DEFAULTT);
 		condition.setLogicModule(lm);
 		condition.setShow(true);
-		condition.setStart(new Date());
+		condition.setStart(t);
 		return condition;
 	}
 

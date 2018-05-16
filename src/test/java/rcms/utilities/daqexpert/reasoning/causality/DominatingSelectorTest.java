@@ -1,5 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.causality;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
@@ -7,6 +9,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
@@ -15,19 +18,26 @@ import static org.junit.Assert.assertEquals;
 
 public class DominatingSelectorTest {
 
+
     /**
      * In this case 2 LM do not have 'requirement' relationship. 'Causality' relationship is used.
      * @throws Exception
      */
     @Test
     public void getLeafsFromCausality() throws Exception {
+        Logger.getLogger(DominatingSelector.class).setLevel(Level.DEBUG);
         DominatingSelector ds = new DominatingSelector();
         Set<Condition> conditionList = new HashSet<>();
         Condition c1 = generateCondition(LogicModuleRegistry.VeryHighTcdsInputRate);
         Condition c2 = generateCondition(LogicModuleRegistry.RateTooHigh);
         conditionList.add(c1);
         conditionList.add(c2);
+
         conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRelations());
+        CausalityManager cm = new CausalityManager();
+        Set<CausalityNode> a = conditionList.stream().map(c->c.getLogicModule().getLogicModule()).collect(Collectors.toSet());
+        cm.transformToCanonical(a);
+
         Set<Condition> result = ds.getLeafsFromCausality(conditionList);
         assertEquals(1, result.size());
         assertThat(result, hasItem(c1));
@@ -49,6 +59,7 @@ public class DominatingSelectorTest {
      */
     @Test
     public void selectDominating() throws Exception {
+        Logger.getLogger(DominatingSelector.class).setLevel(Level.DEBUG);
         DominatingSelector ds = new DominatingSelector();
         Set<Condition> conditionList = new HashSet<>();
         Condition c1 = generateCondition(LogicModuleRegistry.NoRateWhenExpected);
@@ -68,15 +79,41 @@ public class DominatingSelectorTest {
 
 
         Set<Condition> subResult1 = ds.getLeafsFromUsageGraph(conditionList);
-        Set<Condition> subResult2 = ds.getLeafsFromCausality(conditionList);
-
         assertEquals(2, subResult1.size());
+
+        Set<Condition> subResult2 = ds.getLeafsFromCausality(conditionList);
         assertEquals(2, subResult2.size());
 
         Condition result = ds.selectDominating(conditionList);
 
         assertEquals(c3, result);
 
+
+    }
+
+    @Test
+    public void dontConciderConditionsThatEnded() throws Exception {
+        Logger.getLogger(DominatingSelector.class).setLevel(Level.DEBUG);
+        DominatingSelector ds = new DominatingSelector();
+        Set<Condition> conditionList = new HashSet<>();
+        Condition c1 = generateCondition(LogicModuleRegistry.NoRateWhenExpected);
+        Condition c2 = generateCondition(LogicModuleRegistry.TTSDeadtime);
+        Condition c3 = generateCondition(LogicModuleRegistry.FlowchartCase5);
+        conditionList.add(c1);
+        conditionList.add(c2);
+        conditionList.add(c3);
+
+        c3.setEnd(new Date());
+
+        CausalityManager cm = new CausalityManager();
+
+        conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRelations());
+        Set<CausalityNode> a = conditionList.stream().map(c->c.getLogicModule().getLogicModule()).collect(Collectors.toSet());
+
+        cm.transformToCanonical(a);
+
+        Condition result = ds.selectDominating(conditionList);
+        assertEquals(c1, result);
 
     }
 
@@ -87,6 +124,7 @@ public class DominatingSelectorTest {
     @Test
     public void getLeafsFromUsageGraph() throws Exception {
 
+        Logger.getLogger(DominatingSelector.class).setLevel(Level.DEBUG);
         DominatingSelector ds = new DominatingSelector();
         Set<Condition> conditionList = new HashSet<>();
         Condition c1 = generateCondition(LogicModuleRegistry.NoRateWhenExpected);

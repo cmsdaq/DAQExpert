@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.DataManager;
@@ -19,8 +20,10 @@ import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
@@ -45,6 +48,8 @@ public class DataPrepareJob implements Runnable {
 
 	private final ConditionDashboard conditionDashboard;
 
+	private final DominatingPersistor dominatingPersistor;
+
 	/** flag to do demo run */
 	private final boolean demoRun;
 	private boolean waiting;
@@ -66,6 +71,7 @@ public class DataPrepareJob implements Runnable {
 		this.eventSender = eventSender;
 		this.conditionDashboard = conditionDashboard;
 		this.demoRun = demoRun;
+		this.dominatingPersistor = new DominatingPersistor(persistenceManager);
 	}
 
 	private static int priority = 0;
@@ -84,6 +90,8 @@ public class DataPrepareJob implements Runnable {
 
 				if (snapshots.getRight().size() > 0) {
 					waiting = false;
+
+					logger.debug("Processing " + snapshots.getRight().size() + " this round");
 
 					if (priority == Integer.MAX_VALUE)
 						priority = 0;
@@ -115,7 +123,14 @@ public class DataPrepareJob implements Runnable {
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
+						Condition lastDominating = conditionDashboard.getCurrentCondition();
 						conditionDashboard.update(result.getLeft());
+						Condition currentlyDominating = conditionDashboard.getCurrentCondition();
+
+						if(currentlyDominating != lastDominating){
+							dominatingPersistor.persistDominating(lastDominating, currentlyDominating);
+						}
+
 
 						if (demoRun && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {

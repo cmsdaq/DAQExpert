@@ -51,6 +51,10 @@ public enum Setting {
 
 	/** threshold (range 0..1) above which the HLT CPU load is considered to be high */
 	EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD("expert.logic.hlt.cpu.load.threshold"),
+
+	/** holdoff period in milliseconds after the beginning of a run before
+	 *  asserting the high hlt cpu load condition */
+	EXPERT_LOGIC_HLT_CPU_LOAD_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.holdoff.period"),
 	
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

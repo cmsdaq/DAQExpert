@@ -34,6 +34,14 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.BeamActive);
+
+		declareCause(LogicModuleRegistry.HltOutputBandwidthTooHigh);
+		declareCause(LogicModuleRegistry.HltOutputBandwidthExtreme);
+
+
+		declareCause(LogicModuleRegistry.BackpressureFromHlt);
+		declareCause(LogicModuleRegistry.BackpressureFromFerol);
+
 	}
 
 	/**

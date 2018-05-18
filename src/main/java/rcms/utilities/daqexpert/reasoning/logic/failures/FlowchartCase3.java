@@ -36,6 +36,7 @@ public class FlowchartCase3 extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
 	}
 
 	@Override

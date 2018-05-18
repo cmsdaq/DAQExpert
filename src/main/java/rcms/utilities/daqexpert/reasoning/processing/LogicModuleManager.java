@@ -86,11 +86,12 @@ public class LogicModuleManager {
         }
 
         CausalityManager causalityManager = new CausalityManager();
+        causalityManager.transformToCanonical(causalityNodes);
         causalityManager.verifyNoCycle(causalityNodes);
 
         LogicModuleVisualizer logicModuleVisualizer = new LogicModuleVisualizer();
 
-        logicModuleVisualizer.generateGraph(causalityNodes);
+        //logicModuleVisualizer.generateGraph(causalityNodes);
 
 
 

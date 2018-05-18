@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.mixin.IdGenerators;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 
 import java.io.File;
@@ -85,6 +88,20 @@ public class LogicModuleVisualizer {
         return getNextLevel(orderedNodes, remainingNodes, level + 1);
     }
 
+    public static void main(String[] args){
+
+        LogicModuleVisualizer lmv = new LogicModuleVisualizer();
+
+        List<LogicModule> modules = LogicModuleRegistry.getModulesInRunOrder();
+        modules.stream().forEach(c->c.declareRelations());
+        CausalityManager cm = new CausalityManager();
+
+        Set<CausalityNode> nodes = modules.stream().map(c -> (CausalityNode) c).collect(Collectors.toSet());
+        cm.transformToCanonical(nodes);
+        cm.verifyNoCycle(nodes);
+
+        lmv.generateGraph(nodes);
+    }
 
 
     @JsonIdentityInfo(generator = IdGenerators.ObjectUniqueIntIdGenerator.class, property = "id")

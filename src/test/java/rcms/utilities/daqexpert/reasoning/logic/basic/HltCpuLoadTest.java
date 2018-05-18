@@ -79,4 +79,22 @@ public class HltCpuLoadTest {
 		// mock the situation where the HLT CPU load could not be retrieved
 		runTest(null, false);
 	}
+
+	/** contains information about a point in time for the hold off test */
+	private static class HoldOffTestData {
+		private final long timestamp;
+
+		private final boolean runOngoing;
+
+		private final float cpuLoad;
+
+		private final boolean expectedResult;
+
+		public HoldOffTestData(long timestamp, boolean runOngoing, float cpuLoad, boolean expectedResult) {
+			this.timestamp = timestamp;
+			this.runOngoing = runOngoing;
+			this.cpuLoad = cpuLoad;
+			this.expectedResult = expectedResult;
+		}
+	}
 }

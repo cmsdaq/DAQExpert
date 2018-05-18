@@ -163,6 +163,12 @@ var groupsList = [ {
 	title : 'Experimental LM',
 	primary : false
 }, {
+    id : 'dominating',
+    content : 'Dom. (0)',
+    name : 'Dom.',
+    title : 'Dominating LM selection',
+    primary : false
+},{
 	id : 'ver',
 	content : 'Ver. (0)',
 	name : 'Ver.',

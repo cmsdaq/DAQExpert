@@ -89,7 +89,8 @@ public class JobManager {
 		}
 
 		if (demo) {
-			realTimeReaderPeriod = 2000;
+			logger.info("Running in demo mode");
+			realTimeReaderPeriod = 10;
 			batchSnapshotRead = 1;
 		}
 

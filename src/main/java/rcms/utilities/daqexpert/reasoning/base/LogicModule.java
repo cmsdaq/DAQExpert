@@ -152,7 +152,7 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 		required.add(logicModuleRegistry.getLogicModule());
 	}
 
-	protected void declareCausing(LogicModuleRegistry logicModuleRegistry){
+	protected void declareCause(LogicModuleRegistry logicModuleRegistry){
 		declareCausing(logicModuleRegistry.getLogicModule());
 	}
 

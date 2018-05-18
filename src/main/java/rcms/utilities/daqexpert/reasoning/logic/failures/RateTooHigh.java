@@ -33,8 +33,8 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 	@Override
 	public void declareRelations(){
-		declareCausing(LogicModuleRegistry.HighTcdsInputRate);
-		declareCausing(LogicModuleRegistry.VeryHighTcdsInputRate);
+		declareCause(LogicModuleRegistry.HighTcdsInputRate);
+		declareCause(LogicModuleRegistry.VeryHighTcdsInputRate);
 	}
 
 	@Override

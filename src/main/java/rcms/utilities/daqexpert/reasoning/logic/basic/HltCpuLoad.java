@@ -9,6 +9,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.FailFastParameterReader;
+import rcms.utilities.daqexpert.reasoning.logic.basic.helper.HoldOffTimer;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
@@ -22,6 +23,11 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	private Float maxCpuLoad;
 
 	private String additionalNote = "Note that there is also backpressure from HLT.";
+
+	/** timer which returns true only if we are in a run and
+	 *  after the holdoff period
+	 */
+	private HoldOffTimer holdOffTimer;
 
 	public HltCpuLoad() {
 		this.name = "HLT CPU load";
@@ -37,6 +43,21 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
 		assignPriority(results);
+
+		// check if we are in a run now
+		// (rely on the fact that RunOngoing has been run already)
+		Boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
+
+		// update the holdoff timer
+		long now = daq.getLastUpdate();
+		holdOffTimer.updateInput(runOngoing, now);
+
+		if (runOngoing && !holdOffTimer.getOutput(now)) {
+			// we are in a run but still in the holdoff period
+			return false;
+		}
+
+		// we are either outside a run or after the holdoff period in the run
 
 		if (daq.getHltInfo() == null) {
 			return false;
@@ -71,6 +92,12 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	public void parametrize(Properties properties) {
 		this.maxCpuLoad = FailFastParameterReader.getFloatParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD, this.getClass());
 		this.description = String.format("HLT CPU load is high ({{HLT_CPU_LOAD}}, which exceeds the threshold of %.1f%%. [[NOTE]]", maxCpuLoad * 100);
+
+		// an integer in milliseconds is enough to describe 24 days of
+		// holdoff period...
+		Integer holdOffPeriod = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_HOLDOFF_PERIOD, this.getClass());
+		holdOffTimer = new HoldOffTimer(holdOffPeriod);
+
 	}
 
 }

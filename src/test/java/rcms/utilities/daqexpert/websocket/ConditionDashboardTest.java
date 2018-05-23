@@ -74,30 +74,30 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		/* 3 Result */
+		Assert.assertEquals( c3, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
+		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
+
+		/* 4 Change - new condition(s) start/end */
+		c3.setEnd(new Date());
+		conditions.remove(c3);
+		conditionDashboard.update(conditions);
+
+		/* 4 Result */
 		Assert.assertEquals( c1, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
 		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
+
 		/* 4 Change - new condition(s) start/end */
 		c1.setEnd(new Date());
-		conditions.remove(c1);
-		conditionDashboard.update(conditions);
-
-		/* 4 Result */
-		Assert.assertEquals( c2, conditionDashboard.getCurrentCondition());
-		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
-		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
-
-
-		/* 4 Change - new condition(s) start/end */
-		c2.setEnd(new Date());
 		c4.setEnd(new Date());
-		conditions.remove(c2);
+		conditions.remove(c1);
 		conditions.remove(c4);
 		conditionDashboard.update(conditions);
 
 		/* 5 Result */
-		Assert.assertEquals(c3, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(c2, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
 		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
@@ -106,7 +106,7 @@ public class ConditionDashboardTest {
 		conditionDashboard.update(conditions);
 
 		/* 6 Only recent conditions */
-		Assert.assertEquals(c3, conditionDashboard.getCurrentCondition());
+		Assert.assertEquals(c2, conditionDashboard.getCurrentCondition());
 		Assert.assertEquals(4, conditionDashboard.getCurrentConditions().size());
 		Assert.assertEquals(3, conditionDashboard.getConditionsWithoutDominatingCondition().size());
 
@@ -121,6 +121,7 @@ public class ConditionDashboardTest {
 		condition.setPriority(ConditionPriority.DEFAULTT);
 		condition.setLogicModule(lm);
 		condition.setShow(true);
+		condition.setProblematic(true);
 		condition.setStart(t);
 		return condition;
 	}

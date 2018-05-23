@@ -141,6 +141,7 @@ public class DominatingSelectorTest {
 
     private Condition generateCondition(LogicModuleRegistry logicModuleRegistry) {
         Condition c = new Condition();
+        c.setProblematic(true);
 
         c.setLogicModule(logicModuleRegistry);
 

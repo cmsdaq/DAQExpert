@@ -14,6 +14,7 @@ public class ExpectedRate extends SimpleLogicModule {
 		this.name = "Expected rate";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Expecting rate";
+		this.problematic = false;
 	}
 
 	@Override

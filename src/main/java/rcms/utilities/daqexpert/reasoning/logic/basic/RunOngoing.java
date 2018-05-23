@@ -22,6 +22,7 @@ public class RunOngoing extends SimpleLogicModule {
 		this.priority = ConditionPriority.IMPORTANT;
 		this.description = "Run is ongoing according to TCDS state";
 		this.previousState = false;
+		this.problematic = false;
 	}
 
 	private static final List<String> levelZeroRunningStates = Arrays.asList("RUNNING", "PAUSED", "PAUSING", "RESUMING",

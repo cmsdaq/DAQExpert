@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.mixin.IdGenerators;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
@@ -96,7 +97,7 @@ public class LogicModuleVisualizer {
         modules.stream().forEach(c->c.declareRelations());
         CausalityManager cm = new CausalityManager();
 
-        Set<CausalityNode> nodes = modules.stream().map(c -> (CausalityNode) c).collect(Collectors.toSet());
+        Set<CausalityNode> nodes = modules.stream().filter(c->c.isProblematic()).map(c -> (CausalityNode) c).collect(Collectors.toSet());
         cm.transformToCanonical(nodes);
         cm.verifyNoCycle(nodes);
 

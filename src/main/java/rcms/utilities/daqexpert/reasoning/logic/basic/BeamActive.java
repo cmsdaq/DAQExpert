@@ -19,6 +19,7 @@ public class BeamActive extends SimpleLogicModule {
 		this.name = "Beams active";
 		this.description = "Beam active identified";
 		this.priority = ConditionPriority.DEFAULTT;
+		this.problematic = false;
 
 	}
 

@@ -66,6 +66,11 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 	protected boolean holdNotifications;
 
 	/**
+	 * Flag indicating whether this LM identifies problematic condition
+	 */
+	protected boolean problematic;
+
+	/**
 	 * Set of required logic modules
 	 */
 	protected Set<Requiring> required;
@@ -79,6 +84,7 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 		this.required = new LinkedHashSet<>();
 		this.causing = new LinkedHashSet<>();
 		this.affected = new LinkedHashSet<>();
+		this.problematic = true;
 	}
 	/**
 	 * Get name of the condition
@@ -189,4 +195,12 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 
 
 	public void declareRelations() {return;}
+
+	public boolean isProblematic() {
+		return problematic;
+	}
+
+	public void setProblematic(boolean problematic) {
+		this.problematic = problematic;
+	}
 }

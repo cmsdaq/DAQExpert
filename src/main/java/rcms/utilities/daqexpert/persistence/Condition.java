@@ -45,6 +45,11 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @Transient
     private boolean holdNotifications;
 
+    /** Is problematic condition */
+    @JsonIgnore
+    @Transient
+    private boolean problematic;
+
     private boolean mature;
 
     @JsonIgnore
@@ -333,5 +338,13 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
             notifyObservers();
         }
+    }
+
+    public boolean isProblematic() {
+        return problematic;
+    }
+
+    public void setProblematic(boolean problematic) {
+        this.problematic = problematic;
     }
 }

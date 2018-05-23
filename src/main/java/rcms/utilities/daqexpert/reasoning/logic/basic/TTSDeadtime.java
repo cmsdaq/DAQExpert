@@ -42,6 +42,9 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 		declareCause(LogicModuleRegistry.BackpressureFromHlt);
 		declareCause(LogicModuleRegistry.BackpressureFromFerol);
 
+		declareAffected(LogicModuleRegistry.Deadtime);
+		declareAffected(LogicModuleRegistry.CriticalDeadtime);
+
 	}
 
 	/**

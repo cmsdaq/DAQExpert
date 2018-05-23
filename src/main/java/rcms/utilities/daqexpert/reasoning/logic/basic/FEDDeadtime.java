@@ -31,6 +31,9 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
+
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
+		declareAffected(LogicModuleRegistry.PartitionDeadtime);
 	}
 
 	@Override

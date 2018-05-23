@@ -3,6 +3,8 @@ package rcms.utilities.daqexpert.websocket;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 
 import java.util.*;
@@ -38,6 +40,7 @@ public class ConditionDashboard implements Observer {
 
     private DominatingSelector dominatingSelector;
 
+
     public ConditionDashboard(int max) {
         this.maximumNumberOfConditionsHandled = max;
         this.dominatingSelector = new DominatingSelector();
@@ -52,7 +55,7 @@ public class ConditionDashboard implements Observer {
     public void compareWithCurrentlyDominating(Condition condition) {
 
         if(dominatingCondition != null){
-            Set<Condition> conditions = new HashSet<>();
+            Set<Condition> conditions = new LinkedHashSet<>();
             conditions.add(condition);
             conditions.add(dominatingCondition);
             Condition dominating = dominatingSelector.selectDominating(conditions);
@@ -77,15 +80,23 @@ public class ConditionDashboard implements Observer {
             if (condition.isShow() && !condition.isHoldNotifications()) {
 
 
-                compareWithCurrentlyDominating(condition);
+                //compareWithCurrentlyDominating(condition);
 
                 if (!conditions.containsKey(condition.getId())) {
                     if (conditions.size() >= maximumNumberOfConditionsHandled) {
-                        Condition oldest = conditions.values().iterator().next();
+                        Iterator<Condition> it = conditions.values().iterator();
+                        Condition oldest = it.next();
+
+                        // dont remove dominating condition from this list, even though it's old, get next one
+                        if(oldest == dominatingCondition) {
+                            oldest = it.next();
+                        }
+
                         logger.trace("Observers before: " + oldest.countObservers());
                         oldest.deleteObserver(this);
                         logger.trace("Observers after: " + oldest.countObservers());
                         conditions.remove(oldest.getId());
+
                     }
                     conditions.put(condition.getId(), condition);
                     condition.addObserver(this);
@@ -95,12 +106,9 @@ public class ConditionDashboard implements Observer {
                 }
             }
         }
+        Condition dominating = dominatingSelector.selectDominating(conditions.values());
+        this.dominatingCondition = dominating;
 
-        for (Condition condition : conditions.values()) {
-            if (condition.getEnd() == null) {
-                compareWithCurrentlyDominating(condition);
-            }
-        }
 
         if (sessionHander != null) {
             if (lastDominating != this.dominatingCondition) {
@@ -180,5 +188,7 @@ public class ConditionDashboard implements Observer {
         }
 
     }
+
+
 
 }

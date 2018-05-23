@@ -89,4 +89,8 @@ public class ForwardReaderJob implements ReaderJob {
 		return finished;
 	}
 
+	public Long getLast(){
+		return last;
+	}
+
 }

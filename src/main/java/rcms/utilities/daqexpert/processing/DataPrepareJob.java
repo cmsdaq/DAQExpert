@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Level;
@@ -123,12 +124,15 @@ public class DataPrepareJob implements Runnable {
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
+
 						Condition lastDominating = conditionDashboard.getCurrentCondition();
 						conditionDashboard.update(result.getLeft());
 						Condition currentlyDominating = conditionDashboard.getCurrentCondition();
 
+
 						if(currentlyDominating != lastDominating){
-							dominatingPersistor.persistDominating(lastDominating, currentlyDominating);
+							Date currentSnapshotTime = new Date(((ForwardReaderJob)readerJob).getLast());
+							dominatingPersistor.persistDominating(lastDominating, currentlyDominating, currentSnapshotTime);
 						}
 
 

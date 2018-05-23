@@ -6,6 +6,9 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 import java.util.Date;
 
+/**
+ * Persists dominating condition in order to see what was presented as a root case.
+ */
 public class DominatingPersistor {
 
 
@@ -44,10 +47,17 @@ public class DominatingPersistor {
      * R. PPPPCCCPP
      * </pre>
      *
+     * 4. No current dominating
+     * <pre>
+     *     P. ##
+     *     C
+     * </pre>
+     *
      * @param previousDominating
      * @param currentlyDominating
+     * @param transitionTime
      */
-    public void persistDominating(Condition previousDominating, Condition currentlyDominating) {
+    public void persistDominating(Condition previousDominating, Condition currentlyDominating, Date transitionTime) {
 
         Date previousEnds;
         Date currentStarts;
@@ -57,50 +67,70 @@ public class DominatingPersistor {
         // case 1
         if(previousDominating == null){
 
-            currentStarts = currentlyDominating.getStart();
+            currentStarts = transitionTime;
             previousEnds = null; // there is no previous
 
         } else{
 
 
-            // case 2
-            if(previousDominating.getStart().getTime() < currentlyDominating.getStart().getTime()){
+            // case 4
+            if(currentlyDominating == null){
 
-                currentStarts = currentlyDominating.getStart();
+                currentStarts = null;
+                previousEnds = transitionTime;
+            }
+
+
+            // case 2
+            else if(previousDominating.getStart().getTime() < currentlyDominating.getStart().getTime()){
+
+                currentStarts = transitionTime;
                 previousEnds = currentStarts;
             }
 
             // case 3
             else{
 
-                currentStarts = previousDominating.getEnd();
+                currentStarts = transitionTime;
                 previousEnds = currentStarts;
 
             }
 
         }
 
-        Condition dominatingEntry = new Condition();
-        dominatingEntry.setTitle(currentlyDominating.getTitle());
-        String previousDominatingTitle = "empty";
-        if(previousDominating != null){
-            previousDominatingTitle = previousDominating.getTitle();
-        }
-        dominatingEntry.setDescription(currentlyDominating.getTitle() + " dominated previous " + previousDominatingTitle);
-
-        dominatingEntry.setMature(true);
-        dominatingEntry.setClassName(ConditionPriority.DEFAULTT);
-        dominatingEntry.setGroup(ConditionGroup.DOMINATING);
-        dominatingEntry.setStart(currentStarts);
-
-        this.persistenceManager.persist(dominatingEntry);
-
         if(previousDominatingEntry!= null && previousEnds != null){
             previousDominatingEntry.setEnd(previousEnds);
             previousDominatingEntry.calculateDuration();
             this.persistenceManager.update(previousDominatingEntry);
+            logger.info("  - updating previous entry with end date: " + previousEnds);
+
         }
 
-        previousDominatingEntry = dominatingEntry;
+        if(currentStarts != null) {
+            Condition dominatingEntry = new Condition();
+            dominatingEntry.setTitle(currentlyDominating.getTitle());
+            String previousDominatingTitle = "empty";
+            if (previousDominating != null) {
+                previousDominatingTitle = previousDominating.getTitle();
+            }
+            dominatingEntry.setDescription(currentlyDominating.getTitle() + " dominated previous " + previousDominatingTitle);
+
+            dominatingEntry.setMature(true);
+            dominatingEntry.setClassName(ConditionPriority.DEFAULTT);
+            dominatingEntry.setGroup(ConditionGroup.DOMINATING);
+            dominatingEntry.setStart(currentStarts);
+
+            this.persistenceManager.persist(dominatingEntry);
+
+            previousDominatingEntry = dominatingEntry;
+
+            logger.info("  - updating current entry with everything" );
+        } else{
+            previousDominatingEntry = null;
+            logger.info("  - throwing away previous entry" );
+        }
+
+
+
     }
 }

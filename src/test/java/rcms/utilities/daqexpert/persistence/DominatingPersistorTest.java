@@ -17,6 +17,9 @@ public class DominatingPersistorTest {
     static Date t1 = DatatypeConverter.parseDateTime("2017-03-09T10:00:00Z").getTime();
     static Date t2 = DatatypeConverter.parseDateTime("2017-03-09T10:00:01Z").getTime();
     static Date t3 = DatatypeConverter.parseDateTime("2017-03-09T10:00:02Z").getTime();
+    static Date t4 = DatatypeConverter.parseDateTime("2017-03-09T10:00:03Z").getTime();
+    static Date t5 = DatatypeConverter.parseDateTime("2017-03-09T10:00:04Z").getTime();
+    static Date t6 = DatatypeConverter.parseDateTime("2017-03-09T10:00:05Z").getTime();
 
     Deque<Condition> persisted = new ArrayDeque<>();
 
@@ -26,10 +29,27 @@ public class DominatingPersistorTest {
         DominatingPersistor dp = new DominatingPersistor(new PersistenceManagerMock());
         Condition c2 = generate("c2", t1, null);
 
-        dp.persistDominating(null, c2);
+        dp.persistDominating(null, c2,c2.getStart());
 
         Assert.assertEquals(1, persisted.size());
         Assert.assertEquals("c2", persisted.getLast().getTitle());
+
+    }
+
+    @Test
+    public void oneDominatingEndsTest(){
+
+        DominatingPersistor dp = new DominatingPersistor(new PersistenceManagerMock());
+        Condition c2 = generate("c2", t1, null);
+
+        dp.persistDominating(null, c2, c2.getStart());
+        c2.setEnd(t2);
+        dp.persistDominating(c2, null, c2.getEnd());
+
+        Assert.assertEquals(1, persisted.size());
+        Assert.assertEquals("c2", persisted.getLast().getTitle());
+        Assert.assertEquals(t1, persisted.getLast().getStart());
+        Assert.assertEquals(t2, persisted.getLast().getEnd());
 
     }
 
@@ -40,8 +60,8 @@ public class DominatingPersistorTest {
         Condition c1 = generate("c1", t1, null);
         Condition c2 = generate("c2", t2, null);
 
-        dp.persistDominating(null, c1);
-        dp.persistDominating(c1, c2);
+        dp.persistDominating(null, c1, c1.getStart());
+        dp.persistDominating(c1, c2, c2.getStart());
 
         Assert.assertEquals(2, persisted.size());
         Condition first = persisted.pop();
@@ -51,6 +71,45 @@ public class DominatingPersistorTest {
 
     }
 
+    @Test
+    public void multiplePreemptionTest(){
+
+        DominatingPersistor dp = new DominatingPersistor(new PersistenceManagerMock());
+        Condition c1 = generate("c1", t1, null);
+        Condition c2 = generate("c2", t2, null);
+        Condition c3 = generate("c3", t3, null);
+
+        dp.persistDominating(null, c1, c1.getStart());
+        dp.persistDominating(c1, c2, c2.getStart());
+        dp.persistDominating(c2, c3, c3.getStart());
+        c3.setEnd(t4);
+        dp.persistDominating(c3, c2, c3.getEnd());
+        c2.setEnd(t5);
+        dp.persistDominating(c2, c1, c2.getEnd());
+        c1.setEnd(t6);
+        dp.persistDominating(c1, null, c1.getEnd());
+
+        Assert.assertEquals(5, persisted.size());
+
+        Condition r1 = persisted.pop();
+        Condition r2 = persisted.pop();
+        Condition r3 = persisted.pop();
+        Condition r4 = persisted.pop();
+        Condition r5 = persisted.pop();
+
+        Assert.assertEquals("c1", r1.getTitle());
+        Assert.assertEquals("c2", r2.getTitle());
+        Assert.assertEquals("c3", r3.getTitle());
+        Assert.assertEquals("c2", r4.getTitle());
+        Assert.assertEquals("c1", r5.getTitle());
+
+        Assert.assertEquals(t2, r1.getEnd());
+        Assert.assertEquals(t3, r2.getEnd());
+        Assert.assertEquals(t4, r3.getEnd());
+        Assert.assertEquals(t5, r4.getEnd());
+        Assert.assertEquals(t6, r5.getEnd());
+
+    }
 
     @Test
     public void preemptAndComeBackTest(){
@@ -59,10 +118,10 @@ public class DominatingPersistorTest {
         Condition c1 = generate("c1", t1, null);
         Condition c2 = generate("c2", t2, null);
 
-        dp.persistDominating(null, c1);
-        dp.persistDominating(c1, c2);
+        dp.persistDominating(null, c1, c1.getStart());
+        dp.persistDominating(c1, c2, c2.getStart());
         c2.setEnd(t3);
-        dp.persistDominating(c2, c1);
+        dp.persistDominating(c2, c1, c2.getEnd());
 
         Assert.assertEquals(3, persisted.size());
 

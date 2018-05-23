@@ -18,6 +18,7 @@ public class NoRate extends SimpleLogicModule {
 		this.name = "No rate";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Rate value is 0";
+		this.problematic = false;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
@@ -55,7 +56,8 @@ public class LengthyFixingSoftErrorTest {
         daq.setLastUpdate(11000);
         Assert.assertTrue(lm.satisfied(daq,null));
 
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) <strong>TEST</strong>",lm.getDescriptionWithContext());
+        ContextHandler.highlightMarkup = false;
+        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
     }
 
 }

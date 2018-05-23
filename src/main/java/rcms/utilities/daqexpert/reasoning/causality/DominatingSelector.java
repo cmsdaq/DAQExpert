@@ -20,7 +20,7 @@ public class DominatingSelector {
 
     private static Logger logger = Logger.getLogger(DominatingSelector.class);
 
-    public Condition selectDominating(Set<Condition> conditions) {
+    public Condition selectDominating(Collection<Condition> conditions) {
 
         if(conditions.size() == 0){
             throw new ExpertException(ExpertExceptionCode.ExpertProblem,"Bad arguments for dominating selector, 0 conditions supplied");
@@ -28,6 +28,10 @@ public class DominatingSelector {
 
         // ignore conditions that has end date
         Set<Condition> filtered = conditions.stream().filter(c->c.getEnd() == null).collect(Collectors.toSet());
+
+        // ignore conditions that are not problematic
+        filtered = filtered.stream().filter(c->c.isProblematic()).collect(Collectors.toSet());
+
         if(filtered.size() == 1) {
             return filtered.iterator().next();
         } else if(filtered.size() == 0){
@@ -35,8 +39,6 @@ public class DominatingSelector {
             return null;
         }
 
-        // ignore conditions that are comparators
-        filtered = filtered.stream().filter(c->!(c.getLogicModule().getLogicModule() instanceof ComparatorLogicModule)).collect(Collectors.toSet());
 
         logger.debug("Requirement graph will be applied to select dominating condition");
         Set<Condition> subResult1 = getLeafsFromUsageGraph(filtered);
@@ -56,9 +58,25 @@ public class DominatingSelector {
             return null;
         }
 
+        logger.debug("Usefulness will be applied to select dominating condition");
+        int highest = 0;
+        for(Condition condition: subResult2){
+            if(highest < condition.getLogicModule().getUsefulness()){
+                highest = condition.getLogicModule().getUsefulness();
+            }
+        }
+        final int highestFinal = highest;
+        Set<Condition> subResult3 = subResult2.stream().filter(c->c.getLogicModule().getUsefulness() == highestFinal).collect(Collectors.toSet());
+        if(subResult3.size() == 1) {
+            return subResult3.iterator().next();
+        } else if(subResult3.size() == 0){
+            logger.info("No dominating has been selected (after applying usefulness)");
+            return null;
+        }
+
         logger.debug("Start date will be applied to select dominating condition");
         Date earliest = null;
-        for(Condition condition: subResult2){
+        for(Condition condition: subResult3){
             if(earliest == null) {
                 earliest = condition.getStart();
             }
@@ -68,18 +86,18 @@ public class DominatingSelector {
         }
         final Date earliestFinal = earliest;
 
-        Set<Condition> subResult3 = conditions.stream().filter(c-> earliestFinal.equals(c.getStart())).collect(Collectors.toSet());
+        Set<Condition> subResult4 = subResult3.stream().filter(c-> earliestFinal.equals(c.getStart())).collect(Collectors.toSet());
 
-        if(subResult3.size() == 1) {
-            return subResult3.iterator().next();
-        } else if(subResult3.size() == 0){
+        if(subResult4.size() == 1) {
+            return subResult4.iterator().next();
+        } else if(subResult4.size() == 0){
             logger.info("No dominating has been selected (after soring based on start date nothing left)");
             return null;
         }
 
-        logger.warn("Could not find dominating condition "+ subResult3);
-        logger.warn("Selecting the first randomly "+ subResult3.iterator().next());
-        return subResult3.iterator().next();
+        logger.warn("Could not find dominating condition "+ subResult4);
+        logger.warn("Selecting the first randomly "+ subResult4.iterator().next());
+        return subResult4.iterator().next();
 
     }
 

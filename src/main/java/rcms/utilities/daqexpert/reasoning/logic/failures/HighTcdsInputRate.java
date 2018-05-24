@@ -35,6 +35,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 	public void declareRelations(){
 		declareAffected(LogicModuleRegistry.HltOutputBandwidthTooHigh);
 		declareAffected(LogicModuleRegistry.HltOutputBandwidthExtreme);
+		declareAffected(LogicModuleRegistry.RateTooHigh);
 	}
 
 	@Override

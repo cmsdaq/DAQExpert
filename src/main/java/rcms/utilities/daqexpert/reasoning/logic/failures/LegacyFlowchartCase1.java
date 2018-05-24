@@ -72,6 +72,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		require(LogicModuleRegistry.OutOfSequenceData);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";

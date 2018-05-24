@@ -33,6 +33,7 @@ public class RuStuckWaitingOther extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	@Override

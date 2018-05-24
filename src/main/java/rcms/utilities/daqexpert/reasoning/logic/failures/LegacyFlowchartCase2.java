@@ -51,6 +51,7 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		require(LogicModuleRegistry.CorruptedData);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	private static Logger logger = Logger.getLogger(LegacyFlowchartCase2.class);

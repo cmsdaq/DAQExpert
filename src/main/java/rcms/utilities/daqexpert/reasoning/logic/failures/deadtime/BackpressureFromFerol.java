@@ -42,6 +42,9 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
     public void declareRelations(){
         require(LogicModuleRegistry.FedDeadtimeDueToDaq);
         require(LogicModuleRegistry.TmpUpgradedFedProblem);
+
+        declareAffected(LogicModuleRegistry.FEDDeadtime);
+        declareAffected(LogicModuleRegistry.TTSDeadtime);
     }
 
     @Override

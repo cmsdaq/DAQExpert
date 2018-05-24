@@ -56,6 +56,7 @@ public class FlowchartCase5 extends KnownFailure {
 
 		declareAffected(LogicModuleRegistry.TTSDeadtime);
 		declareAffected(LogicModuleRegistry.FlowchartCase3);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	// add triggers info (behind or the same

@@ -46,6 +46,7 @@ public class CorruptedData extends BackpressureAnalyzer {
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		declareAffected(LogicModuleRegistry.TTSDeadtime);
 		declareAffected(LogicModuleRegistry.RuFailed);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	@Override

@@ -84,7 +84,7 @@ public class DominatingSelectorTest {
         assertEquals(2, subResult1.size());
 
         Set<Condition> subResult2 = ds.getLeafsFromCausality(conditionList);
-        assertEquals(2, subResult2.size());
+        assertEquals(1, subResult2.size());
 
         Condition result = ds.selectDominating(conditionList);
 

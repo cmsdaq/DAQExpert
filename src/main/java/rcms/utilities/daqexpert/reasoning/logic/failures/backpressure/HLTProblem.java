@@ -32,6 +32,8 @@ public class HLTProblem extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.BackpressureFromHlt);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	@Override

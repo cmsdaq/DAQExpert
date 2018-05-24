@@ -20,6 +20,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  */
 public class FlowchartCase3 extends KnownFailure {
 
+	//TODO: include FED information
 	public FlowchartCase3() {
 		this.name = "Partition problem";
 		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking trigger.";
@@ -37,6 +38,7 @@ public class FlowchartCase3 extends KnownFailure {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		declareAffected(LogicModuleRegistry.TTSDeadtime);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

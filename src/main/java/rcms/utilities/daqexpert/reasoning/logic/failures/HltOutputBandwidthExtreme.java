@@ -30,6 +30,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
     @Override
     public void declareRelations(){
         require(LogicModuleRegistry.BackpressureFromHlt);
+        declareAffected(LogicModuleRegistry.BackpressureFromHlt);
     }
 
     @Override

@@ -2,9 +2,11 @@ package rcms.utilities.daqexpert.reasoning.causality;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -146,6 +148,81 @@ public class DominatingSelectorTest {
         c.setLogicModule(logicModuleRegistry);
 
         return c;
+    }
+    /**
+     * This test checks that LM can both declare requirement and affected relationship as long as:
+     * - if LM A requires B
+     * - LM A can affect B
+     * - LM A cannot be caused by B - technically can but it will not be taken into account by dominating selection mechanism
+     */
+    @Test
+    public void bothRequirementAndCausalityRelation(){
+
+        LogicModule lm1 = new LogicModuleMock("HLT CPU load mock");
+        LogicModule lm2 = new LogicModuleMock("BP from HLT");
+
+        /* This means the LM1 will be used */
+        lm1.getAffected().add(lm2);
+
+
+        Condition c1 = generateCondition(lm1);
+        Condition c2 = generateCondition(lm2);
+
+        Set<Condition> conditions = new HashSet<>();
+        conditions.add(c1);
+        conditions.add(c2);
+
+        DominatingSelector ds = new DominatingSelector();
+        Condition dominating = ds.selectDominating(conditions);
+
+        Assert.assertNotNull(dominating);
+        Assert.assertEquals(c1, dominating);
+
+        /* This means the LM1 will be used */
+        /* The situation should not change after updating required relation*/
+        lm1.getRequired().add(lm2);
+
+        CausalityManager cm = new CausalityManager();
+        Set<CausalityNode> set = new HashSet<>();
+        set.add(lm1);
+        set.add(lm2);
+        cm.transformToCanonical(set);
+
+        dominating = ds.selectDominating(conditions);
+
+        Assert.assertNotNull(dominating);
+        Assert.assertEquals(c1, dominating);
+
+    }
+
+    private Condition generateCondition(LogicModule producer){
+
+        Condition c = new ConditionMock(producer);
+        c.setTitle(producer.getName());
+        return c;
+    }
+
+    class LogicModuleMock extends LogicModule{
+
+        public LogicModuleMock(String name) {
+            this.name = name;
+        }
+
+    }
+
+    class ConditionMock extends Condition{
+
+        LogicModule producer;
+
+        public ConditionMock(LogicModule producer) {
+            this.producer = producer;
+            this.setProblematic(true);
+        }
+
+        @Override
+        public LogicModule getProducer() {
+            return producer;
+        }
     }
 
 }

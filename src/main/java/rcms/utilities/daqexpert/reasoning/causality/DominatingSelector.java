@@ -105,20 +105,20 @@ public class DominatingSelector {
 
 
         logger.debug("Initial set of conditions (before usage graph):" + conditions);
-        conditions.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::debug);
+        conditions.stream().map(c->c.getProducer().getName()).forEach(logger::debug);
 
         // choose nodes that are not required by anything
         Set<Requiring> requiredByOther = new HashSet<>();
 
         for (Condition condition : conditions) {
-            requiredByOther.addAll(condition.getLogicModule().getLogicModule().getRequired());
+            requiredByOther.addAll(condition.getProducer().getRequired());
         }
 
-        Set<Condition> filtered = conditions.stream().filter(c -> !requiredByOther.contains(c.getLogicModule().getLogicModule())).collect(Collectors.toSet());
+        Set<Condition> filtered = conditions.stream().filter(c -> !requiredByOther.contains(c.getProducer())).collect(Collectors.toSet());
 
 
         logger.debug("Filtered set of conditions (after usage graph):" );
-        filtered.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::debug);
+        filtered.stream().map(c->c.getProducer().getName()).forEach(logger::debug);
 
         return filtered;
 
@@ -129,7 +129,7 @@ public class DominatingSelector {
     public Set<Condition> getLeafsFromCausality(Set<Condition> conditions){
 
         logger.debug("Initial (before causality graph):" );
-        conditions.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::debug);
+        conditions.stream().map(c->c.getProducer().getName()).forEach(logger::debug);
 
 
         Map<Condition, Set<Condition>> forbidden = new HashMap<>();
@@ -139,7 +139,7 @@ public class DominatingSelector {
             for(Condition condition1: conditions) {
                 /* Do not compare to self */
                 if(!condition1.equals(condition)) {
-                    if (condition.getLogicModule().getLogicModule().getAffected().contains(condition1.getLogicModule().getLogicModule())) {
+                    if (condition.getProducer().getAffected().contains(condition1.getProducer())) {
 
                         if(!forbidden.containsKey(condition1)){
                             forbidden.put(condition1, new HashSet<>());
@@ -155,7 +155,7 @@ public class DominatingSelector {
         Set<Condition> result = new HashSet<>();
 
         logger.debug("Forbidden map (after causality graph):" );
-        forbidden.entrySet().stream().map(e->e.getKey().getLogicModule().name() + " by " + e.getValue().stream().map(c->c.getLogicModule().name()).collect(Collectors.toSet())).forEach(logger::debug);
+        forbidden.entrySet().stream().map(e->e.getKey().getProducer().getName() + " by " + e.getValue().stream().map(c->c.getProducer().getName()).collect(Collectors.toSet())).forEach(logger::debug);
 
 
         for(Condition condition: conditions){
@@ -165,7 +165,7 @@ public class DominatingSelector {
         }
 
         logger.debug("Filtered (after causality graph):" );
-        result.stream().map(c->c.getLogicModule().getLogicModule().getName()).forEach(logger::debug);
+        result.stream().map(c->c.getProducer().getName()).forEach(logger::debug);
 
         return result;
     }

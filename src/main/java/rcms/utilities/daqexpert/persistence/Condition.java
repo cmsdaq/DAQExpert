@@ -10,6 +10,7 @@ import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.processing.context.ContextNotifier;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -346,5 +347,9 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
     public void setProblematic(boolean problematic) {
         this.problematic = problematic;
+    }
+
+    public LogicModule getProducer(){
+        return logicModule.getLogicModule();
     }
 }

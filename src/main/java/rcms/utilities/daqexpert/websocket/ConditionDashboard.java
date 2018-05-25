@@ -1,16 +1,9 @@
 package rcms.utilities.daqexpert.websocket;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.persistence.Condition;
@@ -57,7 +50,9 @@ public class ConditionDashboard implements Observer{
 		this.dominatingCondition =DominatingConditionSelector.findDominating(dominatingCondition,condition);
 	}
 
-	public void update(Set<Condition> conditionsProduced) {
+	public void update(Collection<Condition> conditionsProduced) {
+
+		conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
 		Set<Condition> addedThisRound = new HashSet<>();
 		Condition lastDominating = dominatingCondition;
@@ -68,27 +63,33 @@ public class ConditionDashboard implements Observer{
 			}
 		}
 
+		/* Handle observation */
 		for (Condition condition : conditionsProduced) {
-			if (condition.isShow() && !condition.isHoldNotifications()/*
-									 * && condition.getPriority() ==
-									 * ConditionPriority.CRITICAL
-									 */
-					&& condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+			if(condition.getEnd() == null){
+				condition.addObserver(this);
+			}else{
+				logger.trace("Observers before: " + condition.countObservers());
+				condition.deleteObserver(this);
+				logger.trace("Observers after: " + condition.countObservers());
+			}
+		}
+
+
+		for (Condition condition : conditionsProduced) {
+			if (condition.isMature() && condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
 
 
 				compareWithCurrentlyDominating(condition);
 
 				if (!conditions.containsKey(condition.getId())) {
 					if (conditions.size() >= maximumNumberOfConditionsHandled) {
+
+						logger.debug("Need to remove recent conditions: " + conditions.size() + ", " + conditions.keySet());
 						Condition oldest = conditions.values().iterator().next();
-						logger.trace("Observers before: " + oldest.countObservers());
-						oldest.deleteObserver(this);
-						logger.trace("Observers after: " + oldest.countObservers());
 						conditions.remove(oldest.getId());
+						logger.debug("Removing condition " + oldest.getId());
 					}
 					conditions.put(condition.getId(), condition);
-					condition.addObserver(this);
-
 					addedThisRound.add(condition);
 
 				}
@@ -175,6 +176,12 @@ public class ConditionDashboard implements Observer{
 
 		if (o instanceof Condition) {
 			Condition condition = (Condition) o;
+
+
+			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
+				update(Sets.newHashSet(condition));
+			}
+
 			handleUpdate(condition);
 		}
 

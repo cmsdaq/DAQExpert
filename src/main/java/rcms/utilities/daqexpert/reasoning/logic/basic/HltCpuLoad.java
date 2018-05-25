@@ -24,10 +24,16 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 
 	private String additionalNote = "Note that there is also backpressure from HLT.";
 
-	/** timer which returns true only if we are in a run and
-	 *  after the holdoff period
+	/**
+	 *  Timer keeping condition of for a period after RunOngoing condition satisfied
 	 */
-	private HoldOffTimer holdOffTimer;
+	private HoldOffTimer runOngoingHoldOffTimer;
+
+
+	/**
+	 * Timer which keeping condition off for a period after self condition satisfied
+	 */
+	private HoldOffTimer selfHoldOffTimer;
 
 	public HltCpuLoad() {
 		this.name = "HLT CPU load";
@@ -48,35 +54,38 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 		// (rely on the fact that RunOngoing has been run already)
 		Boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
 
-		// update the holdoff timer
+		boolean ignoreRunOngoingHoldoff = runOngoing ? false : true;
+
 		long now = daq.getLastUpdate();
-		holdOffTimer.updateInput(runOngoing, now);
 
-		if (runOngoing && !holdOffTimer.getOutput(now)) {
-			// we are in a run but still in the holdoff period
+		// update the holdoff timer
+		runOngoingHoldOffTimer.updateInput(runOngoing, now);
+
+		boolean thresholdExceeded = false;
+
+		Float cpuLoad = null;
+		if (daq.getHltInfo() != null && daq.getHltInfo().getCpuLoad() != null) {
+			cpuLoad = daq.getHltInfo().getCpuLoad();
+		}
+
+
+		if (cpuLoad != null && cpuLoad > maxCpuLoad) {
+			thresholdExceeded = true;
+			selfHoldOffTimer.updateInput(true, now);
+		} else {
+			selfHoldOffTimer.updateInput(false, now);
 			return false;
 		}
 
-		// we are either outside a run or after the holdoff period in the run
-
-		if (daq.getHltInfo() == null) {
-			return false;
-		}
-
-		Float cpuLoad = daq.getHltInfo().getCpuLoad();
-
-		// TODO: should we issue a warning if we can not retrieve the 
-		//       HLT cpu load ?
-		if (cpuLoad == null) {
-			return false;
-		}
-
+		// check all the conditions now
 		boolean result = false;
-		if (cpuLoad > maxCpuLoad) {
+		if (thresholdExceeded && ( ignoreRunOngoingHoldoff || (runOngoing && runOngoingHoldOffTimer.getOutput(now))) && selfHoldOffTimer.getOutput(now)) {
 			contextHandler.registerForStatistics("HLT_CPU_LOAD", cpuLoad * 100, " %", 1);
 			result =  true;
 		}
 
+
+		/* Additional note */
 		if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
 			//mention the fact that some modules are active
 			contextHandler.registerConditionalNote("NOTE", additionalNote);
@@ -95,9 +104,10 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 
 		// an integer in milliseconds is enough to describe 24 days of
 		// holdoff period...
-		Integer holdOffPeriod = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_HOLDOFF_PERIOD, this.getClass());
-		holdOffTimer = new HoldOffTimer(holdOffPeriod);
-
+		Integer runOngoingHoldOffPeriod = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_RUNONGOING_HOLDOFF_PERIOD, this.getClass());
+		Integer selfHoldOffPeriod = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_SELF_HOLDOFF_PERIOD, this.getClass());
+		runOngoingHoldOffTimer = new HoldOffTimer(runOngoingHoldOffPeriod);
+		selfHoldOffTimer = new HoldOffTimer(selfHoldOffPeriod);
 	}
 
 }

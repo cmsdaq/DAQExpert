@@ -18,13 +18,14 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFr
  */
 public class HltCpuLoadTest {
 
-	private HltCpuLoad makeInstance(long holdOffPeriod) {
+	private HltCpuLoad makeInstance(long runOngoingHoldOffPeriod, long selfHoldOffPeriod) {
 		HltCpuLoad result = new HltCpuLoad();
 
 		// mock properties
 		Properties properties = new Properties();
 		properties.setProperty(Setting.EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD.getKey(), "0.9");
-		properties.setProperty(Setting.EXPERT_LOGIC_HLT_CPU_LOAD_HOLDOFF_PERIOD.getKey(), "" + holdOffPeriod);
+		properties.setProperty(Setting.EXPERT_LOGIC_HLT_CPU_LOAD_RUNONGOING_HOLDOFF_PERIOD.getKey(), "" + runOngoingHoldOffPeriod);
+		properties.setProperty(Setting.EXPERT_LOGIC_HLT_CPU_LOAD_SELF_HOLDOFF_PERIOD.getKey(), "" + selfHoldOffPeriod);
 
 		result.parametrize(properties);
 
@@ -50,7 +51,7 @@ public class HltCpuLoadTest {
 		// use a zero holdoff period so we don't
 		// run into unexpected results due to being in the holdoff period
 		// after the start of a run
-		HltCpuLoad module = makeInstance(0);
+		HltCpuLoad module = makeInstance(0, 0);
 
 		DAQ snapshot = new DAQ();
 
@@ -86,9 +87,10 @@ public class HltCpuLoadTest {
 	@Test
 	public void testHoldOffPeriod() {
 
-		final int holdOffPeriod = 10;
+		final int runOngoingHoldOffPeriod = 10;
+		final int selfHoldOffPeriod = 1;
 
-		HltCpuLoad module = makeInstance(holdOffPeriod);
+		HltCpuLoad module = makeInstance(runOngoingHoldOffPeriod, selfHoldOffPeriod);
 
 		// prepare a sequence of events and expected results
 		List<HoldOffTestData> sequence = new ArrayList<HoldOffTestData>();
@@ -96,8 +98,11 @@ public class HltCpuLoadTest {
 		//                      timestamp, runOngoing, cpuLoad, expectedResult
 		sequence.add(new HoldOffTestData(0, false, 0.5f, false));
 
-		// high HLT load outside run
-		sequence.add(new HoldOffTestData(5, false, 0.95f, true));
+		// high HLT load outside run - but self holdoff
+		sequence.add(new HoldOffTestData(5, false, 0.95f, false));
+
+		// high HLT load outside run - and self holdoff ok
+		sequence.add(new HoldOffTestData(7, false, 0.95f, true));
 
 		// run starts with reasonable CPU load
 		sequence.add(new HoldOffTestData(10, true, 0.5f, false));
@@ -111,7 +116,10 @@ public class HltCpuLoadTest {
 		// normal high CPU load after holdoff period
 		sequence.add(new HoldOffTestData(30, true, 0.5f, false));
 
-		// again too high CPU load after holdoff period
+		// again too high CPU load after holdoff period - but result false as self holdoff timer
+		sequence.add(new HoldOffTestData(31, true, 0.95f, false));
+
+		// self holdoff timer now releasees
 		sequence.add(new HoldOffTestData(35, true, 0.95f, true));
 
 		//-----

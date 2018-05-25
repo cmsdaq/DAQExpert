@@ -1,15 +1,6 @@
 package rcms.utilities.daqexpert.websocket;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
@@ -59,9 +50,9 @@ public class ConditionDashboard implements Observer{
 		this.dominatingCondition =DominatingConditionSelector.findDominating(dominatingCondition,condition);
 	}
 
-	public void update(Set<Condition> conditionsProduced) {
+	public void update(Collection<Condition> conditionsProduced) {
 
-		conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toSet());
+		conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
 		Set<Condition> addedThisRound = new HashSet<>();
 		Condition lastDominating = dominatingCondition;
@@ -92,8 +83,11 @@ public class ConditionDashboard implements Observer{
 
 				if (!conditions.containsKey(condition.getId())) {
 					if (conditions.size() >= maximumNumberOfConditionsHandled) {
+
+						logger.debug("Need to remove recent conditions: " + conditions.size() + ", " + conditions.keySet());
 						Condition oldest = conditions.values().iterator().next();
 						conditions.remove(oldest.getId());
+						logger.debug("Removing condition " + oldest.getId());
 					}
 					conditions.put(condition.getId(), condition);
 					addedThisRound.add(condition);
@@ -184,7 +178,7 @@ public class ConditionDashboard implements Observer{
 			Condition condition = (Condition) o;
 
 
-			if (condition.isMature() && !conditions.containsKey(condition.getId())) {
+			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
 				update(Sets.newHashSet(condition));
 			}
 

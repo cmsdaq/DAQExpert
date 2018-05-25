@@ -54,7 +54,8 @@ public enum Setting {
 
 	/** holdoff period in milliseconds after the beginning of a run before
 	 *  asserting the high hlt cpu load condition */
-	EXPERT_LOGIC_HLT_CPU_LOAD_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.holdoff.period"),
+	EXPERT_LOGIC_HLT_CPU_LOAD_RUNONGOING_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.runongoing.holdoff.period"),
+	EXPERT_LOGIC_HLT_CPU_LOAD_SELF_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.self.holdoff.period"),
 	
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

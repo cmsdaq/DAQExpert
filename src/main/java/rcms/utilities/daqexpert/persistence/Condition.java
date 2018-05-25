@@ -311,6 +311,8 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
     public void setMature(boolean mature) {
         this.mature = mature;
+        setChanged();
+        publishUpdate();
     }
 
     @Override

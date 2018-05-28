@@ -54,7 +54,7 @@ public class ConditionSessionHandler {
 	 *            updated condition
 	 */
 	public void handleConditionUpdate(Condition updatedCondition) {
-		logger.info("Updating");
+		logger.trace("Updating");
 		JsonObject addMessage = createUpdateMessage(updatedCondition);
 		sendToAllConnectedSessions(addMessage);
 	}

@@ -21,6 +21,10 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
 
     private float threshold;
 
+
+    /**
+     * Note that module was introduced because of lack of upgraded fed deadtime data.
+     */
     public TmpUpgradedFedProblem() {
         this.name = "Upgraded FED problem (TMP)";
         this.priority = ConditionPriority.DEFAULTT;
@@ -99,7 +103,7 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
 
         this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
         this.description = "High backpressure on fed(s) {{FED}} in partition(s) {{PARTITION}} in subsystem(s) {{SUBSYSTEM}} is {{VALUE}} the threshold is "
-                + threshold + "%";
+                + threshold + "%. This does not indicate a problem with these FEDs. This condition is only used as a basis for other backpressure analysis since upgraded FEDs have no deadtime monitoring. For legacy FEDs the deadtime is the basis for backpressure analysis.";
 
     }
 

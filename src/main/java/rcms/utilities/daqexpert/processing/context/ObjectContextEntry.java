@@ -1,14 +1,11 @@
 package rcms.utilities.daqexpert.processing.context;
 
-import org.hibernate.annotations.CollectionOfElements;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import rcms.utilities.daqexpert.processing.context.functions.ObjectListOptimizer;
 
 import javax.persistence.*;
-import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Register objects and ignore duplicates by text representation
@@ -20,11 +17,17 @@ public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
 
     private String objectType;
 
+    @Transient
+    @JsonIgnore
+    private ObjectListOptimizer<String> objectListOptimizer;
+
     /**
      * ContextHandler objects - e.g Subsystem object, FED object etc
      */
     @Transient
     private transient Set<T> objectSet;
+
+
 
     //@Convert(converter = StringListConverter.class)
     @ElementCollection
@@ -37,6 +40,8 @@ public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
         this.objectSet = new LinkedHashSet<>();
         this.textRepresentationSet = new LinkedHashSet<>();
         this.type = "O";
+        this.objectListOptimizer = new ObjectListOptimizer<>();
+
     }
 
 
@@ -56,22 +61,10 @@ public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
         return this.objectSet;
     }
 
-    /*
-     * TODO: print only few first objects
-     */
     @Override
     public String getTextRepresentation() {
-        int limit = 4;
-        String representation = textRepresentationSet.stream().limit(limit).collect(Collectors.joining(", "));
 
-        if(textRepresentationSet.size() > limit){
-            representation += " and " + (textRepresentationSet.size() - limit ) + " more";
-        }
-
-        if(textRepresentationSet.size() > 1){
-            representation = "[" + representation + "]";
-        }
-        return representation  ;
+       return objectListOptimizer.getShortestListRepresentation(textRepresentationSet, o->o);
     }
 
     @Override

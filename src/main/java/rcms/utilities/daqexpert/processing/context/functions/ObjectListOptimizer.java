@@ -2,13 +2,51 @@ package rcms.utilities.daqexpert.processing.context.functions;
 
 import rcms.utilities.daqaggregator.data.FED;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ObjectListOptimizer<T> {
+public class ObjectListOptimizer<T> implements Serializable {
+
+    public String getShortestListRepresentation(Set<T> objects, Function<T, Object> function){
+
+        boolean allInteger = true;
+        for(T object: objects){
+            Object r= function.apply(object);
+            if(r instanceof Integer){
+                // nothing to do here, check other elements
+            } else if(r instanceof String){
+                try{
+                    Integer.parseInt((String) r);
+                } catch(NumberFormatException e){
+                    allInteger = false;
+                    break; // no need to check other elements anymore
+                }
+            } else{
+                allInteger = false;
+                break; // no need to check other elements anymore
+            }
+        }
+
+        if(allInteger){
+            return getShortestIntegerListRepresentation(objects, function.andThen(c->c instanceof  Integer? (Integer) c : Integer.parseInt((String)c)));
+        } else{
+            int limit = 4;
+            String representation = objects.stream().map(o->function.apply(o).toString()).limit(limit).collect(Collectors.joining(", "));
+
+            if(objects.size() > limit){
+                representation += " and " + (objects.size() - limit ) + " more";
+            }
+
+            if(objects.size() > 1){
+                representation = "[" + representation + "]";
+            }
+            return representation;
+        }
+    }
 
     /**
      *
@@ -16,7 +54,7 @@ public class ObjectListOptimizer<T> {
      * @param function function to get the object identifier
      * @return
      */
-    public String getShortestListRepresentation(Set<T> objects, Function<T, Integer> function){
+    public String getShortestIntegerListRepresentation(Set<T> objects, Function<T, Integer> function){
 
         if(objects.size() == 0){
             return "";

@@ -20,11 +20,16 @@ import rcms.utilities.daqexpert.events.ConditionEvent;
 import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
@@ -39,6 +44,7 @@ public class DataPrepareJob implements Runnable {
 	private final ReaderJob readerJob;
 	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(DataPrepareJob.class);
+	private final RecoveryJobManager recoveryJobManager;
 	private DataManager dataManager;
 	private final PersistenceManager persistenceManager;
 
@@ -51,8 +57,12 @@ public class DataPrepareJob implements Runnable {
 
 	private final DominatingPersistor dominatingPersistor;
 
+	/** List of conditions that has been started - kept in order to generate finish signals for controller */
+	private final List<Long> recoveryConditionIds = new ArrayList<>();
+
 	/** flag to do demo run */
 	private final boolean demoRun;
+
 	private boolean waiting;
 
 	public boolean isWaiting(){
@@ -61,7 +71,7 @@ public class DataPrepareJob implements Runnable {
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
-			EventSender eventSender, ConditionDashboard conditionDashboard, boolean demoRun) {
+			EventSender eventSender, ConditionDashboard conditionDashboard, RecoveryJobManager recoveryJobManager, boolean demoRun) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -73,6 +83,7 @@ public class DataPrepareJob implements Runnable {
 		this.conditionDashboard = conditionDashboard;
 		this.demoRun = demoRun;
 		this.dominatingPersistor = new DominatingPersistor(persistenceManager);
+		this.recoveryJobManager = recoveryJobManager;
 	}
 
 	private static int priority = 0;
@@ -100,7 +111,7 @@ public class DataPrepareJob implements Runnable {
 						priority++;
 
 					ProcessJob snapshotRetrieveAndAnalyzeJob = new ProcessJob(priority, snapshots.getRight(),
-							dataManager, snapshotProcessor);
+							dataManager, snapshotProcessor, recoveryJobManager);
 					Future<Pair<Set<Condition>, List<Point>>> future = executorService
 							.submit(snapshotRetrieveAndAnalyzeJob);
 
@@ -150,9 +161,50 @@ public class DataPrepareJob implements Runnable {
 								eventsToSend.add(conditionEvent.generateEventToSend());
 							}
 							int sent = eventSender.sendBatchEvents(eventsToSend);
-							logger.info(sent + " events sucessfully sent to NotificationManager");
+							logger.info(sent + " events successfully sent to NotificationManager");
 							eventRegister.getEvents().clear();
 						}
+
+						List<RecoveryRequest> recoveryRequests = new ArrayList<>();
+						for(Condition logicResult: result.getLeft()){
+							if(logicResult.getState() == EntryState.FINISHED){
+								if(recoveryConditionIds.contains(logicResult.getId())){
+									Long id = logicResult.getId();
+									recoveryJobManager.notifyConditionFinished(id);
+									recoveryConditionIds.remove(id);
+								}
+								continue;
+							}
+							if(!logicResult.isShow()){
+								continue;
+							}
+							if(logicResult.getLogicModule().getLogicModule() instanceof ActionLogicModule){
+								ActionLogicModule alm = (ActionLogicModule) logicResult.getLogicModule().getLogicModule();
+								RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+								RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
+										alm.getActionWithContextRawRecovery(),
+										alm.getActionWithContext(),
+                                        alm.getName(),
+                                        alm.getDescriptionWithContext(),
+                                        logicResult.getId());
+
+								if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
+									recoveryRequest.setCondition(logicResult);
+									recoveryRequests.add(recoveryRequest);
+								}
+
+							}
+						}
+
+						if(recoveryRequests.size() > 0) {
+							logger.info("Exist automatic recoveries: " + recoveryRequests);
+							Long dominating = recoveryJobManager.runRecoveryJob(recoveryRequests);
+							if(dominating != null) {
+								recoveryConditionIds.add(dominating);
+								logger.info("Automatic recovery finished successfully");
+							}
+						}
+
 
 					} catch (RuntimeException e) {
 						logger.warn("Exception during result persistence - results will be forgotten");

@@ -16,6 +16,10 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryStep;
 
 public class ContinouslySoftErrorTest {
 
@@ -61,7 +65,7 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
 
-		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet() ;
+		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM_WITH_COUNTS")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
 		Assert.assertEquals(2, problematicSubsystems.size());
 		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));
@@ -187,6 +191,107 @@ public class ContinouslySoftErrorTest {
 		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 122), null));
 	}
 
+	/** configures the ContinouslySoftError module with thresholds used in/closer to
+	 *  production such that the tests work on snapshots generated based
+	 *  on behaviour seen in production.
+	 */
+	private void setLmProductionThresholds() {
+		Properties p = new Properties();
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey(), Integer.toString(3));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey(), Integer.toString(600000));
+		p.setProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey(), Integer.toString(15000));
+		lm.parametrize(p);
+	}
+
+
+	/** Tests a case where two subsystems went several times into
+	 *  fixing soft error state within the time window but only one
+	 *  of them exceeded the threshold. The error message should only
+	 *  contain the latter subsystem (see issue #175).
+	 */
+	@Test
+	public void multipleSubsystemsTest() {
+	
+		// configure the logic module with the parameters used in production
+		// (the ones used in before() are too short
+		setLmProductionThresholds();
+
+		List<DAQ> snapshots = generateMultipleSubsystemsSequence().makeSnapshots();
+		
+		for (DAQ snapshot : snapshots) {
+
+			// clear any previous messages
+			lm.getContextHandler().clearContext();
+
+			// run the test
+			boolean actualResult = lm.satisfied(snapshot, null);
+			
+			// module should fire only from a certain point in time on
+			boolean expectedResult = (snapshot.getLastUpdate() >= 1525297407394L);
+			
+			Assert.assertEquals(expectedResult, actualResult);
+
+			
+			if (actualResult) {
+				// module did fire, ensure that it complains only about CTPPS
+				// but not about PIXEL
+
+				// note that due to merging we can have messages == null
+				// but still a true result from lm.satisfied() (TODO: is this wanted ?)
+			  Set<String> messages = (Set<String>)(lm.getContextHandler().getContext().get("SUBSYSTEM"));
+
+				if (messages != null) {
+					Assert.assertEquals(1, messages.size());
+					Assert.assertTrue(messages.iterator().next().startsWith("CTPPS"));
+				}
+			}
+		}
+	}
+	
+	/** test to check that we get the expected message for CTPPS (including
+	    action objects) */
+	@Test
+	public void checkCTPPSmessage() {
+	
+		// configure the logic module with the parameters used in production
+		// (the ones used in before() are too short
+		setLmProductionThresholds();
+
+		List<DAQ> snapshots = generateMultipleSubsystemsSequence().makeSnapshots();
+		
+		for (DAQ snapshot : snapshots) {
+
+			// clear any previous messages
+			lm.getContextHandler().clearContext();
+
+			if (! lm.satisfied(snapshot, null)) {
+				continue;
+			}
+							
+			// check that there is a recovery request
+			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+			RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(
+							lm.getActionWithContextRawRecovery(),
+							lm.getName(),
+							lm.getDescriptionWithContext(),
+							0L);
+			
+			assertEquals(1, recoveryRequests.getRecoverySteps().size());
+			
+			RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
+			
+			// ensure that we have exactly one recovery step
+			assertEquals(1, recoveryStep.getRedRecycle().size());
+			
+			// ensure that this is a red recycle
+			assertEquals("CTPPS", recoveryStep.getRedRecycle().iterator().next());
+			
+			// just check the first occurrence. Some of the later occurrences
+			// do not have a subsystem due to the merging mechanism.
+			return;
+		}
+	}
+	
 	private DAQ generateSnapshot(String levelZeroState, long lastUpdate) {
 		DAQ daq = new DAQ();
 		SubSystem subsystem1 = new SubSystem();
@@ -204,6 +309,109 @@ public class ContinouslySoftErrorTest {
 		daq.setLevelZeroState(levelZeroState);
 		daq.setLastUpdate(lastUpdate);
 		return daq;
+	}
+
+	/** generates a sequence found in production where two subsystems
+	 * had multiple fixing soft error transitions but only one
+	 * of them crossed the threshold.
+	 */
+	private SubsystemStateSequenceGenerator generateMultipleSubsystemsSequence() {
+		
+		SubsystemStateSequenceGenerator generator = new SubsystemStateSequenceGenerator();
+		
+		generator.addPointInTime(1525297072570L);
+		
+		generator.addNewState(1525297074958L, "CTPPS", "Running");
+		generator.addNewState(1525297074958L, "PIXEL", "RunningSoftErrorDetected");
+		generator.addNewState(1525297074958L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297080113L, "PIXEL", "FixingSoftError");
+
+		generator.addNewState(1525297083378L, "PIXEL", "Running");
+
+		generator.addNewState(1525297086415L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297119886L, "PIXEL", "FixingSoftError");
+		generator.addNewState(1525297119886L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297127837L, "PIXEL", "Running");
+
+		generator.addNewState(1525297130307L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297162102L, "PIXEL", "RunningSoftErrorDetected");
+		generator.addNewState(1525297162102L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297164718L, "PIXEL", "FixingSoftError");
+
+		generator.addNewState(1525297169807L, "PIXEL", "Running");
+
+		generator.addNewState(1525297177621L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297366508L, "CTPPS", "FixingSoftError");
+		generator.addNewState(1525297366508L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297371563L, "CTPPS", "Running");
+
+		generator.addNewState(1525297374058L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297376721L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297376721L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297379313L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297382180L, "CTPPS", "Running");
+
+		generator.addNewState(1525297387419L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297392860L, "CTPPS", "Running");
+		generator.addNewState(1525297392860L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297396337L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297396337L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297399136L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297401848L, "CTPPS", "Running");
+
+		generator.addNewState(1525297404741L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		// fourth time CTPPS goes into FixingSoftError or RunningSoftErrorDetected
+		// should fire according to the currently implemented logic
+		// (which also counts transitions between RunningSoftErrorDetected and
+		// FixingSoftError)
+		generator.addNewState(1525297407394L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297407394L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297410082L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297413310L, "CTPPS", "Running");
+		generator.addNewState(1525297413310L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297416491L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297416491L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297419166L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297422117L, "CTPPS", "Running");
+
+		generator.addNewState(1525297424856L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297427474L, "CTPPS", "FixingSoftError");
+		generator.addNewState(1525297427474L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297433457L, "CTPPS", "Running");
+		generator.addNewState(1525297433457L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		generator.addNewState(1525297436424L, "CTPPS", "RunningSoftErrorDetected");
+		generator.addNewState(1525297436424L, SubsystemStateSequenceGenerator.LEVELZERO, "FixingSoftError");
+
+		generator.addNewState(1525297439432L, "CTPPS", "FixingSoftError");
+
+		generator.addNewState(1525297442171L, "CTPPS", "Running");
+
+		generator.addNewState(1525297444861L, SubsystemStateSequenceGenerator.LEVELZERO, "Running");
+
+		return generator;
 	}
 
 }

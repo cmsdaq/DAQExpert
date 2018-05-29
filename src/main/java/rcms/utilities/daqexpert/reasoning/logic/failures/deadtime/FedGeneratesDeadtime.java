@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.deadtime;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
@@ -38,7 +39,9 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-        Output fedDeadtimeOutput= results.get(FEDDeadtime.class.getSimpleName());
+        assignPriority(results);
+
+        Output fedDeadtimeOutput = results.get(FEDDeadtime.class.getSimpleName());
         if (!fedDeadtimeOutput.getResult()) {
             return false;
         }
@@ -72,15 +75,20 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
                 result = true;
 
 
-                if(problematicFedsBehindPseudoFed == null) {
+                TTCPartition problemPartition = null;
+                if (problematicFedsBehindPseudoFed == null) {
                     contextHandler.registerObject("PROBLEM-FED", fedWithDeadtime, new FedPrinter());
-                } else{
-                    for(FED fed: problematicFedsBehindPseudoFed){
+                    problemPartition = fedWithDeadtime.getTtcp();
+                } else {
+                    for (FED fed : problematicFedsBehindPseudoFed) {
                         contextHandler.registerObject("PROBLEM-FED", fed, f -> "FED" + f.getSrcIdExpected());
+                        problemPartition = fed.getTtcp();
                     }
                 }
                 contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
-                contextHandler.registerForStatistics("DEADTIME",fedWithDeadtime.getPercentBusy() + fedWithDeadtime.getPercentWarning() , "%", 1);
+                contextHandler.registerForStatistics("DEADTIME", fedWithDeadtime.getPercentBusy() + fedWithDeadtime.getPercentWarning(), "%", 1);
+                contextHandler.registerObject("PROBLEM-PARTITION", problemPartition, p -> p.getName());
+                contextHandler.registerObject("PROBLEM-SUBSYSTEM", problemPartition.getSubsystem(), subSystem -> subSystem.getName());
 
             }
         }
@@ -92,7 +100,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     public void parametrize(Properties properties) {
         this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
-        this.description = "FED {{PROBLEM-FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED.";
+        this.description = "FED {{PROBLEM-FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED. FED belongs to partition {{PROBLEM-PARTITION}} in subsystem {{PROBLEM-SUBSYSTEM}}";
     }
 
 }

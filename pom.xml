@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.cern</groupId>
 	<artifactId>DAQExpert</artifactId>
-	<version>2.9.19</version>
+	<version>2.10.11</version>
 
 	<name>DAQExpert</name>
 
@@ -11,7 +11,7 @@
 	<repositories>
 		<repository>
 			<id>libs-release-local</id>
-			<url>http://dev-daq-expert.cern.ch/artifactory/libs-release-local</url>
+			<url>http://dev-daq-expert.cern.ch:8080/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -19,7 +19,7 @@
 
 		<repository>
 			<id>ext-release-local</id>
-			<url>http://dev-daq-expert.cern.ch/artifactory/ext-release-local</url>
+			<url>http://dev-daq-expert.cern.ch:8080/artifactory/ext-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -38,6 +38,13 @@
 			<version>1.2.17</version>
 		</dependency>
 
+		<!-- in order to turn off the hibernate logs -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
                 <dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
@@ -54,7 +61,7 @@
 		<dependency>
 			<groupId>ch.cern</groupId>
 			<artifactId>DAQAggregator</artifactId>
-			<version>1.17.11</version>
+			<version>1.17.12</version>
 		</dependency>
 
 		<!-- JSP -->
@@ -226,6 +233,16 @@
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.21.0-GA</version>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>4.3.14.RELEASE</version>
+        </dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
 		</dependency>
 
 		<dependency>

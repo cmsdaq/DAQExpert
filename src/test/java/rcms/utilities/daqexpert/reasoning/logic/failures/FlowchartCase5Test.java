@@ -9,6 +9,9 @@ import java.util.HashSet;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
+import rcms.utilities.daqexpert.jobs.RecoveryStep;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 
 /**
@@ -21,6 +24,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 	@Test
 	public void case1Test() throws URISyntaxException {
 		DAQ snapshot = getSnapshot("1479614378467.smile");
+		ContextHandler.highlightMarkup =false;
 		assertOnlyOneIsSatisified(fc5, snapshot);
 		ContextHandler context = fc5.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
@@ -30,8 +34,17 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
+
+		assertEquals(Arrays.asList("Issue a TTCResync once",
+				"Problem fixed: Make an e-log entry." ,
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run","Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
+
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(), fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		assertEquals(0, recoveryRequests.getRecoverySteps().size());
+
 	}
 
 	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-26-03:28:25 */
@@ -48,8 +61,33 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
+
+		assertEquals(Arrays.asList("Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",  "Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
+
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		assertEquals(0, recoveryRequest.getRecoverySteps().size());
+	}
+
+	@Test
+	public void multipleFedsProblemTest() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1527446460841.json.gz");
+
+		assertSatisfiedLogicModules(snapshot, fc5, fc3);
+
+
+		ContextHandler context = fc5.getContextHandler();
+		assertEquals(new HashSet(Arrays.asList("GEM", "TRG")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("GEMPILOT1", "MUTF")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(1467, 1380, 1381)), context.getContext().get("FED"));
+
+		ContextHandler.highlightMarkup = false;
+		assertEquals("TTCP [GEMPILOT1, MUTF] of [GEM, TRG] subsystem is blocking triggers, it's in BUSY TTS state, The problem is caused by FED [1380-1381, 1467] in BUSY", fc5.getDescriptionWithContext());
+
+
 	}
 
 	/*
@@ -66,6 +104,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1498096885568.smile");
 
 		// FIXME: we dont know why ferol fifo stuck here: we keep it though?
+		ContextHandler.highlightMarkup = false;
 		assertSatisfiedLogicModules(snapshot, fc5, ferolFifoStuck);
 
 		System.out.println(fc5.getDescriptionWithContext());
@@ -77,7 +116,20 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		
 
 		assertEquals("CSC",context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals(3,fc5.getActionWithContext().size());
+
+		assertEquals(Arrays.asList("Stop and start the run with Red recycle of subsystem CSC and Green recycle of subsystem CSC (try up to 2 times)" ,
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem CSC to inform",
+				"Problem not fixed: Call the DOC for the subsystem CSC"), fc5.getActionWithContext());
+
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		assertEquals(1, recoveryRequests.getRecoverySteps().size());
+		RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
+		assertEquals(1, recoveryStep.getRedRecycle().size());
+		assertEquals(1, recoveryStep.getGreenRecycle().size());
+		assertEquals("CSC", recoveryStep.getRedRecycle().iterator().next());
+		assertEquals("CSC", recoveryStep.getGreenRecycle().iterator().next());
 
 	}
 
@@ -90,6 +142,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertOnlyOneIsSatisified(fc5, snapshot);
 
+		ContextHandler.highlightMarkup = false;
 		System.out.println(fc5.getDescriptionWithContext());
 
 		ContextHandler context = fc5.getContextHandler();
@@ -99,7 +152,20 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		
 
 		assertEquals("HCAL",context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals(3,fc5.getActionWithContext().size());
+
+		assertEquals(Arrays.asList(
+				"Stop and start the run with Red recycle of subsystem HCAL and Green recycle of subsystem HCAL (try up to 2 times)" ,
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem HCAL to inform","Problem not fixed: Call the DOC for the subsystem HCAL"), fc5.getActionWithContext());
+
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		assertEquals(1, recoveryRequests.getRecoverySteps().size());
+		RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
+		assertEquals(1, recoveryStep.getRedRecycle().size());
+		assertEquals(1, recoveryStep.getGreenRecycle().size());
+		assertEquals("HCAL", recoveryStep.getRedRecycle().iterator().next());
+		assertEquals("HCAL", recoveryStep.getGreenRecycle().iterator().next());
 	}
 
 	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-15-09:52:16 */
@@ -116,8 +182,16 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList("WARNING")), context.getContext().get("TTCPSTATE"));
 
-		assertEquals("TRACKER-WARNING", context.getActionKey());
-		assertEquals(5,fc5.getActionWithContext().size());
+		assertEquals("TRACKER", context.getActionKey());
+		assertEquals(4,fc5.getActionWithContext().size());
+
+		assertEquals(Arrays.asList("Issue a TTCResync once",
+				"Problem fixed: Make an e-log entry." ,
+				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run","Problem still not fixed: Call the DOC for the TRACKER"), fc5.getActionWithContext());
+
+		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		assertEquals(0, recoveryRequests.getRecoverySteps().size());
 	}
 
 }

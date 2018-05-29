@@ -44,6 +44,10 @@
 	<%@  page import="rcms.utilities.daqexpert.Application"%>
 	<%@  page import="rcms.utilities.daqexpert.Setting"%>
 
+
+	<div style="display: none;" id="controller-socket-address"
+		 url="<%out.println(Application.get().getProp(Setting.CONTROLLER_SOCKET));%>"></div>
+
 	<nav class="navbar navbar-default navbar-xs" role="navigation">
 
 		<!-- Brand and toggle get grouped for better mobile display -->

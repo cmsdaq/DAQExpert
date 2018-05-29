@@ -1,7 +1,12 @@
 package rcms.utilities.daqexpert.websocket;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -67,6 +72,9 @@ public class ConditionDashboard implements Observer {
 
     public void update(Set<Condition> conditionsProduced) {
 
+        conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
+
+
         Set<Condition> addedThisRound = new HashSet<>();
         Condition lastDominating = dominatingCondition;
 
@@ -76,8 +84,19 @@ public class ConditionDashboard implements Observer {
             }
         }
 
+        /* Handle observation */
         for (Condition condition : conditionsProduced) {
-            if (condition.isShow() && !condition.isHoldNotifications()) {
+            if(condition.getEnd() == null){
+                condition.addObserver(this);
+            }else{
+                logger.trace("Observers before: " + condition.countObservers());
+                condition.deleteObserver(this);
+                logger.trace("Observers after: " + condition.countObservers());
+            }
+        }
+
+        for (Condition condition : conditionsProduced) {
+            if (condition.isMature()) {
 
 
                 //compareWithCurrentlyDominating(condition);
@@ -179,16 +198,20 @@ public class ConditionDashboard implements Observer {
         return sb.toString();
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
+	@Override
+	public void update(Observable o, Object arg) {
 
-        if (o instanceof Condition) {
-            Condition condition = (Condition) o;
-            handleUpdate(condition);
-        }
-
-    }
+		if (o instanceof Condition) {
+			Condition condition = (Condition) o;
 
 
+			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
+				update(Sets.newHashSet(condition));
+			}
+
+			handleUpdate(condition);
+		}
+
+	}
 
 }

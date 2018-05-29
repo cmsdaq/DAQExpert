@@ -6,6 +6,11 @@ public enum Setting {
 	NM_ARCHIVE("nm.archive"),
 	NM_API_CREATE("nm.api"),
 	NM_OFFSET("nm.offset"),
+
+	CONTROLLER_ENABLED("controller.enabled"),
+	CONTROLLER_URL("controller.address"),
+	CONTROLLER_SOCKET("controller.socket"),
+
 	DAQVIEW_LINK("daqview.link"),
 	DAQVIEW_SETUP("daqview.setup"),
 
@@ -26,6 +31,8 @@ public enum Setting {
 	EXPERT_LOGIC_DEADTIME_THESHOLD_TTS("expert.logic.deadtime.threshold.tts"),
 	EXPERT_LOGIC_DEADTIME_THESHOLD_RETRI("expert.logic.deadtime.threshold.retri"),
 
+	EXPERT_LOGIC_NO_TRIGGER_RATE_THRESHOLD("expert.logic.norate.threshold"),
+	
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT("expert.logic.continoussofterror.threshold.count"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD("expert.logic.continoussofterror.threshold.period"),
 	EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP("expert.logic.continoussofterror.threshold.keep"),
@@ -44,6 +51,11 @@ public enum Setting {
 
 	/** threshold (range 0..1) above which the HLT CPU load is considered to be high */
 	EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD("expert.logic.hlt.cpu.load.threshold"),
+
+	/** holdoff period in milliseconds after the beginning of a run before
+	 *  asserting the high hlt cpu load condition */
+	EXPERT_LOGIC_HLT_CPU_LOAD_RUNONGOING_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.runongoing.holdoff.period"),
+	EXPERT_LOGIC_HLT_CPU_LOAD_SELF_HOLDOFF_PERIOD("expert.logic.hlt.cpu.load.self.holdoff.period"),
 	
 	PROCESSING_START_DATETIME("processing.start"),
 	PROCESSING_END_DATETIME("processing.end"),

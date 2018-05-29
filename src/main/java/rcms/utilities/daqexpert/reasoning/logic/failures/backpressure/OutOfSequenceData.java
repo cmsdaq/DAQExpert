@@ -26,18 +26,20 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
 		/* Default action */
-		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
-				"Stop the run. Red & green recycle the subsystem {{PROBLEM-SUBSYSTEM}}. Start a new Run",
+		ConditionalAction action = new ConditionalAction(
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> & <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>> using L0 Automator",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
-		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)", "Stop the run, Start a new run.",
+		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)",
+				"<<StopAndStartTheRun>>",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
+		//TODO: adapt to multistep recovery
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "Try to stop/start the run",
 				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
@@ -45,7 +47,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data data)");
 
 		/* FED=1111 */
-		action.addContextSteps("FED1111or1109", "Stop the run, Start a new run.",
+		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");

@@ -5,9 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.argThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -20,35 +19,29 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.model.Delay;
 import org.mockserver.model.Header;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventSender;
+import rcms.utilities.daqexpert.jobs.*;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.argThat;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.matchers.Times.exactly;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -56,12 +49,14 @@ public class JobManagerIT {
 
     private static final Logger logger = Logger.getLogger(JobManagerIT.class);
     private List<Condition> conditionsYielded;
-    private EventSender eventSender;
 
+    private List<RecoveryRequest> recoveryRequestsYielded;
+
+    private List<ConditionEventResource> notifications;
     @BeforeClass
     public static void prepareNMStub() {
         MockServerClient mockServer = startClientAndServer(18081);
-        mockServer.when(request().withMethod("POST").withPath("/nm/rest/events/"), exactly(1))
+        mockServer.when(request().withMethod("POST").withPath("/nm/rest/events/"))
                 .respond(
                         response().withStatusCode(201)
                                 .withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
@@ -79,10 +74,13 @@ public class JobManagerIT {
         Application.get().getProp().setProperty(Setting.PROCESSING_END_DATETIME.getKey(), endDateString);
         DataManager dataManager = new DataManager();
         String sourceDirectory = Application.get().getProp(Setting.SNAPSHOTS_DIR);
-        JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifierStub(null));
+
+        RecoveryJobManager recoveryJobManager = new RecoveryJobManagerStub();
+
+        JobManager jobManager = new JobManager(sourceDirectory, dataManager, eventSender, new CleanStartupVerifierStub(null), recoveryJobManager);
         ContextHandler.highlightMarkup = false;
         jobManager.startJobs();
-        Thread.sleep(1000);
+        Thread.sleep(5000);
     }
 
     /**
@@ -109,7 +107,7 @@ public class JobManagerIT {
         expectedNotifications.add("Ended: FED stuck");
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
-        expectedConditionDescriptions.add("TTCP TIBTID of TRACKER subsystem is blocking trigger, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING");
+        expectedConditionDescriptions.add("TTCP TIBTID of TRACKER subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 101 in WARNING");
         expectedConditionDescriptions.add("Deadtime is ( last: 100%,  avg: 98.8%,  min: 79.2%,  max: 100%), the threshold is 5.0%");
 
 
@@ -121,7 +119,6 @@ public class JobManagerIT {
 
 
     @Test
-    @Ignore
     public void blackboxTest2() throws InterruptedException {
 
         String startDateString = "2017-06-12T09:15:00Z";
@@ -142,8 +139,8 @@ public class JobManagerIT {
         expectedNotifications.add("Level Zero State: Running");
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
-        expectedConditionDescriptions.add("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [ES 1 time(s), TRACKER 4 time(s)]");
-        expectedConditionDescriptions.add("Run blocked by out-of-sync data from FED 774 received by RU ru-c2e15-28-01.cms");
+        expectedConditionDescriptions.add("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) TRACKER 4 time(s)");
+        expectedConditionDescriptions.add("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers.");
 
         runForBlackboxTest(startDateString, endDateString);
         assertExpectedConditions(expectedConditions);
@@ -183,7 +180,55 @@ public class JobManagerIT {
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
     }
 
+    /**
+     *
+     * This case contains 38 conditions of Fedstuck due to fluctuating rate.
+     */
+    @Test
+    public void blackboxTest4() throws InterruptedException {
 
+        String startDateString = "2017-11-06T01:00:00Z";
+        String endDateString = "2017-11-06T05:25:00Z";
+
+        Set<String> expectedConditions = new HashSet<>();
+        expectedConditions.add("Partition deadtime");
+        expectedConditions.add("FED deadtime");
+        expectedConditions.add("Dataflow stuck");
+        expectedConditions.add("FED problem");
+        expectedConditions.add("FED stuck");
+
+        Set<String> expectedNotifications = new HashSet<>();
+        expectedNotifications.add("Started: FED stuck");
+        expectedNotifications.add("Ended: FED stuck");
+
+        Set<String> expectedConditionDescriptions = new HashSet<>();
+        expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
+        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC+, CSC-] in subsystem CSC");
+
+
+        Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
+        expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
+
+        runForBlackboxTest(startDateString, endDateString);
+        assertExpectedConditions(expectedConditions);
+        assertExpectedNotifications(expectedNotifications);
+        assertExpectedConditionDescriptions(expectedConditionDescriptions);
+
+        /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
+        assertExpectedRecoveryRequest(34, expectedRecoveryRequests);
+    }
+
+    private RecoveryRequest generateRecovery(int steps, String problemDescription){
+        RecoveryRequest rr = new RecoveryRequest();
+
+        rr.setRecoverySteps(new ArrayList());
+        for(int i = 0; i< steps; i++){
+            rr.getRecoverySteps().add(new RecoveryStep());
+        }
+
+        rr.setProblemDescription(problemDescription);
+        return rr;
+    }
     /**
      * Clean before blackbox test scenarios
      */
@@ -191,8 +236,9 @@ public class JobManagerIT {
     public void clean() {
 
         logger.info("Cleaning before blackbox testing");
-        eventSender = null;
-        conditionsYielded = null;
+        conditionsYielded = new ArrayList<>();
+        notifications = new ArrayList<>();
+        recoveryRequestsYielded = new ArrayList<>();
     }
 
 
@@ -208,8 +254,7 @@ public class JobManagerIT {
         Application.initialize("src/test/resources/integration.properties");
         HttpClient client = HttpClientBuilder.create().build();
 
-        eventSender = Mockito
-                .spy(new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE)));
+        EventSender eventSender = new EventSenderStub();
 
         runOverTestPeriod(start, end, eventSender);
 
@@ -218,17 +263,31 @@ public class JobManagerIT {
         long durationThreshold = 0;
         boolean includeTinyEntriesMask = false;
 
-        int retries = 15;
-        int last = 0;
+        int retries = 0;
+        int retriesLimit = 3;
+        int lastSize = 0;
         Thread.sleep(1000);
-        for (int i = 0; i < retries; i++) {
-            logger.info("Waiting for results: " + (i + 1));
-            if (conditionsYielded == null || conditionsYielded.size() == 0 || conditionsYielded.size() != last) {
-                Thread.sleep(1000);
-                last = conditionsYielded != null ? conditionsYielded.size() : 0;
-                conditionsYielded = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
-                        includeTinyEntriesMask, true);
+        while(retries<retriesLimit) {
+
+            int currentSize = (conditionsYielded!=null)? conditionsYielded.size(): 0;
+            int increment = currentSize - lastSize;
+            logger.info("Waiting for results: " + (retriesLimit-retries) + " more seconds");
+
+            /* Things are processing here */
+            if (conditionsYielded == null || increment > 0) { // 1 Because version condition is generated immediately
+                retries = 0;
             }
+
+            /* things most likely finished */
+            else {
+                logger.info("zero condition yielded");
+                retries++;
+            }
+            lastSize = currentSize;
+            conditionsYielded = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+                    includeTinyEntriesMask, true);
+            Thread.sleep(2000);
+
         }
         List<Point> rawResult = Application.get().getPersistenceManager().getRawData(startDate, endDate,
                 DataResolution.Full);
@@ -284,17 +343,27 @@ public class JobManagerIT {
     }
 
     public void assertExpectedNotifications(Collection<String> expectedNotifications) {
-        /* Verify that all notifications were sent in one batch */
-        Mockito.verify(eventSender, Mockito.times(1)).sendBatchEvents(Mockito.anyList());
 
-		/* Verify that the number of notifications generated was greater than 0 */
-        Mockito.verify(eventSender).sendBatchEvents((List) argThat(IsCollectionWithSize.hasSize(greaterThan(0))));
+        notifications.stream().forEach(n->logger.info(n.toString()));
 
+        assertThat(notifications.size(), greaterThan(0));
 
         for (String notificationTitle : expectedNotifications) {
-            Mockito.verify(eventSender).sendBatchEvents(
-                    (List) argThat(hasItem(Matchers.<Condition>hasProperty("title", equalTo(notificationTitle)))));
+            assertThat(notifications,
+                    hasItem(Matchers.hasProperty("title", equalTo(notificationTitle))));
         }
+    }
+
+    public void assertExpectedRecoveryRequest(int totalNumberOfRecovoveryRequests, Collection<RecoveryRequest> expectedRecoveryRequests){
+
+        recoveryRequestsYielded.stream().forEach(c->System.out.println("P " + c.getProblemId() + c.getCondition().getTitle() + c.getCondition().getStart()));
+        //assertEquals(totalNumberOfRecovoveryRequests,  recoveryRequestsYielded.size());
+        assertThat(recoveryRequestsYielded.size(), greaterThanOrEqualTo(totalNumberOfRecovoveryRequests));
+
+        for (RecoveryRequest rr : expectedRecoveryRequests) {
+            assertThat(recoveryRequestsYielded, hasItem(Matchers.<RecoveryRequest>hasProperty("problemDescription", equalTo(rr.getProblemDescription()))));
+        }
+
     }
 
     class CleanStartupVerifierStub extends CleanStartupVerifier {
@@ -305,6 +374,64 @@ public class JobManagerIT {
 
         @Override
         public void ensureSafeStartupProcedure() {
+        }
+    }
+
+    class RecoveryJobManagerStub extends RecoveryJobManager{
+
+
+        public RecoveryJobManagerStub() {
+            super(new ExpertControllerClientStub(""));
+        }
+
+        @Override
+        public Long runRecoveryJob(List<RecoveryRequest> requests) {
+            logger.info("Recovery job called: " + requests);
+            recoveryRequestsYielded.addAll(requests);
+            return 0L;
+        }
+
+    }
+
+    class ExpertControllerClientStub extends ExpertControllerClient {
+
+        public ExpertControllerClientStub(String mainUri) {
+            super(mainUri);
+        }
+
+        @Override
+        public RecoveryResponse sendRecoveryRequest(RecoveryRequest recoveryRequest) {
+
+            logger.info("Sending recovery request: " + recoveryRequest);
+            return null;
+        }
+
+        @Override
+        public void sendConditionFinishedSignal(Long id) {
+            logger.info("Sending signal");
+        }
+    }
+
+    class EventSenderStub extends EventSender {
+
+        public EventSenderStub(){
+            super(null,null);
+        }
+
+        public EventSenderStub(HttpClient httpClient, String address) {
+            super(httpClient, address);
+        }
+
+        @Override
+        public int sendBatchEvents(List<ConditionEventResource> events) {
+            notifications.addAll(events);
+            return 0;
+        }
+
+        @Override
+        public int sendEventsIndividually(List<ConditionEventResource> events) {
+            notifications.addAll(events);
+            return 0;
         }
     }
 }

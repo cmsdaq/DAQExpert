@@ -9,6 +9,7 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
@@ -28,6 +29,8 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static java.util.function.Predicate.isEqual;
 
 public class FedGeneratesDeadtimeTest {
     @Test
@@ -64,13 +67,14 @@ public class FedGeneratesDeadtimeTest {
         ContextHandler.highlightMarkup = false;
 
         /** Note that DEADTIME context value is not filled in this test as it comes from other LM. It's not the scope of this test. This is covered in integration tests */
-        Assert.assertEquals("FED 2 generates deadtime 3%, the threshold is 2.0%. There is no backpressure from DAQ on this FED.", module.getDescriptionWithContext());
+        Assert.assertEquals("FED 2 generates deadtime 3%, the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition testpartition in subsystem testsubsystem", module.getDescriptionWithContext());
 
     }
 
     private Map<String, Output> getOutputFromRequiredLm(Properties p, DAQ daq, Predicate<FED> predicate) {
         Map<String, Output> r = new HashMap<>();
 
+        r.put(StableBeams.class.getSimpleName(), new Output(true));
         r.put(ExpectedRate.class.getSimpleName(), new Output(true));
 
         FEDDeadtime fd = new FEDDeadtime();
@@ -94,6 +98,8 @@ public class FedGeneratesDeadtimeTest {
         Properties p = new Properties();
         Map<String, Output> r = new HashMap<>();
 
+        r.put(StableBeams.class.getSimpleName(), new Output(false));
+
 
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(), "2");
@@ -102,6 +108,10 @@ public class FedGeneratesDeadtimeTest {
 
         DAQ snapshot = new DAQ();
         TTCPartition partition = new TTCPartition();
+        partition.setName("P1");
+        SubSystem subsystem = new SubSystem();
+        subsystem.setName("S1");
+        partition.setSubsystem(subsystem);
         Set<FED> feds = new HashSet<>();
 
         FED pseudoFed = mockTestObject(10000, 10, 0, partition);
@@ -140,6 +150,9 @@ public class FedGeneratesDeadtimeTest {
         snapshot.setTtcPartitions(Arrays.asList(partition));
         Assert.assertTrue(module.satisfied(snapshot, r));
 
+        Assert.assertEquals(module.getContextHandler().getContext().getTextRepresentation("PROBLEM-PARTITION"), "P1");
+        Assert.assertEquals(module.getContextHandler().getContext().getTextRepresentation("PROBLEM-SUBSYSTEM"), "S1");
+
     }
 
 
@@ -173,7 +186,7 @@ public class FedGeneratesDeadtimeTest {
         ContextHandler.highlightMarkup = false;
 
         Assert.assertTrue(fedGeneratesDeadtime.satisfied(snapshot, results));
-        Assert.assertEquals("FED 106 generates deadtime 7.5%, the threshold is 2.0%. There is no backpressure from DAQ on this FED.",
+        Assert.assertEquals("FED 106 generates deadtime 7.5%, the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition TIBTID in subsystem TRACKER",
                 fedGeneratesDeadtime.getDescriptionWithContext());
 
 

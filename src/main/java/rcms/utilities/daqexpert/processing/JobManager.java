@@ -26,7 +26,9 @@ import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.events.collectors.EventPrinter;
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.events.collectors.MatureEventCollector;
+import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.InternalConditionProducer;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -70,7 +72,9 @@ public class JobManager {
 
 	private final CleanStartupVerifier cleanStartupVerifier;
 
-	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender, CleanStartupVerifier cleanStartupVerifier) {
+	private final InternalConditionProducer internalConditionProducer;
+
+	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender, CleanStartupVerifier cleanStartupVerifier, RecoveryJobManager recoveryJobManager) {
 		
 		this.eventSender = eventSender;
 		this.cleanStartupVerifier = cleanStartupVerifier;
@@ -79,10 +83,22 @@ public class JobManager {
 		int batchSnapshotRead = 2000;
 
 		boolean demo = false;
+		int demoPeriod = 2000;
 		if (Application.get().getProp().containsKey("demo")) {
 			try {
 				Object a = Application.get().getProp().get("demo");
 				demo = Boolean.parseBoolean((String) a);
+				demoPeriod = Integer.parseInt((String) a);
+
+			} catch (NumberFormatException e) {
+				logger.warn("Demo configuration could not be parsed");
+			}
+		}
+		if (Application.get().getProp().containsKey("demo.delay")) {
+			try {
+				Object a = Application.get().getProp().get("demo.delay");
+				demoPeriod = Integer.parseInt((String) a);
+
 			} catch (NumberFormatException e) {
 				logger.warn("Demo configuration could not be parsed");
 			}
@@ -95,6 +111,8 @@ public class JobManager {
 		}
 
 		this.persistenceManager = Application.get().getPersistenceManager();
+
+		this.internalConditionProducer = new InternalConditionProducer(persistenceManager);
 
 		RunConfigurator runConfigurator = new RunConfigurator(persistenceManager);
 
@@ -147,7 +165,7 @@ public class JobManager {
 		ConditionDashboard conditionDashboard = Application.get().getDashboard();
 
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
-				eventRegister, eventSender, conditionDashboard, demo);
+				eventRegister, eventSender, conditionDashboard, recoveryJobManager, demo);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob, realTimeReaderPeriod);
 
@@ -157,25 +175,12 @@ public class JobManager {
 
 
 	private void persistVersion(Date startDate, Date endDate) {
-
-		versionCondition = new Condition();
-		versionCondition.setMature(true);
-		versionCondition.setStart(startDate);
-		versionCondition.setEnd(endDate);
-		if (endDate != null) {
-			versionCondition.calculateDuration();
-		}
-		// TODO: class name vs priority - decide on one convention
-		versionCondition.setClassName(ConditionPriority.DEFAULTT);
-
-		versionCondition.setGroup(ConditionGroup.EXPERT_VERSION);
 		String version = this.getClass().getPackage().getImplementationVersion();
 		if (version == null) {
 			logger.info("Problem detecting version");
 			version = "unknown";
 		}
-		versionCondition.setTitle(version);
-		this.persistenceManager.persist(versionCondition);
+		versionCondition = internalConditionProducer.persistCondition(version,startDate,endDate,ConditionGroup.EXPERT_VERSION);
 	}
 
 	private void getRecentSuggestions() {
@@ -209,7 +214,7 @@ public class JobManager {
 		conditionProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(conditionProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
-				persistenceManager, eventRegister, null, conditionDashboard, false);
+				persistenceManager, eventRegister, null, conditionDashboard, null,false);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);
@@ -241,9 +246,9 @@ public class JobManager {
 		Date endDate = runConfigurator.getEndDate();
 		if (endDate == null)
 			endDate = new Date();
+
 		versionCondition.setEnd(endDate);
-		versionCondition.calculateDuration();
-		persistenceManager.persist(versionCondition);
+		internalConditionProducer.updateCondition(versionCondition);
 
 	}
 

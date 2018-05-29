@@ -11,7 +11,6 @@ import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import sun.rmi.runtime.Log;
 
 /**
  * Module which catches otherwise unidentified failures which can then be looked for in the notification manager

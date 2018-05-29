@@ -1,14 +1,15 @@
 package rcms.utilities.daqexpert.processing.context;
 
 import org.apache.log4j.Logger;
-import org.mockito.internal.matchers.Null;
+import rcms.utilities.daqexpert.jobs.RecoveryJob;
 import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ContextHandler {
 
@@ -70,8 +71,12 @@ public class ContextHandler {
 
         ObjectContextEntry reusableContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValues = reusableContextEntry.getTextRepresentation();
         reusableContextEntry.update(object, s);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValues, reusableContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
     }
 
 
@@ -97,8 +102,24 @@ public class ContextHandler {
             logger.warn("Trimming context value from: " + oldValue + " to " + stringRepresentation);
         }
 
+        String oldValue = simpleContextEntry.getTextRepresentation();
         simpleContextEntry.update(value, stringRepresentation);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValue, stringRepresentation)) {
+            contextNotifier.registerChange(key);
+        }
+    }
+
+
+    public boolean verifyChanged(String oldValues, String newValues){
+
+        if(oldValues == null) {
+            return true;
+        } else if(oldValues.equalsIgnoreCase(newValues)){
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -121,8 +142,13 @@ public class ContextHandler {
 
         StatisticContextEntry statisticContextEntry = (StatisticContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValues = statisticContextEntry.getTextRepresentation();
+
         statisticContextEntry.update(value.floatValue());
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValues, statisticContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
 
 
         // TODO handle significant changes
@@ -147,10 +173,15 @@ public class ContextHandler {
             verifyNoContextMismatch(key, OptionalContextEntry.class);
         }
 
+
         OptionalContextEntry optionalContextEntry = (OptionalContextEntry) context.getContextEntryMap().get(key);
 
+        String oldValue = optionalContextEntry.getTextRepresentation();
         optionalContextEntry.setValue(value);
-        contextNotifier.registerChange(key);
+
+        if(verifyChanged(oldValue, optionalContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
     }
 
     public void unregisterConditionalNote(String key) {
@@ -212,8 +243,25 @@ public class ContextHandler {
         return text;
     }
 
-    public List<String> getActionWithContext(Action action) {
+    public String putAutomaticAction(String text) {
 
+        Pattern pattern = Pattern.compile(".*\\<\\<.*\\>\\>.*");
+        Matcher matcher = pattern.matcher(text);
+
+        if(matcher.matches()){
+
+            for(RecoveryJob job: RecoveryJob.values()){
+                text = text.replaceAll(job.name(), job.getReadable());
+            }
+            text = text.replaceAll("<<","");
+            text = text.replaceAll(">>", "");
+            text = text.replaceAll("::", " of subsystem ");
+
+        }
+        return text;
+    }
+
+    public List<String> getRawAction(Action action){
         List<String> actionSteps = null;
 
         if (action instanceof ConditionalAction) {
@@ -222,6 +270,17 @@ public class ContextHandler {
         } else if (action instanceof SimpleAction) {
             actionSteps = action.getSteps();
         }
+        return actionSteps;
+    }
+
+
+    public List<String> getActionWithContext(Action action ) {
+        return this.getActionWithContext(action, true);
+    }
+    public List<String> getActionWithContext(Action action, boolean replaceRecovery) {
+
+        List<String> actionSteps = getRawAction(action);
+
         logger.debug("Putting contextHandler into action: " + actionSteps);
         logger.debug("ContextHandler to be used: " + context.getContextEntryMap());
 
@@ -230,6 +289,9 @@ public class ContextHandler {
 
             for (String step : actionSteps) {
                 String stepWithContext = putContext(step);
+                if(replaceRecovery) {
+                    stepWithContext = putAutomaticAction(stepWithContext);
+                }
                 if(stepWithContext.length() > 255){
                     String oldValue = stepWithContext;
                     stepWithContext = stepWithContext.substring(0,252) + "...";

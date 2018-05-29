@@ -3,13 +3,18 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.SubSystem;
+import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
+import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
  *
@@ -81,6 +86,49 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+
+	}
+
+	@Test
+	public void ecalEsInUnstableLHCClockSpecificCaseTest() throws URISyntaxException {
+		DAQ daq = new DAQ();
+
+		Map<String, Output> r = new HashMap<>();
+
+		r.put(NoRateWhenExpected.class.getSimpleName(), new Output(true));
+		r.put(StableBeams.class.getSimpleName(), new Output(false ));
+
+
+		daq.setClockSource("LHC");
+		daq.setLhcClockStable(false);
+		List<SubSystem> subsystemList = new ArrayList<>();
+		SubSystem ecal = new SubSystem();
+		ecal.setName("ECAL");
+		TTCPartition test = new TTCPartition();
+		test.setName("TestPartition");
+		test.setTtsState(TTSState.OUT_OF_SYNC.getCode());
+		ecal.setTtcPartitions(new HashSet<>());
+		ecal.getTtcPartitions().add(test);
+		ecal.setStatus(TTSState.OUT_OF_SYNC.getCode());
+		subsystemList.add(ecal);
+		daq.setSubSystems(subsystemList);
+
+		ContextHandler.highlightMarkup= false;
+		fc3.satisfied(daq, r);
+
+		System.out.println(fc3.getDescriptionWithContext());
+		System.out.println(fc3.getActionWithContext());
+
+		assertEquals(3, fc3.getActionWithContext().size());
+
+		ContextHandler context = fc3.getContextHandler();
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
+
+
+		daq.setLhcClockStable(true);
+		fc3.satisfied(daq, r);
+		assertEquals(6, fc3.getActionWithContext().size());
+
 
 	}
 

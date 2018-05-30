@@ -354,6 +354,10 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     }
 
     public LogicModule getProducer(){
-        return logicModule.getLogicModule();
+        if(logicModule != null) {
+            return logicModule.getLogicModule();
+        } else {
+            return null;
+        }
     }
 }

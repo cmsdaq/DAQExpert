@@ -193,7 +193,7 @@ public class JobManager {
 			for (Condition condition : briefHistory) {
 				Set<Condition> fakeGroup = new HashSet<>();
 				fakeGroup.add(condition);
-				Application.get().getDashboard().update(fakeGroup);
+				Application.get().getDashboard().update(fakeGroup,true);
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.persistence;
 
 import org.apache.log4j.Logger;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
@@ -25,28 +26,28 @@ public class DominatingPersistor {
 
     /**
      * Persist dominating selection. Following cases are possible:
-     *
+     * <p>
      * 1. no previous (P) dominating condition. Current (C) is persisted as result (R)
      * <pre>
      * P.
      * C. ####
      * R. CCCC
      * </pre>
-     *
+     * <p>
      * 2. Current preempts previous. End date of previous = start of current
      * <pre>
      * P. ####
      * C.   #####
      * R. PPCCCCC
      * </pre>
-     *
+     * <p>
      * 3. Current preempts previous and ends before previous.
      * <pre>
      * P. #########
      * C.     ###
      * R. PPPPCCCPP
      * </pre>
-     *
+     * <p>
      * 4. No current dominating
      * <pre>
      *     P. ##
@@ -62,19 +63,19 @@ public class DominatingPersistor {
         Date previousEnds;
         Date currentStarts;
 
-        logger.info("Persisting dominating for " + (previousDominating != null ? previousDominating.getTitle(): "null" )+ " and " + (currentlyDominating != null ? currentlyDominating.getTitle(): "null" ));
+        logger.info("Persisting dominating for " + (previousDominating != null ? previousDominating.getTitle() : "null") + " and " + (currentlyDominating != null ? currentlyDominating.getTitle() : "null"));
 
         // case 1
-        if(previousDominating == null){
+        if (previousDominating == null) {
 
             currentStarts = transitionTime;
             previousEnds = null; // there is no previous
 
-        } else{
+        } else {
 
 
             // case 4
-            if(currentlyDominating == null){
+            if (currentlyDominating == null) {
 
                 currentStarts = null;
                 previousEnds = transitionTime;
@@ -82,14 +83,14 @@ public class DominatingPersistor {
 
 
             // case 2
-            else if(previousDominating.getStart().getTime() < currentlyDominating.getStart().getTime()){
+            else if (previousDominating.getStart().getTime() < currentlyDominating.getStart().getTime()) {
 
                 currentStarts = transitionTime;
                 previousEnds = currentStarts;
             }
 
             // case 3
-            else{
+            else {
 
                 currentStarts = transitionTime;
                 previousEnds = currentStarts;
@@ -98,7 +99,7 @@ public class DominatingPersistor {
 
         }
 
-        if(previousDominatingEntry!= null && previousEnds != null){
+        if (previousDominatingEntry != null && previousEnds != null) {
             previousDominatingEntry.setEnd(previousEnds);
             previousDominatingEntry.calculateDuration();
             this.persistenceManager.update(previousDominatingEntry);
@@ -106,14 +107,20 @@ public class DominatingPersistor {
 
         }
 
-        if(currentStarts != null) {
+        if (currentStarts != null) {
             Condition dominatingEntry = new Condition();
             dominatingEntry.setTitle(currentlyDominating.getTitle());
-            String previousDominatingTitle = "empty";
-            if (previousDominating != null) {
-                previousDominatingTitle = previousDominating.getTitle();
+
+            LogicModule producer = currentlyDominating.getProducer();
+            if (producer != null && producer.getBriefDescription() != null) {
+                dominatingEntry.setDescription(currentlyDominating.getProducer().getBriefDescription());
+            } else {
+                dominatingEntry.setDescription(currentlyDominating.getDescription());
             }
-            dominatingEntry.setDescription(currentlyDominating.getTitle() + " dominated previous " + previousDominatingTitle);
+
+            if (currentlyDominating.getContext() != null) {
+                dominatingEntry.setContext(currentlyDominating.getContext());
+            }
 
             dominatingEntry.setMature(true);
             dominatingEntry.setClassName(ConditionPriority.DEFAULTT);
@@ -124,12 +131,11 @@ public class DominatingPersistor {
 
             previousDominatingEntry = dominatingEntry;
 
-            logger.info("  - updating current entry with everything" );
-        } else{
+            logger.info("  - updating current entry with everything");
+        } else {
             previousDominatingEntry = null;
-            logger.info("  - throwing away previous entry" );
+            logger.info("  - throwing away previous entry");
         }
-
 
 
     }

@@ -52,7 +52,7 @@ public class ConditionDashboardTest {
 
 		/* 1 Change - new condition(s) start/end */
         conditions.add(c4);
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 1 Result */
@@ -62,7 +62,7 @@ public class ConditionDashboardTest {
 
 		/* 2 Change - new condition(s) start/end */
         conditions.add(c3);
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 2 Result */
@@ -73,7 +73,7 @@ public class ConditionDashboardTest {
 		/* 3 Change - new condition(s) start/end */
         conditions.add(c1);
         conditions.add(c2);
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 3 Result */
@@ -84,7 +84,7 @@ public class ConditionDashboardTest {
 		/* 4 Change - new condition(s) start/end */
         c3.setEnd(new Date());
         conditions.remove(c3);
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 4 Result */
@@ -98,7 +98,7 @@ public class ConditionDashboardTest {
         c4.setEnd(new Date());
         conditions.remove(c1);
         conditions.remove(c4);
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 5 Result */
@@ -108,7 +108,7 @@ public class ConditionDashboardTest {
 
 		/* 6 no more conditions */
         conditions.clear();
-        conditionDashboard.update(conditions);
+        conditionDashboard.update(conditions,true);
         conditions.clear();
 
 		/* 6 Only recent conditions */

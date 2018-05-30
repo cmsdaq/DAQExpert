@@ -70,9 +70,9 @@ public class ConditionDashboard implements Observer {
         }
     }
 
-    public void update(Set<Condition> conditionsProduced) {
+    public void update(Set<Condition> conditionsProduced, boolean updateCurrentlyDominating) {
 
-        conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
+        conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
 
         Set<Condition> addedThisRound = new HashSet<>();
@@ -98,7 +98,6 @@ public class ConditionDashboard implements Observer {
         for (Condition condition : conditionsProduced) {
             if (condition.isMature()) {
 
-
                 //compareWithCurrentlyDominating(condition);
 
                 if (!conditions.containsKey(condition.getId())) {
@@ -110,23 +109,19 @@ public class ConditionDashboard implements Observer {
                         if(oldest == dominatingCondition) {
                             oldest = it.next();
                         }
-
-                        logger.trace("Observers before: " + oldest.countObservers());
-                        oldest.deleteObserver(this);
-                        logger.trace("Observers after: " + oldest.countObservers());
                         conditions.remove(oldest.getId());
-
                     }
                     conditions.put(condition.getId(), condition);
-                    condition.addObserver(this);
-
                     addedThisRound.add(condition);
-
                 }
             }
         }
         Condition dominating = dominatingSelector.selectDominating(conditions.values());
-        this.dominatingCondition = dominating;
+
+
+        if(updateCurrentlyDominating) {
+            this.dominatingCondition = dominating;
+        }
 
 
         if (sessionHander != null) {
@@ -138,6 +133,8 @@ public class ConditionDashboard implements Observer {
                 sessionHander.handleRecentConditionsChange(addedThisRound);
             }
         }
+
+        //return dominating;
     }
 
     public Condition getCurrentCondition() {
@@ -206,7 +203,7 @@ public class ConditionDashboard implements Observer {
 
 
 			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
-				update(Sets.newHashSet(condition));
+				update(Sets.newHashSet(condition), false);
 			}
 
 			handleUpdate(condition);

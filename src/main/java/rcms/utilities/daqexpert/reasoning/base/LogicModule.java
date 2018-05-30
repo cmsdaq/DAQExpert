@@ -61,6 +61,12 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 
 
 	/**
+	 * Brief description, introduced for Runtime logger
+	 */
+	protected String briefDescription;
+
+
+	/**
 	 * Hold generation of notifications
 	 */
 	protected boolean holdNotifications;
@@ -202,5 +208,13 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 
 	public void setProblematic(boolean problematic) {
 		this.problematic = problematic;
+	}
+
+	public String getBriefDescription() {
+		return briefDescription;
+	}
+
+	public void setBriefDescription(String briefDescription) {
+		this.briefDescription = briefDescription;
 	}
 }

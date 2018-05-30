@@ -137,7 +137,7 @@ public class DataPrepareJob implements Runnable {
 
 
 						Condition lastDominating = conditionDashboard.getCurrentCondition();
-						conditionDashboard.update(result.getLeft());
+						conditionDashboard.update(result.getLeft(),true);
 						Condition currentlyDominating = conditionDashboard.getCurrentCondition();
 
 

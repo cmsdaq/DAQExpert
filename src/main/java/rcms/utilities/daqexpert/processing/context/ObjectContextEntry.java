@@ -73,4 +73,11 @@ public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
     }
 
 
+    public Set<String> getTextRepresentationSet() {
+        return textRepresentationSet;
+    }
+
+    public void setTextRepresentationSet(Set<String> textRepresentationSet){
+        this.textRepresentationSet = textRepresentationSet;
+    }
 }

@@ -37,7 +37,7 @@ public class ContextHandler {
     public ContextHandler(ContextNotifier contextNotifier) {
         this.contextNotifier = contextNotifier;
         this.context = new Context();
-        this.context.setContextEntryMap(new HashMap<>());
+        this.context.setContextEntryMap(new LinkedHashMap<>());
         this.actionKey = new HashSet<>();
         this.highlightMarkup = true;
     }

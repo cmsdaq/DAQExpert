@@ -1,1 +1,1 @@
-[{"id":1,"level":3,"required":[2],"name":"n1"},{"id":3,"level":0,"required":[],"name":"n4"},{"id":4,"level":1,"required":[3],"name":"n3"},{"id":2,"level":2,"required":[4],"name":"n2"}]
+[{"id":1,"level":1,"required":[2],"name":"n3"},{"id":2,"level":0,"required":[],"name":"n4"},{"id":3,"level":2,"required":[1],"name":"n2"},{"id":4,"level":3,"required":[3],"name":"n1"}]

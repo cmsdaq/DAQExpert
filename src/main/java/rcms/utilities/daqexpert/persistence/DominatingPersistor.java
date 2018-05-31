@@ -1,11 +1,15 @@
 package rcms.utilities.daqexpert.persistence;
 
 import org.apache.log4j.Logger;
+import rcms.utilities.daqexpert.processing.context.*;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Persists dominating condition in order to see what was presented as a root case.
@@ -102,6 +106,8 @@ public class DominatingPersistor {
         if (previousDominatingEntry != null && previousEnds != null) {
             previousDominatingEntry.setEnd(previousEnds);
             previousDominatingEntry.calculateDuration();
+
+            updateDescriptionAndContext(previousDominating, previousDominatingEntry);
             this.persistenceManager.update(previousDominatingEntry);
             logger.info("  - updating previous entry with end date: " + previousEnds);
 
@@ -111,16 +117,7 @@ public class DominatingPersistor {
             Condition dominatingEntry = new Condition();
             dominatingEntry.setTitle(currentlyDominating.getTitle());
 
-            LogicModule producer = currentlyDominating.getProducer();
-            if (producer != null && producer.getBriefDescription() != null) {
-                dominatingEntry.setDescription(currentlyDominating.getProducer().getBriefDescription());
-            } else {
-                dominatingEntry.setDescription(currentlyDominating.getDescription());
-            }
-
-            if (currentlyDominating.getContext() != null) {
-                dominatingEntry.setContext(currentlyDominating.getContext());
-            }
+            updateDescriptionAndContext(currentlyDominating, dominatingEntry);
 
             dominatingEntry.setMature(true);
             dominatingEntry.setClassName(ConditionPriority.DEFAULTT);
@@ -139,4 +136,66 @@ public class DominatingPersistor {
 
 
     }
+
+    private void updateDescriptionAndContext(Condition baseCondition, Condition dominatingEntry) {
+        LogicModule producer = baseCondition.getProducer();
+        if (producer != null && producer.getBriefDescription() != null) {
+            dominatingEntry.setDescription(baseCondition.getProducer().getBriefDescription());
+        } else {
+            dominatingEntry.setDescription(baseCondition.getDescription());
+        }
+
+
+        Map<String, ContextEntry> baseContext = null;
+        if(baseCondition.getProducer() instanceof ContextLogicModule && ((ContextLogicModule)baseCondition.getProducer()).getContextHandler().getContext() != null)
+            baseContext = ((ContextLogicModule)baseCondition.getProducer()).getContextHandler().getContext().getContextEntryMap();
+
+        if (baseContext!= null) {
+
+            if (dominatingEntry.getContext() == null) {
+                dominatingEntry.setContext(new HashMap<>());
+            }
+
+
+            for (Map.Entry<String, ContextEntry> entry : baseContext.entrySet()) {
+
+                ContextEntry value = entry.getValue();
+                String key = entry.getKey();
+
+                if (dominatingEntry.getContext().containsKey(key)) {
+
+                    if (value instanceof StatisticContextEntry) {
+                        StatisticContextEntry v = (StatisticContextEntry) value;
+                        ((StatisticContextEntry) dominatingEntry.getContext().get(key)).setMin(v.getMin());
+                        ((StatisticContextEntry) dominatingEntry.getContext().get(key)).setMax(v.getMax());
+                        ((StatisticContextEntry) dominatingEntry.getContext().get(key)).setAvg(v.getAvg());
+                        ((StatisticContextEntry) dominatingEntry.getContext().get(key)).setCurrent(v.getCurrent());
+                        ((StatisticContextEntry) dominatingEntry.getContext().get(key)).setUnit(v.getUnit());
+
+
+                    } else if (value instanceof ObjectContextEntry) {
+                        ObjectContextEntry v = (ObjectContextEntry) value;
+                        ((ObjectContextEntry) dominatingEntry.getContext().get(key)).setTextRepresentationSet(v.getTextRepresentationSet());
+
+
+                    } else if (value instanceof OptionalContextEntry) {
+                        ObjectContextEntry v = (ObjectContextEntry) value;
+
+                    }
+                } else {
+
+                    dominatingEntry.getContext().put(key, (ContextEntry) org.apache.commons.lang.SerializationUtils.clone(value));
+                    dominatingEntry.getContext().get(key).setId(null);
+                }
+
+            }
+
+        }
+
+
+    }
 }
+
+
+
+

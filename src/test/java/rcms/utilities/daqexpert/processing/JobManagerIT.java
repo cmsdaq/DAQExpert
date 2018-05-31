@@ -3,9 +3,6 @@ package rcms.utilities.daqexpert.processing;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -203,7 +200,7 @@ public class JobManagerIT {
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
-        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC+, CSC-] in subsystem CSC");
+        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC-, CSC+] in subsystem CSC");
 
 
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();

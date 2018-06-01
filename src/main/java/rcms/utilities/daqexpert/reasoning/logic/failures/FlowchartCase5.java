@@ -29,6 +29,7 @@ public class FlowchartCase5 extends KnownFailure {
 		this.name = "FED stuck";
 		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking triggers, it's in {{TTCPSTATE}} TTS state, "
 				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
+		this.briefDescription = "{{SUBSYSTEM}}/{{TTCP}}/{{FED}} is stuck in TTS state {{TTCPSTATE}}";
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction(

@@ -201,7 +201,8 @@ public class JobManagerIT {
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
         expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC-, CSC+] in subsystem CSC");
-
+        expectedConditionDescriptions.add("CSC/CSC+/847 is stuck in TTS state WARNING");
+        expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
 
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));

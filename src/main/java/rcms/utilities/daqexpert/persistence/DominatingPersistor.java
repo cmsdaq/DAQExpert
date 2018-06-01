@@ -140,7 +140,27 @@ public class DominatingPersistor {
     private void updateDescriptionAndContext(Condition baseCondition, Condition dominatingEntry) {
         LogicModule producer = baseCondition.getProducer();
         if (producer != null && producer.getBriefDescription() != null) {
-            dominatingEntry.setDescription(baseCondition.getProducer().getBriefDescription());
+            String briefDescription = baseCondition.getProducer().getBriefDescription();
+
+            Map<String, ContextEntry> contextEntryMap = null;
+
+            if(baseCondition.getContext() != null && baseCondition.getContext().size() > 0){
+                contextEntryMap = baseCondition.getContext();
+
+            } else {
+                if (producer instanceof ContextLogicModule) {
+                    ContextLogicModule clm = (ContextLogicModule) producer;
+                    if (clm.getContextHandler().getContext().getContextEntryMap().size() > 0) {
+                        contextEntryMap = clm.getContextHandler().getContext().getContextEntryMap();
+                    }
+                }
+            }
+
+
+            if(contextEntryMap != null && contextEntryMap.size() >0){
+                briefDescription = ContextHandler.putContext(briefDescription, contextEntryMap, null);
+            }
+            dominatingEntry.setDescription(briefDescription);
         } else {
             dominatingEntry.setDescription(baseCondition.getDescription());
         }

@@ -22,6 +22,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
         this.name = "Extreme HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
+        this.briefDescription = "The HLT output bandwidth is extreme: {{BANDWIDTH}}";
         this.action = new SimpleAction( "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );

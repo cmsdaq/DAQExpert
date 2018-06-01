@@ -105,6 +105,7 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
         this.description = "High backpressure on fed(s) {{FED}} in partition(s) {{PARTITION}} in subsystem(s) {{SUBSYSTEM}} is {{VALUE}} the threshold is "
                 + threshold + "%. This does not indicate a problem with these FEDs. This condition is only used as a basis for other backpressure analysis since upgraded FEDs have no deadtime monitoring. For legacy FEDs the deadtime is the basis for backpressure analysis.";
 
+        this.briefDescription = "High backpressure on fed(s) {{SUBSYSTEM}}/{{PARTITION}}/{{FED}}, {{VALUE}}";
     }
 
 }

@@ -132,5 +132,6 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
 
         String printableBusThreshold = Math.round(100 * fractionBusEnabledThreshold) + "%";
         this.description = "DAQ backpressure coming from Filter Farm. EVM has few ({{EVMREQUESTS}} requests, the threshold is <" + evmRequestsThreshold + ") requests. Large fraction ({{BUSFRACTION}}, the threshold is >" + printableBusThreshold + ") of BUs not enabled";
+        this.briefDescription = "DAQ backpressure coming from Filter Farm";
     }
 }

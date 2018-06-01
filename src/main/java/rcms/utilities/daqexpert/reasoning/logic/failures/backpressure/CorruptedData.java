@@ -24,6 +24,8 @@ public class CorruptedData extends BackpressureAnalyzer {
 				+ "Problem FED belongs to partition {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
+		this.briefDescription = "Run blocked by corrupted data from FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-TTCP}}/{{PROBLEM-FED}}";
+
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",

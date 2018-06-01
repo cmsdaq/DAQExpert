@@ -34,6 +34,7 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         this.name = "CMSSW crashes";
 
 
+        this.briefDescription = "CMSSW crashes frequently, there are {{CRASHES}}";
         this.action = new SimpleAction("Call the HLT DOC, mentioning the messages under you see under HLT Alerts in F3 Mon. ",
                 "Call the DAQ DOC. He might need to clean up the Filter Farm.");
 

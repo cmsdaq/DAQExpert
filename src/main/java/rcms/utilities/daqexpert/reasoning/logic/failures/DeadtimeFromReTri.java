@@ -76,6 +76,6 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
     public void parametrize(Properties properties) {
         this.contributionThresholdInPercent = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_RETRI, this.getClass());
         this.description = "A large contribution ({{RETRI_CONTRIBUTION}}, the threshold is " + contributionThresholdInPercent + "%) of the deadtime comes from the resonant trigger protection (ReTri). This can happen in fills with only a few bunches.";
-
+        this.briefDescription = "A large contribution ({{RETRI_CONTRIBUTION}} of the deadtime comes from the resonant trigger protection (ReTri).";
     }
 }

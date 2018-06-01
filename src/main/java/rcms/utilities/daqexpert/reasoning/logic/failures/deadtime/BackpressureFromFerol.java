@@ -32,6 +32,7 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
         this.description = "DAQ backpressure coming from FEROL or FEDBuilder. " +
                 "FED Builder with backpressure {{BACKPRESSURE}} to FED {{PROBLEMATIC-FED}}. " +
                 "Corresponding RU {{PROBLEMATIC-RU}} has more than 0 requests and less than 256 fragments.";
+        this.briefDescription = "DAQ FED Builder causes backpressure {{BACKPRESSURE}} to FED {{PROBLEMATIC-FED}}";
 
         this.action = new SimpleAction("Call the DAQ on-call and mention this message");
 

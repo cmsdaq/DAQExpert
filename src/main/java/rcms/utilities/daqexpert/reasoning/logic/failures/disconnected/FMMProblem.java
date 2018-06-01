@@ -20,6 +20,7 @@ public class FMMProblem extends DisconnectedAnalyzer {
 		
 		this.description = "FMM problem: Top level FMM of the {{PROBLEM-PARTITION}} partition in {{PROBLEM-SUBSYSTEM}} subsystem with url {{PROBLEM-FMM-URL}} and geoslot {{PROBLEM-FMM-GEOSLOT}} has output state disconnected but no FED in that partition is disconnected.";
 
+		this.briefDescription = "FMM {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FMM-URL}}/{{PROBLEM-FMM-GEOSLOT}} has output state disconnected but no FED in that partition is disconnected.";
 		this.action = new SimpleAction(
 				"FMM crate may need to be powercycle. Call DAQ on call.");
 	}

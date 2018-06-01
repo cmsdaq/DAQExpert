@@ -26,6 +26,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 		this.threshold = 0;
 
 		this.description = "failed to set description";
+		this.briefDescription = "The TCDS trigger input rate is high: {{TCDS_TRIGGER_INPUT_RATE}}";
 		this.action = new SimpleAction("Ask the trigger shifter to check the prescale column",
 		                               "Make an e-log entry"
 		                               );

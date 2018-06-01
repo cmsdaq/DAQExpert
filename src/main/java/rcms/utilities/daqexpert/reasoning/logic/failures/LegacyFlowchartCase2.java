@@ -30,6 +30,8 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 				+ "A RU {{PROBLEM-RU}} is in Failed state. A FED {{PROBLEM-FED}} has sent corrupted data to the DAQ. "
 				+ "Problem FED belongs to subsystem {{PROBLEM-SUBSYSTEM}}";
 
+		this.briefDescription = "A FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-FED}} has sent corrupted data";
+
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
 				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",

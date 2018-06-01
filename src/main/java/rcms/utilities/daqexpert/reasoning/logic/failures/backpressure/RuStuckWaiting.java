@@ -22,6 +22,7 @@ public class RuStuckWaiting extends BackpressureAnalyzer {
 				+ "and maximum is {{MAX-FRAGMENT-COUNT}} in {{MAX-FRAGMENT-PARTITION}} partition. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in the same FED-builder {{PROBLEM-FED-BUILDER}}. "
 				+ "Note that there is nothing wrong with backpressured FED {{AFFECTED-FED}}.";
+		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-TTCP}}/{{PROBLEM-FED}}";
 
 		this.action = null;
 

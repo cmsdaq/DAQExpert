@@ -18,6 +18,7 @@ public class RuStuck extends BackpressureAnalyzer {
 
 		this.description = "RU {{AFFECTED-RU}} is stuck. " + "RU has more than 0 requests - {{RU-REQUESTS}}. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
+		this.briefDescription = "RU {{AFFECTED-RU}} is stuck";
 
 		this.action = null;
 

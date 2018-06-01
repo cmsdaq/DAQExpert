@@ -26,6 +26,7 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 		this.max = 0;
 
 		this.description = "failed to set description";
+		this.briefDescription = "The trigger rate of {{ACTUAL_READOUT_RATE}} is to high";
     	this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger",
                                    "Make an e-log entry"
 			);

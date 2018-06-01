@@ -19,6 +19,7 @@ public class PiDisconnected extends DisconnectedAnalyzer {
 		this.name = "PI disconnected";
 		this.description = "PI is disconnected. Pi of {{PROBLEM-PARTITION}} partition in {{PROBLEM-SUBSYSTEM}} subsystem is disconnected. This PI contains mTCA inputs for which no monitoring information is available. Cannot investigate further.";
 
+		this.briefDescription = "Pi of {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is disconnected.";
 		this.action = new SimpleAction(
 				"Check the PI controller webpage to determine if this is the FED problem or a problem with the PI itself");
 	}

@@ -28,6 +28,7 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
         this.name = "Too high HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
+        this.briefDescription = "The HLT output bandwidth is high: {{BANDWIDTH}}";
         this.action = new SimpleAction("Talk to the trigger shifter and shift leader. " +
                 "Have them check the pre-scale column. You may need to call the HLT DOC.");
     }
@@ -71,6 +72,7 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
                     + bandwidthThresholdInGbps + " GB/s at which delays to Rate Monitoring and Express streams can appear. " +
                     "DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. [[NOTE]]";
+
 
             logger.debug("Parametrized: " + description);
 

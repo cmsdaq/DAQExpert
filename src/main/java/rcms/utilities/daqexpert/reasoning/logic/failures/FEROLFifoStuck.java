@@ -31,6 +31,7 @@ public class FEROLFifoStuck extends KnownFailure {
 				+ "its RU. This is likely a bug in the FEROL/FEROL40 firmware."
 			;
 
+		this.briefDescription = "FEROL of FED {{FEDID}} stopped sending fragments to its RU. Possibly bug in the FEROL/FEROL40 firmware.";
 		this.action = new SimpleAction("Make a dump of the FEROL/FEROL40 registers: "
 				+ "go to {{FRLFULLURL}}, click on and click on \"Register Dump\".",
 

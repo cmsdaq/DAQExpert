@@ -101,6 +101,7 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
         this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
         this.description = "FED {{PROBLEM-FED}} generates deadtime {{DEADTIME}}, the threshold is " + deadtimeThresholdInPercentage + "%. There is no backpressure from DAQ on this FED. FED belongs to partition {{PROBLEM-PARTITION}} in subsystem {{PROBLEM-SUBSYSTEM}}";
+        this.briefDescription = "FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}} generates deadtime {{DEADTIME}}";
     }
 
 }

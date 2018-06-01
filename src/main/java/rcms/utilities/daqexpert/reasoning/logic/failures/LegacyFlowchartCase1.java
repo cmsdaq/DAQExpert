@@ -38,6 +38,8 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 				+ "Problem FED belongs to TTCP {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "Original error message: {{ORIGERRMSG}}";
 
+		this.briefDescription = "Run blocked by out-of-sync data from FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-TTCP}}/{{PROBLEM-FED}}";
+
 		/* Default action */
 		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
 				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> & <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>>",

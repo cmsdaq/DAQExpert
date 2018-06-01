@@ -107,6 +107,7 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
         this.description = "FED {{FED}} has a deadtime {{DEADTIME}}, due to DAQ backpressure {{BACKPRESSURE}}. " +
                 "The threshold for deadtime is " + deadtimeThresholdInPercentage + "%, backpressure: " + backpressureThresholdInPercentage + "%";
+        this.briefDescription = "FED {{FED}} has a deadtime {{DEADTIME}}, due to DAQ backpressure {{BACKPRESSURE}}.";
     }
 
 }

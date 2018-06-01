@@ -46,6 +46,8 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 		this.action = action;
 
+		this.briefDescription = "Level zero repeatably in FixingSoftError due to subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
+
 		this.pastOccurrences = new ArrayList<>();
 		this.previousResult = false;
 		this.previousState = "";
@@ -64,6 +66,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
 			this.description = "Level zero in FixingSoftError more than 3 times in past "
 					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
+
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

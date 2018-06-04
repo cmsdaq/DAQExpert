@@ -23,7 +23,7 @@ public class DominatingSelector {
     public Condition selectDominating(Collection<Condition> conditions) {
 
         if(conditions.size() == 0){
-            throw new ExpertException(ExpertExceptionCode.ExpertProblem,"Bad arguments for dominating selector, 0 conditions supplied");
+            return null;
         }
 
         // ignore conditions that has end date

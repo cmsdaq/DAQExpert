@@ -57,18 +57,6 @@ public class ConditionDashboard implements Observer {
         }
     }
 
-    public void compareWithCurrentlyDominating(Condition condition) {
-
-        if(dominatingCondition != null){
-            Set<Condition> conditions = new LinkedHashSet<>();
-            conditions.add(condition);
-            conditions.add(dominatingCondition);
-            Condition dominating = dominatingSelector.selectDominating(conditions);
-            this.dominatingCondition = dominating;
-        } else{
-            this.dominatingCondition = condition;
-        }
-    }
 
     public void update(Set<Condition> conditionsProduced, boolean updateCurrentlyDominating) {
 
@@ -79,7 +67,7 @@ public class ConditionDashboard implements Observer {
         Condition lastDominating = dominatingCondition;
 
         if (dominatingCondition != null) {
-            if (dominatingCondition.getEnd() != null) {
+            if (dominatingCondition.getEnd() != null && updateCurrentlyDominating) {
                 dominatingCondition = null;
             }
         }

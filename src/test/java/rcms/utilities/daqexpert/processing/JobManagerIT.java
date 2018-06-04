@@ -32,15 +32,13 @@ import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 public class JobManagerIT {
 
@@ -214,6 +212,31 @@ public class JobManagerIT {
 
         /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
         assertExpectedRecoveryRequest(34, expectedRecoveryRequests);
+
+    }
+
+    /**
+     * Test generated dominating entries
+     */
+    @Test
+    public void blackboxTest5() throws InterruptedException {
+
+        String startDateString = "2018-06-01T20:36:24.281Z";
+        String endDateString = "2018-06-01T20:38:19.152Z";
+
+        runForBlackboxTest(startDateString, endDateString);
+
+        conditionsYielded.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).map(c-> c.getTitle() + " " + c.getStart() + " " + c.getEnd()).forEach(System.out::println);
+
+
+        assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
+                hasProperty("title", equalTo("Rate out of range")),
+                hasProperty("group", equalTo(ConditionGroup.DOMINATING)),
+                hasProperty("start", notNullValue()),
+                hasProperty("end", notNullValue())
+        )));
+
+
     }
 
     private RecoveryRequest generateRecovery(int steps, String problemDescription){

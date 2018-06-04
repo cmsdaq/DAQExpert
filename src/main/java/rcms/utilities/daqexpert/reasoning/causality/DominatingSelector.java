@@ -35,7 +35,7 @@ public class DominatingSelector {
         if(filtered.size() == 1) {
             return filtered.iterator().next();
         } else if(filtered.size() == 0){
-            logger.info("No dominating has been selected (after filtering unfinished conditions nothing left)");
+            logger.debug("No dominating has been selected (after filtering unfinished conditions nothing left)");
             return null;
         }
 
@@ -45,7 +45,7 @@ public class DominatingSelector {
         if(subResult1.size() == 1) {
             return subResult1.iterator().next();
         } else if(subResult1.size() == 0){
-            logger.info("No dominating has been selected (after applying requirement graph nothing left)");
+            logger.debug("No dominating has been selected (after applying requirement graph nothing left)");
             return null;
         }
 
@@ -54,7 +54,7 @@ public class DominatingSelector {
         if(subResult2.size() == 1) {
             return subResult2.iterator().next();
         } else if(subResult2.size() == 0){
-            logger.info("No dominating has been selected (after applying causality graph nothing left)");
+            logger.debug("No dominating has been selected (after applying causality graph nothing left)");
             return null;
         }
 
@@ -70,7 +70,7 @@ public class DominatingSelector {
         if(subResult3.size() == 1) {
             return subResult3.iterator().next();
         } else if(subResult3.size() == 0){
-            logger.info("No dominating has been selected (after applying usefulness)");
+            logger.debug("No dominating has been selected (after applying usefulness)");
             return null;
         }
 
@@ -91,7 +91,7 @@ public class DominatingSelector {
         if(subResult4.size() == 1) {
             return subResult4.iterator().next();
         } else if(subResult4.size() == 0){
-            logger.info("No dominating has been selected (after soring based on start date nothing left)");
+            logger.debug("No dominating has been selected (after soring based on start date nothing left)");
             return null;
         }
 

@@ -23,9 +23,11 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  */
 public class FlowchartCase3 extends KnownFailure {
 
+	//TODO: include FED information
 	public FlowchartCase3() {
 		this.name = "Partition problem";
 		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers.";
+		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is {{DEADTIME}}";
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -46,8 +48,10 @@ public class FlowchartCase3 extends KnownFailure {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

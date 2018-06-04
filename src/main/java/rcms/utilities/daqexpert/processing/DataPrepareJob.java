@@ -7,8 +7,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.DataManager;
@@ -22,8 +24,10 @@ import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
@@ -31,7 +35,7 @@ import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 /**
  * This job manages reading and processing the snapshots
- *
+ * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
@@ -50,6 +54,8 @@ public class DataPrepareJob implements Runnable {
 	protected final EventSender eventSender;
 
 	private final ConditionDashboard conditionDashboard;
+
+	private final DominatingPersistor dominatingPersistor;
 
 	/** List of conditions that has been started - kept in order to generate finish signals for controller */
 	private final List<Long> recoveryConditionIds = new ArrayList<>();
@@ -76,6 +82,7 @@ public class DataPrepareJob implements Runnable {
 		this.eventSender = eventSender;
 		this.conditionDashboard = conditionDashboard;
 		this.demoRun = demoRun;
+		this.dominatingPersistor = new DominatingPersistor(persistenceManager);
 		this.recoveryJobManager = recoveryJobManager;
 	}
 
@@ -95,6 +102,8 @@ public class DataPrepareJob implements Runnable {
 
 				if (snapshots.getRight().size() > 0) {
 					waiting = false;
+
+					logger.debug("Processing " + snapshots.getRight().size() + " this round");
 
 					if (priority == Integer.MAX_VALUE)
 						priority = 0;
@@ -126,11 +135,21 @@ public class DataPrepareJob implements Runnable {
 								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
-						conditionDashboard.update(result.getLeft());
+
+						Condition lastDominating = conditionDashboard.getCurrentCondition();
+						conditionDashboard.update(result.getLeft(),true);
+						Condition currentlyDominating = conditionDashboard.getCurrentCondition();
+
+
+						if(currentlyDominating != lastDominating){
+							Date currentSnapshotTime = new Date(((ForwardReaderJob)readerJob).getLast());
+							dominatingPersistor.persistDominating(lastDominating, currentlyDominating, currentSnapshotTime);
+						}
+
 
 						if (demoRun && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {
-							//Thread.sleep(2000);
+							Thread.sleep(2000);
 							id = conditionDashboard.getCurrentCondition().getId();
 						}
 

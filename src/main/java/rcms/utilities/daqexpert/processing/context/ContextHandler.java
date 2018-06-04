@@ -37,7 +37,7 @@ public class ContextHandler {
     public ContextHandler(ContextNotifier contextNotifier) {
         this.contextNotifier = contextNotifier;
         this.context = new Context();
-        this.context.setContextEntryMap(new HashMap<>());
+        this.context.setContextEntryMap(new LinkedHashMap<>());
         this.actionKey = new HashSet<>();
         this.highlightMarkup = true;
     }
@@ -189,6 +189,10 @@ public class ContextHandler {
     }
 
 
+    public String putContext(String text){
+        return putContext(text, context.getContextEntryMap(), contextNotifier);
+
+    }
     /**
      * Put collected contextHandler into given text. All variables {{VARIABLE_NAME}} will be replaced with value if
      * exists in contextHandler
@@ -196,17 +200,23 @@ public class ContextHandler {
      * @param text text where contextHandler will be inserted
      * @return text with contextHandler inserted
      */
-    public String putContext(String text) {
+    public static String putContext(String text, Map<String, ContextEntry> contextEntryMap, ContextNotifier contextNotifier) {
 
         String replacementForRequired = "?";
         String replacementForOptional = "";
 
-        logger.debug("Putting contextHandler into message, current changeset: " + context.getContextEntryMap().keySet());
+        logger.debug("Putting contextHandler into message, current changeset: " + contextEntryMap.keySet());
 
-        for (Map.Entry<String, ContextEntry> contextEntryElement : context.getContextEntryMap().entrySet()) {
+        for (Map.Entry<String, ContextEntry> contextEntryElement : contextEntryMap.entrySet()) {
             String key = contextEntryElement.getKey();
             ContextEntry contextEntry = contextEntryElement.getValue();
-            boolean updated = contextNotifier.isChanged(key);
+
+
+
+            boolean updated = false;
+            if(contextNotifier != null && contextNotifier.isChanged(key)){
+                updated = contextNotifier.isChanged(key);
+            }
 
 
             String replacement = contextEntry.getTextRepresentation();

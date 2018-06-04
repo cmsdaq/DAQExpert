@@ -29,6 +29,8 @@ public class NoRate extends SimpleLogicModule implements Parameterizable {
 		this.name = "No rate";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Rate value is 0";
+		this.briefDescription = "Trigger rate is 0 Hz";
+		this.problematic = false;
 	}
 
 	/**

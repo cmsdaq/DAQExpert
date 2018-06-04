@@ -10,6 +10,7 @@ import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.processing.context.ContextNotifier;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
@@ -44,6 +45,11 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
     @JsonIgnore
     @Transient
     private boolean holdNotifications;
+
+    /** Is problematic condition */
+    @JsonIgnore
+    @Transient
+    private boolean problematic;
 
     private boolean mature;
 
@@ -336,6 +342,22 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
         if (hasChanged()) {
 
             notifyObservers();
+        }
+    }
+
+    public boolean isProblematic() {
+        return problematic;
+    }
+
+    public void setProblematic(boolean problematic) {
+        this.problematic = problematic;
+    }
+
+    public LogicModule getProducer(){
+        if(logicModule != null) {
+            return logicModule.getLogicModule();
+        } else {
+            return null;
         }
     }
 }

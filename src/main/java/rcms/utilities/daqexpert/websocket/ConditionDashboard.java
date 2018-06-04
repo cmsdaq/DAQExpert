@@ -5,171 +5,183 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
-
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
+
+import java.util.*;
 
 /**
+ * Condition Dashboard represents the current state of Dashboard view of DAQExpert. It holds recent conditions and
+ * notifications and marks currently dominating condition in order to facilitate if for operator.
  *
+ * <p>
  * Logical Condition dashboard
+ * <p>
  *
- * ConditionWebSocketServer.sessionHandler.addCondition(condition);
- * ConditionWebSocketServer.sessionHandler.removeCurrent();
+ * ConditionWebSocketServer.sessionHandler.addCondition(condition); ConditionWebSocketServer.sessionHandler.removeCurrent();
  * ConditionWebSocketServer.sessionHandler.updateCurrent(currentCondition);
  *
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
- *
  */
-public class ConditionDashboard implements Observer{
+public class ConditionDashboard implements Observer {
 
-	private final static Logger logger = Logger.getLogger(ConditionDashboard.class);
+    private final static Logger logger = Logger.getLogger(ConditionDashboard.class);
 
-	/**
-	 * Current condition
-	 */
-	private Condition dominatingCondition;
+    /** Maximum number of recent conditions displayed in the dashboard. */
+    private final int maximumNumberOfConditionsHandled;
 
-	private HashMap<Long, Condition> conditions = new LinkedHashMap<>();
+    /** Current dominating condition, choosen with the common dominating-selection mechanism */
+    private Condition dominatingCondition;
 
-	private ConditionSessionHandler sessionHander;
+    /** Map of recent conditions. Limited to @ConditionDashboard. */
+    private HashMap<Long, Condition> conditions = new LinkedHashMap<>();
 
-	private final int maximumNumberOfConditionsHandled;
+    /** Client session handler*/
+    private ConditionSessionHandler sessionHander;
 
-	public ConditionDashboard(int max) {
-		this.maximumNumberOfConditionsHandled = max;
-	}
-
-	private void handleUpdate(Condition condition) {
-		if (sessionHander != null) {
-			sessionHander.handleConditionUpdate(condition);
-		}
-	}
-
-	public void compareWithCurrentlyDominating(Condition condition){
-		this.dominatingCondition =DominatingConditionSelector.findDominating(dominatingCondition,condition);
-	}
-
-	public void update(Collection<Condition> conditionsProduced) {
-
-		conditionsProduced = conditionsProduced.stream().filter(c->c.isShow() && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
-
-		Set<Condition> addedThisRound = new HashSet<>();
-		Condition lastDominating = dominatingCondition;
-
-		if (dominatingCondition != null) {
-			if(dominatingCondition.getEnd() != null){
-				dominatingCondition = null;
-			}
-		}
-
-		/* Handle observation */
-		for (Condition condition : conditionsProduced) {
-			if(condition.getEnd() == null){
-				condition.addObserver(this);
-			}else{
-				logger.trace("Observers before: " + condition.countObservers());
-				condition.deleteObserver(this);
-				logger.trace("Observers after: " + condition.countObservers());
-			}
-		}
+    private DominatingSelector dominatingSelector;
 
 
-		for (Condition condition : conditionsProduced) {
-			if (condition.isMature() && condition.getLogicModule().getLogicModule() instanceof ContextLogicModule) {
+    public ConditionDashboard(int max) {
+        this.maximumNumberOfConditionsHandled = max;
+        this.dominatingSelector = new DominatingSelector();
+    }
+
+    private void handleUpdate(Condition condition) {
+        if (sessionHander != null) {
+            sessionHander.handleConditionUpdate(condition);
+        }
+    }
 
 
-				compareWithCurrentlyDominating(condition);
+    public void update(Set<Condition> conditionsProduced, boolean updateCurrentlyDominating) {
 
-				if (!conditions.containsKey(condition.getId())) {
-					if (conditions.size() >= maximumNumberOfConditionsHandled) {
+        conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
-						logger.debug("Need to remove recent conditions: " + conditions.size() + ", " + conditions.keySet());
-						Condition oldest = conditions.values().iterator().next();
-						conditions.remove(oldest.getId());
-						logger.debug("Removing condition " + oldest.getId());
-					}
-					conditions.put(condition.getId(), condition);
-					addedThisRound.add(condition);
 
-				}
-			}
-		}
+        Set<Condition> addedThisRound = new HashSet<>();
+        Condition lastDominating = dominatingCondition;
 
-		for(Condition condition: conditions.values()){
-			if(condition.getEnd() == null) {
-				compareWithCurrentlyDominating(condition);
-			}
-		}
+        if (dominatingCondition != null) {
+            if (dominatingCondition.getEnd() != null && updateCurrentlyDominating) {
+                dominatingCondition = null;
+            }
+        }
 
-		if (sessionHander != null) {
-			if (lastDominating != this.dominatingCondition) {
-				// this fires also whe dominating is null - signal to the dashboard that 'all is ok' and no problem at the moment
-				sessionHander.handleDominatingConditionChange(this.dominatingCondition);
-			}
-			if (addedThisRound.size() > 0) {
-				sessionHander.handleRecentConditionsChange(addedThisRound);
-			}
-		}
-	}
+        /* Handle observation */
+        for (Condition condition : conditionsProduced) {
+            if(condition.getEnd() == null){
+                condition.addObserver(this);
+            }else{
+                logger.trace("Observers before: " + condition.countObservers());
+                condition.deleteObserver(this);
+                logger.trace("Observers after: " + condition.countObservers());
+            }
+        }
 
-	public Condition getCurrentCondition() {
-		return dominatingCondition;
-	}
+        for (Condition condition : conditionsProduced) {
+            if (condition.isMature()) {
 
-	protected Collection<Condition> getCurrentConditions() {
-		return conditions.values();
-	}
+                //compareWithCurrentlyDominating(condition);
 
-	/**
-	 * Get condition list without dominating condition
-	 *
-	 * @return
-	 */
-	public Collection<Condition> getConditionsWithoutDominatingCondition() {
-		List<Condition> result = new ArrayList<>();
-		Iterator<Condition> i = conditions.values().iterator();
+                if (!conditions.containsKey(condition.getId())) {
+                    if (conditions.size() >= maximumNumberOfConditionsHandled) {
+                        Iterator<Condition> it = conditions.values().iterator();
+                        Condition oldest = it.next();
 
-		while (i.hasNext()) {
-			Condition curr = i.next();
-			if (dominatingCondition == null) {
-				result.add(curr);
-			} else if (dominatingCondition.getId() != curr.getId()) {
-				result.add(curr);
-			}
-		}
-		return result;
+                        // dont remove dominating condition from this list, even though it's old, get next one
+                        if(oldest == dominatingCondition) {
+                            oldest = it.next();
+                        }
+                        conditions.remove(oldest.getId());
+                    }
+                    conditions.put(condition.getId(), condition);
+                    addedThisRound.add(condition);
+                }
+            }
+        }
+        Condition dominating = dominatingSelector.selectDominating(conditions.values());
 
-	}
 
-	public ConditionSessionHandler getSessionHander() {
-		return sessionHander;
-	}
+        if(updateCurrentlyDominating) {
+            this.dominatingCondition = dominating;
+        }
 
-	public void setSessionHander(ConditionSessionHandler sessionHander) {
-		this.sessionHander = sessionHander;
-	}
 
-	@Override
-	public String toString() {
+        if (sessionHander != null) {
+            if (lastDominating != this.dominatingCondition) {
+                // this fires also whe dominating is null - signal to the dashboard that 'all is ok' and no problem at the moment
+                sessionHander.handleDominatingConditionChange(this.dominatingCondition);
+            }
+            if (addedThisRound.size() > 0) {
+                sessionHander.handleRecentConditionsChange(addedThisRound);
+            }
+        }
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("ConditionDashboard [currentCondition="
-				+ (dominatingCondition != null ? dominatingCondition.getId() : "<none>") + ", recentConditions=[");
-		logger.trace("recent size: " + conditions.size());
-		for (Condition condition : conditions.values()) {
-			sb.append(condition.getId());
-			sb.append(",");
-		}
-		logger.trace("filtered size: " + getConditionsWithoutDominatingCondition().size());
-		sb.append("], filteredConditions=[");
-		for (Condition condition : getConditionsWithoutDominatingCondition()) {
-			sb.append(condition.getId());
-			sb.append(",");
-		}
-		sb.append("]");
-		return sb.toString();
-	}
+        //return dominating;
+    }
+
+    public Condition getCurrentCondition() {
+        return dominatingCondition;
+    }
+
+    protected Collection<Condition> getCurrentConditions() {
+        return conditions.values();
+    }
+
+    /**
+     * Get condition list without dominating condition
+     *
+     * @return
+     */
+    public Collection<Condition> getConditionsWithoutDominatingCondition() {
+        List<Condition> result = new ArrayList<>();
+        Iterator<Condition> i = conditions.values().iterator();
+
+        while (i.hasNext()) {
+            Condition curr = i.next();
+            if (dominatingCondition == null) {
+                result.add(curr);
+            } else if (dominatingCondition.getId() != curr.getId()) {
+                result.add(curr);
+            }
+        }
+        return result;
+
+    }
+
+    public ConditionSessionHandler getSessionHander() {
+        return sessionHander;
+    }
+
+    public void setSessionHander(ConditionSessionHandler sessionHander) {
+        this.sessionHander = sessionHander;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("ConditionDashboard [currentCondition="
+                + (dominatingCondition != null ? dominatingCondition.getId() : "<none>") + ", recentConditions=[");
+        logger.trace("recent size: " + conditions.size());
+        for (Condition condition : conditions.values()) {
+            sb.append(condition.getId());
+            sb.append(",");
+        }
+        logger.trace("filtered size: " + getConditionsWithoutDominatingCondition().size());
+        sb.append("], filteredConditions=[");
+        for (Condition condition : getConditionsWithoutDominatingCondition()) {
+            sb.append(condition.getId());
+            sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -179,7 +191,7 @@ public class ConditionDashboard implements Observer{
 
 
 			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
-				update(Sets.newHashSet(condition));
+				update(Sets.newHashSet(condition), false);
 			}
 
 			handleUpdate(condition);

@@ -19,12 +19,14 @@ public class OnlyFedStoppedSendingData extends BackpressureAnalyzer {
 		this.description = "The only FED {{PROBLEM-FED}} in RU {{PROBLEM-RU}} stopped sending data. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
+		this.briefDescription = "FED {{PROBLEM-FED}} stopped sending data.";
+
 		this.action = null;
 
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

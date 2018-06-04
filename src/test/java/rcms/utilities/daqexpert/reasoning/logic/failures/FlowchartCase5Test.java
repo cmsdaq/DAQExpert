@@ -72,6 +72,24 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(0, recoveryRequest.getRecoverySteps().size());
 	}
 
+	@Test
+	public void multipleFedsProblemTest() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1527446460841.json.gz");
+
+		assertSatisfiedLogicModules(snapshot, fc5, fc3);
+
+
+		ContextHandler context = fc5.getContextHandler();
+		assertEquals(new HashSet(Arrays.asList("GEM", "TRG")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("GEMPILOT1", "MUTF")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(1467, 1380, 1381)), context.getContext().get("FED"));
+
+		ContextHandler.highlightMarkup = false;
+		assertEquals("TTCP [GEMPILOT1, MUTF] of [GEM, TRG] subsystem is blocking triggers, it's in BUSY TTS state, The problem is caused by FED [1380-1381, 1467] in BUSY", fc5.getDescriptionWithContext());
+
+
+	}
+
 	/*
 	 * http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-22-04:01:25
 	 * 

@@ -221,6 +221,7 @@ public class ConditionProducer {
         Condition condition = new Condition();
         condition.setLogicModule(logicModule.getLogicModuleRegistry());
         condition.setHoldNotifications(logicModule.isHoldNotifications());
+        condition.setProblematic(logicModule.isProblematic());
         condition.setClassName(eventClass);
         condition.setTitle(content);
         condition.setShow(value);

@@ -21,13 +21,15 @@ public class LinkProblem extends BackpressureAnalyzer {
 				+ "FED belongs to TTCP {{AFFECTED-TTCP}} in {{AFFECTED-SUBSYSTEM}} subsystem. "
 				+ "FED is in {{AFFECTED-TTCP-STATE}} and stopped sending data.";
 
+		this.briefDescription = "Link problem detected on RU {{AFFECTED-RU}}";
 		this.action = null;
 
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	@Override

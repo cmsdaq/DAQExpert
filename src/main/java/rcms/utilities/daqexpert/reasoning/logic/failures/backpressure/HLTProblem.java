@@ -22,6 +22,8 @@ public class HLTProblem extends BackpressureAnalyzer {
 				"(this means that CMSSW crashed already 5 times). "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
+		this.briefDescription = "HLT Problem detected";
+
 		this.action = new SimpleAction("Call the HLT DOC and tell him/her that HLT processes crash. " +
 				"This is most likely a problem in the L1 or HLT menu. " +
 				"Another cause could be that the Frontier/DB service failed. ",
@@ -30,8 +32,10 @@ public class HLTProblem extends BackpressureAnalyzer {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.BackpressureFromHlt);
+		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
 
 	@Override

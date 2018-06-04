@@ -163,6 +163,12 @@ var groupsList = [ {
 	title : 'Experimental LM',
 	primary : false
 }, {
+    id : 'dominating',
+    content : 'Dom. (0)',
+    name : 'Dom.',
+    title : 'Dominating LM selection',
+    primary : false
+},{
     id : 'rec',
     content : 'Rec. (0)',
     name : 'Rec.',
@@ -174,7 +180,7 @@ var groupsList = [ {
 	name : 'Ver.',
 	title : 'Software version',
 	primary : true
-}];
+} ];
 
 var options = {
 	editable : false,
@@ -393,8 +399,6 @@ function getDatap(parameters) {
 		console.log("errorThrown " + errorThrown);
 		console.log("incoming Text " + jqXHR.responseText);
 	});
-
-
 }
 
 /** Load new data on event */
@@ -465,7 +469,7 @@ function load(data, fakeEnd) {
 		var groupName = value['group'];
 		var currCount = 0;
 
-        // for (prop in timeline) {
+		// for (prop in timeline) {
 		// console.log("groups: " + prop);
 		// }
 

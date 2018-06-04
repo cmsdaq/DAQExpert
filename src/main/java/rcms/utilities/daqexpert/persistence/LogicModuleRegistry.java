@@ -139,7 +139,7 @@ public enum LogicModuleRegistry {
         for (LogicModuleRegistry logicModuleRegistry : LogicModuleRegistry.values()) {
             if (logicModuleRegistry.getLogicModule() != null) {
                 logicModuleRegistry.getLogicModule().setLogicModuleRegistry(logicModuleRegistry);
-                logicModuleRegistry.getLogicModule().declareRequired();
+                logicModuleRegistry.getLogicModule().declareRelations();
                 toOrder.add(logicModuleRegistry.getLogicModule());
             }
         }

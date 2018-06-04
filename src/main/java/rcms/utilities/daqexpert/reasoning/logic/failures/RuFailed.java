@@ -23,6 +23,7 @@ public class RuFailed extends KnownFailure {
 		this.description = "{{NUMFAILEDRUS}} RUs ({{RU}}) are in failed state for an unidentified reason. "
 						+ "The most often occurring (({{MOSTFREQUENTERRORCOUNT}} times) error message is: {{MOSTFREQUENTERROR}}"
 				;
+		this.briefDescription = "{{NUMFAILEDRUS}} RUs ({{RU}}) are in failed state";
 
 		this.action = new SimpleAction(
 				"Try to recover: Stop the run. Red & green recycle the DAQ. Start a new Run. (Try up to 2 times)",
@@ -31,8 +32,9 @@ public class RuFailed extends KnownFailure {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+
 	}
 
 	private final String ERROR_STATE = "ERROR";

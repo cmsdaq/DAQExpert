@@ -60,7 +60,7 @@ public class ForwardReaderJob implements ReaderJob {
 			logger.debug("Exploring with " + last);
 			if (limit == null) {
 				logger.debug("Exploring without upper limit");
-				entry = persistenceExplorer.explore(last, sourceDirectory);
+				entry = persistenceExplorer.explore(last, Long.MAX_VALUE, sourceDirectory, batchSnapshotRead);
 			} else {
 				logger.debug("Exploring with upper limit of " + new Date(limit));
 				entry = persistenceExplorer.explore(last, limit, sourceDirectory, batchSnapshotRead);
@@ -87,6 +87,10 @@ public class ForwardReaderJob implements ReaderJob {
 	@Override
 	public boolean finished() {
 		return finished;
+	}
+
+	public Long getLast(){
+		return last;
 	}
 
 }

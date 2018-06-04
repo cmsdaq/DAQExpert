@@ -18,13 +18,14 @@ public class ProblemWithPi extends DisconnectedAnalyzer {
 	public ProblemWithPi() {
 		this.name = "PI problem";
 		this.description = "PI problem: PI of {{PROBLEM-PARTITION}} partition in {{PROBLEM-SUBSYSTEM}} subsystem is seen as disconnected but the FMM input to the PI is not disconnected. This seems to be a problem with the PI";
+		this.briefDescription = "PI of {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is seen as disconnected but the FMM input to the PI is not disconnected.";
 		this.action = new SimpleAction("Stop the run,", "R&G recycle the subystem {{PROBLEM-SUBSYSTEM}}", "Start a new run",
 				"If this doesn't help call the DAQ on-call");
 
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 	}
 

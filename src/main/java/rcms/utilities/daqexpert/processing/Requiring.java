@@ -5,6 +5,5 @@ import java.util.Set;
 public interface Requiring {
 
     Set<Requiring> getRequired();
-
-    default void declareRequired() {return;}
 }
+

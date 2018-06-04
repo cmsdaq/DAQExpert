@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
@@ -26,9 +27,17 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
         this.threshold = 0;
 
         this.description = "failed to set description";
+        this.briefDescription = "The TCDS trigger input rate is very high: {{TCDS_TRIGGER_INPUT_RATE}}";
         this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger (noisy towers, failed links)",
                 "Make an e-log entry"
         );
+    }
+
+    @Override
+    public void declareRelations(){
+        declareAffected(LogicModuleRegistry.HltOutputBandwidthTooHigh);
+        declareAffected(LogicModuleRegistry.HltOutputBandwidthExtreme);
+        declareAffected(LogicModuleRegistry.RateTooHigh);
     }
 
     @Override

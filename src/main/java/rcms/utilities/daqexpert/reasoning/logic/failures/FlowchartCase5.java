@@ -27,15 +27,15 @@ public class FlowchartCase5 extends KnownFailure {
 
 	public FlowchartCase5() {
 		this.name = "FED stuck";
-		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is blocking triggers, it's in {{TTCPSTATE}} TTS state, "
-				+ "The problem is caused by FED {{FED}} in {{FEDSTATE}}";
+		this.description = "TTCP {{PROBLEM-PARTITION}} of {{PROBLEM-SUBSYSTEM}} subsystem is blocking triggers, it's in {{TTCPSTATE}} TTS state, "
+				+ "The problem is caused by FED {{PROBLEM-FED}} in {{FEDSTATE}}";
 		this.briefDescription = "{{SUBSYSTEM}}/{{TTCP}}/{{FED}} is stuck in TTS state {{TTCPSTATE}}";
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{SUBSYSTEM}}>> and <<GreenRecycle::{{SUBSYSTEM}}>> (try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{SUBSYSTEM}} to inform",
-				"Problem not fixed: Call the DOC for the subsystem {{SUBSYSTEM}}");
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
+				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{PROBLEM-SUBSYSTEM}} to inform",
+				"Problem not fixed: Call the DOC for the subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>> (try up to 2 times)",
@@ -97,7 +97,7 @@ public class FlowchartCase5 extends KnownFailure {
 										for (FED dep : fed.getValue()) {
 											if (dep.getPercentBackpressure() == 0F) {
 												result = true;
-												contextHandler.register("FED",
+												contextHandler.register("PROBLEM-FED",
 														"(" + dep.getSrcIdExpected() + " behind pseudo FED "
 																+ fed.getKey().getSrcIdExpected() + ")");
 												contextHandler.register("FEDSTATE",
@@ -113,7 +113,7 @@ public class FlowchartCase5 extends KnownFailure {
 									else {
 										if (fed.getKey().getPercentBackpressure() == 0F) {
 											result = true;
-											contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+											contextHandler.register("PROBLEM-FED", fed.getKey().getSrcIdExpected());
 											contextHandler.register("FEDSTATE", currentFedState.name());
 										} else {
 											existsAtLeaseOneFedBackpressured = true;
@@ -122,9 +122,9 @@ public class FlowchartCase5 extends KnownFailure {
 									}
 
 									if (result) {
-										contextHandler.register("TTCP", ttcp.getName());
+										contextHandler.register("PROBLEM-PARTITION", ttcp.getName());
 										contextHandler.register("TTCPSTATE", currentState.name());
-										contextHandler.register("SUBSYSTEM", subSystem.getName());
+										contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 
 										contextHandler.setActionKey(subSystem.getName());
 									}

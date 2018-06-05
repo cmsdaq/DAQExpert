@@ -134,7 +134,7 @@ public class JobManagerIT {
         expectedNotifications.add("Level Zero State: Running");
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
-        expectedConditionDescriptions.add("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) TRACKER 4 time(s)");
+        expectedConditionDescriptions.add("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [TRACKER 4 time(s)]");
         expectedConditionDescriptions.add("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers.");
 
         runForBlackboxTest(startDateString, endDateString);
@@ -235,6 +235,34 @@ public class JobManagerIT {
                 hasProperty("start", notNullValue()),
                 hasProperty("end", notNullValue())
         )));
+
+
+    }
+
+    /**
+     * Test merging of conditions
+     *
+     * 2018-06-01T16:58:47.734Z&end=2018-06-01T17:02:47.734Z
+     */
+    @Test
+    public void blackboxTest6() throws InterruptedException {
+
+        String startDateString = "2018-06-01T16:58:47.734Z";
+        String endDateString = "2018-06-01T17:02:47.734Z";
+
+        runForBlackboxTest(startDateString, endDateString);
+
+        conditionsYielded.stream().filter(c->c.getGroup()== ConditionGroup.OTHER).map(c->c.getTitle() +": " + c.getDescription()).forEach(System.out::println);
+
+        assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
+                hasProperty("title", equalTo("Continuous fixing-soft-error")),
+                hasProperty("description", equalTo("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [TRACKER 10 time(s)]")),
+                hasProperty("group", equalTo(ConditionGroup.OTHER)),
+                hasProperty("start", notNullValue()),
+                hasProperty("end", notNullValue())
+        )));
+
+
 
 
     }

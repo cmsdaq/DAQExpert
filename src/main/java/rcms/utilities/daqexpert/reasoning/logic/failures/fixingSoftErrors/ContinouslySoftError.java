@@ -147,6 +147,8 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				currentResult = true;
 				lastFinish = new Date(daq.getLastUpdate());
 
+				List<String> subsystemWithCounts = new ArrayList<>();
+
 				for (Entry<String, Integer> count : coutsPerSubsystem.entrySet()) {
 					if (count.getValue() > occurrencesThreshold) {
 
@@ -156,14 +158,14 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 						contextHandler.register("SUBSYSTEM", problematicSubsystem);
 
-						// this is used for displaying information about the number
-						// of fixing soft error cycles
-						contextHandler.register("SUBSYSTEM_WITH_COUNTS",
-										problematicSubsystem + " " + count.getValue() + " time(s)");
-
+						subsystemWithCounts.add(problematicSubsystem + " " + count.getValue() + " time(s)");
 						contextHandler.setActionKey(problematicSubsystem);
 					}
 				}
+
+				// this is used for displaying information about the number
+				// of fixing soft error cycles
+				contextHandler.registerSingleValue("SUBSYSTEM_WITH_COUNTS", subsystemWithCounts.toString());
 			}
 
 		}

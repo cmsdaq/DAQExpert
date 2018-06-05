@@ -14,21 +14,13 @@ import java.util.regex.Pattern;
 public class ContextHandler {
 
     private final static Logger logger = Logger.getLogger(ContextHandler.class);
-
+    public static boolean highlightMarkup;
     private Context context;
-
     /**
      * Set of action keys that are used in case of conditional action.
      */
     private Set<String> actionKey;
-
     private ContextNotifier contextNotifier;
-
-    public void setHighlightMarkup(boolean highlightMarkup) {
-        this.highlightMarkup = highlightMarkup;
-    }
-
-    public static boolean highlightMarkup;
 
     public ContextHandler() {
         this(new ContextNotifier());
@@ -42,157 +34,6 @@ public class ContextHandler {
         this.highlightMarkup = true;
     }
 
-    public ContextEntry getContextEntry(String key) {
-        return context.getContextEntryMap().get(key);
-    }
-
-
-    /**
-     * Register object for given key.
-     *
-     * @param key      key for the object
-     * @param object   object, eg. FED, Subsystem etc.
-     * @param function function to generate textual representation from the object
-     */
-    public <T> void registerObject(String key, T object, Function<T, String> function) {
-        String s;
-        try {
-            s = function.apply(object);
-        } catch(NullPointerException e){
-            logger.warn("Could not get text representation fo object " + object + " given function " + function);
-            s = "unavailable";
-        }
-
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new ObjectContextEntry());
-        } else {
-            verifyNoContextMismatch(key, ObjectContextEntry.class);
-        }
-
-        ObjectContextEntry reusableContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
-
-        String oldValues = reusableContextEntry.getTextRepresentation();
-        reusableContextEntry.update(object, s);
-
-        if(verifyChanged(oldValues, reusableContextEntry.getTextRepresentation())) {
-            contextNotifier.registerChange(key);
-        }
-    }
-
-
-    public <T> void register(String key, T value) {
-
-        if(value == null){
-            logger.warn("Cannot register null value, trying to register the key: " + key);
-            return;
-        }
-
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new ObjectContextEntry());
-        } else {
-            verifyNoContextMismatch(key, ObjectContextEntry.class);
-        }
-
-        ObjectContextEntry simpleContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
-
-        String stringRepresentation = value.toString();
-        if(stringRepresentation.length() > 255){
-            String oldValue = stringRepresentation;
-            stringRepresentation = stringRepresentation.substring(0,252) + "...";
-            logger.warn("Trimming context value from: " + oldValue + " to " + stringRepresentation);
-        }
-
-        String oldValue = simpleContextEntry.getTextRepresentation();
-        simpleContextEntry.update(value, stringRepresentation);
-
-        if(verifyChanged(oldValue, stringRepresentation)) {
-            contextNotifier.registerChange(key);
-        }
-    }
-
-
-    public boolean verifyChanged(String oldValues, String newValues){
-
-        if(oldValues == null) {
-            return true;
-        } else if(oldValues.equalsIgnoreCase(newValues)){
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Register new statistical value for given key.
-     *
-     * @param key       key for the value
-     * @param value     current value
-     * @param unit      unit of the value
-     * @param precision desired presentation precision (note that the precision doesn't influence statistics, only final
-     *                  textual representation of the contextHandler)
-     * @return true if change is significant
-     */
-    public boolean registerForStatistics(String key, Number value, String unit, int precision) {
-
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new StatisticContextEntry(unit, precision));
-        } else {
-            verifyNoContextMismatch(key, StatisticContextEntry.class);
-        }
-
-        StatisticContextEntry statisticContextEntry = (StatisticContextEntry) context.getContextEntryMap().get(key);
-
-        String oldValues = statisticContextEntry.getTextRepresentation();
-
-        statisticContextEntry.update(value.floatValue());
-
-        if(verifyChanged(oldValues, statisticContextEntry.getTextRepresentation())) {
-            contextNotifier.registerChange(key);
-        }
-
-
-        // TODO handle significant changes
-        boolean isChangeSignificant = statisticContextEntry.isReport();
-        return isChangeSignificant;
-    }
-
-    public boolean registerForStatistics(String key, Number value) {
-        return registerForStatistics(key, value, "", 1);
-    }
-
-    /**
-     * Register additional note.
-     *
-     * @param key   key for the additional note
-     * @param value current aditional note
-     */
-    public void registerConditionalNote(String key, String value) {
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new OptionalContextEntry());
-        } else {
-            verifyNoContextMismatch(key, OptionalContextEntry.class);
-        }
-
-
-        OptionalContextEntry optionalContextEntry = (OptionalContextEntry) context.getContextEntryMap().get(key);
-
-        String oldValue = optionalContextEntry.getTextRepresentation();
-        optionalContextEntry.setValue(value);
-
-        if(verifyChanged(oldValue, optionalContextEntry.getTextRepresentation())) {
-            contextNotifier.registerChange(key);
-        }
-    }
-
-    public void unregisterConditionalNote(String key) {
-        registerConditionalNote(key, null);
-    }
-
-
-    public String putContext(String text){
-        return putContext(text, context.getContextEntryMap(), contextNotifier);
-
-    }
     /**
      * Put collected contextHandler into given text. All variables {{VARIABLE_NAME}} will be replaced with value if
      * exists in contextHandler
@@ -212,9 +53,8 @@ public class ContextHandler {
             ContextEntry contextEntry = contextEntryElement.getValue();
 
 
-
             boolean updated = false;
-            if(contextNotifier != null && contextNotifier.isChanged(key)){
+            if (contextNotifier != null && contextNotifier.isChanged(key)) {
                 updated = contextNotifier.isChanged(key);
             }
 
@@ -253,17 +93,210 @@ public class ContextHandler {
         return text;
     }
 
+    public void setHighlightMarkup(boolean highlightMarkup) {
+        this.highlightMarkup = highlightMarkup;
+    }
+
+    public ContextEntry getContextEntry(String key) {
+        return context.getContextEntryMap().get(key);
+    }
+
+    /**
+     * Register object for given key.
+     *
+     * @param key      key for the object
+     * @param object   object, eg. FED, Subsystem etc.
+     * @param function function to generate textual representation from the object
+     */
+    public <T> void registerObject(String key, T object, Function<T, String> function) {
+        String s;
+        try {
+            s = function.apply(object);
+        } catch (NullPointerException e) {
+            logger.warn("Could not get text representation fo object " + object + " given function " + function);
+            s = "unavailable";
+        }
+
+        if (!context.getContextEntryMap().containsKey(key)) {
+            context.getContextEntryMap().put(key, new ObjectContextEntry());
+        } else {
+            verifyNoContextMismatch(key, ObjectContextEntry.class);
+        }
+
+        ObjectContextEntry reusableContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
+
+        String oldValues = reusableContextEntry.getTextRepresentation();
+        reusableContextEntry.update(object, s);
+
+        if (verifyChanged(oldValues, reusableContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
+    }
+
+
+    public void resetKey(){
+
+    }
+
+    /**
+     * Register new object under certain key. This object will replace any value that was registered before.
+     *
+     * @param <T>
+     */
+    public <T> void registerSingleValue(String key, T value) {
+
+        register(key, value, true);
+
+    }
+
+    /**
+     * Register new object under certain key. Note that each method call will append the list of objects.
+     *
+     * @param key
+     * @param value
+     * @param <T>
+     */
+    public <T> void register(String key, T value) {
+        register(key, value, false);
+    }
+
+    /**
+     * Register new object under certain key. The objects will be collected as a list or stored as a single element
+     * depending on the value of the "replace" flag.
+     *
+     * @param key   key to identify the object group
+     * @param value object to register
+     * @param <T>   type of the object
+     */
+    public <T> void register(String key, T value, boolean replace) {
+
+        if (value == null) {
+            logger.warn("Cannot register null value, trying to register the key: " + key);
+            return;
+        }
+
+        if (!context.getContextEntryMap().containsKey(key)) {
+            context.getContextEntryMap().put(key, new ObjectContextEntry());
+        } else {
+            verifyNoContextMismatch(key, ObjectContextEntry.class);
+        }
+
+        ObjectContextEntry simpleContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
+        String oldValue = simpleContextEntry.getTextRepresentation();
+
+
+        if(replace) {
+            context.getContextEntryMap().put(key, new ObjectContextEntry());
+            simpleContextEntry = (ObjectContextEntry) context.getContextEntryMap().get(key);
+        }
+
+        String stringRepresentation = value.toString();
+        if (stringRepresentation.length() > 255) {
+            String orgValue = stringRepresentation;
+            stringRepresentation = stringRepresentation.substring(0, 252) + "...";
+            logger.warn("Trimming context value from: " + orgValue + " to " + stringRepresentation);
+        }
+
+        simpleContextEntry.update(value, stringRepresentation);
+
+        if (verifyChanged(oldValue, stringRepresentation)) {
+            contextNotifier.registerChange(key);
+        }
+    }
+
+    public boolean verifyChanged(String oldValues, String newValues) {
+
+        if (oldValues == null) {
+            return true;
+        } else if (oldValues.equalsIgnoreCase(newValues)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Register new statistical value for given key.
+     *
+     * @param key       key for the value
+     * @param value     current value
+     * @param unit      unit of the value
+     * @param precision desired presentation precision (note that the precision doesn't influence statistics, only final
+     *                  textual representation of the contextHandler)
+     * @return true if change is significant
+     */
+    public boolean registerForStatistics(String key, Number value, String unit, int precision) {
+
+        if (!context.getContextEntryMap().containsKey(key)) {
+            context.getContextEntryMap().put(key, new StatisticContextEntry(unit, precision));
+        } else {
+            verifyNoContextMismatch(key, StatisticContextEntry.class);
+        }
+
+        StatisticContextEntry statisticContextEntry = (StatisticContextEntry) context.getContextEntryMap().get(key);
+
+        String oldValues = statisticContextEntry.getTextRepresentation();
+
+        statisticContextEntry.update(value.floatValue());
+
+        if (verifyChanged(oldValues, statisticContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
+
+
+        // TODO handle significant changes
+        boolean isChangeSignificant = statisticContextEntry.isReport();
+        return isChangeSignificant;
+    }
+
+    public boolean registerForStatistics(String key, Number value) {
+        return registerForStatistics(key, value, "", 1);
+    }
+
+    /**
+     * Register additional note.
+     *
+     * @param key   key for the additional note
+     * @param value current aditional note
+     */
+    public void registerConditionalNote(String key, String value) {
+        if (!context.getContextEntryMap().containsKey(key)) {
+            context.getContextEntryMap().put(key, new OptionalContextEntry());
+        } else {
+            verifyNoContextMismatch(key, OptionalContextEntry.class);
+        }
+
+
+        OptionalContextEntry optionalContextEntry = (OptionalContextEntry) context.getContextEntryMap().get(key);
+
+        String oldValue = optionalContextEntry.getTextRepresentation();
+        optionalContextEntry.setValue(value);
+
+        if (verifyChanged(oldValue, optionalContextEntry.getTextRepresentation())) {
+            contextNotifier.registerChange(key);
+        }
+    }
+
+    public void unregisterConditionalNote(String key) {
+        registerConditionalNote(key, null);
+    }
+
+    public String putContext(String text) {
+        return putContext(text, context.getContextEntryMap(), contextNotifier);
+
+    }
+
     public String putAutomaticAction(String text) {
 
         Pattern pattern = Pattern.compile(".*\\<\\<.*\\>\\>.*");
         Matcher matcher = pattern.matcher(text);
 
-        if(matcher.matches()){
+        if (matcher.matches()) {
 
-            for(RecoveryJob job: RecoveryJob.values()){
+            for (RecoveryJob job : RecoveryJob.values()) {
                 text = text.replaceAll(job.name(), job.getReadable());
             }
-            text = text.replaceAll("<<","");
+            text = text.replaceAll("<<", "");
             text = text.replaceAll(">>", "");
             text = text.replaceAll("::", " of subsystem ");
 
@@ -271,7 +304,7 @@ public class ContextHandler {
         return text;
     }
 
-    public List<String> getRawAction(Action action){
+    public List<String> getRawAction(Action action) {
         List<String> actionSteps = null;
 
         if (action instanceof ConditionalAction) {
@@ -284,9 +317,10 @@ public class ContextHandler {
     }
 
 
-    public List<String> getActionWithContext(Action action ) {
+    public List<String> getActionWithContext(Action action) {
         return this.getActionWithContext(action, true);
     }
+
     public List<String> getActionWithContext(Action action, boolean replaceRecovery) {
 
         List<String> actionSteps = getRawAction(action);
@@ -299,13 +333,13 @@ public class ContextHandler {
 
             for (String step : actionSteps) {
                 String stepWithContext = putContext(step);
-                if(replaceRecovery) {
+                if (replaceRecovery) {
                     stepWithContext = putAutomaticAction(stepWithContext);
                 }
-                if(stepWithContext.length() > 255){
+                if (stepWithContext.length() > 255) {
                     String oldValue = stepWithContext;
-                    stepWithContext = stepWithContext.substring(0,252) + "...";
-                    logger.warn("Trimming action step " + oldValue + " to: " + stepWithContext );
+                    stepWithContext = stepWithContext.substring(0, 252) + "...";
+                    logger.warn("Trimming action step " + oldValue + " to: " + stepWithContext);
                 }
                 actionStepsWithContext.add(stepWithContext);
             }

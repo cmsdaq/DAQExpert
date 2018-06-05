@@ -67,9 +67,8 @@ public class ContinouslySoftErrorTest {
 
 		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM_WITH_COUNTS")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
-		Assert.assertEquals(2, problematicSubsystems.size());
-		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("B 4 time(s)")));
-		assertThat(problematicSubsystems, hasItem(Matchers.<String> is("C 4 time(s)")));
+		Assert.assertEquals(1, problematicSubsystems.size());
+		Assert.assertEquals("[B 4 time(s), C 4 time(s)]", problematicSubsystems.iterator().next().toString());
 	}
 
 	@Test
@@ -244,8 +243,13 @@ public class ContinouslySoftErrorTest {
 					Assert.assertEquals(1, messages.size());
 					Assert.assertTrue(messages.iterator().next().startsWith("CTPPS"));
 				}
+
+
+				System.out.println(lm.getDescriptionWithContext());
+				//Assert.assertEquals("",lm.getDescriptionWithContext());
 			}
 		}
+
 	}
 	
 	/** test to check that we get the expected message for CTPPS (including

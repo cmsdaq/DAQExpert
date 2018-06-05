@@ -35,6 +35,7 @@ import rcms.utilities.daqexpert.persistence.Point;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 import java.util.*;
@@ -216,6 +217,34 @@ public class JobManagerIT {
 
         /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
         assertExpectedRecoveryRequest(34, expectedRecoveryRequests);
+    }
+
+    /**
+     * Test merging of conditions
+     *
+     * 2018-06-01T16:58:47.734Z&end=2018-06-01T17:02:47.734Z
+     */
+    @Test
+    public void blackboxTest6() throws InterruptedException {
+
+        String startDateString = "2018-06-01T16:58:47.734Z";
+        String endDateString = "2018-06-01T17:02:47.734Z";
+
+        runForBlackboxTest(startDateString, endDateString);
+
+        conditionsYielded.stream().filter(c->c.getGroup()== ConditionGroup.OTHER).map(c->c.getTitle() +": " + c.getDescription()).forEach(System.out::println);
+
+        assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
+                hasProperty("title", equalTo("Continuous fixing-soft-error")),
+                hasProperty("description", equalTo("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [TRACKER 10 time(s)]")),
+                hasProperty("group", equalTo(ConditionGroup.OTHER)),
+                hasProperty("start", notNullValue()),
+                hasProperty("end", notNullValue())
+        )));
+
+
+
+
     }
 
     private RecoveryRequest generateRecovery(int steps, String problemDescription){

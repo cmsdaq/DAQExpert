@@ -230,7 +230,7 @@ public class JobManagerIT {
 
 
         assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
-                hasProperty("title", equalTo("Rate out of range")),
+                hasProperty("title", equalTo("Downtime")),
                 hasProperty("group", equalTo(ConditionGroup.DOMINATING)),
                 hasProperty("start", notNullValue()),
                 hasProperty("end", notNullValue())

@@ -31,6 +31,9 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.BeamActive);
+
+
+		declareAffected(LogicModuleRegistry.Deadtime);
 	}
 
 	/**

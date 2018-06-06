@@ -13,6 +13,7 @@ import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
 
 /**
@@ -56,9 +57,17 @@ public class FlowchartCase5 extends KnownFailure {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 
-		declareAffected(LogicModuleRegistry.TTSDeadtime);
-		declareAffected(LogicModuleRegistry.FlowchartCase3);
 		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
+
+		declareCause(LogicModuleRegistry.CorruptedData);
+		//? declareCause(LogicModuleRegistry.BugInFilterfarm); //TODO: can this be caused by
+		declareCause(LogicModuleRegistry.HLTProblem);
+		declareCause(LogicModuleRegistry.RuStuckWaiting);
+		declareCause(LogicModuleRegistry.RuStuck);
+		declareCause(LogicModuleRegistry.LinkProblem);
+		declareCause(LogicModuleRegistry.FlowchartCase1);
+		declareCause(LogicModuleRegistry.RuStuckWaitingOther);
+		declareCause(LogicModuleRegistry.OutOfSequenceData);
 	}
 
 	// add triggers info (behind or the same

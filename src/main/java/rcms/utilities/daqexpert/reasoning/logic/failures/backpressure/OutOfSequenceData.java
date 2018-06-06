@@ -60,7 +60,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
-		declareAffected(LogicModuleRegistry.FlowchartCase5);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

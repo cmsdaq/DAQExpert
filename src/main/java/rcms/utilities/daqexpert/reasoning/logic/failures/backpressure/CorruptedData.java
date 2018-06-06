@@ -46,9 +46,10 @@ public class CorruptedData extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+
 		declareAffected(LogicModuleRegistry.TTSDeadtime);
 		declareAffected(LogicModuleRegistry.RuFailed);
-		declareAffected(LogicModuleRegistry.FlowchartCase5);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

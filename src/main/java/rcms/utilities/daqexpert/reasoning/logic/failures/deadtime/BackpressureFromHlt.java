@@ -45,6 +45,7 @@ public class BackpressureFromHlt extends KnownFailure implements Parameterizable
         declareAffected(LogicModuleRegistry.TTSDeadtime);
         declareAffected(LogicModuleRegistry.BackpressureFromEventBuilding);
         declareAffected(LogicModuleRegistry.BackpressureFromFerol);
+        declareAffected(LogicModuleRegistry.TmpUpgradedFedProblem);
     }
 
     @Override

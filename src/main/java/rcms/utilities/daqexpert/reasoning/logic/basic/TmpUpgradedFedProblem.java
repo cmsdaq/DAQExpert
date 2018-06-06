@@ -34,6 +34,7 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     @Override
     public void declareRelations(){
         require(LogicModuleRegistry.TTSDeadtime);
+        declareAffected(LogicModuleRegistry.TTSDeadtime);
     }
 
     @Override

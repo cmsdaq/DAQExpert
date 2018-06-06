@@ -24,6 +24,7 @@ public class Downtime extends SimpleLogicModule {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRate);
 		require(LogicModuleRegistry.StableBeams);
+
 	}
 
 	/**

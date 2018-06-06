@@ -4,13 +4,13 @@ import java.util.Properties;
 
 public class FailFastParameterReader {
 
-    public static String getStringParameter(Properties properties, Setting setting, Class logicModuleClass) {
+    public static String getStringParameter(Properties properties, String key, Class logicModuleClass) {
 
         try {
-            String result = properties.getProperty(setting.getKey());
+            String result = properties.getProperty(key);
 
             if(result == null){
-                throw new ExpertException(ExpertExceptionCode.MissingProperty, "Missing property " + setting.getKey() + ", it's required by LM " + logicModuleClass.getSimpleName());
+                throw new ExpertException(ExpertExceptionCode.MissingProperty, "Missing property " + key + ", it's required by LM " + logicModuleClass.getSimpleName());
             }
             return result;
 
@@ -22,38 +22,51 @@ public class FailFastParameterReader {
     }
 
     public static Float getFloatParameter(Properties properties, Setting setting, Class logicModuleClass) {
+        return getFloatParameter(properties, setting.getKey(), logicModuleClass);
+    }
+
+    public static Float getFloatParameter(Properties properties, String key, Class logicModuleClass) {
         String value = null;
         try {
-            value = getStringParameter(properties, setting, logicModuleClass);
+            value = getStringParameter(properties, key, logicModuleClass);
             return Float.parseFloat(value);
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as float from property " + setting.getKey() + " number parsing problem: " + e.getMessage());
+                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as float from property " + key + " number parsing problem: " + e.getMessage());
         }
     }
 
+
     public static Integer getIntegerParameter(Properties properties, Setting setting, Class logicModuleClass) {
+        return getIntegerParameter(properties, setting.getKey(), logicModuleClass);
+    }
+
+    public static Integer getIntegerParameter(Properties properties, String key, Class logicModuleClass) {
         String value = null;
         try {
-            value = getStringParameter(properties, setting, logicModuleClass);
+            value = getStringParameter(properties, key, logicModuleClass);
             return Integer.parseInt(value);
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as int from property " + setting.getKey() + " number parsing problem: " + e.getMessage());
+                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as int from property " + key + " number parsing problem: " + e.getMessage());
         }
     }
 
     public static Boolean getBooleanParameter(Properties properties, Setting setting, Class logicModuleClass) {
+        return getBooleanParameter(properties, setting.getKey(), logicModuleClass);
+    }
+
+    public static Boolean getBooleanParameter(Properties properties, String key, Class logicModuleClass) {
         String value = null;
         try {
-            value = getStringParameter(properties, setting, logicModuleClass);
+            value = getStringParameter(properties, key, logicModuleClass);
             return Boolean.parseBoolean(value);
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as boolean from property " + setting.getKey() + " number parsing problem: " + e.getMessage());
+                    + logicModuleClass.getSimpleName() + ", failed to parse " + value + " as boolean from property " + key + " number parsing problem: " + e.getMessage());
         }
     }
 }

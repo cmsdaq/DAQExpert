@@ -55,7 +55,7 @@ public class LengthyFixingSoftErrorTest {
         Assert.assertTrue(lm.satisfied(daq,null));
 
         ContextHandler.highlightMarkup = false;
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class LengthyFixingSoftErrorTest {
         Assert.assertTrue(lm.satisfied(daq,null));
 
         ContextHandler.highlightMarkup = false;
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class LengthyFixingSoftErrorTest {
         Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
         ContextHandler.highlightMarkup = false;
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) ECAL",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) ECAL. The default threshold is 5 s. Note there are subsystem specific threshold(s): [tracker: 10 s]",lm.getDescriptionWithContext());
 
 
         daq.setLastUpdate(12001);
@@ -162,7 +162,7 @@ public class LengthyFixingSoftErrorTest {
 
         Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL", "Tracker")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) [ECAL, Tracker]",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) [ECAL, Tracker]. The default threshold is 5 s. Note there are subsystem specific threshold(s): [tracker: 10 s]",lm.getDescriptionWithContext());
     }
 
 }

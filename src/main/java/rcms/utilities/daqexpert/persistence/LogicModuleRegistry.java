@@ -41,7 +41,7 @@ public enum LogicModuleRegistry {
     Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
     CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, "", 105),
     FlowchartCase1(new LegacyFlowchartCase1(), ConditionGroup.FLOWCHART, "Legacy OutOfSequenceData", 10004),
-    FlowchartCase2(new LegacyFlowchartCase2(), ConditionGroup.FLOWCHART, "Legacy CorruptedData", 10005),
+    FlowchartCase2(null, ConditionGroup.FLOWCHART, "Legacy CorruptedData. Covered by other", 10005),
     FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
     FlowchartCase4(null, ConditionGroup.FLOWCHART, "Partition disconnected: extended to other LMs", 0),
     FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),

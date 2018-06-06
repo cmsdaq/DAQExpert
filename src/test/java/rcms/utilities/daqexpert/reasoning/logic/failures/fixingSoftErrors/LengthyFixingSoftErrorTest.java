@@ -9,9 +9,7 @@ import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -57,7 +55,7 @@ public class LengthyFixingSoftErrorTest {
         Assert.assertTrue(lm.satisfied(daq,null));
 
         ContextHandler.highlightMarkup = false;
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
     }
 
     @Test
@@ -88,20 +86,83 @@ public class LengthyFixingSoftErrorTest {
         daq.setLastUpdate(7000);
         Assert.assertFalse(lm.satisfied(daq,null));
 
-        /* Even though subsystem is going back to running it will be reported */
+        /* Subsystem going back to running will reset its counter - continuous errors will be caught by other LM */
         subsystem.setStatus("Running");
+        daq.setLastUpdate(8000);
+        Assert.assertFalse(lm.satisfied(daq,null));
+
+        subsystem.setStatus("FixingSoftError");
+        daq.setLastUpdate(9000);
+        Assert.assertFalse(lm.satisfied(daq,null));
+
+        daq.setLastUpdate(14000);
+        Assert.assertFalse(lm.satisfied(daq,null));
+
+        daq.setLastUpdate(14001);
+        Assert.assertTrue(lm.satisfied(daq,null));
+
+        ContextHandler.highlightMarkup = false;
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
+    }
+
+    @Test
+    public void subsystemSpecificThreshods() throws Exception {
+
+        KnownFailure lm = new LengthyFixingSoftError();
+
+        Properties props = new Properties();
+        props.setProperty(Setting.EXPERT_LOGIC_LENGHTYFIXINGSOFTERROR_THESHOLD_PERIOD.getKey(),"5000");
+        props.setProperty(Setting.EXPERT_LOGIC_LENGHTYFIXINGSOFTERROR_THESHOLD_PERIOD.getKey()+ ".tracker","10000");
+        DAQ daq = new DAQ();
+        List<SubSystem> subsystems = new ArrayList<>();
+
+        SubSystem subsystem = new SubSystem();
+        subsystem.setName("Tracker");
+        subsystems.add(subsystem);
+        subsystem.setStatus("Running");
+
+        SubSystem subsystem2 = new SubSystem();
+        subsystem2.setName("ECAL");
+        subsystems.add(subsystem2);
+        subsystem2.setStatus("Running");
+
+        daq.setSubSystems(subsystems);
+        daq.setLevelZeroState("Other");
+        ((Parameterizable)lm).parametrize(props);
+
+        daq.setLastUpdate(1000);
+        Assert.assertFalse(lm.satisfied(daq,null));
+
+        daq.setLevelZeroState("FixingSoftError");
+        subsystem.setStatus("FixingSoftError");
+        subsystem2.setStatus("FixingSoftError");
+        daq.setLastUpdate(2000);
+        Assert.assertFalse(lm.satisfied(daq,null));
+
+        daq.setLastUpdate(7000);
+        Assert.assertFalse(lm.satisfied(daq,null));
 
         daq.setLastUpdate(7001);
         Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
         daq.setLastUpdate(8000);
         Assert.assertTrue(lm.satisfied(daq,null));
 
-        daq.setLastUpdate(11000);
+        daq.setLastUpdate(12000);
         Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
         ContextHandler.highlightMarkup = false;
-        Assert.assertEquals("Level zero in FixingSoftError longer than 5 sec. This is caused by subsystem(s) TEST",lm.getDescriptionWithContext());
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) ECAL. The default threshold is 5 s. Note there are subsystem specific threshold(s): [tracker: 10 s]",lm.getDescriptionWithContext());
+
+
+        daq.setLastUpdate(12001);
+        Assert.assertTrue(lm.satisfied(daq,null));
+
+        Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL", "Tracker")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
+
+        Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) [ECAL, Tracker]. The default threshold is 5 s. Note there are subsystem specific threshold(s): [tracker: 10 s]",lm.getDescriptionWithContext());
     }
 
 }

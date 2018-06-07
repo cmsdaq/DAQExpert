@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
+import rcms.utilities.daqaggregator.data.FMM;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
@@ -34,6 +35,38 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     @Override
     public void declareRequired(){
         require(LogicModuleRegistry.TTSDeadtime);
+    }
+
+    private boolean isUpgraded(FED fed){
+
+        FMM fmm = null;
+        if(!fed.isFmmMasked()){
+            fmm = fed.getFmm();
+        }else  {
+            if(fed.getDependentFeds().size() ==1){
+                FED dep = fed.getDependentFeds().iterator().next();
+                if(!dep.isFmmMasked()){
+                    fmm = dep.getFmm();
+                }
+
+            }
+        }
+
+
+        if(fmm != null && fmm.getFmmType() != null) {
+
+            switch(fmm.getFmmType()){
+                case fmm:
+                    return false;
+                case pi:
+                case amc13:
+                    return true;
+                default:
+                    return false;
+            }
+        }else {
+            return false;
+        }
     }
 
     @Override
@@ -74,7 +107,7 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
                     ).collect(Collectors.toSet());
                 }
 
-                if (backpressure > threshold) {
+                if (backpressure > threshold && isUpgraded(topLevelFed)) {
                     result = true;
                     contextHandler.registerForStatistics("VALUE", backpressure, "%", 1);
                     if (problematicFedsBehindPseudoFed == null) {

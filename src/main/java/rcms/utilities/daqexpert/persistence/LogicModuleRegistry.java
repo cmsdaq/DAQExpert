@@ -29,7 +29,7 @@ public enum LogicModuleRegistry {
     ExpectedRate(new ExpectedRate(), ConditionGroup.EXPECTED_RATE, ""),
     Transition(null, ConditionGroup.TRANSITION, ""),
     LongTransition(new LongTransition(), ConditionGroup.HIDDEN, ""),
-    WarningInSubsystem(new WarningInSubsystem(), ConditionGroup.Warning, "", 1004),
+    WarningInSubsystem(null, ConditionGroup.Warning, "Covered by other", 1004),
     SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, "", 1006),
     SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, "", 1007),
     SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, "", 1005),
@@ -100,7 +100,7 @@ public enum LogicModuleRegistry {
 
 
     FedGeneratesDeadtime(new FedGeneratesDeadtime(), ConditionGroup.OTHER, "", 2001),
-    FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 2002),
+    FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 1050),
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER, "", 2012),
     TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER, "", 2012),
     HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),;

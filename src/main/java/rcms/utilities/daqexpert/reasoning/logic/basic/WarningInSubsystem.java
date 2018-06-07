@@ -10,6 +10,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
+@Deprecated
 public class WarningInSubsystem extends ContextLogicModule {
 
 	public WarningInSubsystem() {

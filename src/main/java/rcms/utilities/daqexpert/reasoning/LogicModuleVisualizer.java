@@ -37,6 +37,32 @@ public class LogicModuleVisualizer {
 
         Set<CausalityNode> r = getNextLevel(new HashSet<>(), nodes, 0);
 
+        boolean modify = true;
+
+        if(modify) {
+
+            CausalityNode max = r.stream().max((a1, a2) -> a1.getLevel() > a2.getLevel() ? 1 : -1).orElse(null);
+            System.out.println("max " + max.getLevel());
+
+
+            Set<CausalityNode> referenced = new HashSet<>();
+            for (CausalityNode causalityNode : r) {
+                if (causalityNode.getCausing().size() > 0) {
+                    for (CausalityNode referencedEntry : causalityNode.getCausing()) {
+                        referenced.add(referencedEntry);
+                    }
+                }
+            }
+
+            System.out.println("Referenced: " + referenced.stream().map(c -> c.getNodeName()).collect(Collectors.toSet()));
+            Set<CausalityNode> result = r.stream().filter(c -> c.getLevel() == 0 && !referenced.contains(c)).collect(Collectors.toSet());
+
+
+            result.stream().forEach(c -> c.setLevel(max.getLevel()));
+
+        }
+
+
 
         ObjectMapper om = new ObjectMapper();
         om.addMixIn(CausalityNode.class, LogicModuleVisualizer.CausalityNodeMixin.class);

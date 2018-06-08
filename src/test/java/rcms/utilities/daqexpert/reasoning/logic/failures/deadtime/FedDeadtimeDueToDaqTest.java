@@ -18,6 +18,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetr
 
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -48,17 +49,43 @@ public class FedDeadtimeDueToDaqTest {
         module.parametrize(config);
     }
 
+    private String printFed(FED fed){
+        return "" + fed.getSrcIdExpected() + "( dead=" +(fed.getPercentWarning() + fed.getPercentBusy())+ "%, bp="+fed.getPercentBackpressure()+"%)";
+    }
+
     @Test
     public void test01() throws URISyntaxException {
-        assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212900008.json.gz"), results));
+        DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212900008.json.gz");
+        //assertTrue(module.satisfied(snapshot, results));
+
+        TTCPartition pa = snapshot.getTtcPartitions().stream().filter(p -> "EB-".equalsIgnoreCase(p.getName())).findFirst().get();
+
+        System.out.println("Found partition: " + pa.getName());
+        Map<FED, Set<FED>> h = FEDHierarchyRetriever.getFEDHierarchy(pa);
+
+        for(Map.Entry<FED, Set<FED>> entry : h.entrySet()){
+            //if(entry.getKey().getSrcIdExpected() == 622 || entry.getValue().stream().filter(f->622 == f.getSrcIdExpected()).count() >0 ) {
+                System.out.println(printFed(entry.getKey()) + " --> " + entry.getValue().stream().map(f->printFed(f)).collect(Collectors.toList()));
+            //}
+        }
+
+
         logger.info(module.getDescriptionWithContext());
         assertEquals("FED <strong>622</strong> has a deadtime <strong>5.2%</strong>, due to DAQ backpressure <strong>5.2%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
     }
 
     @Test
     public void test03() throws URISyntaxException {
-        assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212240143.json.gz"), results));
+        DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212240143.json.gz");
+        assertTrue(module.satisfied(snapshot, results));
         logger.info(module.getDescriptionWithContext());
+
+        for(FED fed : snapshot.getFeds()){
+            if(fed.getSrcIdExpected() == 359){
+                System.out.println();
+            }
+        }
+
         assertEquals("FED <strong>359</strong> has a deadtime <strong>4.4%</strong>, due to DAQ backpressure <strong>4.4%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
 
     }

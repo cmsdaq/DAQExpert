@@ -44,7 +44,7 @@ public class FEDHierarchyRetriever {
 
 				String compactDependentList = "[";
 
-				if (fed.isHasTTS() && fed.isHasSLINK()) {
+				if (false && fed.isHasTTS() && fed.isHasSLINK()) {
 					// if FED has both SLINK and TTS than don't treat is
 					// as a dependent FED - that's the case for all ECAL
 					// FEDS

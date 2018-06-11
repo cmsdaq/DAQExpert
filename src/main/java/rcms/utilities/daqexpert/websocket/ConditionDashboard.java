@@ -43,12 +43,10 @@ public class ConditionDashboard implements Observer {
     /** Client session handler*/
     private ConditionSessionHandler sessionHander;
 
-    private DominatingSelector dominatingSelector;
 
 
     public ConditionDashboard(int max) {
         this.maximumNumberOfConditionsHandled = max;
-        this.dominatingSelector = new DominatingSelector();
     }
 
     private void handleUpdate(Condition condition) {
@@ -58,19 +56,13 @@ public class ConditionDashboard implements Observer {
     }
 
 
-    public void update(Set<Condition> conditionsProduced, boolean updateCurrentlyDominating) {
+    public void update(Set<Condition> conditionsProduced, Long dominatingId) {
+
 
         conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
-
         Set<Condition> addedThisRound = new HashSet<>();
-        Condition lastDominating = dominatingCondition;
 
-        if (dominatingCondition != null) {
-            if (dominatingCondition.getEnd() != null && updateCurrentlyDominating) {
-                dominatingCondition = null;
-            }
-        }
 
         /* Handle observation */
         for (Condition condition : conditionsProduced) {
@@ -94,7 +86,7 @@ public class ConditionDashboard implements Observer {
                         Condition oldest = it.next();
 
                         // dont remove dominating condition from this list, even though it's old, get next one
-                        if(oldest == dominatingCondition) {
+                        if(oldest.getId() == dominatingId) {
                             oldest = it.next();
                         }
                         conditions.remove(oldest.getId());
@@ -104,12 +96,16 @@ public class ConditionDashboard implements Observer {
                 }
             }
         }
-        Condition dominating = dominatingSelector.selectDominating(conditions.values());
 
 
-        if(updateCurrentlyDominating) {
-            this.dominatingCondition = dominating;
+        Condition lastDominating = dominatingCondition;
+        if(dominatingId != null) {
+            dominatingCondition = conditions.get(dominatingId);
+        }else{
+            dominatingCondition = null;
         }
+
+
 
 
         if (sessionHander != null) {
@@ -188,11 +184,6 @@ public class ConditionDashboard implements Observer {
 
 		if (o instanceof Condition) {
 			Condition condition = (Condition) o;
-
-
-			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
-				update(Sets.newHashSet(condition), false);
-			}
 
 			handleUpdate(condition);
 		}

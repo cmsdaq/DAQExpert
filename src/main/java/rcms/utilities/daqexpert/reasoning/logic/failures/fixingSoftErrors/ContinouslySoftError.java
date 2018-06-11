@@ -97,15 +97,11 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		String currentState = daq.getLevelZeroState();
 
 		// 1. clear too old occurrences
-		Iterator<Pair<Date, List<String>>> i = this.pastOccurrences.iterator();
 		Date repeatThreshold = new Date(daq.getLastUpdate() - thresholdPeriod);
 		Date mergeThreshold = new Date(daq.getLastUpdate() - mergePeriod);
-		while (i.hasNext()) {
-			Pair<Date, List<String>> entry = i.next();
-			if (entry.getLeft().before(repeatThreshold)) {
-				i.remove();
-			}
-		}
+
+		this.pastOccurrences.removeIf(e -> (e.getLeft().before(repeatThreshold))); // remove too old
+		this.pastOccurrences.removeIf(e -> (e.getLeft().after(new Date(daq.getLastUpdate())))); // remove future (IT test)
 
 		if (levelZeroProblematicState.equalsIgnoreCase(currentState)) {
 

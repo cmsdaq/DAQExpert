@@ -198,7 +198,7 @@ public class JobManagerIT {
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
-        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC-, CSC+] in subsystem CSC");
+        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC+, CSC-] in subsystem CSC");
         expectedConditionDescriptions.add("CSC/CSC+/847 is stuck in TTS state WARNING");
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
 
@@ -219,6 +219,7 @@ public class JobManagerIT {
      * Test generated dominating entries
      */
     @Test
+
     public void blackboxTest5() throws InterruptedException {
 
         String startDateString = "2018-06-01T20:36:24.281Z";
@@ -226,7 +227,13 @@ public class JobManagerIT {
 
         runForBlackboxTest(startDateString, endDateString);
 
+
+
+        logger.info("Yielded dominating conditions:");
         conditionsYielded.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).map(c-> c.getTitle() + " " + c.getStart() + " " + c.getEnd()).forEach(System.out::println);
+
+        logger.info("All conditions:");
+        conditionsYielded.stream().filter(c->c.isShow()).map(c-> c.getTitle() + " " + c.getGroup()+ " " + c.getStart() + " " + c.getEnd()).forEach(System.out::println);
 
 
         assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
@@ -239,18 +246,26 @@ public class JobManagerIT {
 
     }
 
+    @Test
+    public void blackboxTest6WrapperDemo() throws InterruptedException {
+        blackboxTest6(true);
+    }
+
+    @Test
+    public void blackboxTest6WrapperBatch() throws InterruptedException {
+        blackboxTest6(false);
+    }
     /**
      * Test merging of conditions
      *
      * 2018-06-01T16:58:47.734Z&end=2018-06-01T17:02:47.734Z
      */
-    @Test
-    public void blackboxTest6() throws InterruptedException {
+    public void blackboxTest6(boolean demo) throws InterruptedException {
 
         String startDateString = "2018-06-01T16:58:47.734Z";
         String endDateString = "2018-06-01T17:02:47.734Z";
 
-        runForBlackboxTest(startDateString, endDateString);
+        runForBlackboxTest(startDateString, endDateString, demo);
 
         conditionsYielded.stream().filter(c->c.getGroup()== ConditionGroup.OTHER).map(c->c.getTitle() +": " + c.getDescription()).forEach(System.out::println);
 
@@ -291,16 +306,23 @@ public class JobManagerIT {
     }
 
 
+
+    public void runForBlackboxTest(String start, String end) throws InterruptedException {
+        runForBlackboxTest(start, end, true);
+    }
+
     /**
      * @param start start of the scenario timespan in ISO 8601 format, e.g. 2016-11-30T12:19:20Z
      * @param end   end of the scenario timespan in ISO 8601 format, e.g. 2016-11-30T12:19:20Z
      */
-    public void runForBlackboxTest(String start, String end) throws InterruptedException {
+    public void runForBlackboxTest(String start, String end, boolean demo) throws InterruptedException {
 
         Date startDate = DatatypeConverter.parseDateTime(start).getTime();
         Date endDate = DatatypeConverter.parseDateTime(end).getTime();
 
         Application.initialize("src/test/resources/integration.properties");
+
+        Application.get().getProp().setProperty("demo", String.valueOf(demo));
         HttpClient client = HttpClientBuilder.create().build();
 
         EventSender eventSender = new EventSenderStub();

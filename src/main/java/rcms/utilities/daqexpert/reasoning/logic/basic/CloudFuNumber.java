@@ -103,6 +103,19 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 
 	}
 
+	/** @return true if we are in a critical beam mode during non-MDTS.
+	 *  In such a mode no FUs should be in cloud mode anymore even if
+	 *  the holdoff timer has not expired yet. */
+	boolean isCriticalBeamMode(LHCBeamMode beamMode, LHCMachineMode machineMode) {
+
+		// ignore beam mode during MD/TS, all are fine
+		if (isLhcMachineTestMode(machineMode)) {
+			return false;
+		}
+
+		return criticalBeamModes.contains(beamMode);
+	}
+
 	/** @return the fraction of FUs in cloud mode. Returns zero if no FUs
 	    were found. */
 	private double calculateCloudFraction(DAQ daq) {
@@ -144,7 +157,8 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		// update the holdoff timer
 		this.holdOffTimer.updateInput(shouldBeOff, now);
 
-		boolean inCriticalBeamMode = this.criticalBeamModes.contains(LHCBeamMode.getModeByCode(daq.getLhcBeamMode()));
+		boolean inCriticalBeamMode = this.isCriticalBeamMode(lhcBeamMode, lhcMachineMode);
+
 		// check if -- after taking into account the holdoff timer --
 		// we should not see any cloud FUs anymore
 		if (!inCriticalBeamMode && !this.holdOffTimer.getOutput(now)) {

@@ -14,6 +14,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
+import rcms.utilities.daqexpert.reasoning.base.enums.LHCMachineMode;
 import rcms.utilities.daqexpert.reasoning.logic.basic.helper.HoldOffTimer;
 
 /**
@@ -32,12 +33,16 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	/** list of LHC beam modes in which the cloud is allowed to run
 	 */
 	private Set<LHCBeamMode> allowedBeamModes = new HashSet<>();
+
+	/** list of LHC beam modes in which no cloud running is tolerated,
+	 *  not even if the holdoff timer is still active
+	 */
 	private Set<LHCBeamMode> criticalBeamModes = new HashSet<>();
 
 	private HoldOffTimer holdOffTimer;
 
 	public CloudFuNumber() {
-		this.name = "CloudFUnumber";
+		this.name = "Too many FUs in cloud mode";
 		this.priority = ConditionPriority.DEFAULTT;
 
 		// default value if no value found in the configuration file
@@ -59,12 +64,22 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		allowedBeamModes.add(LHCBeamMode.INJECT_AND_DUMP);
 		allowedBeamModes.add(LHCBeamMode.CIRCULATE_AND_DUMP);
 
-
+		// no cloud running allowed in the following beam modes,
+		// even not while the holdoff period is still ongoing
 		criticalBeamModes.add(LHCBeamMode.STABLE_BEAMS);
 		criticalBeamModes.add(LHCBeamMode.ADJUST);
 		criticalBeamModes.add(LHCBeamMode.SQUEEZE);
 
 	}
+
+	/** @return true if this is MD/TS (in which the cloud
+	 *  can typically run almost freely)
+	 */
+	boolean isLhcMachineTestMode(LHCMachineMode machineMode) {
+		return LHCMachineMode.MACHINE_DEVELOPMENT.equals(machineMode) ||
+						LHCMachineMode.SHUTDOWN.equals(machineMode); // Technical Stop
+	}
+
 
 	/** @return true if the cloud VMs can be on given the LHC
 	 *  machine and beam modes.
@@ -73,21 +88,32 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	 *  from a state where this function returns true
 	 *  to a state where this function returns false.
 	 */
-	boolean cloudCanBeOn(DAQ daq) {
+	boolean cloudCanBeOn(LHCBeamMode beamMode, LHCMachineMode machineMode) {
 
 		// ignore LHC beam modes during machine development
 		//
 		// note that beam modes like 'STABLE BEAMS' will not
 		// appear e.g. during end of year shutdowns etc.
-		String lhcMachineMode = daq.getLhcMachineMode();
-		if ("MACHINE DEVELOPMENT".equals(lhcMachineMode))
+		if (isLhcMachineTestMode(machineMode)) {
 			return true;
+		}
 
 		// parse the LHC beam mode
-		LHCBeamMode beamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
-
 		return allowedBeamModes.contains(beamMode);
 
+	}
+
+	/** @return true if we are in a critical beam mode during non-MDTS.
+	 *  In such a mode no FUs should be in cloud mode anymore even if
+	 *  the holdoff timer has not expired yet. */
+	boolean isCriticalBeamMode(LHCBeamMode beamMode, LHCMachineMode machineMode) {
+
+		// ignore beam mode during MD/TS, all are fine
+		if (isLhcMachineTestMode(machineMode)) {
+			return false;
+		}
+
+		return criticalBeamModes.contains(beamMode);
 	}
 
 	/** @return the fraction of FUs in cloud mode. Returns zero if no FUs
@@ -120,15 +146,19 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
+		LHCBeamMode lhcBeamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
+		LHCMachineMode lhcMachineMode = LHCMachineMode.getModeByCode(daq.getLhcMachineMode());
+
 		// check the LHC beam mode
-		boolean shouldBeOff = ! this.cloudCanBeOn(daq);
+		boolean shouldBeOff = ! this.cloudCanBeOn(lhcBeamMode, lhcMachineMode);
 
 		long now = daq.getLastUpdate();
 
 		// update the holdoff timer
 		this.holdOffTimer.updateInput(shouldBeOff, now);
 
-		boolean inCriticalBeamMode = this.criticalBeamModes.contains(LHCBeamMode.getModeByCode(daq.getLhcBeamMode()));
+		boolean inCriticalBeamMode = this.isCriticalBeamMode(lhcBeamMode, lhcMachineMode);
+
 		// check if -- after taking into account the holdoff timer --
 		// we should not see any cloud FUs anymore
 		if (!inCriticalBeamMode && !this.holdOffTimer.getOutput(now)) {

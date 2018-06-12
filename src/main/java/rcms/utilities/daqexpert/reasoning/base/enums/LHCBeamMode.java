@@ -42,7 +42,7 @@ public enum LHCBeamMode {
 		return code;
 	}
 
-	/** method to convert a string describing an LHC machine
+	/** method to convert a string describing an LHC beam
 	 *  mode into an LHCBeamMode enum.
 	 *
 	 * @return the LHCBeamMode value corresponding to code

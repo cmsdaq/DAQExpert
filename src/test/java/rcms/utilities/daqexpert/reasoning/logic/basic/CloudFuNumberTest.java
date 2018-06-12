@@ -15,6 +15,7 @@ import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
+import rcms.utilities.daqexpert.reasoning.base.enums.LHCMachineMode;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
 
@@ -41,6 +42,8 @@ public class CloudFuNumberTest
 	@Test
 	public void criticalBeamModeTest() throws URISyntaxException
 	{
+		// Stable beams, proton physics
+		// numFUsCloud is 41696 (82%), total number of FUs: 41696 + 9296 = 50992
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510706999513.json.gz");
 		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();
@@ -79,6 +82,7 @@ public class CloudFuNumberTest
 		buSummary.setNumFUsHLT(hltFus);
 
 		daq.setLhcBeamMode(beamMode.getCode());
+		daq.setLhcMachineMode(LHCMachineMode.PROTON_PHYSICS.getCode());
 		daq.setLastUpdate(minutes*1000L*60L);
 		daq.setBuSummary(buSummary);
 
@@ -122,7 +126,9 @@ public class CloudFuNumberTest
 						expectedResult, result);
 
 		// check the 'raw' result before applying the holdoff timer
-		boolean resultBeforeHoldOff = ! instance.cloudCanBeOn(daq);  //instance.getHoldOffTimer().getInput();
+		LHCBeamMode beamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
+		LHCMachineMode machineMode = LHCMachineMode.getModeByCode(daq.getLhcMachineMode());
+		boolean resultBeforeHoldOff = ! instance.cloudCanBeOn(beamMode, machineMode);  //instance.getHoldOffTimer().getInput();
 		assertEquals("result before taking into account holdoff for snapshot " + daq.getLastUpdate(),
 						expectedResultBeforeHoldOff, resultBeforeHoldOff);
 
@@ -197,4 +203,17 @@ public class CloudFuNumberTest
 
 	}
 
+	/** test for threshold during MD periods */
+	@Test
+	public void testMachineDevelopment() throws URISyntaxException {
+		// create an instance without holdoff period
+		CloudFuNumber instance = this.makeInstance();
+
+		// run on a snapshot during Machine Development
+		doChecks(instance, getSnapshot("1528790505876.json.gz"),
+						false,  // expected output result
+						false,  // expected result before holdoff
+						null
+		);
+	}
 }

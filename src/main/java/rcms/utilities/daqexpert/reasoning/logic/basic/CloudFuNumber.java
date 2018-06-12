@@ -14,6 +14,7 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
+import rcms.utilities.daqexpert.reasoning.base.enums.LHCMachineMode;
 import rcms.utilities.daqexpert.reasoning.logic.basic.helper.HoldOffTimer;
 
 /**
@@ -70,6 +71,15 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		criticalBeamModes.add(LHCBeamMode.SQUEEZE);
 
 	}
+
+	/** @return true if this is MD/TS (in which the cloud
+	 *  can typically run almost freely)
+	 */
+	boolean isLhcMachineTestMode(LHCMachineMode machineMode) {
+		return LHCMachineMode.MACHINE_DEVELOPMENT.equals(machineMode) ||
+						LHCMachineMode.SHUTDOWN.equals(machineMode); // Technical Stop
+	}
+
 
 	/** @return true if the cloud VMs can be on given the LHC
 	 *  machine and beam modes.

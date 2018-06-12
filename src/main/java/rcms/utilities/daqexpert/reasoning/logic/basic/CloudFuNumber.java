@@ -32,6 +32,10 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	/** list of LHC beam modes in which the cloud is allowed to run
 	 */
 	private Set<LHCBeamMode> allowedBeamModes = new HashSet<>();
+
+	/** list of LHC beam modes in which no cloud running is tolerated,
+	 *  not even if the holdoff timer is still active
+	 */
 	private Set<LHCBeamMode> criticalBeamModes = new HashSet<>();
 
 	private HoldOffTimer holdOffTimer;
@@ -59,7 +63,8 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 		allowedBeamModes.add(LHCBeamMode.INJECT_AND_DUMP);
 		allowedBeamModes.add(LHCBeamMode.CIRCULATE_AND_DUMP);
 
-
+		// no cloud running allowed in the following beam modes,
+		// even not while the holdoff period is still ongoing
 		criticalBeamModes.add(LHCBeamMode.STABLE_BEAMS);
 		criticalBeamModes.add(LHCBeamMode.ADJUST);
 		criticalBeamModes.add(LHCBeamMode.SQUEEZE);

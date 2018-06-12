@@ -37,7 +37,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	private HoldOffTimer holdOffTimer;
 
 	public CloudFuNumber() {
-		this.name = "CloudFUnumber";
+		this.name = "Too many FUs in cloud mode";
 		this.priority = ConditionPriority.DEFAULTT;
 
 		// default value if no value found in the configuration file

@@ -199,4 +199,17 @@ public class CloudFuNumberTest
 
 	}
 
+	/** test for threshold during MD periods */
+	@Test
+	public void testMachineDevelopment() throws URISyntaxException {
+		// create an instance without holdoff period
+		CloudFuNumber instance = this.makeInstance();
+
+		// run on a snapshot during Machine Development
+		doChecks(instance, getSnapshot("1528790505876.json.gz"),
+						false,  // expected output result
+						false,  // expected result before holdoff
+						null
+		);
+	}
 }

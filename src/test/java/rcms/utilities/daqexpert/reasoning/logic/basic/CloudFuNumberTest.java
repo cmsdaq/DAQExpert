@@ -41,6 +41,8 @@ public class CloudFuNumberTest
 	@Test
 	public void criticalBeamModeTest() throws URISyntaxException
 	{
+		// Stable beams, proton physics
+		// numFUsCloud is 41696 (82%), total number of FUs: 41696 + 9296 = 50992
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510706999513.json.gz");
 		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();

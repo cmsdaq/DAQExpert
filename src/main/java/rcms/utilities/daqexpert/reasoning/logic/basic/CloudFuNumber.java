@@ -88,19 +88,17 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	 *  from a state where this function returns true
 	 *  to a state where this function returns false.
 	 */
-	boolean cloudCanBeOn(DAQ daq) {
+	boolean cloudCanBeOn(LHCBeamMode beamMode, LHCMachineMode machineMode) {
 
 		// ignore LHC beam modes during machine development
 		//
 		// note that beam modes like 'STABLE BEAMS' will not
 		// appear e.g. during end of year shutdowns etc.
-		String lhcMachineMode = daq.getLhcMachineMode();
-		if ("MACHINE DEVELOPMENT".equals(lhcMachineMode))
+		if (isLhcMachineTestMode(machineMode)) {
 			return true;
+		}
 
 		// parse the LHC beam mode
-		LHCBeamMode beamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
-
 		return allowedBeamModes.contains(beamMode);
 
 	}
@@ -135,8 +133,11 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	@Override
 	public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
+		LHCBeamMode lhcBeamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
+		LHCMachineMode lhcMachineMode = LHCMachineMode.getModeByCode(daq.getLhcMachineMode());
+
 		// check the LHC beam mode
-		boolean shouldBeOff = ! this.cloudCanBeOn(daq);
+		boolean shouldBeOff = ! this.cloudCanBeOn(lhcBeamMode, lhcMachineMode);
 
 		long now = daq.getLastUpdate();
 

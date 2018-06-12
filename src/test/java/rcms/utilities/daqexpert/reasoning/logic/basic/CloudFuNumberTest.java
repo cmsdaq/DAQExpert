@@ -15,6 +15,7 @@ import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
+import rcms.utilities.daqexpert.reasoning.base.enums.LHCMachineMode;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
 
@@ -124,7 +125,9 @@ public class CloudFuNumberTest
 						expectedResult, result);
 
 		// check the 'raw' result before applying the holdoff timer
-		boolean resultBeforeHoldOff = ! instance.cloudCanBeOn(daq);  //instance.getHoldOffTimer().getInput();
+		LHCBeamMode beamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
+		LHCMachineMode machineMode = LHCMachineMode.getModeByCode(daq.getLhcMachineMode());
+		boolean resultBeforeHoldOff = ! instance.cloudCanBeOn(beamMode, machineMode);  //instance.getHoldOffTimer().getInput();
 		assertEquals("result before taking into account holdoff for snapshot " + daq.getLastUpdate(),
 						expectedResultBeforeHoldOff, resultBeforeHoldOff);
 

@@ -82,6 +82,7 @@ public class CloudFuNumberTest
 		buSummary.setNumFUsHLT(hltFus);
 
 		daq.setLhcBeamMode(beamMode.getCode());
+		daq.setLhcMachineMode(LHCMachineMode.PROTON_PHYSICS.getCode());
 		daq.setLastUpdate(minutes*1000L*60L);
 		daq.setBuSummary(buSummary);
 

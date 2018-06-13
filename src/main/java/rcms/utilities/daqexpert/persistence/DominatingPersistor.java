@@ -199,13 +199,15 @@ public class DominatingPersistor {
 
 
                     } else if (value instanceof OptionalContextEntry) {
-                        ObjectContextEntry v = (ObjectContextEntry) value;
+                        OptionalContextEntry v = (OptionalContextEntry) value;
+                        // do not persist
 
                     }
                 } else {
-
-                    dominatingEntry.getContext().put(key, (ContextEntry) org.apache.commons.lang.SerializationUtils.clone(value));
-                    dominatingEntry.getContext().get(key).setId(null);
+                    if (!(value instanceof OptionalContextEntry)) {
+                        dominatingEntry.getContext().put(key, (ContextEntry) org.apache.commons.lang.SerializationUtils.clone(value));
+                        dominatingEntry.getContext().get(key).setId(null);
+                    }
                 }
 
             }

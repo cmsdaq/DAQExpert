@@ -167,7 +167,7 @@ var groupsList = [ {
     content : 'Dom. (0)',
     name : 'Dom.',
     title : 'Dominating LM selection',
-    primary : false
+    primary : true
 },{
     id : 'rec',
     content : 'Rec. (0)',

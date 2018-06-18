@@ -29,7 +29,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		this.name = "Continuous fixing-soft-error";
 
 		/* default action */
-		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{SUBSYSTEM}}");
+		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ES specific instructions */
 		action.addContextSteps("ES", "Stop the run and re-start it",
@@ -41,8 +41,8 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				"If no problem in DCS call Pixel DOC immediately");
 
 		/* CTPPS specific instructions */
-		action.addContextSteps("CTPPS", "<<RedRecycle::{{SUBSYSTEM}}>>",
-				"Call DOC of subsystem {{SUBSYSTEM}}");
+		action.addContextSteps("CTPPS", "<<RedRecycle::{{PROBLEM-SUBSYSTEM}}>>",
+				"Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		this.action = action;
 
@@ -152,7 +152,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 						logger.debug("Registering " + count.getValue());
 
-						contextHandler.register("SUBSYSTEM", problematicSubsystem);
+						contextHandler.register("PROBLEM-SUBSYSTEM", problematicSubsystem);
 
 						subsystemWithCounts.add(problematicSubsystem + " " + count.getValue() + " time(s)");
 						contextHandler.setActionKey(problematicSubsystem);

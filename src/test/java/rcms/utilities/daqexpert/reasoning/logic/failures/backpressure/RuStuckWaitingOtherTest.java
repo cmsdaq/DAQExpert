@@ -38,7 +38,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(1122)), context.getContext().getReusableContextEntry("FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("HF")), context.getContext().getReusableContextEntry("AFFECTED-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("HF")), context.getContext().getReusableContextEntry("AFFECTED-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("HF")), context.getContext().getReusableContextEntry("AFFECTED-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("HFb")), context.getContext().getReusableContextEntry("AFFECTED-FED-BUILDER").getObjectSet().stream().map(f->((FEDBuilder)f).getName()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
 
@@ -65,7 +65,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(1386)), context.getContext().getReusableContextEntry("AFFECTED-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().getReusableContextEntry("AFFECTED-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().getReusableContextEntry("AFFECTED-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().getReusableContextEntry("AFFECTED-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
 
 	}
@@ -94,7 +94,7 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(1404)), context.getContext().getReusableContextEntry("FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().getReusableContextEntry("AFFECTED-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("GTUP")), context.getContext().getReusableContextEntry("AFFECTED-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("GTUP")), context.getContext().getReusableContextEntry("AFFECTED-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
 
 

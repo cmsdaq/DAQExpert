@@ -30,7 +30,7 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 
 		/* Assert problem FEDs */
 		ObjectContextEntry<FED> problemFeds = (ObjectContextEntry<FED>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED");
-		ObjectContextEntry<TTCPartition> problemPartitions = (ObjectContextEntry<TTCPartition>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-TTCP");
+		ObjectContextEntry<TTCPartition> problemPartitions = (ObjectContextEntry<TTCPartition>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-PARTITION");
 		ObjectContextEntry<SubSystem> problemSubsystems = (ObjectContextEntry<SubSystem>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM");
 		ObjectContextEntry<FEDBuilder> problemFedBuilder = (ObjectContextEntry<FEDBuilder>) ruStuckWaiting.getContextHandler().getContext().getContextEntryMap().get("PROBLEM-FED-BUILDER");
 

@@ -40,7 +40,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("622")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("ECAL",context.getActionKey());
 		assertEquals(4,legacyFc1.getActionWithContext().size());
@@ -64,7 +64,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("ES",context.getActionKey());
 		assertEquals(4,legacyFc1.getActionWithContext().size());
@@ -83,7 +83,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("CTPPS_TOT",context.getActionKey());
 		assertEquals(4,legacyFc1.getActionWithContext().size());
@@ -102,7 +102,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
 		assertEquals(4,legacyFc1.getActionWithContext().size());
@@ -121,14 +121,14 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
 		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 	
-	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-TTCP}}
+	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-PARTITION}}
 	 * and {{PROBLEM-SUBSYSTEM}} (see issue #90)
 	 *
 	 */
@@ -149,7 +149,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1111")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("FED1111or1109",legacyFc1.getContextHandler().getActionKey());
 		assertEquals(3,legacyFc1.getActionWithContext().size());

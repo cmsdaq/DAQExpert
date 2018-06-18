@@ -51,7 +51,7 @@ public class ContinouslySoftErrorTest {
 
 		// TODO: check list of previous occ
 
-		Assert.assertNull(lm.getContextHandler().getContext().get("SUBSYSTEM"));
+		Assert.assertNull(lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 	}
 
 	@Test
@@ -237,7 +237,7 @@ public class ContinouslySoftErrorTest {
 
 				// note that due to merging we can have messages == null
 				// but still a true result from lm.satisfied() (TODO: is this wanted ?)
-			  Set<String> messages = (Set<String>)(lm.getContextHandler().getContext().get("SUBSYSTEM"));
+			  Set<String> messages = (Set<String>)(lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
 				if (messages != null) {
 					Assert.assertEquals(1, messages.size());

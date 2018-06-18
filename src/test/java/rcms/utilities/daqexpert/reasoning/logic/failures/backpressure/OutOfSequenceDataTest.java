@@ -56,7 +56,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = legacyFc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("582")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-PARTITION"));
 		
 
 		assertEquals("CTPPS_TOT",legacyFc1.getContextHandler().getActionKey());
@@ -98,7 +98,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("548")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(new HashSet(Arrays.asList("ru-c2e14-27-01.cms")), context.getContext().get("PROBLEM-RU"));
 		assertEquals(new HashSet(Arrays.asList(1360)), context.getContext().get("AFFECTED-FED"));
 
@@ -124,7 +124,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1386")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("ES")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(new HashSet(Arrays.asList("ru-c2e12-40-01.cms")), context.getContext().get("PROBLEM-RU"));
 		assertEquals(new HashSet(Arrays.asList(1380)), context.getContext().get("AFFECTED-FED"));
 	}
@@ -147,7 +147,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList(774)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("DT")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet())
 				);
-		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet())
+		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet())
 );
 		assertEquals(new HashSet(Arrays.asList("ru-c2e15-28-01.cms")), context.getContext().get("PROBLEM-RU"));
 		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().getReusableContextEntry("AFFECTED-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
@@ -184,7 +184,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 		assertEquals("ECAL",fc1.getContextHandler().getActionKey());
 		assertEquals(4,fc1.getActionWithContext().size());
 
@@ -227,7 +227,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1326")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-PARTITION"));
 		
 
 		assertEquals("PIXEL",fc1.getContextHandler().getActionKey());
@@ -254,7 +254,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc1.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("1241")), context.getContext().get("PROBLEM-FED"));
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-TTCP"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
 		
 
 		assertEquals("PIXEL", fc1.getContextHandler().getActionKey());
@@ -262,7 +262,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 	}
 
-	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-TTCP}}
+	/** testcase to check proper filling of {{PROBLEM-FED}}, {{PROBLEM-PARTITION}}
 	 * and {{PROBLEM-SUBSYSTEM}} (see issue #90)
 	 *
 	 */
@@ -281,7 +281,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(1111)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("HCAL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("HBHEB")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 
 		assertEquals("FED1111or1109",fc1.getContextHandler().getActionKey());
 		assertEquals(3,fc1.getActionWithContext().size());

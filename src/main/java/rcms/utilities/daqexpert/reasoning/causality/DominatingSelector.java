@@ -1,12 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.causality;
 
 import org.apache.log4j.Logger;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.processing.Requiring;
-import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,23 +46,28 @@ public class DominatingSelector {
         }
 
         logger.debug("Causality graph will be applied to select dominating condition");
-        Set<Condition> subResult2 = getLeafsFromCausality(subResult1);
-        if(subResult2.size() == 1) {
-            return subResult2.iterator().next();
-        } else if(subResult2.size() == 0){
+        Set<Condition> subResult2 = getLeafsFromCausality(filtered);
+
+
+        Set<Condition> intersection = new HashSet<>(subResult1); // use the copy constructor
+        intersection.retainAll(subResult2);
+
+        if(intersection.size() == 1) {
+            return intersection.iterator().next();
+        } else if(intersection.size() == 0){
             logger.debug("No dominating has been selected (after applying causality graph nothing left)");
             return null;
         }
 
         logger.debug("Usefulness will be applied to select dominating condition");
         int highest = 0;
-        for(Condition condition: subResult2){
+        for(Condition condition: intersection){
             if(highest < condition.getLogicModule().getUsefulness()){
                 highest = condition.getLogicModule().getUsefulness();
             }
         }
         final int highestFinal = highest;
-        Set<Condition> subResult3 = subResult2.stream().filter(c->c.getLogicModule().getUsefulness() == highestFinal).collect(Collectors.toSet());
+        Set<Condition> subResult3 = intersection.stream().filter(c->c.getLogicModule().getUsefulness() == highestFinal).collect(Collectors.toSet());
         if(subResult3.size() == 1) {
             return subResult3.iterator().next();
         } else if(subResult3.size() == 0){

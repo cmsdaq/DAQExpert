@@ -267,6 +267,11 @@ public class JobManagerIT {
 
         runForBlackboxTest(startDateString, endDateString, demo);
 
+        logger.info("Yielded dominating conditions:");
+        conditionsYielded.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).map(c-> c.getTitle() + " " + c.getStart() + " " + c.getEnd() +": " + c.getDescription()).forEach(System.out::println);
+
+
+        logger.info("Other conditions:");
         conditionsYielded.stream().filter(c->c.getGroup()== ConditionGroup.OTHER).map(c->c.getTitle() +": " + c.getDescription()).forEach(System.out::println);
 
         assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
@@ -276,6 +281,15 @@ public class JobManagerIT {
                 hasProperty("start", notNullValue()),
                 hasProperty("end", notNullValue())
         )));
+
+        assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
+                hasProperty("title", equalTo("Continuous fixing-soft-error")),
+                hasProperty("description", equalTo("Level zero repeatably in FixingSoftError due to subsystem(s) [TRACKER 10 time(s)]")),
+                hasProperty("group", equalTo(ConditionGroup.DOMINATING)),
+                hasProperty("start", notNullValue()),
+                hasProperty("end", notNullValue())
+        )));
+
 
 
 

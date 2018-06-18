@@ -139,28 +139,35 @@ public class DominatingPersistor {
 
     private void updateDescriptionAndContext(Condition baseCondition, Condition dominatingEntry) {
         LogicModule producer = baseCondition.getProducer();
-        if (producer != null && producer.getBriefDescription() != null) {
-            String briefDescription = baseCondition.getProducer().getBriefDescription();
 
-            Map<String, ContextEntry> contextEntryMap = null;
+        Map<String, ContextEntry> contextEntryMap = null;
 
-            if(baseCondition.getContext() != null && baseCondition.getContext().size() > 0){
-                contextEntryMap = baseCondition.getContext();
+        if(baseCondition.getContext() != null && baseCondition.getContext().size() > 0){
+            contextEntryMap = baseCondition.getContext();
 
-            } else {
-                if (producer instanceof ContextLogicModule) {
-                    ContextLogicModule clm = (ContextLogicModule) producer;
-                    if (clm.getContextHandler().getContext().getContextEntryMap().size() > 0) {
-                        contextEntryMap = clm.getContextHandler().getContext().getContextEntryMap();
-                    }
+        } else {
+            if (producer instanceof ContextLogicModule) {
+                ContextLogicModule clm = (ContextLogicModule) producer;
+                if (clm.getContextHandler().getContext().getContextEntryMap().size() > 0) {
+                    contextEntryMap = clm.getContextHandler().getContext().getContextEntryMap();
                 }
             }
+        }
+
+        String dominatingDescription;
 
 
-            if(contextEntryMap != null && contextEntryMap.size() >0){
-                briefDescription = ContextHandler.putContext(briefDescription, contextEntryMap, null);
+        if(producer != null) {
+            if (producer.getBriefDescription() != null) {
+                dominatingDescription = baseCondition.getProducer().getBriefDescription();
+            } else {
+                dominatingDescription = baseCondition.getProducer().getDescription();
             }
-            dominatingEntry.setDescription(briefDescription);
+
+            if (contextEntryMap != null && contextEntryMap.size() > 0) {
+                dominatingDescription = ContextHandler.putContext(dominatingDescription, contextEntryMap, null, false);
+            }
+            dominatingEntry.setDescription(dominatingDescription);
         } else {
             dominatingEntry.setDescription(baseCondition.getDescription());
         }

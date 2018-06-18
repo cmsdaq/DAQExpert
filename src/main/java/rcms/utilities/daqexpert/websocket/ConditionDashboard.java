@@ -44,7 +44,6 @@ public class ConditionDashboard implements Observer {
     private ConditionSessionHandler sessionHander;
 
 
-
     public ConditionDashboard(int max) {
         this.maximumNumberOfConditionsHandled = max;
     }
@@ -55,8 +54,11 @@ public class ConditionDashboard implements Observer {
         }
     }
 
-
     public void update(Set<Condition> conditionsProduced, Long dominatingId) {
+        update(conditionsProduced, dominatingId, true);
+    }
+
+    public void update(Set<Condition> conditionsProduced, Long dominatingId, boolean requireProblematic) {
 
 
         conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -76,7 +78,7 @@ public class ConditionDashboard implements Observer {
         }
 
         for (Condition condition : conditionsProduced) {
-            if (condition.isMature()) {
+            if (condition.isMature() && ( !requireProblematic || condition.isProblematic())) {
 
                 //compareWithCurrentlyDominating(condition);
 

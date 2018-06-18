@@ -28,8 +28,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1478748186297.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
 	}
 
 	/* 2016-12-04T02:05:40 */
@@ -38,8 +38,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1480813540739.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("PROBLEM-PARTITION"));
 	}
 
 	/* 2017-04-07T16:51:54 */
@@ -48,8 +48,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1491576714151.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("PROBLEM-PARTITION"));
 	}
 
 
@@ -61,8 +61,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(fc3, snapshot);
 
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
 	}
 
 	/*
@@ -84,8 +84,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
 
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("PROBLEM-PARTITION"));
 
 	}
 
@@ -122,7 +122,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertEquals(3, fc3.getActionWithContext().size());
 
 		ContextHandler context = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 
 
 		daq.setLhcClockStable(true);

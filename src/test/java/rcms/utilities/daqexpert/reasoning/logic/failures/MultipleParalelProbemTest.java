@@ -27,8 +27,8 @@ public class MultipleParalelProbemTest extends FlowchartCaseTestBase {
 		assertSatisfiedLogicModules(snapshot, fc3, legacyFc1);
 
 		ContextHandler contextHandler = fc3.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), ((ObjectContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("SUBSYSTEM")).getObjectSet());
-		assertEquals(new HashSet(Arrays.asList("TOTDET")), ((ObjectContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("TTCP")).getObjectSet());
+		assertEquals(new HashSet(Arrays.asList("CTPPS_TOT")), ((ObjectContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("PROBLEM-SUBSYSTEM")).getObjectSet());
+		assertEquals(new HashSet(Arrays.asList("TOTDET")), ((ObjectContextEntry<String>)contextHandler.getContext().getContextEntryMap().get("PROBLEM-PARTITION")).getObjectSet());
 
 	}
 

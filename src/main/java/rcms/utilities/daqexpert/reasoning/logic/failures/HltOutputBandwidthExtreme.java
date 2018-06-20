@@ -32,10 +32,16 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
     public void declareRelations(){
         require(LogicModuleRegistry.BackpressureFromHlt);
         declareAffected(LogicModuleRegistry.BackpressureFromHlt);
+        require(LogicModuleRegistry.HltOutputBandwidthTooHigh);
     }
 
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+
+        if (!results.get(HltOutputBandwidthTooHigh.class.getSimpleName()).getResult()) {
+            return false;
+        }
 
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);

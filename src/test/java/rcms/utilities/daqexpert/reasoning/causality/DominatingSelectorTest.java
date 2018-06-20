@@ -289,6 +289,34 @@ public class DominatingSelectorTest {
 
     }
 
+
+    @Test
+    public void multipleCandidatesTest2() throws URISyntaxException {
+        DAQ daq = FlowchartCaseTestBase.getSnapshot("1528225251698.json.gz");
+
+        DominatingSelector ds = new DominatingSelector();
+
+        ConditionProducer cp = new ConditionProducer();
+        cp.setEventRegister(new EventRegisterMock());
+
+        Application.initialize("src/test/resources/integration.properties");
+
+        LogicModuleManager logicModuleManager = new LogicModuleManager(cp);
+
+        Long originalTimestamp = daq.getLastUpdate();
+        daq.setLastUpdate(originalTimestamp - 10000000);
+        List<Condition> result = logicModuleManager.runLogicModules(daq, false);
+
+
+        daq.setLastUpdate(originalTimestamp);
+        result.addAll(logicModuleManager.runLogicModules(daq, false));
+
+
+        Condition dominating = ds.selectDominating(result.stream().filter(c->c.isShow() && c.isProblematic() && !c.isHoldNotifications()).collect(Collectors.toSet()));
+
+        Assert.assertEquals("Extreme HLT output bandwidth", dominating.getTitle());
+
+    }
     private Condition generateCondition(LogicModule producer){
 
         Condition c = new ConditionMock(producer);

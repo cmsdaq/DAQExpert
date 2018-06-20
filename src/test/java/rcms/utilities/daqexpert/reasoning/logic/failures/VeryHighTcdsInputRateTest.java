@@ -46,6 +46,7 @@ public class VeryHighTcdsInputRateTest
 		Map<String, Output> results = new HashMap<>();
 
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
+		results.put(HighTcdsInputRate.class.getSimpleName(), new Output(true));
 										
 		// ensure that the VeryHighTcdsInputRate module fires
 		VeryHighTcdsInputRate module = new VeryHighTcdsInputRate();

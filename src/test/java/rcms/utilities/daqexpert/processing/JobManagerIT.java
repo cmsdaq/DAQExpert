@@ -215,37 +215,6 @@ public class JobManagerIT {
 
     }
 
-    /**
-     * Test generated dominating entries
-     */
-    @Test
-
-    public void blackboxTest5() throws InterruptedException {
-
-        String startDateString = "2018-06-01T20:36:24.281Z";
-        String endDateString = "2018-06-01T20:38:19.152Z";
-
-        runForBlackboxTest(startDateString, endDateString);
-
-
-
-        logger.info("Yielded dominating conditions:");
-        conditionsYielded.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).map(c-> c.getTitle() + " " + c.getStart() + " " + c.getEnd()).forEach(System.out::println);
-
-        logger.info("All conditions:");
-        conditionsYielded.stream().filter(c->c.isShow()).map(c-> c.getTitle() + " " + c.getGroup()+ " " + c.getStart() + " " + c.getEnd()).forEach(System.out::println);
-
-
-        assertThat(conditionsYielded, hasItem(Matchers.<Condition>allOf(
-                hasProperty("title", equalTo("Downtime")),
-                hasProperty("group", equalTo(ConditionGroup.DOMINATING)),
-                hasProperty("start", notNullValue()),
-                hasProperty("end", notNullValue())
-        )));
-
-
-    }
-
     @Test
     public void blackboxTest6WrapperDemo() throws InterruptedException {
         blackboxTest6(true);

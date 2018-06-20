@@ -18,6 +18,7 @@ public class Downtime extends SimpleLogicModule {
 		this.name = "Downtime";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "No rate during stable beams";
+		this.problematic = false; // this module is not problematic - it's for statistical reasons. No rate and dataflow stuck cover the analysis part
 	}
 
 	@Override

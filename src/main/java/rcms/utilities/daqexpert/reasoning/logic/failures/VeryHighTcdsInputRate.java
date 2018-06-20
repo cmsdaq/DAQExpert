@@ -35,6 +35,7 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
 
     @Override
     public void declareRelations(){
+        require(LogicModuleRegistry.HighTcdsInputRate);
         declareAffected(LogicModuleRegistry.HltOutputBandwidthTooHigh);
         declareAffected(LogicModuleRegistry.HltOutputBandwidthExtreme);
         declareAffected(LogicModuleRegistry.RateTooHigh);
@@ -53,6 +54,11 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
 
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+
+        if (!results.get(HighTcdsInputRate.class.getSimpleName()).getResult()) {
+            return false;
+        }
 
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);

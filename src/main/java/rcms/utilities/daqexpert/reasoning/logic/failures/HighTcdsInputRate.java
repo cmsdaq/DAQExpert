@@ -18,7 +18,6 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 
 	/** minimum above which this module fires */
 	private float threshold;
-	private float thresholdVeryHigh;
 
 
 	public HighTcdsInputRate() {
@@ -43,7 +42,6 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 	public void parametrize(Properties properties) {
 
 		this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_TCDS_INPUT_RATE_HIGH, this.getClass());
-		this.thresholdVeryHigh = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_TCDS_INPUT_RATE_VERYHIGH, this.getClass());
 
 		// TODO: add note when there is backpressure from hlt
 		this.description = "The TCDS trigger input rate is {{TCDS_TRIGGER_INPUT_RATE}} " +
@@ -63,7 +61,7 @@ public class HighTcdsInputRate extends KnownFailure implements Parameterizable {
 		double inputTriggerRate = rates.getTrg_rate_total() + rates.getSup_trg_rate_total();
 
 		boolean result = false;
-		if (threshold < inputTriggerRate && inputTriggerRate <= thresholdVeryHigh) {
+		if (threshold < inputTriggerRate) {
 			contextHandler.registerForStatistics("TCDS_TRIGGER_INPUT_RATE", inputTriggerRate,"Hz",1);
 			result = true;
 		}

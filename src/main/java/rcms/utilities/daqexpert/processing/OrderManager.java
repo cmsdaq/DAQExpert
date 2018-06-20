@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Finds the order of running the Logic Modules satisfying their 'require' declarations.
@@ -50,7 +51,10 @@ public class OrderManager <T extends Requiring> {
             ordered.addAll(toOrderThisRound);
 
             if (toWait.size() == toOrderSize && ordered.size() == orderedSize) {
-                throw new RuntimeException("Cyclic dependency detected for elements: " + toOrder);
+
+                toOrder.stream().map(o->o.getClass().getSimpleName() + " requires: " + o.getRequired().stream().map(r->r.getClass().getSimpleName()).collect(Collectors.toList())).forEach(logger::warn);
+
+                throw new RuntimeException("Cyclic dependency detected for elements: " + toOrder.stream().map(o->o.getClass().getSimpleName()).collect(Collectors.toList()));
             }
 
             List<T> orderedPart = order(toWait, ordered);

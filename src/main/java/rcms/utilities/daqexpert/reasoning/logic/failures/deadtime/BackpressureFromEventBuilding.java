@@ -48,6 +48,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
         declareAffected(LogicModuleRegistry.BackpressureFromFerol);
         declareAffected(LogicModuleRegistry.TmpUpgradedFedProblem);
+        declareAffected(LogicModuleRegistry.FedDeadtimeDueToDaq);
     }
 
     @Override

@@ -30,6 +30,7 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
     @Override
     public void declareRelations(){
         require(LogicModuleRegistry.FEDDeadtime);
+        declareAffected(LogicModuleRegistry.FEDDeadtime);
     }
 
     @Override

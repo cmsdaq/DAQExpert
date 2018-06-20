@@ -41,6 +41,8 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 		declareAffected(LogicModuleRegistry.HltOutputBandwidthExtreme);
 
 		declareAffected(LogicModuleRegistry.HltCpuLoad);
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
+		declareAffected(LogicModuleRegistry.FedGeneratesDeadtime);
 	}
 
 	@Override

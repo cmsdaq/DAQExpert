@@ -8,6 +8,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
@@ -51,6 +52,7 @@ public class HltOutputBandwidthExtremeTest {
                 hltOutputBandwidthExtreme.getDescriptionWithContext());
     }
 
+    @Ignore // no longer using notes to indicate that other problem is active. Will now use causality graph (affected nodes will be displayed)
     @Test
     public void testWithAdditionalNote() throws URISyntaxException {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);

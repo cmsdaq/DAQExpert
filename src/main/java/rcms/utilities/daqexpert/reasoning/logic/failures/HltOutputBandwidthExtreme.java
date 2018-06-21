@@ -54,13 +54,6 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
             result = true;
         }
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-            //mention the fact that some modules are active
-            contextHandler.registerConditionalNote("NOTE", additionalNote);
-        } else{
-            contextHandler.unregisterConditionalNote("NOTE");
-        }
-
         return result;
     }
 
@@ -71,8 +64,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. " +
                     "You should not continue running in these conditions. " +
-                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
-                    "[[NOTE]]";
+                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ";
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

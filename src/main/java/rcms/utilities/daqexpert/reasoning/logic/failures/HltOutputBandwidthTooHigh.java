@@ -54,13 +54,6 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
             result = true;
         }
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-            //mention the fact that some modules are active
-            contextHandler.registerConditionalNote("NOTE", additionalNote);
-        } else{
-            contextHandler.unregisterConditionalNote("NOTE");
-        }
-
         return result;
     }
 
@@ -71,7 +64,7 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
                     + bandwidthThresholdInGbps + " GB/s at which delays to Rate Monitoring and Express streams can appear. " +
-                    "DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. [[NOTE]]";
+                    "DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.";
 
 
             logger.debug("Parametrized: " + description);

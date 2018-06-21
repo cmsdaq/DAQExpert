@@ -253,33 +253,6 @@ public class ContextHandler {
         return registerForStatistics(key, value, "", 1);
     }
 
-    /**
-     * Register additional note.
-     *
-     * @param key   key for the additional note
-     * @param value current aditional note
-     */
-    public void registerConditionalNote(String key, String value) {
-        if (!context.getContextEntryMap().containsKey(key)) {
-            context.getContextEntryMap().put(key, new OptionalContextEntry());
-        } else {
-            verifyNoContextMismatch(key, OptionalContextEntry.class);
-        }
-
-
-        OptionalContextEntry optionalContextEntry = (OptionalContextEntry) context.getContextEntryMap().get(key);
-
-        String oldValue = optionalContextEntry.getTextRepresentation();
-        optionalContextEntry.setValue(value);
-
-        if (verifyChanged(oldValue, optionalContextEntry.getTextRepresentation())) {
-            contextNotifier.registerChange(key);
-        }
-    }
-
-    public void unregisterConditionalNote(String key) {
-        registerConditionalNote(key, null);
-    }
 
     public String putContext(String text) {
         return putContext(text, context.getContextEntryMap(), contextNotifier, highlightMarkup);

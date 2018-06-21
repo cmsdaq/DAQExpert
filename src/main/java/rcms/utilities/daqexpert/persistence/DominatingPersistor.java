@@ -1,7 +1,10 @@
 package rcms.utilities.daqexpert.persistence;
 
 import org.apache.log4j.Logger;
-import rcms.utilities.daqexpert.processing.context.*;
+import rcms.utilities.daqexpert.processing.context.ContextEntry;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
+import rcms.utilities.daqexpert.processing.context.StatisticContextEntry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
@@ -142,7 +145,7 @@ public class DominatingPersistor {
 
         Map<String, ContextEntry> contextEntryMap = null;
 
-        if(baseCondition.getContext() != null && baseCondition.getContext().size() > 0){
+        if (baseCondition.getContext() != null && baseCondition.getContext().size() > 0) {
             contextEntryMap = baseCondition.getContext();
 
         } else {
@@ -157,7 +160,7 @@ public class DominatingPersistor {
         String dominatingDescription;
 
 
-        if(producer != null) {
+        if (producer != null) {
             if (producer.getBriefDescription() != null) {
                 dominatingDescription = baseCondition.getProducer().getBriefDescription();
             } else {
@@ -174,10 +177,10 @@ public class DominatingPersistor {
 
 
         Map<String, ContextEntry> baseContext = null;
-        if(baseCondition.getProducer() instanceof ContextLogicModule && ((ContextLogicModule)baseCondition.getProducer()).getContextHandler().getContext() != null)
-            baseContext = ((ContextLogicModule)baseCondition.getProducer()).getContextHandler().getContext().getContextEntryMap();
+        if (baseCondition.getProducer() instanceof ContextLogicModule && ((ContextLogicModule) baseCondition.getProducer()).getContextHandler().getContext() != null)
+            baseContext = ((ContextLogicModule) baseCondition.getProducer()).getContextHandler().getContext().getContextEntryMap();
 
-        if (baseContext!= null) {
+        if (baseContext != null) {
 
             if (dominatingEntry.getContext() == null) {
                 dominatingEntry.setContext(new HashMap<>());
@@ -205,16 +208,11 @@ public class DominatingPersistor {
                         ((ObjectContextEntry) dominatingEntry.getContext().get(key)).setTextRepresentationSet(v.getTextRepresentationSet());
 
 
-                    } else if (value instanceof OptionalContextEntry) {
-                        OptionalContextEntry v = (OptionalContextEntry) value;
-                        // do not persist
-
                     }
                 } else {
-                    if (!(value instanceof OptionalContextEntry)) {
-                        dominatingEntry.getContext().put(key, (ContextEntry) org.apache.commons.lang.SerializationUtils.clone(value));
-                        dominatingEntry.getContext().get(key).setId(null);
-                    }
+                    dominatingEntry.getContext().put(key, (ContextEntry) org.apache.commons.lang.SerializationUtils.clone(value));
+                    dominatingEntry.getContext().get(key).setId(null);
+
                 }
 
             }

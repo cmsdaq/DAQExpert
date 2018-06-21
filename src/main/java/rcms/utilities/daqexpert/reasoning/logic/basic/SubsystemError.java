@@ -13,12 +13,12 @@ public class SubsystemError extends ContextLogicModule {
 
 	public SubsystemError() {
 		this.name = "Subsystem in error";
-		this.description = "{{SUBSYSTEM}} subsystem is in error";
+		this.description = "{{PROBLEM-SUBSYSTEM}} subsystem is in error";
 		this.priority = ConditionPriority.DEFAULTT;
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.RunOngoing);
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.LongTransition);
@@ -44,7 +44,7 @@ public class SubsystemError extends ContextLogicModule {
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
 			if ("Error".equalsIgnoreCase(subSystem.getStatus())) {
-				contextHandler.register("SUBSYSTEM", subSystem.getName());
+				contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 				result = true;
 			}
 		}

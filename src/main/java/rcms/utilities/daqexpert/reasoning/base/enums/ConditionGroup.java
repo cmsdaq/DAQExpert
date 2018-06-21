@@ -32,7 +32,8 @@ public enum ConditionGroup {
 	SUBSYS_SOFT_ERR("ss-soft-err"),
 	SUBSYS_ERROR("ss-err"),
 	EXPERT_VERSION("ver"),
-	HIDDEN("hidden");
+	HIDDEN("hidden"),
+	DOMINATING("dominating");
 	
 	private final String code;
 

@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -40,6 +41,11 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	private Set<LHCBeamMode> criticalBeamModes = new HashSet<>();
 
 	private HoldOffTimer holdOffTimer;
+
+	@Override
+	public void declareRelations(){
+		declareAffected(LogicModuleRegistry.BackpressureFromHlt);
+	}
 
 	public CloudFuNumber() {
 		this.name = "Too many FUs in cloud mode";

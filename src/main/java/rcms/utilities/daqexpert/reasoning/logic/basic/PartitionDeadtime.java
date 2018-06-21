@@ -27,8 +27,10 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.ExpectedRate);
+
+        declareAffected(LogicModuleRegistry.TTSDeadtime);
     }
 
     /**
@@ -71,6 +73,7 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
         this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_PARTITION, this.getClass());
         this.description = "Deadtime of partition(s) {{PROBLEM-PARTITION}} in subsystem(s) {{PROBLEM-SUBSYSTEM}} is {{DEADTIME}} the threshold is "
                 + threshold + "%";
+        this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is {{DEADTIME}}";
 
     }
 

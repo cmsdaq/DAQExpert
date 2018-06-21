@@ -7,6 +7,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
@@ -25,9 +26,23 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 		this.max = 0;
 
 		this.description = "failed to set description";
-    this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger",
+		this.briefDescription = "The trigger rate of {{ACTUAL_READOUT_RATE}} is to high";
+    	this.action = new SimpleAction("Ask the trigger shifter to check the inputs to the L1 trigger",
                                    "Make an e-log entry"
 			);
+	}
+
+	@Override
+	public void declareRelations(){
+		declareCause(LogicModuleRegistry.HighTcdsInputRate);
+		declareCause(LogicModuleRegistry.VeryHighTcdsInputRate);
+
+		declareAffected(LogicModuleRegistry.HltOutputBandwidthTooHigh);
+		declareAffected(LogicModuleRegistry.HltOutputBandwidthExtreme);
+
+		declareAffected(LogicModuleRegistry.HltCpuLoad);
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
+		declareAffected(LogicModuleRegistry.FedGeneratesDeadtime);
 	}
 
 	@Override

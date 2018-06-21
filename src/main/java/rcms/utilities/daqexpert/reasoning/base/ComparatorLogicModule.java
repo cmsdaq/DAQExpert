@@ -12,6 +12,10 @@ import rcms.utilities.daqaggregator.data.DAQ;
  */
 public abstract class ComparatorLogicModule extends LogicModule {
 
+	public ComparatorLogicModule(){
+		this.problematic = false;
+	}
+
 	private DAQ last;
 
 	private static Logger logger = Logger.getLogger(ComparatorLogicModule.class);

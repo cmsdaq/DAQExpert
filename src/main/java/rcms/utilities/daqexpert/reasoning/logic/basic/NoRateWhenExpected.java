@@ -17,10 +17,12 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.StableBeams);
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.NoRate);
+
+		declareAffected(LogicModuleRegistry.TTSDeadtime);
 	}
 
 	@Override

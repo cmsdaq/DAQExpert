@@ -24,6 +24,8 @@ public class StatisticContextEntry extends ContextEntry {
     private Float lastReportedAvg;
     @Transient
     private Float sum;
+
+
     @Transient
     private Float current;
     @Transient
@@ -33,9 +35,17 @@ public class StatisticContextEntry extends ContextEntry {
     @Transient
     private boolean allTheSame;
 
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     private String unit;
     @Transient
     private DecimalFormat df;
+
+    public StatisticContextEntry(){
+
+    }
 
     public StatisticContextEntry(String unit, int precision) {
 
@@ -138,6 +148,15 @@ public class StatisticContextEntry extends ContextEntry {
     }
 
 
+    public Float getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Float current) {
+        this.current = current;
+    }
+
+
     @Override
     public String getTextRepresentation() {
         boolean highlightMakrup = ContextHandler.highlightMarkup;
@@ -174,5 +193,9 @@ public class StatisticContextEntry extends ContextEntry {
     @Override
     public Object getValue() {
         return this;
+    }
+
+    public String getUnit() {
+        return unit;
     }
 }

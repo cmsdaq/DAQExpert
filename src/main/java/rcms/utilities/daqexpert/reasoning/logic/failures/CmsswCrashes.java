@@ -34,6 +34,7 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         this.name = "CMSSW crashes";
 
 
+        this.briefDescription = "CMSSW crashes frequently, there are {{CRASHES}}";
         this.action = new SimpleAction("Call the HLT DOC, mentioning the messages under you see under HLT Alerts in F3 Mon. ",
                 "Call the DAQ DOC. He might need to clean up the Filter Farm.");
 
@@ -41,8 +42,9 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.BackpressureFromHlt);
+        declareAffected(LogicModuleRegistry.BackpressureFromHlt);
     }
 
     @Override
@@ -80,13 +82,6 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         // update the sliding window - keep as less data as possible for next iteration
         timeWindow = timeWindow.stream().filter(e -> e.getLeft() >= startTimestampOfSlidingWindow).collect(Collectors.toList());
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-            //mention the fact that some modules are active
-            contextHandler.registerConditionalNote("NOTE", additionalNote);
-        } else{
-            contextHandler.unregisterConditionalNote("NOTE");
-        }
-
         return result;
 
 
@@ -97,7 +92,7 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         this.crashesCountThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_THRESHOLD, this.getClass());
         this.slidingWindowPeriodInSeconds = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_TIME_WINDOW, this.getClass());
 
-        this.description = "CMSSW crashes frequently, there are {{CRASHES}}, which exceeds the threshold of " + crashesCountThreshold + " crashes per " + slidingWindowPeriodInSeconds + "s. [[NOTE]]";
+        this.description = "CMSSW crashes frequently, there are {{CRASHES}}, which exceeds the threshold of " + crashesCountThreshold + " crashes per " + slidingWindowPeriodInSeconds + "s.";
 
         logger.debug("Parametrized: " + description);
     }

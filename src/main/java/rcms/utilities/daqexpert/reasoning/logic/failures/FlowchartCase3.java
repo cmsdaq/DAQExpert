@@ -23,15 +23,17 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  */
 public class FlowchartCase3 extends KnownFailure {
 
+	//TODO: include FED information
 	public FlowchartCase3() {
 		this.name = "Partition problem";
-		this.description = "Partition {{TTCP}} in {{SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers.";
+		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers.";
+		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is {{DEADTIME}}";
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
-				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem {{SUBSYSTEM}}. Start a new run. Try up to 2 times",
-				"Problem still not fixed after recover: Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}})",
-				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
+				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem {{PROBLEM-SUBSYSTEM}}. Start a new run. Try up to 2 times",
+				"Problem still not fixed after recover: Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}})",
+				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		action.addContextSteps("ECAL-LHC-UNSTABLE", "This problem is normal for ECAL in periods of unstable clock",
 				"Stop the run, Red recycle ECAL and start a new run",
@@ -46,8 +48,10 @@ public class FlowchartCase3 extends KnownFailure {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override
@@ -76,8 +80,8 @@ public class FlowchartCase3 extends KnownFailure {
 						TTSState currentState = getParitionState(ttcp);
 						if (currentState == TTSState.OUT_OF_SYNC || currentState == TTSState.ERROR) {
 
-							contextHandler.register("SUBSYSTEM", subSystem.getName());
-							contextHandler.register("TTCP", ttcp.getName());
+							contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
+							contextHandler.register("PROBLEM-PARTITION", ttcp.getName());
 							contextHandler.register("STATE", currentState.name());
 							result = true;
 

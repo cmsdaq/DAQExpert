@@ -22,18 +22,26 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
         this.name = "Extreme HLT output bandwidth";
         this.bandwidthThresholdInGbps = 0;
 
+        this.briefDescription = "The HLT output bandwidth is extreme: {{BANDWIDTH}}";
         this.action = new SimpleAction( "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.BackpressureFromHlt);
+        declareAffected(LogicModuleRegistry.BackpressureFromHlt);
+        require(LogicModuleRegistry.HltOutputBandwidthTooHigh);
     }
 
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+
+        if (!results.get(HltOutputBandwidthTooHigh.class.getSimpleName()).getResult()) {
+            return false;
+        }
 
         // assign the priority based on whether we are in stable beams or not
         assignPriority(results);
@@ -46,13 +54,6 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
             result = true;
         }
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-            //mention the fact that some modules are active
-            contextHandler.registerConditionalNote("NOTE", additionalNote);
-        } else{
-            contextHandler.unregisterConditionalNote("NOTE");
-        }
-
         return result;
     }
 
@@ -63,8 +64,7 @@ public class HltOutputBandwidthExtreme extends KnownFailure implements Parameter
             this.bandwidthThresholdInGbps = Double.parseDouble(properties.getProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey()));
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. " +
                     "You should not continue running in these conditions. " +
-                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. " +
-                    "[[NOTE]]";
+                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ";
 
         } catch (NumberFormatException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "

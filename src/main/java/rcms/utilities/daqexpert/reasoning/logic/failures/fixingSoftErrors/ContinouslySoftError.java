@@ -29,7 +29,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		this.name = "Continuous fixing-soft-error";
 
 		/* default action */
-		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{SUBSYSTEM}}");
+		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ES specific instructions */
 		action.addContextSteps("ES", "Stop the run and re-start it",
@@ -41,10 +41,12 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 				"If no problem in DCS call Pixel DOC immediately");
 
 		/* CTPPS specific instructions */
-		action.addContextSteps("CTPPS", "<<RedRecycle::{{SUBSYSTEM}}>>",
-				"Call DOC of subsystem {{SUBSYSTEM}}");
+		action.addContextSteps("CTPPS", "<<RedRecycle::{{PROBLEM-SUBSYSTEM}}>>",
+				"Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		this.action = action;
+
+		this.briefDescription = "Level zero repeatably in FixingSoftError due to subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
 
 		this.pastOccurrences = new ArrayList<>();
 		this.previousResult = false;
@@ -64,6 +66,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
 			this.description = "Level zero in FixingSoftError more than 3 times in past "
 					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
+
 
 		} catch (NumberFormatException e) {
 			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
@@ -94,15 +97,11 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		String currentState = daq.getLevelZeroState();
 
 		// 1. clear too old occurrences
-		Iterator<Pair<Date, List<String>>> i = this.pastOccurrences.iterator();
 		Date repeatThreshold = new Date(daq.getLastUpdate() - thresholdPeriod);
 		Date mergeThreshold = new Date(daq.getLastUpdate() - mergePeriod);
-		while (i.hasNext()) {
-			Pair<Date, List<String>> entry = i.next();
-			if (entry.getLeft().before(repeatThreshold)) {
-				i.remove();
-			}
-		}
+
+		this.pastOccurrences.removeIf(e -> (e.getLeft().before(repeatThreshold))); // remove too old
+		this.pastOccurrences.removeIf(e -> (e.getLeft().after(new Date(daq.getLastUpdate())))); // remove future (IT test)
 
 		if (levelZeroProblematicState.equalsIgnoreCase(currentState)) {
 
@@ -153,7 +152,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 
 						logger.debug("Registering " + count.getValue());
 
-						contextHandler.register("SUBSYSTEM", problematicSubsystem);
+						contextHandler.register("PROBLEM-SUBSYSTEM", problematicSubsystem);
 
 						subsystemWithCounts.add(problematicSubsystem + " " + count.getValue() + " time(s)");
 						contextHandler.setActionKey(problematicSubsystem);

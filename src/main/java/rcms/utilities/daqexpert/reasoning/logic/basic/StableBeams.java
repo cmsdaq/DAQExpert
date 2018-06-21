@@ -19,6 +19,7 @@ public class StableBeams extends SimpleLogicModule {
 		this.name = "Stable beams";
 		this.description = "Stable beams identified";
 		this.priority = ConditionPriority.DEFAULTT;
+		this.problematic = false;
 	}
 
 	@Override

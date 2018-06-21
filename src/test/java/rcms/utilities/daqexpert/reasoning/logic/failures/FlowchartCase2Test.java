@@ -51,9 +51,9 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getActionWithContext());
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(644)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(644)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB+")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals(4, fc2.getActionWithContext().size());
 	}
@@ -82,9 +82,9 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getActionWithContext());
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(4, fc2.getActionWithContext().size());
 
 	}
@@ -119,9 +119,9 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(3, fc2.getActionWithContext().size());
 	}
 
@@ -149,10 +149,10 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getActionWithContext());
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(841, 843)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList(841, 843)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		// assertEquals(new HashSet(Arrays.asList("CSC+")),
-		// contextHandler.getContextHandler().get("TTCP"));
+		// contextHandler.getContextHandler().get("PROBLEM-PARTITION"));
 
 		assertEquals(3, fc2.getActionWithContext().size());
 	}
@@ -179,9 +179,9 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEquals(false, unidentified.satisfied(snapshot, results));
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals(4, fc2.getActionWithContext().size());
 	}

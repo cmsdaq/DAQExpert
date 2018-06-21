@@ -73,9 +73,9 @@ public class RuStuckTest extends FlowchartCaseTestBase {
 		assertOnlyOneIsSatisified(ruStuck, snapshot);
 
 		ContextHandler context = ruStuck.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("DT")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(773)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("DT")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("DT+")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(new HashSet<>(Arrays.asList("DT")), context.getContext().get("FROZENSUBSYSTEM"));
 
 	}

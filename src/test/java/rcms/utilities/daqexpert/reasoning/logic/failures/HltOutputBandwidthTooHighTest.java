@@ -8,6 +8,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
@@ -43,9 +44,10 @@ public class HltOutputBandwidthTooHighTest
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. ",hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
+	@Ignore // no longer using notes to indicate that other problem is active. Will now use causality graph (affected nodes will be displayed)
 	@Test
 	public void testWithAdditionalNote() throws URISyntaxException
 	{

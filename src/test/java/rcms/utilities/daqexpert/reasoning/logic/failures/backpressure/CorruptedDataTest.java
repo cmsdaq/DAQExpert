@@ -42,7 +42,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 
 		assertEquals(4, fc2.getActionWithContext().size());
 
@@ -107,9 +107,9 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		System.out.println("Output: " + fc2.getActionWithContext());
 
 		ContextHandler context = fc2.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList(644)), context.getContext().get("FED"));
-		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("EB+")), context.getContext().get("TTCP"));
+		assertEquals(new HashSet(Arrays.asList(644)), context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB+")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals(4, fc2.getActionWithContext().size());
 	}
@@ -125,7 +125,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 
 		assertEquals(3, fc2.getActionWithContext().size());
 	}
@@ -142,7 +142,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 		assertEquals(new HashSet(Arrays.asList(841,843)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 
 
 
@@ -164,7 +164,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-TTCP").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
 
 
 

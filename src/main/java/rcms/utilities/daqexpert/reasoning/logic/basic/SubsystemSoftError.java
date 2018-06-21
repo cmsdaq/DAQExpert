@@ -13,12 +13,12 @@ public class SubsystemSoftError extends ContextLogicModule {
 
 	public SubsystemSoftError() {
 		this.name = "Subsystem soft error detected";
-		this.description = "{{SUBSYSTEM}} subsystem is in soft error detected";
+		this.description = "{{PROBLEM-SUBSYSTEM}} subsystem is in soft error detected";
 		this.priority = ConditionPriority.DEFAULTT;
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.RunOngoing);
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.LongTransition);
@@ -44,7 +44,7 @@ public class SubsystemSoftError extends ContextLogicModule {
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
 			if ("RunningSoftErrordetected".equalsIgnoreCase(subSystem.getStatus())) {
-				contextHandler.register("SUBSYSTEM", subSystem.getName());
+				contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 				result = true;
 			}
 		}

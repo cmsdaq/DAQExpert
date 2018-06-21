@@ -33,8 +33,9 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.TTSDeadtime);
+        declareAffected(LogicModuleRegistry.TTSDeadtime);
     }
 
     private boolean isUpgraded(FED fed){
@@ -111,16 +112,16 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
                     result = true;
                     contextHandler.registerForStatistics("VALUE", backpressure, "%", 1);
                     if (problematicFedsBehindPseudoFed == null) {
-                        contextHandler.register("FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.register("PROBLEM-FED", topLevelFed.getSrcIdExpected());
                     } else {
                         for (FED fed : problematicFedsBehindPseudoFed) {
-                            contextHandler.register("FED", fed.getSrcIdExpected());
+                            contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
                         }
                     }
                     TTCPartition p = topLevelFed.getTtcp();
 
-                    contextHandler.register("PARTITION", p != null ? p.getName() : "null");
-                    contextHandler.register("SUBSYSTEM", p != null ?
+                    contextHandler.register("PROBLEM-PARTITION", p != null ? p.getName() : "null");
+                    contextHandler.register("PROBLEM-SUBSYSTEM", p != null ?
                             p.getSubsystem() != null ? p.getSubsystem().getName() : "null"
                             : "null");
                 }
@@ -135,9 +136,10 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     public void parametrize(Properties properties) {
 
         this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
-        this.description = "High backpressure on fed(s) {{FED}} in partition(s) {{PARTITION}} in subsystem(s) {{SUBSYSTEM}} is {{VALUE}} the threshold is "
+        this.description = "High backpressure on fed(s) {{PROBLEM-FED}} in partition(s) {{PROBLEM-PARTITION}} in subsystem(s) {{PROBLEM-SUBSYSTEM}} is {{VALUE}} the threshold is "
                 + threshold + "%. This does not indicate a problem with these FEDs. This condition is only used as a basis for other backpressure analysis since upgraded FEDs have no deadtime monitoring. For legacy FEDs the deadtime is the basis for backpressure analysis.";
 
+        this.briefDescription = "High backpressure on fed(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}, {{VALUE}}";
     }
 
 }

@@ -18,11 +18,12 @@ public class LongTransition extends SimpleLogicModule {
 		this.name = "LongTransition";
 		this.priority = ConditionPriority.DEFAULTT;
 		this.description = "Transition for new run (long)";
+		this.problematic = false;
 
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 	}
 

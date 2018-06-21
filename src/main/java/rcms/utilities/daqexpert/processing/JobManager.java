@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 
-import org.h2.tools.Recover;
 import rcms.utilities.daqaggregator.persistence.FileSystemConnector;
 import rcms.utilities.daqaggregator.persistence.PersistenceExplorer;
 import rcms.utilities.daqexpert.Application;
@@ -84,15 +83,15 @@ public class JobManager {
 		int batchSnapshotRead = 2000;
 
 		boolean demo = false;
-		int demoPeriod = 2000;
+		int demoPeriod = 10;
 		if (Application.get().getProp().containsKey("demo")) {
 			try {
 				Object a = Application.get().getProp().get("demo");
 				demo = Boolean.parseBoolean((String) a);
-				demoPeriod = Integer.parseInt((String) a);
 
 			} catch (NumberFormatException e) {
 				logger.warn("Demo configuration could not be parsed");
+				e.printStackTrace();
 			}
 		}
 		if (Application.get().getProp().containsKey("demo.delay")) {
@@ -106,6 +105,7 @@ public class JobManager {
 		}
 
 		if (demo) {
+			logger.info("Running in demo mode");
 			realTimeReaderPeriod = demoPeriod;
 			batchSnapshotRead = 1;
 		}
@@ -164,7 +164,6 @@ public class JobManager {
 
 		ConditionDashboard conditionDashboard = Application.get().getDashboard();
 
-
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
 				eventRegister, eventSender, conditionDashboard, recoveryJobManager, demo);
 
@@ -194,7 +193,7 @@ public class JobManager {
 			for (Condition condition : briefHistory) {
 				Set<Condition> fakeGroup = new HashSet<>();
 				fakeGroup.add(condition);
-				Application.get().getDashboard().update(fakeGroup);
+				Application.get().getDashboard().update(fakeGroup, null, false);
 			}
 		}
 	}

@@ -28,8 +28,9 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
     }
 
     @Override
-    public void declareRequired(){
+    public void declareRelations(){
         require(LogicModuleRegistry.FEDDeadtime);
+        declareAffected(LogicModuleRegistry.FEDDeadtime);
     }
 
     @Override
@@ -84,10 +85,10 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
                     result = true;
 
                     if(problematicFedsBehindPseudoFed == null) {
-                        contextHandler.register("FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.register("PROBLEM-FED", topLevelFed.getSrcIdExpected());
                     } else{
                         for(FED fed: problematicFedsBehindPseudoFed){
-                            contextHandler.register("FED", fed.getSrcIdExpected());
+                            contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
                         }
                     }
                     contextHandler.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
@@ -105,8 +106,9 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
     public void parametrize(Properties properties) {
         this.deadtimeThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED, this.getClass());
         this.backpressureThresholdInPercentage = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED, this.getClass());
-        this.description = "FED {{FED}} has a deadtime {{DEADTIME}}, due to DAQ backpressure {{BACKPRESSURE}}. " +
+        this.description = "FED {{PROBLEM-FED}} has a deadtime {{DEADTIME}}, due to DAQ backpressure {{BACKPRESSURE}}. " +
                 "The threshold for deadtime is " + deadtimeThresholdInPercentage + "%, backpressure: " + backpressureThresholdInPercentage + "%";
+        this.briefDescription = "FED {{PROBLEM-FED}} has a deadtime {{DEADTIME}}, due to DAQ backpressure {{BACKPRESSURE}}.";
     }
 
 }

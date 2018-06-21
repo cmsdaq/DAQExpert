@@ -35,8 +35,10 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{PROBLEM-FED}}, RU {{RU}} is in syncloss. "
-				+ "Problem FED belongs to TTCP {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
+				+ "Problem FED belongs to TTCP {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "Original error message: {{ORIGERRMSG}}";
+
+		this.briefDescription = "Run blocked by out-of-sync data from FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
 		/* Default action */
 		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
@@ -69,9 +71,10 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	}
 
 	@Override
-	public void declareRequired(){
+	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		require(LogicModuleRegistry.OutOfSequenceData);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	private static final String RUNBLOCKED_STATE = "RUNBLOCKED";
@@ -80,7 +83,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	private void setContextValues(String text) {
 
 		contextHandler.register("PROBLEM-FED", text);
-		contextHandler.register("PROBLEM-TTCP", text);
+		contextHandler.register("PROBLEM-PARTITION", text);
 		contextHandler.register("PROBLEM-SUBSYSTEM", text);
 		contextHandler.register("ORIGERRMSG", "-");
 
@@ -176,7 +179,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 								subsystemName = ttcp.getSubsystem().getName();
 							}
 						}
-						contextHandler.register("PROBLEM-TTCP", ttcpName);
+						contextHandler.register("PROBLEM-PARTITION", ttcpName);
 						contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
 
 						if (problematicFED.getSrcIdExpected() == 1111 || problematicFED.getSrcIdExpected() == 1109) {

@@ -67,13 +67,15 @@ public class UnidentifiedFailure extends ActionLogicModule {
     }
 
     @Override
-    public void declareRequired() {
+    public void declareRelations() {
         Arrays.stream(LogicModuleRegistry.values())
                 .filter(l->l.getLogicModule() != null)
                 .filter(l->l.getLogicModule() instanceof ActionLogicModule)
                 .filter(l->l!=LogicModuleRegistry.UnidentifiedFailure)
                 .forEach(l->required.add(l.getLogicModule()));
         //required.stream().map(f->f.getClass().getSimpleName()).forEach(System.out::println);
+
+        declareAffected(LogicModuleRegistry.NoRateWhenExpected);
     }
 
     public void setKnownFailureClasses(Set<LogicModule> knownFailureClasses) {

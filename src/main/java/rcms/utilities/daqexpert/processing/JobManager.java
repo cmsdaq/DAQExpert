@@ -83,7 +83,7 @@ public class JobManager {
 		int batchSnapshotRead = 2000;
 
 		boolean demo = false;
-		int demoPeriod = 2000;
+		int demoPeriod = 10;
 		if (Application.get().getProp().containsKey("demo")) {
 			try {
 				Object a = Application.get().getProp().get("demo");
@@ -106,7 +106,7 @@ public class JobManager {
 
 		if (demo) {
 			logger.info("Running in demo mode");
-			realTimeReaderPeriod = 10;
+			realTimeReaderPeriod = demoPeriod;
 			batchSnapshotRead = 1;
 		}
 

@@ -40,6 +40,9 @@ public class ConditionDashboard implements Observer {
     /** Map of recent conditions. Limited to @ConditionDashboard. */
     private HashMap<Long, Condition> conditions = new LinkedHashMap<>();
 
+
+    private HashMap<Long, Condition> conditionsTmp = new LinkedHashMap<>();
+
     /** Client session handler*/
     private ConditionSessionHandler sessionHander;
 
@@ -60,6 +63,7 @@ public class ConditionDashboard implements Observer {
 
     public void update(Set<Condition> conditionsProduced, Long dominatingId, boolean requireProblematic) {
 
+        Condition lastDominating = dominatingCondition;
 
         conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -77,10 +81,23 @@ public class ConditionDashboard implements Observer {
             }
         }
 
-        for (Condition condition : conditionsProduced) {
+
+
+        for(Condition condition: conditionsProduced){
+            conditionsTmp.put(condition.getId(), condition);
+        }
+
+        Iterator<Map.Entry<Long,Condition>> iterator = conditionsTmp.entrySet().iterator();
+
+
+        while(iterator.hasNext()) {
+
+            Map.Entry<Long, Condition> entry = iterator.next();
+            Condition condition = entry.getValue();
+
             if (condition.isMature() && ( !requireProblematic || condition.isProblematic())) {
 
-                //compareWithCurrentlyDominating(condition);
+                iterator.remove();
 
                 if (!conditions.containsKey(condition.getId())) {
                     if (conditions.size() >= maximumNumberOfConditionsHandled) {
@@ -100,7 +117,6 @@ public class ConditionDashboard implements Observer {
         }
 
 
-        Condition lastDominating = dominatingCondition;
         if(dominatingId != null) {
             dominatingCondition = conditions.get(dominatingId);
         }else{

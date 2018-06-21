@@ -5,15 +5,21 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class ConditionDashboardTest {
 
@@ -26,6 +32,7 @@ public class ConditionDashboardTest {
     static Condition c2 = generateCondition("c2", LogicModuleRegistry.RateTooHigh, t1);
     static Condition c3 = generateCondition("c3", LogicModuleRegistry.FlowchartCase5, t2);
     static Condition c4 = generateCondition("c4", LogicModuleRegistry.NoRateWhenExpected, t2);
+    static Condition c5 = generateCondition("c5", LogicModuleRegistry.NoRateWhenExpected, t2);
 
     @BeforeClass
     public static void prepare(){
@@ -44,11 +51,67 @@ public class ConditionDashboardTest {
 
 
     @Test
+    public void communicationHandlerTest(){
+
+        ConditionDashboard conditionDashboard = new ConditionDashboard(5);
+        SessionHandlerStub conditionSessionHandler = new SessionHandlerStub(conditionDashboard);
+        conditionDashboard.setSessionHander(conditionSessionHandler);
+
+        conditionDashboard.update(get(c1),0L);
+        assertThat(conditionSessionHandler.recentConditionSignalsReceived, hasItem(equalTo(Arrays.asList(0L))));
+        assertThat(conditionSessionHandler.dominatingSignalsReceived, contains(equalTo(0L)));
+
+
+        conditionDashboard.update(get(c2),0L);
+        assertThat(conditionSessionHandler.recentConditionSignalsReceived, allOf(
+                hasItem(equalTo(Arrays.asList(0L))),
+                hasItem(equalTo(Arrays.asList(1L)))
+        ));
+        assertThat(conditionSessionHandler.dominatingSignalsReceived, contains(equalTo(0L)));
+
+
+        conditionDashboard.update(get(c3),2L);
+        assertThat(conditionSessionHandler.recentConditionSignalsReceived, allOf(
+                hasItem(equalTo(Arrays.asList(0L))),
+                hasItem(equalTo(Arrays.asList(1L))),
+                hasItem(equalTo(Arrays.asList(2L)))
+        ));
+        assertThat(conditionSessionHandler.dominatingSignalsReceived, contains(
+                equalTo(0L),
+                equalTo(2L)
+        ));
+
+        conditionDashboard.update(get(c4, c5),4L);
+        assertThat(conditionSessionHandler.recentConditionSignalsReceived, allOf(
+                hasItem(equalTo(Arrays.asList(0L))),
+                hasItem(equalTo(Arrays.asList(1L))),
+                hasItem(equalTo(Arrays.asList(2L))),
+                hasItem(equalTo(Arrays.asList(4L, 3L)))
+        ));
+        assertThat(conditionSessionHandler.dominatingSignalsReceived, contains(
+                equalTo(0L),
+                equalTo(2L),
+                equalTo(4L)
+        ));
+
+
+        conditionDashboard.update(c1, null);
+
+        assertThat(conditionSessionHandler.updatedConditionSignalsReceived, contains(equalTo(0L)));
+
+
+    }
+
+    private Set<Condition> get(Condition... conditions){
+        return Arrays.asList(conditions).stream().collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Test
     public void simpleScenarioTest() {
 
         ConditionDashboard conditionDashboard = new ConditionDashboard(5);
 
-        Set<Condition> conditions = new LinkedHashSet<Condition>();
+        Set<Condition> conditions = new LinkedHashSet<>();
 
 		/* 1 Change - new condition(s) start/end */
         conditions.add(c4);
@@ -131,6 +194,39 @@ public class ConditionDashboardTest {
         condition.setProblematic(true);
         condition.setStart(t);
         return condition;
+    }
+
+    class SessionHandlerStub extends ConditionSessionHandler{
+
+
+        public List<Long> dominatingSignalsReceived;
+        public List<Long> updatedConditionSignalsReceived;
+        public List<List<Long>> recentConditionSignalsReceived;
+
+
+        public SessionHandlerStub(ConditionDashboard conditionDashboard) {
+            super(conditionDashboard);
+
+            dominatingSignalsReceived = new ArrayList<>();
+            updatedConditionSignalsReceived = new ArrayList<>();
+            recentConditionSignalsReceived = new ArrayList<>();
+        }
+
+
+        @Override
+        public void handleDominatingConditionChange(Condition dominatingCondition) {
+            dominatingSignalsReceived.add(dominatingCondition.getId());
+        }
+
+        @Override
+        public void handleConditionUpdate(Condition updatedCondition) {
+            updatedConditionSignalsReceived.add(updatedCondition.getId());
+        }
+
+        @Override
+        public void handleRecentConditionsChange(Collection<Condition> recentConditions) {
+            recentConditionSignalsReceived.add(recentConditions.stream().map(c->c.getId()).collect(Collectors.toList()));
+        }
     }
 
 

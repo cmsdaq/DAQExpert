@@ -107,7 +107,7 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 									subsystemName = ttcp.getSubsystem().getName();
 							}
 							contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
-							contextHandler.register("PROBLEM-TTCP", ttcpName);
+							contextHandler.register("PROBLEM-PARTITION", ttcpName);
 							contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
 							contextHandler.setActionKey(subsystemName);
 							i++;

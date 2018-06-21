@@ -35,7 +35,7 @@ public class ObjectListOptimizer<T> implements Serializable {
             return getShortestIntegerListRepresentation(objects, function.andThen(c->c instanceof  Integer? (Integer) c : Integer.parseInt((String)c)));
         } else{
             int limit = 4;
-            String representation = objects.stream().map(o->function.apply(o).toString()).limit(limit).collect(Collectors.joining(", "));
+            String representation = objects.stream().map(o->function.apply(o).toString()).sorted().limit(limit).collect(Collectors.joining(", "));
 
             if(objects.size() > limit){
                 representation += " and " + (objects.size() - limit ) + " more";

@@ -74,6 +74,8 @@ public class UnidentifiedFailure extends ActionLogicModule {
                 .filter(l->l!=LogicModuleRegistry.UnidentifiedFailure)
                 .forEach(l->required.add(l.getLogicModule()));
         //required.stream().map(f->f.getClass().getSimpleName()).forEach(System.out::println);
+
+        declareAffected(LogicModuleRegistry.NoRateWhenExpected);
     }
 
     public void setKnownFailureClasses(Set<LogicModule> knownFailureClasses) {

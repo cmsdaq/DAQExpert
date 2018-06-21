@@ -40,15 +40,15 @@ public class ConditionDashboard implements Observer {
     /** Map of recent conditions. Limited to @ConditionDashboard. */
     private HashMap<Long, Condition> conditions = new LinkedHashMap<>();
 
+
+    private HashMap<Long, Condition> conditionsTmp = new LinkedHashMap<>();
+
     /** Client session handler*/
     private ConditionSessionHandler sessionHander;
-
-    private DominatingSelector dominatingSelector;
 
 
     public ConditionDashboard(int max) {
         this.maximumNumberOfConditionsHandled = max;
-        this.dominatingSelector = new DominatingSelector();
     }
 
     private void handleUpdate(Condition condition) {
@@ -57,20 +57,18 @@ public class ConditionDashboard implements Observer {
         }
     }
 
+    public void update(Set<Condition> conditionsProduced, Long dominatingId) {
+        update(conditionsProduced, dominatingId, true);
+    }
 
-    public void update(Set<Condition> conditionsProduced, boolean updateCurrentlyDominating) {
+    public void update(Set<Condition> conditionsProduced, Long dominatingId, boolean requireProblematic) {
+
+        Condition lastDominating = dominatingCondition;
 
         conditionsProduced = conditionsProduced.stream().filter(c->c.isShow()  && !c.isHoldNotifications()).collect(Collectors.toCollection(LinkedHashSet::new));
 
-
         Set<Condition> addedThisRound = new HashSet<>();
-        Condition lastDominating = dominatingCondition;
 
-        if (dominatingCondition != null) {
-            if (dominatingCondition.getEnd() != null && updateCurrentlyDominating) {
-                dominatingCondition = null;
-            }
-        }
 
         /* Handle observation */
         for (Condition condition : conditionsProduced) {
@@ -83,10 +81,25 @@ public class ConditionDashboard implements Observer {
             }
         }
 
-        for (Condition condition : conditionsProduced) {
-            if (condition.isMature()) {
 
-                //compareWithCurrentlyDominating(condition);
+
+        for(Condition condition: conditionsProduced){
+            conditionsTmp.put(condition.getId(), condition);
+        }
+
+        logger.trace("Currently on tmp list: " + conditionsTmp.size() + ": " + conditionsTmp.values().stream().map(c->c.getTitle()).collect(Collectors.toList()));
+
+        Iterator<Map.Entry<Long,Condition>> iterator = conditionsTmp.entrySet().iterator();
+
+
+        while(iterator.hasNext()) {
+
+            Map.Entry<Long, Condition> entry = iterator.next();
+            Condition condition = entry.getValue();
+
+            if (condition.isMature() && ( !requireProblematic || condition.isProblematic())) {
+
+                iterator.remove();
 
                 if (!conditions.containsKey(condition.getId())) {
                     if (conditions.size() >= maximumNumberOfConditionsHandled) {
@@ -94,7 +107,7 @@ public class ConditionDashboard implements Observer {
                         Condition oldest = it.next();
 
                         // dont remove dominating condition from this list, even though it's old, get next one
-                        if(oldest == dominatingCondition) {
+                        if(oldest.getId() == dominatingId) {
                             oldest = it.next();
                         }
                         conditions.remove(oldest.getId());
@@ -104,11 +117,21 @@ public class ConditionDashboard implements Observer {
                 }
             }
         }
-        Condition dominating = dominatingSelector.selectDominating(conditions.values());
 
 
-        if(updateCurrentlyDominating) {
-            this.dominatingCondition = dominating;
+        if(dominatingId != null) {
+            dominatingCondition = conditions.get(dominatingId);
+        }else{
+            dominatingCondition = null;
+        }
+
+        Iterator<Map.Entry<Long,Condition>> cleanupIterator = conditionsTmp.entrySet().iterator();
+        while(cleanupIterator.hasNext()) {
+            Map.Entry<Long, Condition> entry = cleanupIterator.next();
+            Condition condition = entry.getValue();
+            if(condition.getEnd() != null){
+                cleanupIterator.remove();
+            }
         }
 
 
@@ -188,11 +211,6 @@ public class ConditionDashboard implements Observer {
 
 		if (o instanceof Condition) {
 			Condition condition = (Condition) o;
-
-
-			if (arg != null && "becomeMature".equals((String) arg) &&  !conditions.containsKey(condition.getId())) {
-				update(Sets.newHashSet(condition), false);
-			}
 
 			handleUpdate(condition);
 		}

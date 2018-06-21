@@ -13,7 +13,7 @@ public class SubsystemRunningDegraded extends ContextLogicModule {
 
 	public SubsystemRunningDegraded() {
 		this.name = "Subsystem running degraded";
-		this.description = "{{SUBSYSTEM}} subsystem is in running degraded";
+		this.description = "{{PROBLEM-SUBSYSTEM}} subsystem is in running degraded";
 		this.priority = ConditionPriority.DEFAULTT;
 	}
 
@@ -45,7 +45,7 @@ public class SubsystemRunningDegraded extends ContextLogicModule {
 
 		for (SubSystem subSystem : daq.getSubSystems()) {
 			if ("RunningDegraded".equalsIgnoreCase(subSystem.getStatus())) {
-				contextHandler.register("SUBSYSTEM", subSystem.getName());
+				contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 				result = true;
 			}
 		}

@@ -22,10 +22,10 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 		this.name = "Out of sequence data received";
 
 		this.description = "Run blocked by out-of-sync data from FED {{PROBLEM-FED}} received by RU {{PROBLEM-RU}} - now in syncloss state. "
-				+ "Problem FED belongs to partition {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
+				+ "Problem FED belongs to partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
 
-		this.briefDescription = "Run blocked by out-of-sync data from FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-TTCP}}/{{PROBLEM-FED}}";
+		this.briefDescription = "Run blocked by out-of-sync data from FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
 		/* Default action */
 		ConditionalAction action = new ConditionalAction(
@@ -60,7 +60,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
-		declareAffected(LogicModuleRegistry.FlowchartCase5);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

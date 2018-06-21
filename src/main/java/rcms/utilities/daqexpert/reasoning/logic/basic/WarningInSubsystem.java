@@ -10,11 +10,12 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
+@Deprecated
 public class WarningInSubsystem extends ContextLogicModule {
 
 	public WarningInSubsystem() {
 		this.name = "Warning in partition";
-		this.description = "TTCP {{TTCP}} of {{SUBSYSTEM}} subsystem is in warning {{WARNING}}, it may affect rate.";
+		this.description = "TTCP {{PROBLEM-PARTITION}} of {{PROBLEM-SUBSYSTEM}} subsystem is in warning {{WARNING}}, it may affect rate.";
 		this.priority = ConditionPriority.DEFAULTT;
 	}
 
@@ -48,8 +49,8 @@ public class WarningInSubsystem extends ContextLogicModule {
 			for (TTCPartition ttcp : subSystem.getTtcPartitions()) {
 
 				if (ttcp.getPercentWarning() > 50F) {
-					contextHandler.register("TTCP", ttcp.getName());
-					contextHandler.register("SUBSYSTEM", subSystem.getName());
+					contextHandler.register("PROBLEM-PARTITION", ttcp.getName());
+					contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 					contextHandler.registerForStatistics("WARNING", ttcp.getPercentWarning(),"%",1);
 					result = true;
 				}

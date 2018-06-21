@@ -83,15 +83,15 @@ public class JobManager {
 		int batchSnapshotRead = 2000;
 
 		boolean demo = false;
-		int demoPeriod = 2000;
+		int demoPeriod = 10;
 		if (Application.get().getProp().containsKey("demo")) {
 			try {
 				Object a = Application.get().getProp().get("demo");
 				demo = Boolean.parseBoolean((String) a);
-				demoPeriod = Integer.parseInt((String) a);
 
 			} catch (NumberFormatException e) {
 				logger.warn("Demo configuration could not be parsed");
+				e.printStackTrace();
 			}
 		}
 		if (Application.get().getProp().containsKey("demo.delay")) {
@@ -106,7 +106,7 @@ public class JobManager {
 
 		if (demo) {
 			logger.info("Running in demo mode");
-			realTimeReaderPeriod = 10;
+			realTimeReaderPeriod = demoPeriod;
 			batchSnapshotRead = 1;
 		}
 
@@ -193,7 +193,7 @@ public class JobManager {
 			for (Condition condition : briefHistory) {
 				Set<Condition> fakeGroup = new HashSet<>();
 				fakeGroup.add(condition);
-				Application.get().getDashboard().update(fakeGroup,true);
+				Application.get().getDashboard().update(fakeGroup, null, false);
 			}
 		}
 	}

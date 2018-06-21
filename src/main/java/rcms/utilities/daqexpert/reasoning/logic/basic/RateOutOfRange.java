@@ -27,7 +27,7 @@ public class RateOutOfRange extends ContextLogicModule implements Parameterizabl
     }
 
     @Override
-    public void declareRequired() {
+    public void declareRelations() {
         require(LogicModuleRegistry.StableBeams);
         require(LogicModuleRegistry.NoRate);
     }

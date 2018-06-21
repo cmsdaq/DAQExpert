@@ -82,13 +82,6 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         // update the sliding window - keep as less data as possible for next iteration
         timeWindow = timeWindow.stream().filter(e -> e.getLeft() >= startTimestampOfSlidingWindow).collect(Collectors.toList());
 
-        if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-            //mention the fact that some modules are active
-            contextHandler.registerConditionalNote("NOTE", additionalNote);
-        } else{
-            contextHandler.unregisterConditionalNote("NOTE");
-        }
-
         return result;
 
 
@@ -99,7 +92,7 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
         this.crashesCountThreshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_THRESHOLD, this.getClass());
         this.slidingWindowPeriodInSeconds = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_CMSSW_CRASHES_TIME_WINDOW, this.getClass());
 
-        this.description = "CMSSW crashes frequently, there are {{CRASHES}}, which exceeds the threshold of " + crashesCountThreshold + " crashes per " + slidingWindowPeriodInSeconds + "s. [[NOTE]]";
+        this.description = "CMSSW crashes frequently, there are {{CRASHES}}, which exceeds the threshold of " + crashesCountThreshold + " crashes per " + slidingWindowPeriodInSeconds + "s.";
 
         logger.debug("Parametrized: " + description);
     }

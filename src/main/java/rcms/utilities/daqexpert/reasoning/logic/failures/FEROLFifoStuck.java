@@ -49,6 +49,7 @@ public class FEROLFifoStuck extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	private static final Logger logger = Logger.getLogger(FEROLFifoStuck.class);

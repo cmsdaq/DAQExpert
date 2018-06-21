@@ -8,6 +8,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
@@ -35,6 +36,7 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
         Map<String, Output> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
         results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
@@ -50,6 +52,7 @@ public class HltOutputBandwidthExtremeTest {
                 hltOutputBandwidthExtreme.getDescriptionWithContext());
     }
 
+    @Ignore // no longer using notes to indicate that other problem is active. Will now use causality graph (affected nodes will be displayed)
     @Test
     public void testWithAdditionalNote() throws URISyntaxException {
         Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
@@ -58,6 +61,7 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
         Map<String, Output> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
         results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
@@ -82,6 +86,7 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(), "4.5");
         Map<String, Output> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), new Output(true));
+        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
         results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 
 

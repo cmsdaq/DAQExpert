@@ -22,7 +22,6 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 
 	private Float maxCpuLoad;
 
-	private String additionalNote = "Note that there is also backpressure from HLT.";
 
 	/**
 	 *  Timer keeping condition of for a period after RunOngoing condition satisfied
@@ -85,14 +84,6 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 			result =  true;
 		}
 
-
-		/* Additional note */
-		if (results.get(BackpressureFromHlt.class.getSimpleName()).getResult()) {
-			//mention the fact that some modules are active
-			contextHandler.registerConditionalNote("NOTE", additionalNote);
-		} else{
-			contextHandler.unregisterConditionalNote("NOTE");
-		}
 
 		return result;
 

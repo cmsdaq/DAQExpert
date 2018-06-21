@@ -18,11 +18,11 @@ public class RuStuckWaitingOther extends BackpressureAnalyzer {
 		this.name = "RU waiting for other FED";
 
 		this.description = "RU {{AFFECTED-RU}} is stuck waiting for FED {{PROBLEM-FED}}. "
-				+ "Problem FED(s) belong(s) to partition {{PROBLEM-TTCP}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
+				+ "Problem FED(s) belong(s) to partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem. "
 				+ "This causes backpressure at FED {{AFFECTED-FED}} in other FED-builder {{AFFECTED-FED-BUILDER}} of subsystem {{AFFECTED-SUBSYSTEM}}. "
 				+ "Note that there is nothing wrong with backpressured FED {{AFFECTED-FED}}.";
 
-		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-TTCP}}/{{PROBLEM-FED}}";
+		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
 		this.action = new SimpleAction("Try to recover: Stop the run",
 				"Red & green recycle the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data)",
@@ -35,7 +35,7 @@ public class RuStuckWaitingOther extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
-		declareAffected(LogicModuleRegistry.FlowchartCase5);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

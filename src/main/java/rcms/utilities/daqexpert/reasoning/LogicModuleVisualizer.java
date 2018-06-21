@@ -16,10 +16,7 @@ import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LogicModuleVisualizer {
@@ -37,6 +34,35 @@ public class LogicModuleVisualizer {
 
         Set<CausalityNode> r = getNextLevel(new HashSet<>(), nodes, 0);
 
+
+        boolean modify = true;
+
+        if(modify) {
+
+            CausalityNode max = r.stream().max((a1, a2) -> a1.getLevel() > a2.getLevel() ? 1 : -1).orElse(null);
+            System.out.println("max " + max.getLevel());
+
+
+            Set<CausalityNode> referenced = new HashSet<>();
+            for (CausalityNode causalityNode : r) {
+                if (causalityNode.getCausing().size() > 0) {
+                    for (CausalityNode referencedEntry : causalityNode.getCausing()) {
+                        referenced.add(referencedEntry);
+                    }
+                }
+            }
+
+            System.out.println("Referenced: " + referenced.stream().map(c -> c.getNodeName()).collect(Collectors.toCollection(LinkedHashSet::new)));
+            Set<CausalityNode> result = r.stream().filter(c -> c.getLevel() == 0 && !referenced.contains(c)).collect(Collectors.toCollection(LinkedHashSet::new));
+
+
+            result.stream().forEach(c -> c.setLevel(max.getLevel()));
+
+        }
+
+        r = r.stream().sorted((c1, c2)-> c1.getLevel() < c2.getLevel()? -1 : (c1.getLevel() == c2.getLevel()? 0 : 1)).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        r.stream().forEach(c->c.getNodeName());
 
         ObjectMapper om = new ObjectMapper();
         om.addMixIn(CausalityNode.class, LogicModuleVisualizer.CausalityNodeMixin.class);
@@ -94,6 +120,7 @@ public class LogicModuleVisualizer {
         LogicModuleVisualizer lmv = new LogicModuleVisualizer();
 
         List<LogicModule> modules = LogicModuleRegistry.getModulesInRunOrder();
+        modules.forEach(m-> {if (m.getName().length() > 20){ m.setName(m.getName().substring(0,20));}});
         modules.stream().forEach(c->c.declareRelations());
         CausalityManager cm = new CausalityManager();
 
@@ -106,7 +133,7 @@ public class LogicModuleVisualizer {
 
 
     @JsonIdentityInfo(generator = IdGenerators.ObjectUniqueIntIdGenerator.class, property = "id")
-    @JsonIgnoreProperties({"priority", "logicModuleRegistry", "description", "holdNotifications","maturityThreshold", "contextHandler", "descriptionWithContext", "mature", "action", "actionWithContext", "last"})
+    @JsonIgnoreProperties({"priority", "logicModuleRegistry", "description", "holdNotifications","maturityThreshold", "contextHandler", "descriptionWithContext", "mature", "action", "actionWithContext", "last", "actionWithContextRawRecovery", "briefDescription", "problematic"})
     public interface CausalityNodeMixin {
 
         @JsonProperty("required")

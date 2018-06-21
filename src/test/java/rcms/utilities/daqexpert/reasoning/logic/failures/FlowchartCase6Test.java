@@ -49,7 +49,7 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(773)),
 		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("DT")),
 		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("DT+")),
-		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("DT")),
+		 * contextHandler.getContextHandler().get("PROBLEM-PARTITION")); assertEquals(new HashSet<>(Arrays.asList("DT")),
 		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 	}
@@ -92,7 +92,7 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1404)),
 		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
 		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("GTUP")),
-		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("PIXEL")),
+		 * contextHandler.getContextHandler().get("PROBLEM-PARTITION")); assertEquals(new HashSet<>(Arrays.asList("PIXEL")),
 		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 
@@ -109,7 +109,7 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1386)),
 		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
 		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
-		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("TRG", "HF", "PIXEL")),
+		 * contextHandler.getContextHandler().get("PROBLEM-PARTITION")); assertEquals(new HashSet<>(Arrays.asList("TRG", "HF", "PIXEL")),
 		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 
@@ -140,7 +140,7 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1386)),
 		 * contextHandler.getContextHandler().get("FED")); assertEquals(new HashSet(Arrays.asList("TRG")),
 		 * contextHandler.getContextHandler().get("SUBSYSTEM")); assertEquals(new HashSet(Arrays.asList("MUTFUP")),
-		 * contextHandler.getContextHandler().get("TTCP")); assertEquals(new HashSet<>(Arrays.asList("HF")),
+		 * contextHandler.getContextHandler().get("PROBLEM-PARTITION")); assertEquals(new HashSet<>(Arrays.asList("HF")),
 		 * contextHandler.getContextHandler().get("FROZENSUBSYSTEM"));
 		 */
 	}

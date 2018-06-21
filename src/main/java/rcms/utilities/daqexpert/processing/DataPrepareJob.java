@@ -7,10 +7,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.Date;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Level;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 
 import rcms.utilities.daqexpert.DataManager;
@@ -38,6 +37,7 @@ import rcms.utilities.daqexpert.websocket.ConditionDashboard;
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
+ * TODO: more appropriate name for this class is SnapshotProcessJobBuilder
  */
 public class DataPrepareJob implements Runnable {
 
@@ -56,6 +56,9 @@ public class DataPrepareJob implements Runnable {
 	private final ConditionDashboard conditionDashboard;
 
 	private final DominatingPersistor dominatingPersistor;
+
+	private final DominatingSelector dominatingSelector;
+
 
 	/** List of conditions that has been started - kept in order to generate finish signals for controller */
 	private final List<Long> recoveryConditionIds = new ArrayList<>();
@@ -83,7 +86,9 @@ public class DataPrepareJob implements Runnable {
 		this.conditionDashboard = conditionDashboard;
 		this.demoRun = demoRun;
 		this.dominatingPersistor = new DominatingPersistor(persistenceManager);
+		this.dominatingSelector = new DominatingSelector();
 		this.recoveryJobManager = recoveryJobManager;
+		ProcessJob.flush();
 	}
 
 	private static int priority = 0;
@@ -111,11 +116,11 @@ public class DataPrepareJob implements Runnable {
 						priority++;
 
 					ProcessJob snapshotRetrieveAndAnalyzeJob = new ProcessJob(priority, snapshots.getRight(),
-							dataManager, snapshotProcessor, recoveryJobManager);
-					Future<Pair<Set<Condition>, List<Point>>> future = executorService
+							dataManager, snapshotProcessor, recoveryJobManager, dominatingSelector, dominatingPersistor);
+					Future<Triple<Set<Condition>, List<Point>, Condition>> future = executorService
 							.submit(snapshotRetrieveAndAnalyzeJob);
 
-					Pair<Set<Condition>, List<Point>> result = future.get(10, TimeUnit.SECONDS);
+					Triple<Set<Condition>, List<Point>, Condition> result = future.get(10, TimeUnit.SECONDS);
 
 					if (result == null) {
 						logger.info("No result this round");
@@ -128,23 +133,23 @@ public class DataPrepareJob implements Runnable {
 						long t1 = System.currentTimeMillis();
 						persistenceManager.persist(result.getLeft());
 						long t2 = System.currentTimeMillis();
-						persistenceManager.persist(result.getRight());
+						persistenceManager.persist(result.getMiddle());
 						long t3 = System.currentTimeMillis();
 
 						logger.debug("Persistence finished in: " + (t3 - t1) + "ms, " + result.getLeft().size()
-								+ " entries in: " + (t2 - t1) + "ms , " + result.getRight().size() + " points in: "
+								+ " entries in: " + (t2 - t1) + "ms , " + result.getMiddle().size() + " points in: "
 								+ (t3 - t2) + "ms");
 
 
-						Condition lastDominating = conditionDashboard.getCurrentCondition();
-						conditionDashboard.update(result.getLeft(),true);
-						Condition currentlyDominating = conditionDashboard.getCurrentCondition();
+						//Condition lastDominating = conditionDashboard.getCurrentCondition();
+						conditionDashboard.update(result.getLeft(), result.getRight() != null? result.getRight().getId(): null);
+						//Condition currentlyDominating = conditionDashboard.getCurrentCondition();
 
 
-						if(currentlyDominating != lastDominating){
+						/*if(currentlyDominating != lastDominating){
 							Date currentSnapshotTime = new Date(((ForwardReaderJob)readerJob).getLast());
 							dominatingPersistor.persistDominating(lastDominating, currentlyDominating, currentSnapshotTime);
-						}
+						}*/
 
 
 						if (demoRun && conditionDashboard.getCurrentCondition() != null

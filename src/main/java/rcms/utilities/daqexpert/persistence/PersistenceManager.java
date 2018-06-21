@@ -20,7 +20,6 @@ import org.hibernate.criterion.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hibernate.transform.Transformers;
-import rcms.utilities.daqexpert.processing.context.OptionalContextEntry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -50,18 +49,6 @@ public class PersistenceManager {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	private void avoidPersistingOptionalContext(Condition c){
-		if(c.getContext() != null){
-			Set<String> keysToRemove = new HashSet<>();
-			c.getContext().forEach((key, value) -> {
-				if(value instanceof OptionalContextEntry){
-					logger.info("Avoiding persistence of optional context for condition " + c.getTitle() + " under key; " + key);
-					keysToRemove.add(key);
-				}
-			});
-			keysToRemove.forEach(key -> c.getContext().remove(key));
-		}
-	}
 
 	/**
 	 * Persiste multipe entries in one transaction
@@ -85,8 +72,6 @@ public class PersistenceManager {
 		}
 
 		for (Condition point : entries) {
-
-			avoidPersistingOptionalContext(point);
 			if (point.isShow()) {
 				entityManager.persist(point);
 			}
@@ -107,22 +92,21 @@ public class PersistenceManager {
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
-		avoidPersistingOptionalContext(entry);
-		ensureConditionEntityManagerOpen();
-		EntityTransaction tx = entityManager.getTransaction();
-		tx.begin();
-		entityManager.persist(entry);
-		tx.commit();
-		//entityManager.close();
-	}
+        ensureConditionEntityManagerOpen();
+        EntityTransaction tx = entityManager.getTransaction();
+        tx.begin();
+        entityManager.persist(entry);
+        tx.commit();
+        //entityManager.close();
+    }
 
 	public void update(Condition condition){
-		ensureConditionEntityManagerOpen();
-		EntityTransaction tx = entityManager.getTransaction();
-		tx.begin();
+        ensureConditionEntityManagerOpen();
+        EntityTransaction tx = entityManager.getTransaction();
+        tx.begin();
 		entityManager.merge(condition);
-		tx.commit();
-	}
+        tx.commit();
+    }
 
 	public void persist(Point test) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();

@@ -31,7 +31,7 @@ public class FlowchartCase6 extends KnownFailure {
 	public FlowchartCase6() {
 		this.name = "Backpressure detected";
 
-		this.description = "A FED stopped sending data in subsystem {{FROZENSUBSYSTEM}}. Therefore, FED {{FED}} is backpressured, which causes partition {{TTCP}} of subsystem {{SUBSYSTEM}} to be in {{TTCPSTATE}} TTS state. There is NOTHING wrong with {{SUBSYSTEM}}.";
+		this.description = "A FED stopped sending data in subsystem {{FROZENSUBSYSTEM}}. Therefore, FED {{PROBLEM-FED}} is backpressured, which causes partition {{PROBLEM-PARTITION}} of subsystem {{PROBLEM-SUBSYSTEM}} to be in {{TTCPSTATE}} TTS state. There is NOTHING wrong with {{PROBLEM-SUBSYSTEM}}.";
 
 		this.action = new SimpleAction("Try to recover: Stop the run",
 				"Red & green recycle the subsystem {{FROZENSUBSYSTEM}} (whose FED stopped sending data)",
@@ -81,7 +81,7 @@ public class FlowchartCase6 extends KnownFailure {
 
 											if (dep.getPercentBackpressure() > 0F) {
 
-												contextHandler.register("FED", dep.getSrcIdExpected());
+												contextHandler.register("PROBLEM-FED", dep.getSrcIdExpected());
 												contextHandler.register("FEDSTATE", "(" + currentFedState.name()
 														+ " seen on FED" + fed.getKey().getSrcIdExpected() + ")");
 												fedsBackpressuredByDaq.add(fed.getKey());
@@ -94,7 +94,7 @@ public class FlowchartCase6 extends KnownFailure {
 									} else {
 
 										if (fed.getKey().getPercentBackpressure() > 0F) {
-											contextHandler.register("FED", fed.getKey().getSrcIdExpected());
+											contextHandler.register("PROBLEM-FED", fed.getKey().getSrcIdExpected());
 											contextHandler.register("FEDSTATE", currentFedState.name());
 											fedsBackpressuredByDaq.add(fed.getKey());
 											result = true;
@@ -106,9 +106,9 @@ public class FlowchartCase6 extends KnownFailure {
 							}
 
 							if (result) {
-								contextHandler.register("TTCP", ttcp.getName());
+								contextHandler.register("PROBLEM-PARTITION", ttcp.getName());
 								contextHandler.register("TTCPSTATE", currentState.name());
-								contextHandler.register("SUBSYSTEM", subSystem.getName());
+								contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 							}
 						}
 					}

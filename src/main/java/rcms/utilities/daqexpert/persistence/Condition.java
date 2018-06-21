@@ -298,15 +298,15 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
             return false;
         if (show != other.show)
             return false;
-        if (start == null) {
-            if (other.start != null)
-                return false;
-        } else if (!start.equals(other.start))
-            return false;
         if (title == null) {
             if (other.title != null)
                 return false;
         } else if (!title.equals(other.title))
+            return false;
+        if (start == null) {
+            if (other.start != null)
+                return false;
+        } else if (!start.equals(other.start))
             return false;
         return true;
     }
@@ -317,8 +317,6 @@ public class Condition extends Observable implements Comparable<Condition>, Obse
 
     public void setMature(boolean mature) {
         this.mature = mature;
-        setChanged();
-        notifyObservers("becomeMature");
     }
 
     @Override

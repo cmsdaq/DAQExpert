@@ -29,7 +29,7 @@ public enum LogicModuleRegistry {
     ExpectedRate(new ExpectedRate(), ConditionGroup.EXPECTED_RATE, ""),
     Transition(null, ConditionGroup.TRANSITION, ""),
     LongTransition(new LongTransition(), ConditionGroup.HIDDEN, ""),
-    WarningInSubsystem(new WarningInSubsystem(), ConditionGroup.Warning, "", 1004),
+    WarningInSubsystem(null, ConditionGroup.Warning, "Covered by other", 1004),
     SubsystemRunningDegraded(new SubsystemRunningDegraded(), ConditionGroup.SUBSYS_DEGRADED, "", 1006),
     SubsystemError(new SubsystemError(), ConditionGroup.SUBSYS_ERROR, "", 1007),
     SubsystemSoftError(new SubsystemSoftError(), ConditionGroup.SUBSYS_SOFT_ERR, "", 1005),
@@ -41,7 +41,7 @@ public enum LogicModuleRegistry {
     Deadtime(new Deadtime(), ConditionGroup.DEADTIME, ""),
     CriticalDeadtime(new CriticalDeadtime(), ConditionGroup.CRITICAL_DEADTIME, "", 105),
     FlowchartCase1(new LegacyFlowchartCase1(), ConditionGroup.FLOWCHART, "Legacy OutOfSequenceData", 10004),
-    FlowchartCase2(new LegacyFlowchartCase2(), ConditionGroup.FLOWCHART, "Legacy CorruptedData", 10005),
+    FlowchartCase2(null, ConditionGroup.FLOWCHART, "Legacy CorruptedData. Covered by other", 10005),
     FlowchartCase3(new FlowchartCase3(), ConditionGroup.FLOWCHART, "", 10006),
     FlowchartCase4(null, ConditionGroup.FLOWCHART, "Partition disconnected: extended to other LMs", 0),
     FlowchartCase5(new FlowchartCase5(), ConditionGroup.FLOWCHART, "", 10008),
@@ -100,7 +100,7 @@ public enum LogicModuleRegistry {
 
 
     FedGeneratesDeadtime(new FedGeneratesDeadtime(), ConditionGroup.OTHER, "", 2001),
-    FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 2002),
+    FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 1050),
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER, "", 2012),
     TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER, "", 2012),
     HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),;

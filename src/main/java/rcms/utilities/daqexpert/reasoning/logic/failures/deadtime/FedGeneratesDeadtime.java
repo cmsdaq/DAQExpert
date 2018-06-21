@@ -34,6 +34,8 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     @Override
     public void declareRelations(){
         require(LogicModuleRegistry.FEDDeadtime);
+        declareCause(LogicModuleRegistry.FlowchartCase5);
+        declareAffected(LogicModuleRegistry.FEDDeadtime);
     }
 
     @Override

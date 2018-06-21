@@ -4,11 +4,20 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.Application;
+import rcms.utilities.daqexpert.events.ConditionEvent;
+import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.processing.ConditionProducer;
+import rcms.utilities.daqexpert.reasoning.processing.LogicModuleManager;
 
+import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.Date;
@@ -144,6 +153,7 @@ public class DominatingSelectorTest {
     private Condition generateCondition(LogicModuleRegistry logicModuleRegistry) {
         Condition c = new Condition();
         c.setProblematic(true);
+        c.setTitle(logicModuleRegistry.name());
 
         c.setLogicModule(logicModuleRegistry);
 
@@ -195,6 +205,118 @@ public class DominatingSelectorTest {
 
     }
 
+
+    @Test
+    public void transitiveCausalityTest(){
+
+        LogicModule lm1 = new LogicModuleMock("TTS Deadtime");
+        LogicModule lm2 = new LogicModuleMock("Partition problem");
+        LogicModule lm3 = new LogicModuleMock("Downtime");
+        LogicModule lm4 = new LogicModuleMock("Dataflow stuck");
+
+        lm2.getAffected().add(lm4);
+        lm4.getAffected().add(lm1);
+        lm2.getRequired().add(lm4);
+
+
+        Condition c1 = generateCondition(lm1);
+        Condition c2 = generateCondition(lm2);
+        Condition c3 = generateCondition(lm3);
+        Condition c4 = generateCondition(lm4);
+
+        Set<Condition> conditions = new HashSet<>();
+        conditions.add(c1);
+        conditions.add(c2);
+        conditions.add(c3);
+        conditions.add(c4);
+
+        DominatingSelector ds = new DominatingSelector();
+
+        System.out.println("Usage:");
+        Set<Condition> leafsFromUSage = ds.getLeafsFromUsageGraph(conditions);
+        leafsFromUSage.stream().forEach(System.out::println);
+        Assert.assertEquals(3, leafsFromUSage.size());
+
+        System.out.println("Causality (from all):");
+        Set<Condition> leafsFromCausality = ds.getLeafsFromCausality(conditions);
+        leafsFromCausality.stream().forEach(System.out::println);
+        Assert.assertEquals(2, leafsFromCausality.size());
+
+
+        // from subset you will get more unresolved nodes (3 instead of 2) - as graph is not completed
+        System.out.println("Causality (from subset):");
+        Set<Condition> leafsFromCausalitySubset = ds.getLeafsFromCausality(leafsFromUSage);
+        leafsFromCausalitySubset.stream().forEach(System.out::println);
+        Assert.assertEquals(3, leafsFromCausalitySubset.size());
+
+
+        Set<Condition> intersection = new HashSet<>(leafsFromUSage); // use the copy constructor
+        intersection.retainAll(leafsFromCausality);
+
+        System.out.println("Intersection:");
+        intersection.stream().forEach(System.out::println);
+        Assert.assertEquals(2, intersection.size());
+
+
+    }
+
+
+    @Test
+    public void multipleCandidatesTest() throws URISyntaxException {
+        DAQ daq = FlowchartCaseTestBase.getSnapshot("1527847792106.json.gz");
+
+        DominatingSelector ds = new DominatingSelector();
+
+        ConditionProducer cp = new ConditionProducer();
+        cp.setEventRegister(new EventRegisterMock());
+
+        Application.initialize("src/test/resources/integration.properties");
+
+        LogicModuleManager logicModuleManager = new LogicModuleManager(cp);
+
+        Long originalTimestamp = daq.getLastUpdate();
+        daq.setLastUpdate(originalTimestamp - 10000000);
+        List<Condition> result = logicModuleManager.runLogicModules(daq, false);
+
+
+        daq.setLastUpdate(originalTimestamp);
+        result.addAll(logicModuleManager.runLogicModules(daq, false));
+
+
+        Condition dominating = ds.selectDominating(result.stream().filter(c->c.isShow() && c.isProblematic() && !c.isHoldNotifications()).collect(Collectors.toSet()));
+
+        Assert.assertEquals("Partition problem", dominating.getTitle());
+
+    }
+
+
+    @Test
+    public void multipleCandidatesTest2() throws URISyntaxException {
+        DAQ daq = FlowchartCaseTestBase.getSnapshot("1528225251698.json.gz");
+
+        DominatingSelector ds = new DominatingSelector();
+
+        ConditionProducer cp = new ConditionProducer();
+        cp.setEventRegister(new EventRegisterMock());
+
+        Application.initialize("src/test/resources/integration.properties");
+
+        LogicModuleManager logicModuleManager = new LogicModuleManager(cp);
+
+        Long originalTimestamp = daq.getLastUpdate();
+        daq.setLastUpdate(originalTimestamp - 10000000);
+        List<Condition> result = logicModuleManager.runLogicModules(daq, false);
+
+
+        daq.setLastUpdate(originalTimestamp);
+        result.addAll(logicModuleManager.runLogicModules(daq, false));
+
+
+        Condition dominating = ds.selectDominating(result.stream().filter(c->c.isShow() && c.isProblematic() && !c.isHoldNotifications()).collect(Collectors.toSet()));
+
+        Assert.assertEquals("Extreme HLT output bandwidth", dominating.getTitle());
+
+    }
     private Condition generateCondition(LogicModule producer){
 
         Condition c = new ConditionMock(producer);
@@ -222,6 +344,29 @@ public class DominatingSelectorTest {
         @Override
         public LogicModule getProducer() {
             return producer;
+        }
+    }
+
+    class EventRegisterMock implements EventRegister {
+
+        @Override
+        public void registerBegin(Condition condition) {
+
+        }
+
+        @Override
+        public void registerEnd(Condition condition) {
+
+        }
+
+        @Override
+        public void registerUpdate(Condition condition) {
+
+        }
+
+        @Override
+        public List<ConditionEvent> getEvents() {
+            return null;
         }
     }
 

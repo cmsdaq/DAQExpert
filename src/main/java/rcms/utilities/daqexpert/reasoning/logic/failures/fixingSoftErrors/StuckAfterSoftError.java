@@ -48,8 +48,8 @@ public class StuckAfterSoftError extends KnownFailure {
     private List<String> problemStates = Arrays.asList("Error");
     public StuckAfterSoftError() {
         this.name = "Stuck after fixing-soft-error";
-        this.description = "Level zero is stuck after fixing soft error. This is caused by subsystem(s) {{SUBSYSTEM}}";
-        this.action = new SimpleAction("Call the DOC of subsystem {{SUBSYSTEM}}", "Ask the DCS shifter to check the status of subsystem {{SUBSYSTEM}}");
+        this.description = "Level zero is stuck after fixing soft error. This is caused by subsystem(s) {{PROBLEM-SUBSYSTEM}}";
+        this.action = new SimpleAction("Call the DOC of subsystem {{PROBLEM-SUBSYSTEM}}", "Ask the DCS shifter to check the status of subsystem {{PROBLEM-SUBSYSTEM}}");
     }
 
     @Override
@@ -79,7 +79,7 @@ public class StuckAfterSoftError extends KnownFailure {
 
             for (SubSystem subsystem : daq.getSubSystems()) {
                 if (problemStates.contains(subsystem.getStatus())) {
-                    contextHandler.register("SUBSYSTEM", subsystem.getName());
+                    contextHandler.register("PROBLEM-SUBSYSTEM", subsystem.getName());
                 }
             }
 

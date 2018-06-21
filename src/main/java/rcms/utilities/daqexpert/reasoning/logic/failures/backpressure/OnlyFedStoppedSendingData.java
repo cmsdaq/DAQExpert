@@ -28,6 +28,7 @@ public class OnlyFedStoppedSendingData extends BackpressureAnalyzer {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
 	@Override

@@ -87,6 +87,8 @@ public class ConditionDashboard implements Observer {
             conditionsTmp.put(condition.getId(), condition);
         }
 
+        logger.info("Currently on tmp list: " + conditionsTmp.size() + ": " + conditionsTmp.values().stream().map(c->c.getTitle()).collect(Collectors.toList()));
+
         Iterator<Map.Entry<Long,Condition>> iterator = conditionsTmp.entrySet().iterator();
 
 
@@ -123,7 +125,14 @@ public class ConditionDashboard implements Observer {
             dominatingCondition = null;
         }
 
-
+        Iterator<Map.Entry<Long,Condition>> cleanupIterator = conditionsTmp.entrySet().iterator();
+        while(cleanupIterator.hasNext()) {
+            Map.Entry<Long, Condition> entry = cleanupIterator.next();
+            Condition condition = entry.getValue();
+            if(condition.getEnd() != null){
+                cleanupIterator.remove();
+            }
+        }
 
 
         if (sessionHander != null) {

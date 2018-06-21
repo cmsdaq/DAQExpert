@@ -87,7 +87,7 @@ public class ConditionDashboard implements Observer {
             conditionsTmp.put(condition.getId(), condition);
         }
 
-        logger.info("Currently on tmp list: " + conditionsTmp.size() + ": " + conditionsTmp.values().stream().map(c->c.getTitle()).collect(Collectors.toList()));
+        logger.trace("Currently on tmp list: " + conditionsTmp.size() + ": " + conditionsTmp.values().stream().map(c->c.getTitle()).collect(Collectors.toList()));
 
         Iterator<Map.Entry<Long,Condition>> iterator = conditionsTmp.entrySet().iterator();
 

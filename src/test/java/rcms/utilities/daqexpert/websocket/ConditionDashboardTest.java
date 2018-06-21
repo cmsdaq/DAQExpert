@@ -86,7 +86,7 @@ public class ConditionDashboardTest {
                 hasItem(equalTo(Arrays.asList(0L))),
                 hasItem(equalTo(Arrays.asList(1L))),
                 hasItem(equalTo(Arrays.asList(2L))),
-                hasItem(equalTo(Arrays.asList(4L, 3L)))
+                hasItem(equalTo(Arrays.asList(3L, 4L)))
         ));
         assertThat(conditionSessionHandler.dominatingSignalsReceived, contains(
                 equalTo(0L),
@@ -225,7 +225,7 @@ public class ConditionDashboardTest {
 
         @Override
         public void handleRecentConditionsChange(Collection<Condition> recentConditions) {
-            recentConditionSignalsReceived.add(recentConditions.stream().map(c->c.getId()).collect(Collectors.toList()));
+            recentConditionSignalsReceived.add(recentConditions.stream().map(c->c.getId()).sorted().collect(Collectors.toList()));
         }
     }
 

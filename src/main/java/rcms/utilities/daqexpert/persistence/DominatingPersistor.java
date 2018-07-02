@@ -123,6 +123,7 @@ public class DominatingPersistor {
             updateDescriptionAndContext(currentlyDominating, dominatingEntry);
 
             dominatingEntry.setMature(true);
+            dominatingEntry.setLogicModule(currentlyDominating.getLogicModule());
             dominatingEntry.setClassName(ConditionPriority.DEFAULTT);
             dominatingEntry.setGroup(ConditionGroup.DOMINATING);
             dominatingEntry.setStart(currentStarts);

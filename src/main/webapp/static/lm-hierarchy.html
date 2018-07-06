@@ -8,8 +8,12 @@
             font: 10pt sans;
         }
 
-        #mynetwork {
-            height: 1100px;
+        #causality {
+            height: 1000px;
+            border: 1px solid lightgray;
+        }
+        #requirement {
+            height: 1000px;
             border: 1px solid lightgray;
         }
     </style>
@@ -20,21 +24,14 @@
 
 
     <script type="text/javascript">
-        var nodes = null;
-        var edges = null;
-        var network = null;
-        var directionInput = "LR";
-
-        function destroy() {
-            if (network !== null) {
-                network.destroy();
-                network = null;
-            }
-        }
 
 
-        function draw(graph) {
-            destroy();
+
+        function draw(graph, where) {
+
+            var nodes = null;
+            var edges = null;
+            var network = null;
             nodes = [];
             edges = [];
             var connectionCount = [];
@@ -53,7 +50,7 @@
 
 
             // create a network
-            var container = document.getElementById('mynetwork');
+            var container = document.getElementById(where);
             var data = {
                 nodes: nodes,
                 edges: edges
@@ -61,6 +58,8 @@
 
             console.log(JSON.stringify(data));
             var options = {
+                clickToUse: true,
+                autoResize: true,
                 edges: {
                     arrows: {
                         to: {
@@ -91,10 +90,7 @@
             };
             network = new vis.Network(container, data, options);
 
-            // add event listeners
-            network.on('select', function (params) {
-                document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
-            });
+
         }
 
     </script>
@@ -104,26 +100,37 @@
 <body>
 <h2>LM Network</h2>
 
-<div id="mynetwork"></div>
 
-<p id="selection"></p>
+<p>Causality graph</p>
+<div id="causality"></div>
+
+<p>Requirement graph</p>
+<div id="requirement"></div>
+
 <script language="JavaScript">
     //var graph = [{"id":1,"name":"N1", "required":[]},{"id":2,"name":"N2", "required":[1]}];
     //var graph = [{"id":1,"name":"NoRate","required":[]},{"id":2,"name":"RateOutOfRange","required":[]},{"id":3,"name":"BeamActive","required":[]},{"id":4,"name":"RunOngoing","required":[]},{"id":5,"name":"StableBeams","required":[]},{"id":6,"name":"SessionComparator","required":[]},{"id":7,"name":"LHCBeamModeComparator","required":[]},{"id":8,"name":"LHCMachineModeComparator","required":[]},{"id":9,"name":"RunComparator","required":[]},{"id":10,"name":"LevelZeroStateComparator","required":[]},{"id":11,"name":"TCDSStateComparator","required":[]},{"id":12,"name":"DAQStateComparator","required":[]},{"id":13,"name":"CloudFuNumber","required":[]},{"id":14,"name":"ExpectedRate","required":[4]},{"id":15,"name":"Downtime","required":[1,5]},{"id":16,"name":"Deadtime","required":[3]},{"id":17,"name":"RateTooHigh","required":[5]},{"id":18,"name":"ContinousSoftError","required":[5]},{"id":19,"name":"StuckAfterSoftError","required":[5]},{"id":20,"name":"LengthyFixingSoftError","required":[5]},{"id":21,"name":"HighTcdsInputRate","required":[5]},{"id":22,"name":"VeryHighTcdsInputRate","required":[5]},{"id":23,"name":"LongTransition","required":[14]},{"id":24,"name":"FEDDeadtime","required":[14]},{"id":25,"name":"PartitionDeadtime","required":[14]},{"id":26,"name":"NoRateWhenExpected","required":[5,14,1]},{"id":27,"name":"CriticalDeadtime","required":[14,3]},{"id":28,"name":"TTSDeadtime","required":[14,3]},{"id":29,"name":"WarningInSubsystem","required":[4,14,23]},{"id":30,"name":"SubsystemRunningDegraded","required":[4,14,23]},{"id":31,"name":"SubsystemError","required":[4,14,23]},{"id":32,"name":"SubsystemSoftError","required":[4,14,23]},{"id":33,"name":"FlowchartCase3","required":[26]},{"id":34,"name":"FlowchartCase5","required":[26]},{"id":35,"name":"PiDisconnected","required":[26]},{"id":36,"name":"PiProblem","required":[26]},{"id":37,"name":"FEDDisconnected","required":[26]},{"id":38,"name":"FMMProblem","required":[26]},{"id":39,"name":"FEROLFifoStuck","required":[26]},{"id":40,"name":"RuFailed","required":[26]},{"id":41,"name":"LinkProblem","required":[26]},{"id":42,"name":"RuStuckWaiting","required":[26]},{"id":43,"name":"RuStuck","required":[26]},{"id":44,"name":"RuStuckWaitingOther","required":[26]},{"id":45,"name":"HLTProblem","required":[26]},{"id":46,"name":"BugInFilterfarm","required":[26]},{"id":47,"name":"OnlyFedStoppedSendingData","required":[26]},{"id":48,"name":"OutOfSequenceData","required":[26]},{"id":49,"name":"CorruptedData","required":[26]},{"id":50,"name":"DeadtimeFromReTri","required":[27,3]},{"id":51,"name":"FedGeneratesDeadtime","required":[24]},{"id":52,"name":"FedDeadtimeDueToDaq","required":[24]},{"id":53,"name":"TmpUpgradedFedProblem","required":[28]},{"id":54,"name":"FlowchartCase1","required":[26,48]},{"id":55,"name":"FlowchartCase2","required":[26,49]},{"id":56,"name":"BackpressureFromFerol","required":[52,53]},{"id":57,"name":"BackpressureFromEventBuilding","required":[52,53]},{"id":58,"name":"BackpressureFromHlt","required":[52,53]},{"id":59,"name":"HltOutputBandwidthTooHigh","required":[58]},{"id":60,"name":"HltOutputBandwidthExtreme","required":[58]},{"id":61,"name":"CmsswCrashes","required":[58]},{"id":62,"name":"HltCpuLoad","required":[58]},{"id":63,"name":"UnidentifiedFailure","required":[54,55,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,17,18,19,20,28,59,60,21,22,50,56,57,58,51,52,61,62]}];
 
-    $.getJSON("causality.json", function(json) {
+    function shorten(json){
         for (var i = 0; i < json.length; i++) {
-
-
 
             var curr = json[i];
             if(curr.name.length > 22){
                 curr.name = curr.name.substr(0,10) + ".." +curr.name.substr(curr.name.length-10,curr.name.length-1) ;
             }
         }
-        draw(json);
+    }
+
+    $.getJSON("causality.json", function(json) {
+        shorten(json);
+        draw(json, 'causality');
     });
 
+
+    $.getJSON("requirement.json", function(json) {
+        shorten(json);
+        draw(json, 'requirement');
+    });
 
     ;
 

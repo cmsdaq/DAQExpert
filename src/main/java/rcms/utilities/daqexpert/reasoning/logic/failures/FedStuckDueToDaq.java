@@ -34,6 +34,10 @@ public class FedStuckDueToDaq extends KnownFailure {
 
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
+
+        // Conditions:
+        // - backprssure > 80%
+        // - warning stuck;
         return false;
     }
 }

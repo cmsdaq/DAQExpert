@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.mixin.IdGenerators;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.processing.Requiring;
 import rcms.utilities.daqexpert.reasoning.base.ComparatorLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
@@ -22,13 +23,7 @@ import java.util.stream.Collectors;
 public class LogicModuleVisualizer {
 
     private static Logger logger = Logger.getLogger(LogicModuleVisualizer.class);
-    /**
-     * Generate requirement and causality graphs
-     */
-    public void generateGraphs() {
 
-
-    }
 
     public void generateGraph(Set<CausalityNode> nodes) {
 
@@ -129,7 +124,85 @@ public class LogicModuleVisualizer {
         cm.verifyNoCycle(nodes);
 
         lmv.generateGraph(nodes);
+
+
+
+        Set<Requiring> requirementNodes = modules.stream().map(c -> (Requiring) c).collect(Collectors.toSet());
+
+        lmv.generateRequirementGraph(requirementNodes);
     }
+
+
+    public void generateRequirementGraph(Set<Requiring> nodes) {
+
+        Set<Requiring> r = getNextRequirementLevel(new HashSet<>(), nodes, 0);
+
+
+        r = r.stream().sorted((c1, c2)-> c1.getLevel() < c2.getLevel()? -1 : (c1.getLevel() == c2.getLevel()? 0 : 1)).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        r.stream().forEach(c->c.getNodeName());
+
+        ObjectMapper om = new ObjectMapper();
+        om.addMixIn(Requiring.class, LogicModuleVisualizer.RequiringMixin.class);
+        om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+        try {
+            om.writeValue(new File("src/main/webapp/static/requirement.json"), r);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public Set<Requiring> getNextRequirementLevel(Set<Requiring> orderedNodes, Set<Requiring> remainingNodes, final int level) {
+
+        if (remainingNodes.size() == 0) {
+            return orderedNodes;
+        }
+
+        // find nodes in remaining nodes that are affected only by already ordered nodes
+        Iterator<Requiring> iterator = remainingNodes.iterator();
+
+
+        Set<Requiring> next = new HashSet<>();
+        while(iterator.hasNext()){
+            Requiring node = iterator.next();
+            // all causing nodes must be in ordered nodes
+            logger.info("Checking whether to add " + node.getNodeName());
+            boolean add = true;
+            for (Requiring required : node.getRequired()) {
+
+                logger.info(" - " + required.getNodeName());
+                if (!orderedNodes.contains(required)) {
+                    add = false;
+                    logger.info(" don't add!, not in ordered!");
+                }
+            }
+
+            // confirmed
+            if (add) {
+                logger.info("Moving node: " + node + " with level " + level);
+                next.add(node);
+            } else{
+                logger.info("Not adding " + node.getNodeName());
+
+
+            }
+
+        }
+
+        remainingNodes.removeAll(next);
+        orderedNodes.addAll(next);
+        next.forEach(c->c.setLevel(level));
+
+        return getNextRequirementLevel(orderedNodes, remainingNodes, level + 1);
+    }
+
+
+
+
 
 
     @JsonIdentityInfo(generator = IdGenerators.ObjectUniqueIntIdGenerator.class, property = "id")
@@ -142,6 +215,20 @@ public class LogicModuleVisualizer {
 
         @JsonIgnore
         abstract List<CausalityNode> getAffected();
+
+        @JsonProperty("name")
+        abstract String getNodeName();
+
+
+    }
+
+    @JsonIdentityInfo(generator = IdGenerators.ObjectUniqueIntIdGenerator.class, property = "id")
+    @JsonIgnoreProperties({"priority", "affected", "causing", "logicModuleRegistry", "description", "holdNotifications","maturityThreshold", "contextHandler", "descriptionWithContext", "mature", "action", "actionWithContext", "last", "actionWithContextRawRecovery", "briefDescription", "problematic"})
+    public interface RequiringMixin {
+
+        @JsonProperty("required")
+        @JsonIdentityReference(alwaysAsId = true)
+        abstract List<Requiring> getRequired();
 
         @JsonProperty("name")
         abstract String getNodeName();

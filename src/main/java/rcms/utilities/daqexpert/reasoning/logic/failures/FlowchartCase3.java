@@ -36,11 +36,11 @@ public class FlowchartCase3 extends KnownFailure {
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		action.addContextSteps("ECAL-LHC-UNSTABLE", "This problem is normal for ECAL in periods of unstable clock",
-				"Stop the run, Red recycle ECAL and start a new run",
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{ECAL}}>> and <<GreenRecycle::{{ECAL}}>>",
 				"Do not call the ECAL DOC");
 
 		action.addContextSteps("ES-LHC-UNSTABLE", "This problem is normal for ES in periods of unstable clock",
-				"Stop the run, Red recycle ES and start a new run",
+				"<<StopAndStartTheRun>> with <<RedRecycle::{{ES}}>> and <<GreenRecycle::{{ES}}>>",
 				"Do not call the ES DOC");
 
 		this.action = action;

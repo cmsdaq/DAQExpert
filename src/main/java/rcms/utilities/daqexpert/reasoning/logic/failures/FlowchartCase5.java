@@ -49,6 +49,10 @@ public class FlowchartCase5 extends KnownFailure {
 				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",
 				"Problem still not fixed: Call the DOC for the TRACKER");
 
+		/* gem 1467 specific case */
+		action.addContextSteps("GEM-1467-BUSY", "<<StopAndStartTheRun>> with <<GreenRecycle::GEM>> (try up to 3 times)",
+				"Whether the above helped or not, call the GEM DOC and write an ELOG about the actions taken and the results obtained");
+
 		this.action = action;
 
 	}
@@ -124,6 +128,7 @@ public class FlowchartCase5 extends KnownFailure {
 											result = true;
 											contextHandler.register("PROBLEM-FED", fed.getKey().getSrcIdExpected());
 											contextHandler.register("FEDSTATE", currentFedState.name());
+
 										} else {
 											existsAtLeaseOneFedBackpressured = true;
 										}
@@ -135,7 +140,13 @@ public class FlowchartCase5 extends KnownFailure {
 										contextHandler.register("TTCPSTATE", currentState.name());
 										contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 
-										contextHandler.setActionKey(subSystem.getName());
+										if("GEM".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-SUBSYSTEM").getTextRepresentation())
+												&& "1467".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation())
+												&& "BUSY".equalsIgnoreCase(contextHandler.getContextEntry("FEDSTATE").getTextRepresentation())){
+											contextHandler.setActionKey("GEM-1467-BUSY");
+										} else {
+											contextHandler.setActionKey(subSystem.getName());
+										}
 									}
 								}
 							}

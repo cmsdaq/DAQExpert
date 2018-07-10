@@ -3,15 +3,54 @@ package rcms.utilities.daqexpert.jobs;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockserver.model.Action;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 public class RecoveryRequestBuilderTest {
+
+    @Test
+    public void checkAutomatedRecoveriesMarkupInLM(){
+        List<ActionLogicModule> r = LogicModuleRegistry.getModulesInRunOrder()
+                .stream().filter(l->l instanceof ActionLogicModule).map(l->(ActionLogicModule)l).collect(Collectors.toList());
+
+
+        RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+
+        for(ActionLogicModule lm : r){
+
+
+            try {
+                List<String> fakeContextSteps = lm.getActionWithContextRawRecovery();
+
+                if(fakeContextSteps != null) {
+                    fakeContextSteps = fakeContextSteps.stream().map(s -> s.replaceAll("\\{\\{.*\\}\\}", "X")).collect(Collectors.toList());
+
+                    RecoveryRequest rr = recoveryRequestBuilder.buildRecoveryRequest(fakeContextSteps, "", "", 1L);
+
+                    if (rr != null && rr.getRecoverySteps().size() > 0) {
+                        System.out.println("Name: " + lm.getName());
+                        //System.out.println("Rec:  " + lm.getActionWithContextRawRecovery());
+                        System.out.println(rr);
+                        System.out.println("---");
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                Assert.fail("Could not build recovery for lm: " + lm.getName());
+            }
+
+        }
+    }
 
     @Test
     public void test(){

@@ -71,6 +71,11 @@ public class RecoveryRequestBuilder {
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         add = true;
                         break;
+                    case RedAndGreenRecycle:
+                        subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
+                        subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
+                        add = true;
+                        break;
                     case StopAndStartTheRun:
                         add = true;
                         break;

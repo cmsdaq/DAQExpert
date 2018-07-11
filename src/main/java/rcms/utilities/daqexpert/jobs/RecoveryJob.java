@@ -4,7 +4,8 @@ public enum RecoveryJob {
 
 
     StopAndStartTheRun("Stop and start the run"),
-    RedRecycle("Red recycle"), //TODO: RedAndGreenRecycle
+    RedAndGreenRecycle("Red & green recycle"),
+    RedRecycle("Red recycle"),
     GreenRecycle("Green recycle"),
     TTCHardReset("Issue TTC hard reset");
 

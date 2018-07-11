@@ -28,6 +28,8 @@ public class FlowchartCase3 extends KnownFailure {
 		this.name = "Partition problem";
 		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers.";
 		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is {{DEADTIME}}";
+
+		//TODO: automate after TTCHR is available in run control
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -36,11 +38,11 @@ public class FlowchartCase3 extends KnownFailure {
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		action.addContextSteps("ECAL-LHC-UNSTABLE", "This problem is normal for ECAL in periods of unstable clock",
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{ECAL}}>> and <<GreenRecycle::{{ECAL}}>>",
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
 				"Do not call the ECAL DOC");
 
 		action.addContextSteps("ES-LHC-UNSTABLE", "This problem is normal for ES in periods of unstable clock",
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{ES}}>> and <<GreenRecycle::{{ES}}>>",
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::ES>>",
 				"Do not call the ES DOC");
 
 		this.action = action;

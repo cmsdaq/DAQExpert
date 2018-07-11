@@ -4,9 +4,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.junit.internal.runners.statements.Fail;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
@@ -80,19 +82,8 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 
     @Override
     public void parametrize(Properties properties) {
-        try {
-            this.threshold = Integer
-                    .parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL.getKey()));
-
-            this.description = "Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%";
-        } catch (NumberFormatException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-                    "Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-        }
-
+		this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL, this.getClass());
+		this.description = "Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%";
     }
 
 }

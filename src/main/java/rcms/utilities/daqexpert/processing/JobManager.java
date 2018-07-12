@@ -28,6 +28,7 @@ import rcms.utilities.daqexpert.events.collectors.EventRegister;
 import rcms.utilities.daqexpert.events.collectors.MatureEventCollector;
 import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.InternalConditionProducer;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
@@ -72,6 +73,8 @@ public class JobManager {
 
 	private final CleanStartupVerifier cleanStartupVerifier;
 
+	private final DominatingPersistor dominatingPersistor;
+
 	private final InternalConditionProducer internalConditionProducer;
 
 	public JobManager(String sourceDirectory, DataManager dataManager, EventSender eventSender, CleanStartupVerifier cleanStartupVerifier, RecoveryJobManager recoveryJobManager) {
@@ -111,6 +114,8 @@ public class JobManager {
 		}
 
 		this.persistenceManager = Application.get().getPersistenceManager();
+
+		this.dominatingPersistor = new DominatingPersistor(persistenceManager);;
 
 		this.internalConditionProducer = new InternalConditionProducer(persistenceManager);
 
@@ -165,7 +170,7 @@ public class JobManager {
 		ConditionDashboard conditionDashboard = Application.get().getDashboard();
 
 		futureDataPrepareJob = new DataPrepareJob(frj, mainExecutor, dataManager, snapshotProcessor, persistenceManager,
-				eventRegister, eventSender, conditionDashboard, recoveryJobManager, demo);
+				eventRegister, eventSender, conditionDashboard, recoveryJobManager, demo, dominatingPersistor);
 
 		readerRaskController = new JobScheduler(futureDataPrepareJob, realTimeReaderPeriod);
 
@@ -214,7 +219,7 @@ public class JobManager {
 		conditionProducer.setEventRegister(eventRegister);
 		SnapshotProcessor snapshotProcessor2 = new SnapshotProcessor(conditionProducer);
 		DataPrepareJob onDemandDataJob = new DataPrepareJob(onDemandReader, mainExecutor, null, snapshotProcessor2,
-				persistenceManager, eventRegister, null, conditionDashboard, null,false);
+				persistenceManager, eventRegister, null, conditionDashboard, null,false, null);
 		onDemandReader.setTimeSpan(startTime, endTime);
 		onDemandDataJob.getSnapshotProcessor().getCheckManager().getExperimentalProcessor()
 				.setRequestedScript(scriptName);
@@ -249,6 +254,8 @@ public class JobManager {
 
 		versionCondition.setEnd(endDate);
 		internalConditionProducer.updateCondition(versionCondition);
+
+		dominatingPersistor.onExit();
 
 	}
 

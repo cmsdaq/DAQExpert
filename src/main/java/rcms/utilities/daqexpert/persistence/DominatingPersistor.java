@@ -141,6 +141,13 @@ public class DominatingPersistor {
 
     }
 
+    public void onExit(){
+        if(previousDominatingEntry != null){
+            previousDominatingEntry.setEnd(new Date());
+            this.persistenceManager.persist(previousDominatingEntry);
+        }
+    }
+
     private void updateDescriptionAndContext(Condition baseCondition, Condition dominatingEntry) {
         LogicModule producer = baseCondition.getProducer();
 

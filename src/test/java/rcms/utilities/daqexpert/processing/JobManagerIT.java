@@ -36,6 +36,8 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.*;
@@ -48,6 +50,7 @@ public class JobManagerIT {
     private List<RecoveryRequest> recoveryRequestsYielded;
 
     private List<ConditionEventResource> notifications;
+
     @BeforeClass
     public static void prepareNMStub() {
         MockServerClient mockServer = startClientAndServer(18081);
@@ -62,7 +65,7 @@ public class JobManagerIT {
     }
 
 
-    private void runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
+    private JobManager runOverTestPeriod(String startDateString, String endDateString, EventSender eventSender)
             throws InterruptedException {
 
         Application.get().getProp().setProperty(Setting.PROCESSING_START_DATETIME.getKey(), startDateString);
@@ -76,6 +79,7 @@ public class JobManagerIT {
         ContextHandler.highlightMarkup = false;
         jobManager.startJobs();
         Thread.sleep(5000);
+        return jobManager;
     }
 
     /**
@@ -205,7 +209,7 @@ public class JobManagerIT {
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
 
-        runForBlackboxTest(startDateString, endDateString);
+        runForBlackboxTest(startDateString, endDateString, false);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
@@ -265,6 +269,19 @@ public class JobManagerIT {
 
     }
 
+    @Test
+    public void exitingApplicationWhileDominatingOngoing() throws InterruptedException {
+
+        String startDateString = "2018-06-01T16:55:00.000Z";
+        String endDateString = "2018-06-01T17:00:00.000Z";
+
+        runForBlackboxTest(startDateString, endDateString, true);
+
+        logger.info("Yielded dominating conditions:");
+        conditionsYielded.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).map(c-> c.getTitle() + " " + c.getStart() + " " + c.getEnd() +": " + c.getDescription()).forEach(System.out::println);
+
+    }
+
     private RecoveryRequest generateRecovery(int steps, String problemDescription){
         RecoveryRequest rr = new RecoveryRequest();
 
@@ -310,7 +327,7 @@ public class JobManagerIT {
 
         EventSender eventSender = new EventSenderStub();
 
-        runOverTestPeriod(start, end, eventSender);
+        JobManager jobManager = runOverTestPeriod(start, end, eventSender);
 
 
 		/* Verify Conditions produced in DB */
@@ -356,7 +373,20 @@ public class JobManagerIT {
 		/* Verify that the number of visible conditions was greater than 0 */
         Assert.assertTrue(0 < visibleConditions);
 
+        jobManager.stop();
+
+        List<Condition> tmp = Application.get().getPersistenceManager().getEntries(startDate, endDate, durationThreshold,
+                includeTinyEntriesMask, false);
+
+        Condition lastDominating = tmp.stream().filter(c->c.getGroup() == ConditionGroup.DOMINATING).sorted((c1,c2)->c1.getStart().getTime()>c2.getStart().getTime()?1:-1).findFirst().orElse(null);
+
+        if(lastDominating != null){
+            Assert.assertNotNull(lastDominating.getEnd());
+            //Assert.fail("We have a case!");
+        }
+
     }
+
 
     public void assertExpectedConditions(Collection<String> expectedConditions) {
 

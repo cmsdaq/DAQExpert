@@ -74,7 +74,7 @@ public class DataPrepareJob implements Runnable {
 
 	public DataPrepareJob(ReaderJob readerJob, ExecutorService executorService, DataManager dataManager,
 			SnapshotProcessor snapshotProcessor, PersistenceManager persistenceManager, EventRegister eventRegister,
-			EventSender eventSender, ConditionDashboard conditionDashboard, RecoveryJobManager recoveryJobManager, boolean demoRun) {
+			EventSender eventSender, ConditionDashboard conditionDashboard, RecoveryJobManager recoveryJobManager, boolean demoRun, DominatingPersistor dominatingPersistor) {
 		super();
 		this.readerJob = readerJob;
 		this.executorService = executorService;
@@ -85,7 +85,7 @@ public class DataPrepareJob implements Runnable {
 		this.eventSender = eventSender;
 		this.conditionDashboard = conditionDashboard;
 		this.demoRun = demoRun;
-		this.dominatingPersistor = new DominatingPersistor(persistenceManager);
+		this.dominatingPersistor = dominatingPersistor;
 		this.dominatingSelector = new DominatingSelector();
 		this.recoveryJobManager = recoveryJobManager;
 		ProcessJob.flush();

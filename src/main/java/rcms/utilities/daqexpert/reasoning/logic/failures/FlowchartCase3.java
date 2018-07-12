@@ -1,22 +1,22 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.Map;
-
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
-import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
-import rcms.utilities.daqexpert.reasoning.base.action.Action;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
-import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Logic module identifying 3 flowchart case.
- * 
+ *
  * @see flowchart at https://twiki.cern.ch/twiki/pub/CMS/ShiftNews/DAQStuck3.pdf
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
@@ -26,8 +26,8 @@ public class FlowchartCase3 extends KnownFailure {
 	//TODO: include FED information
 	public FlowchartCase3() {
 		this.name = "Partition problem";
-		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers.";
-		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}} is {{DEADTIME}}";
+		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers. The problem is caused by FED {{PROBLEM-FED}}";
+		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}} is {{DEADTIME}}";
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -60,7 +60,7 @@ public class FlowchartCase3 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 		assignPriority(results);
-		
+
 		boolean result = false;
 
 		boolean isLhcClockAndUnstable = false;
@@ -90,7 +90,29 @@ public class FlowchartCase3 extends KnownFailure {
 							} else{
 								contextHandler.setActionKey(subSystem.getName());
 							}
-						}
+
+
+                            Map<FED, Set<FED>> fedHierarchy = FEDHierarchyRetriever.getFEDHierarchy(ttcp);
+                            for (Map.Entry<FED, Set<FED>> entry : fedHierarchy.entrySet()) {
+
+                                if (entry.getValue().size() > 0) {
+                                    for (FED fed : entry.getValue()) {
+
+                                        if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())
+                                                || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())) {
+                                            contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
+                                        }
+                                    }
+
+                                } else {
+                                    if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())
+                                            || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
+                                        contextHandler.register("PROBLEM-FED", entry.getKey().getSrcIdExpected());
+                                    }
+                                }
+
+                            }
+                        }
 					}
 				}
 			}

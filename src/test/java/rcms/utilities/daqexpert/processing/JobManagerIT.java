@@ -139,7 +139,7 @@ public class JobManagerIT {
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("Level zero in FixingSoftError more than 3 times in past 10 min. This is caused by subsystem(s) [TRACKER 4 time(s)]");
-        expectedConditionDescriptions.add("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers.");
+        expectedConditionDescriptions.add("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers. The problem is caused by FED 120");
 
         runForBlackboxTest(startDateString, endDateString);
         assertExpectedConditions(expectedConditions);

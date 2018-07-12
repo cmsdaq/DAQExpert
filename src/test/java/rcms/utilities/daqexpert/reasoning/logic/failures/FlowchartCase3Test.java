@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.net.URISyntaxException;
 import java.util.*;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
@@ -30,6 +32,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
+		assertNull("No FED in this state", context.getContext().get("PROBLEM-FED"));
 	}
 
 	/* 2016-12-04T02:05:40 */
@@ -38,8 +41,12 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1480813540739.smile");
 		assertOnlyOneIsSatisified(fc3, snapshot);
 		ContextHandler context = fc3.getContextHandler();
+		ContextHandler.highlightMarkup = false;
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("PROBLEM-PARTITION"));
+		assertEquals(new HashSet(Arrays.asList(120)), context.getContext().get("PROBLEM-FED"));
+		assertEquals("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers. The problem is caused by FED 120", fc3.getDescriptionWithContext());
+
 	}
 
 	/* 2017-04-07T16:51:54 */
@@ -50,6 +57,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("TRG")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("MUTFUP")), context.getContext().get("PROBLEM-PARTITION"));
+		assertNull("No FED in this state", context.getContext().get("PROBLEM-FED"));
 	}
 
 
@@ -63,6 +71,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("PIXEL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
+		assertNull("No FED in this state", context.getContext().get("PROBLEM-FED"));
 	}
 
 	/*
@@ -84,8 +93,11 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
 
 		ContextHandler context = fc3.getContextHandler();
+		ContextHandler.highlightMarkup = false;
 		assertEquals(new HashSet(Arrays.asList("TRACKER")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("PROBLEM-PARTITION"));
+		assertEquals(new HashSet(Arrays.asList(96)), context.getContext().get("PROBLEM-FED"));
+		assertEquals("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers. The problem is caused by FED 96", fc3.getDescriptionWithContext());
 
 	}
 
@@ -123,6 +135,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertNull("No FED in this state", context.getContext().get("PROBLEM-FED"));
 
 
 		daq.setLhcClockStable(true);

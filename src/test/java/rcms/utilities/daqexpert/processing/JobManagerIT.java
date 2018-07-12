@@ -209,7 +209,7 @@ public class JobManagerIT {
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
 
-        runForBlackboxTest(startDateString, endDateString, false);
+        runForBlackboxTest(startDateString, endDateString);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);

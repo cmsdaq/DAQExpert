@@ -1,10 +1,13 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
@@ -60,11 +63,10 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		
 
 		assertEquals("CTPPS_TOT",legacyFc1.getContextHandler().getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 		assertEquals(Arrays.asList(
-				"Try to recover (try up to 2 times)",
-				"Stop and start the run with Red recycle of subsystem CTPPS_TOT & Green recycle of subsystem CTPPS_TOT",
+				"Stop and start the run with Red & green recycle of subsystem CTPPS_TOT (try up to 2 times)",
 				"Problem not fixed: Call the DOC of CTPPS_TOT (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry.Call the DOC CTPPS_TOT (subsystem that caused the SyncLoss) to inform about the problem"
 		), legacyFc1.getActionWithContext());
@@ -161,7 +163,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getActionWithContext());
 
 		assertEquals(Arrays.asList(
-				"Stop and start the run with Red recycle of subsystem DT & Green recycle of subsystem DT using L0 Automator",
+				"Stop and start the run with Red & green recycle of subsystem DT using L0 Automator",
 				"Problem not fixed: Call the DOC of DT (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry.Call the DOC DT (subsystem that caused the SyncLoss) to inform about the problem"
 		), fc1.getActionWithContext());
@@ -191,16 +193,22 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 		System.out.println(fc1.getDescriptionWithContext());
 		assertEquals(Arrays.asList(
-				"Try to stop/start the run",
-				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem ECAL. Start new Run. (Try up to 2 times)",
+				"Stop and start the run",
+				"If this doesn't help: Stop and start the run with both Red & green recycle of subsystem ECAL and Red & green recycle of subsystem DAQ (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of ECAL (subsystem that sent out-of-sync data) to inform about the problem",
 				"Problem not fixed: Call the DOC of ECAL (subsystem that sent out-of-sync data data)"
 				), fc1.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getName(),fc1.getDescriptionWithContext(), 0L);
-		assertEquals(0, recoveryRequest.getRecoverySteps().size());
+		assertEquals(2, recoveryRequest.getRecoverySteps().size());
 
+		Iterator<RecoveryStep> i = recoveryRequest.getRecoverySteps().iterator();
+		i.next();
+		RecoveryStep secondStep = i.next();
+
+		assertThat(secondStep.getGreenRecycle(), contains("DAQ", "ECAL"));
+		assertThat(secondStep.getRedRecycle(), contains("DAQ", "ECAL"));
 
 	}
 

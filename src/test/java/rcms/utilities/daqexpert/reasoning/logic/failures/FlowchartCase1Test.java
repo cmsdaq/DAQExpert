@@ -43,7 +43,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("ECAL",context.getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -67,7 +67,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("ES+")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("ES",context.getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -86,7 +86,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TOTDET")), context.getContext().get("PROBLEM-PARTITION"));
 
 		assertEquals("CTPPS_TOT",context.getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -105,7 +105,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -124,7 +124,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
-		assertEquals(4,legacyFc1.getActionWithContext().size());
+		assertEquals(3,legacyFc1.getActionWithContext().size());
 
 	}
 	

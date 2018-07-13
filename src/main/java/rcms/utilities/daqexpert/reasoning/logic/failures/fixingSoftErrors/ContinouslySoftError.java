@@ -17,6 +17,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
@@ -32,7 +33,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ES specific instructions */
-		action.addContextSteps("ES", "Stop the run and re-start it",
+		action.addContextSteps("ES", "<<StopAndStartTheRun>>",
 				"If 1) doesn't work and DAQ is in the same condition as before, stop the run and red-recycle ES");
 
 		/* Pixel specific instructions */
@@ -56,25 +57,13 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 	@Override
 	public void parametrize(Properties properties) {
 
-		try {
-			this.thresholdPeriod = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD.getKey()));
+			this.thresholdPeriod = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_PERIOD,this.getClass());
 
-			this.mergePeriod = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP.getKey()));
-			this.occurrencesThreshold = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT.getKey()));
+			this.mergePeriod = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_KEEP,this.getClass());
+			this.occurrencesThreshold = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_LOGIC_CONTINOUSSOFTERROR_THESHOLD_COUNT,this.getClass());
 			this.description = "Level zero in FixingSoftError more than 3 times in past "
 					+ (thresholdPeriod / 1000 / 60) + " min. This is caused by subsystem(s) {{SUBSYSTEM_WITH_COUNTS}}";
 
-
-		} catch (NumberFormatException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-		} catch (NullPointerException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-		}
 	}
 
 	private static final Logger logger = Logger.getLogger(ContinouslySoftError.class);

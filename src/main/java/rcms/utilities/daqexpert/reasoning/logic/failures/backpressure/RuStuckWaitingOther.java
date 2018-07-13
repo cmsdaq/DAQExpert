@@ -24,9 +24,7 @@ public class RuStuckWaitingOther extends BackpressureAnalyzer {
 
 		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
-		this.action = new SimpleAction("Try to recover: Stop the run",
-				"Red & green recycle the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data)",
-				"Start new Run (Try 1 time)",
+		this.action = new SimpleAction("<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (whose FED stopped sending data)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data) to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{PROBLEM-SUBSYSTEM}} (whose FED stopped sending data)");
 

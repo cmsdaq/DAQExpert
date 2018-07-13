@@ -272,6 +272,7 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 			logger.debug("#3 check: RU has > 0 requests?");
 			if (relatedRu.getRequests() > 0) {
 				logger.debug("#FOUND: ru " + relatedRu.getHostname() + " is stuck");
+				contextHandler.registerForStatistics("RU-REQUESTS", relatedRu.getRequests());
 				return Subcase.RuIsStuck;
 			} else {
 				logger.trace("RU has 0 requests, check other RUs");

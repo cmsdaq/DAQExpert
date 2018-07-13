@@ -1,9 +1,11 @@
 package rcms.utilities.daqexpert.persistence;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
 
 public class LogicModuleRegistryTest {
@@ -57,6 +59,18 @@ public class LogicModuleRegistryTest {
 		Assert.assertTrue(orderOfFedDeadtimeDueToDaq < orderOfBpFromHlt);
 		Assert.assertTrue(orderOfBpFromHlt < orderOfHltCpuLoad);
 
+	}
+
+	@Test
+	public void showActionLogicModules(){
+		List<ActionLogicModule> a = LogicModuleRegistry.getModulesInRunOrder().stream().filter(c->c instanceof ActionLogicModule).map(c->(ActionLogicModule)c).collect(Collectors.toList());
+
+		for(ActionLogicModule l: a){
+			System.out.println(l.getName());
+			if(l.getAction() == null || l.getAction().getSteps().size() == 0){
+				System.out.println("   No action defined");
+			}
+		}
 	}
 
 }

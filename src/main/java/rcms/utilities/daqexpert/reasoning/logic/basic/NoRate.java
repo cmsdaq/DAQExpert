@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.ExpertException;
@@ -46,17 +47,7 @@ public class NoRate extends SimpleLogicModule implements Parameterizable {
 
 	@Override
 	public void parametrize(Properties properties) {
-		try {
-			this.threshold = Integer
-					.parseInt(properties.getProperty(Setting.EXPERT_LOGIC_NO_TRIGGER_RATE_THRESHOLD.getKey()));
-
-		} catch (NumberFormatException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-		} catch (NullPointerException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-		}
+		this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_NO_TRIGGER_RATE_THRESHOLD, this.getClass());
 	}
 
 }

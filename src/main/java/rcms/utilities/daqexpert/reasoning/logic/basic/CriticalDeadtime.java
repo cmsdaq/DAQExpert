@@ -1,12 +1,15 @@
 package rcms.utilities.daqexpert.reasoning.logic.basic;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
-import rcms.utilities.daqexpert.ExpertException;
-import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
@@ -27,12 +30,13 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 		this.priority = ConditionPriority.IMPORTANT;
 	}
 
+	/** Do not display this keys as contribution, these are resulting deadtimes */
+	private List<String> contributionFilter = Arrays.asList("total", "beamactive_total");
+
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.ExpectedRate);
 		require(LogicModuleRegistry.BeamActive);
-
-
 		declareAffected(LogicModuleRegistry.Deadtime);
 	}
 
@@ -44,11 +48,18 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 
         boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
 
+        boolean beamActive = results.get(BeamActive.class.getSimpleName()).getResult();
+
         if (!expectedRate) {
             return false;
         }
 
-        double deadtime = getDeadtime(daq, results);
+        double deadtime = getTotalDeadtime(daq, beamActive);
+		Map<String, Double> contributions = getContributions(daq, beamActive);
+
+		contributions.entrySet().stream()
+				.filter(c->!(contributionFilter.contains(c.getKey())))
+				.forEach(c -> contextHandler.registerForStatistics("CONTRIBUTIONS_" + c.getKey(), c.getValue(), "%",1));
 
         if (deadtime > threshold) {
             contextHandler.registerForStatistics("DEADTIME", deadtime, "%", 1);
@@ -57,42 +68,48 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 		return false;
 	}
 
-	private double getDeadtime(DAQ daq, Map<String, Output> results){
+	/**
+	 * Get deadtime. Returns instant deadtimes if available. Per lumisection otherwise
+	 */
+	private Map<String, Double> getDeadtimes(DAQ daq){
 		try {
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
-				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
-						.get("beamactive_total");
-
-			} else {
-				return daq.getTcdsGlobalInfo().getDeadTimesInstant().get("total");
-			}
+			return daq.getTcdsGlobalInfo().getDeadTimesInstant();
 		} catch (NullPointerException e) {
-			logger.warn("Instantaneous deadtime value is not available. Using per lumi section.");
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
-				return daq.getTcdsGlobalInfo().getDeadTimes()
-						.get("beamactive_total");
+			return daq.getTcdsGlobalInfo().getDeadTimes();
 
-			} else {
-				return daq.getTcdsGlobalInfo().getDeadTimes().get("total");
-			}
 		}
+	}
+
+	/**
+	 * Returns total deadtime depending on beamactive flag.
+	 */
+	private double getTotalDeadtime(DAQ daq, boolean beamactive){
+		if (beamactive) {
+			return getDeadtimes(daq).get("beamactive_total");
+		} else {
+			return getDeadtimes(daq).get("total");
+		}
+	}
+
+	/**
+	 * Get contributions to the deadtime depending to beamactive flag.
+	 */
+	private Map<String, Double> getContributions(DAQ daq, boolean beamActive){
+		Stream<Map.Entry<String,Double>> stream;
+		if(beamActive){
+			stream = getDeadtimes(daq).entrySet().stream().filter(e->e.getKey().startsWith("beamactive"));
+		} else{
+			stream = getDeadtimes(daq).entrySet().stream().filter(e->!e.getKey().startsWith("beamactive"));
+		}
+		return stream.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 	}
 
     @Override
     public void parametrize(Properties properties) {
-        try {
-            this.threshold = Integer
-                    .parseInt(properties.getProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL.getKey()));
-
-            this.description = "Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%";
-        } catch (NumberFormatException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-                    + this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-                    "Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-        }
-
+		this.threshold = FailFastParameterReader.getIntegerParameter(properties, Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL, this.getClass());
+		this.description = "Deadtime during running is {{DEADTIME}}, the threshold is " + threshold + "%. There are following contributions: " +
+				"{{CONTRIBUTIONS_*}}";
     }
 
 }

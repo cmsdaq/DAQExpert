@@ -59,6 +59,15 @@ public class StatisticContextEntry extends ContextEntry {
         this.type = "S";
     }
 
+    public boolean isNonZero(){
+        if(allTheSame){
+            if(current == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void update(Float n) {
         count++;
         current = n;

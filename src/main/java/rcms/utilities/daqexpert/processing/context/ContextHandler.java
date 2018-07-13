@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ContextHandler {
 
@@ -81,6 +82,40 @@ public class ContextHandler {
                 text = text.replaceAll(variableKeyRegex, replacement);
 
             }
+        }
+
+        // replace multi keys
+        List<String> multiKeys = getMultiKeys(text);
+        if (multiKeys != null && multiKeys.size() >0) {
+
+            for(String multiKey : multiKeys){
+                int size = multiKey.length();
+
+                // collect all context that matches this multi key
+                Map<String, ContextEntry> entries = contextEntryMap.entrySet().stream().filter(c -> c.getKey().startsWith(multiKey)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                boolean allStatistic = true;
+                for(ContextEntry contextEntry : entries.values()){
+                    if(!(contextEntry instanceof StatisticContextEntry)){
+                        allStatistic = false;
+                    }
+                }
+                if(allStatistic){
+                    entries = entries.entrySet().stream().map(e-> new LinkedHashMap.SimpleEntry<>(e.getKey(), (StatisticContextEntry)e.getValue()))
+                            .filter(e->e.getValue().isNonZero()).sorted((e1,e2) -> e1.getValue().getAvg() > e2.getValue().getAvg()? -1: 1)
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1,v2)->v1, LinkedHashMap::new));
+                }
+
+                String replace = "\\{\\{"+multiKey.substring(0,size-1)+"\\_\\*\\}\\}";
+                logger.trace("Multikey: " + multiKey);
+
+                String replacement = entries.entrySet().stream().map(e -> e.getKey().substring(size) + "=" + e.getValue().getTextRepresentation()).collect(Collectors.toList()).toString();
+                if ( highlightReplacements) {
+                    replacement = "<strong>" + replacement + "</strong>";
+                }
+                text = text.replaceAll(replace, replacement);
+            }
+
         }
 
         logger.debug("Replacing remaining keys");
@@ -343,6 +378,42 @@ public class ContextHandler {
         if (!classs.isInstance(context.getContextEntryMap().get(key))) {
             throw new RuntimeException("Different type of contextHandler (" + context.getContextEntryMap().get(key).getClass().getName()
                     + ") has been already registered for this key: " + key);
+        }
+    }
+
+    public static List<String> getMultiKeys(String text){
+
+        Pattern pattern = Pattern.compile(".*\\{\\{[\\w]*\\_\\*\\}\\}.*");
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.matches()) {
+            List<String> list = new ArrayList<>();
+
+            int from = 0;
+            String star = "_*";
+            String open = "{{";
+            String close = "}}";
+            while(text.indexOf(star, from) > -1){
+                int indexOfStar = text.indexOf(star, from);
+
+                int indexOfRelevantBracketsOpen = 0;
+                int relevantBracketsFrom = 0;
+                while(text.indexOf(open, relevantBracketsFrom) < indexOfStar && text.indexOf(open, relevantBracketsFrom) > -1){
+                    indexOfRelevantBracketsOpen = text.indexOf(open, relevantBracketsFrom);
+                    relevantBracketsFrom = indexOfRelevantBracketsOpen + 1;
+                }
+                int indexOfRelevantBracketsClose = text.indexOf(close, indexOfStar);
+
+                String multiKey = text.substring(indexOfRelevantBracketsOpen +2, indexOfRelevantBracketsClose -1);
+                list.add(multiKey);
+                from = indexOfStar + 1;
+
+            }
+
+            return list;
+
+        } else{
+            return null;
         }
     }
 

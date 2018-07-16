@@ -1,17 +1,8 @@
 package rcms.utilities.daqexpert.processing;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
-
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
@@ -19,18 +10,26 @@ import rcms.utilities.daqexpert.events.ConditionEvent;
 import rcms.utilities.daqexpert.events.ConditionEventResource;
 import rcms.utilities.daqexpert.events.EventSender;
 import rcms.utilities.daqexpert.events.collectors.EventRegister;
-import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
-import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This job manages reading and processing the snapshots
@@ -58,10 +57,6 @@ public class DataPrepareJob implements Runnable {
 	private final DominatingPersistor dominatingPersistor;
 
 	private final DominatingSelector dominatingSelector;
-
-
-	/** List of conditions that has been started - kept in order to generate finish signals for controller */
-	private final List<Long> recoveryConditionIds = new ArrayList<>();
 
 	/** flag to do demo run */
 	private final boolean demoRun;
@@ -168,46 +163,6 @@ public class DataPrepareJob implements Runnable {
 							int sent = eventSender.sendBatchEvents(eventsToSend);
 							logger.info(sent + " events successfully sent to NotificationManager");
 							eventRegister.getEvents().clear();
-						}
-
-						List<RecoveryRequest> recoveryRequests = new ArrayList<>();
-						for(Condition logicResult: result.getLeft()){
-							if(logicResult.getState() == EntryState.FINISHED){
-								if(recoveryConditionIds.contains(logicResult.getId())){
-									Long id = logicResult.getId();
-									recoveryJobManager.notifyConditionFinished(id);
-									recoveryConditionIds.remove(id);
-								}
-								continue;
-							}
-							if(!logicResult.isShow()){
-								continue;
-							}
-							if(logicResult.getLogicModule().getLogicModule() instanceof ActionLogicModule){
-								ActionLogicModule alm = (ActionLogicModule) logicResult.getLogicModule().getLogicModule();
-								RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-								RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
-										alm.getActionWithContextRawRecovery(),
-										alm.getActionWithContext(),
-                                        alm.getName(),
-                                        alm.getDescriptionWithContext(),
-                                        logicResult.getId());
-
-								if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
-									recoveryRequest.setCondition(logicResult);
-									recoveryRequests.add(recoveryRequest);
-								}
-
-							}
-						}
-
-						if(recoveryRequests.size() > 0) {
-							logger.info("Exist automatic recoveries: " + recoveryRequests);
-							Long dominating = recoveryJobManager.runRecoveryJob(recoveryRequests);
-							if(dominating != null) {
-								recoveryConditionIds.add(dominating);
-								logger.info("Automatic recovery finished successfully");
-							}
 						}
 
 

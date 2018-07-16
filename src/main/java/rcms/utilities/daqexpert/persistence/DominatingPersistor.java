@@ -70,7 +70,7 @@ public class DominatingPersistor {
         Date previousEnds;
         Date currentStarts;
 
-        logger.info("Persisting dominating for " + (previousDominating != null ? previousDominating.getTitle() : "null") + " and " + (currentlyDominating != null ? currentlyDominating.getTitle() : "null"));
+        logger.info("Persisting dominating. Previous: " + (previousDominating != null ? previousDominating.getTitle() : "-") + ", Current: " + (currentlyDominating != null ? currentlyDominating.getTitle() : "-"));
 
         // case 1
         if (previousDominating == null) {
@@ -112,7 +112,7 @@ public class DominatingPersistor {
 
             updateDescriptionAndContext(previousDominating, previousDominatingEntry);
             this.persistenceManager.update(previousDominatingEntry);
-            logger.info("  - updating previous entry with end date: " + previousEnds);
+            logger.trace("  - updating previous entry with end date: " + previousEnds);
 
         }
 
@@ -132,10 +132,10 @@ public class DominatingPersistor {
 
             previousDominatingEntry = dominatingEntry;
 
-            logger.info("  - updating current entry with everything");
+            logger.trace("  - updating current entry with everything");
         } else {
             previousDominatingEntry = null;
-            logger.info("  - throwing away previous entry");
+            logger.trace("  - throwing away previous entry");
         }
 
 

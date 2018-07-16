@@ -469,9 +469,9 @@ public class JobManagerIT {
         }
 
         @Override
-        public Long runRecoveryJob(List<RecoveryRequest> requests) {
-            logger.info("Recovery job called: " + requests);
-            recoveryRequestsYielded.addAll(requests);
+        public Long runRecoveryJob(RecoveryRequest request) {
+            logger.info("Recovery job called: " + request);
+            recoveryRequestsYielded.add(request);
             return 0L;
         }
 

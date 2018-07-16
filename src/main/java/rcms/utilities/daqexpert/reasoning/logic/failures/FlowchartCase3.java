@@ -100,14 +100,14 @@ public class FlowchartCase3 extends KnownFailure {
                                     for (FED fed : entry.getValue()) {
 
                                         if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())
-                                                || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())) {
+                                                || TTSState.ERROR.getCode().equalsIgnoreCase(fed.getTtsState())) {
                                             contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
                                         }
                                     }
 
                                 } else {
                                     if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())
-                                            || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
+                                            || TTSState.ERROR.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
                                         contextHandler.register("PROBLEM-FED", entry.getKey().getSrcIdExpected());
                                     }
                                 }

@@ -1,18 +1,10 @@
 package rcms.utilities.daqexpert.websocket;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
-import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
-import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
-import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Condition Dashboard represents the current state of Dashboard view of DAQExpert. It holds recent conditions and

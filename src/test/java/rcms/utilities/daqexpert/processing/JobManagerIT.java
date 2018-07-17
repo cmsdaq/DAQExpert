@@ -209,15 +209,49 @@ public class JobManagerIT {
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
 
-        runForBlackboxTest(startDateString, endDateString);
+        runForBlackboxTest(startDateString, endDateString, false);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
 
         /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
-        assertExpectedRecoveryRequest(34, expectedRecoveryRequests);
+        assertExpectedRecoveryRequest(35, expectedRecoveryRequests, true);
 
     }
+
+
+    /**
+     * Test that automated recovery is not issued here. It should not be issued on immature events.
+     * @throws InterruptedException
+     */
+    @Test
+    public void blackboxTest7() throws InterruptedException {
+
+        String startDateString = "2018-07-12T18:44:00.000Z";
+        String endDateString = "2018-07-12T18:45:00.000Z";
+
+        Set<String> expectedConditions = new HashSet<>();
+        expectedConditions.add("Too high HLT output bandwidth");
+
+        Set<String> expectedNotifications = new HashSet<>();
+        expectedNotifications.add("Started: Too high HLT output bandwidth");
+
+        Set<String> expectedConditionDescriptions = new HashSet<>();
+        expectedConditionDescriptions.add("The HLT output bandwidth is 4.6GB/s which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.");
+
+        Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
+        expectedRecoveryRequests.add(generateRecovery(0,null));
+
+        runForBlackboxTest(startDateString, endDateString);
+        assertExpectedConditions(expectedConditions);
+        assertExpectedNotifications(expectedNotifications);
+        assertExpectedConditionDescriptions(expectedConditionDescriptions);
+
+        assertExpectedRecoveryRequest(0, expectedRecoveryRequests, false);
+
+    }
+
+
 
     @Test
     public void blackboxTest6WrapperDemo() throws InterruptedException {
@@ -319,6 +353,9 @@ public class JobManagerIT {
 
         Date startDate = DatatypeConverter.parseDateTime(start).getTime();
         Date endDate = DatatypeConverter.parseDateTime(end).getTime();
+
+        logger.info(">" + startDate.getTime());
+        logger.info("<" + endDate.getTime());
 
         Application.initialize("src/test/resources/integration.properties");
 
@@ -438,14 +475,24 @@ public class JobManagerIT {
         }
     }
 
-    public void assertExpectedRecoveryRequest(int totalNumberOfRecovoveryRequests, Collection<RecoveryRequest> expectedRecoveryRequests){
+    public void assertExpectedRecoveryRequest(int totalNumberOfRecovoveryRequests, Collection<RecoveryRequest> expectedRecoveryRequests, boolean moreThan){
 
-        recoveryRequestsYielded.stream().forEach(c->System.out.println("P " + c.getProblemId() + c.getCondition().getTitle() + c.getCondition().getStart()));
+        System.out.println("Recoveries: ");
+        recoveryRequestsYielded.stream().forEach(c->System.out.println("P " + c.getProblemId() + " " +  c.getCondition().getTitle() + " " + c.getCondition().getStart()));
         //assertEquals(totalNumberOfRecovoveryRequests,  recoveryRequestsYielded.size());
-        assertThat(recoveryRequestsYielded.size(), greaterThanOrEqualTo(totalNumberOfRecovoveryRequests));
 
-        for (RecoveryRequest rr : expectedRecoveryRequests) {
-            assertThat(recoveryRequestsYielded, hasItem(Matchers.<RecoveryRequest>hasProperty("problemDescription", equalTo(rr.getProblemDescription()))));
+
+        if(moreThan){
+            assertThat(recoveryRequestsYielded.size(), greaterThanOrEqualTo(totalNumberOfRecovoveryRequests));
+        } else {
+            assertThat(recoveryRequestsYielded.size(), equalTo(totalNumberOfRecovoveryRequests));
+        }
+
+
+        if(totalNumberOfRecovoveryRequests != 0){
+            for (RecoveryRequest rr : expectedRecoveryRequests) {
+                assertThat(recoveryRequestsYielded, hasItem(Matchers.<RecoveryRequest>hasProperty("problemDescription", equalTo(rr.getProblemDescription()))));
+            }
         }
 
     }
@@ -469,9 +516,9 @@ public class JobManagerIT {
         }
 
         @Override
-        public Long runRecoveryJob(List<RecoveryRequest> requests) {
-            logger.info("Recovery job called: " + requests);
-            recoveryRequestsYielded.addAll(requests);
+        public Long runRecoveryJob(RecoveryRequest request) {
+            logger.info("Recovery job called: " + request);
+            recoveryRequestsYielded.add(request);
             return 0L;
         }
 

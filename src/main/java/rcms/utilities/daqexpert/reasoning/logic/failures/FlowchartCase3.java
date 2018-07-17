@@ -29,7 +29,6 @@ public class FlowchartCase3 extends KnownFailure {
 	public FlowchartCase3() {
 		this.name = "Partition problem";
 		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers. The problem is caused by FED {{PROBLEM-FED}}";
-		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}} is {{DEADTIME}}";
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -101,14 +100,14 @@ public class FlowchartCase3 extends KnownFailure {
                                     for (FED fed : entry.getValue()) {
 
                                         if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())
-                                                || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())) {
+                                                || TTSState.ERROR.getCode().equalsIgnoreCase(fed.getTtsState())) {
                                             contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
                                         }
                                     }
 
                                 } else {
                                     if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())
-                                            || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
+                                            || TTSState.ERROR.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
                                         contextHandler.register("PROBLEM-FED", entry.getKey().getSrcIdExpected());
                                     }
                                 }

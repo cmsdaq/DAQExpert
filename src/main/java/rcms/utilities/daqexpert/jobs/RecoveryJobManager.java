@@ -3,14 +3,11 @@ package rcms.utilities.daqexpert.jobs;
 import com.google.common.collect.EvictingQueue;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
-import rcms.utilities.daqexpert.processing.DominatingConditionSelector;
 import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
-
 /**
  * Manages the recovery job distribution to the controller given output from Logic Modules (set of conditions with
  * recovery suggestions)
@@ -35,6 +32,8 @@ public class RecoveryJobManager {
      */
     private long threshold = 20000;
 
+    private DominatingSelector dominatingSelector;
+
 
     public RecoveryJobManager(ExpertControllerClient expertControllerClient) {
         this.expertControllerClient = expertControllerClient;
@@ -44,34 +43,24 @@ public class RecoveryJobManager {
     /**
      * Run recovery job TODO: accept single request. reuse dominating mechanism
      */
-    public Long runRecoveryJob(List<RecoveryRequest> requests) {
+    public Long runRecoveryJob(RecoveryRequest dominatingRequest) {
 
-        logger.info(requests.size() + " recovery jobs submitted. Now checking the age." );
+        logger.info(dominatingRequest.getProblemTitle() + " recovery job submitted. Now checking the age." );
 
         Date now = new Date();
 
-        Collection<RecoveryRequest> filtered = requests.stream().filter(r -> r.getCondition().getStart().getTime() > now.getTime()-threshold).collect(Collectors.toList());
-
-        if(requests.size() != filtered.size()){
-            logger.info(requests.size() - filtered.size() + " were filtered - older than " + threshold + " ms");
+        if(!(dominatingRequest.getCondition().getStart().getTime() > now.getTime()-threshold)){
+            logger.info("No recent recovery found. The threshold is " + threshold + "ms old. The threshold is " + threshold + "ms");
+            return null;
         }
 
-
-        if(filtered.size() == 0 ){
-            logger.info("No recent recovery found. The threshold is " + threshold + "ms old");
+        if(dominatingRequest.getRecoverySteps().size() == 0){
+            logger.info("No executable recovery steps. The recovery request cannot be automated.");
             return null;
         }
 
 
-
-        logger.info("Now choosing the dominating");
-
-        Condition dominatingCondition = findMostImportant(requests.stream().map(r->r.getCondition()).collect(Collectors.toList()) );
-
-        RecoveryRequest dominatingRequest = requests.stream().filter(r -> r.getProblemId() == dominatingCondition.getId()).findFirst().orElse(null);
-
         logger.info("Dominating recovery job selected: " + dominatingRequest.getProblemDescription() );
-
 
         recentRecoveryConditions.add(dominatingRequest.getCondition());
         RecoveryResponse recoveryResponse = expertControllerClient.sendRecoveryRequest(dominatingRequest);
@@ -89,7 +78,7 @@ public class RecoveryJobManager {
             if(conditionOptional.isPresent()){
 
                 Condition rejectionConditionReason = conditionOptional.get();
-                String decision = handleRejection(dominatingCondition, rejectionConditionReason);
+                String decision = handleRejection(dominatingRequest.getCondition(), rejectionConditionReason);
 
                 logger.info("Handling rejection with decision to: " + decision);
 
@@ -132,17 +121,6 @@ public class RecoveryJobManager {
 
     }
 
-    /**
-     * Temoporary method to choose dominating condition.
-     *
-     * TODO: use common dominating mechanism
-     */
-    private Condition findMostImportant(List<Condition> requests) {
-
-        Condition topRequest = DominatingConditionSelector.findDominating(requests);
-
-        return topRequest;
-    }
 
     private boolean isSameCondition(Condition currentlyDominating, Condition currentlyRejecting){
 
@@ -192,7 +170,7 @@ public class RecoveryJobManager {
      * Handle rejection from controller. 3 possible ways:
      * - continue, if the conditions are the same meaning that the problem is not yet resolved. Maybe other steps are necessary
      * - ignore, if the condition that generate currently executing recovery is more important than ones that appeared afterwards
-     * - interrupt, if more important condition appeard after currently executing recovery
+     * - interrupt, if more important condition appeared after currently executing recovery
      * @param currentlyDominating condition that has appeared recently and dominates all others
      * @param currentlyRejecting condition that is now being recovered
      * @return
@@ -209,13 +187,14 @@ public class RecoveryJobManager {
             List<Condition> twoConditions = new ArrayList<>();
             twoConditions.add(currentlyDominating);
             twoConditions.add(currentlyRejecting);
-            Condition top = findMostImportant(twoConditions);
+
+            Condition top = dominatingSelector.selectDominating(twoConditions);
 
             if(top.getId() == currentlyRejecting.getId()){
                 //TODO: two cases here: "postpone" and "ignore"
                 return "postpone"; // currently rejecting is the most important, postpone currently dominating condition and continue with recovery
             } else {
-                return "interrupt"; // currenty rejecting is less important, interrupt it and start recovery of currently dominating
+                return "interrupt"; // currently rejecting is less important, interrupt it and start recovery of currently dominating
             }
 
         }

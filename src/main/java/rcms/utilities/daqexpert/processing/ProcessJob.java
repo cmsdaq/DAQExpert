@@ -7,10 +7,14 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
+import rcms.utilities.daqexpert.jobs.RecoveryRequest;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.servlets.DummyDAQ;
@@ -47,6 +51,10 @@ public class ProcessJob implements Callable<Triple<Set<Condition>, List<Point>, 
 	private static Set<Condition> allActiveConditions = new HashSet<>();
 
 	private static Condition lastDominating;
+
+
+	/** List of conditions that has been started - kept in order to generate finish signals for controller */
+	private final List<Long> recoveryConditionIds = new ArrayList<>();
 
 
 	public ProcessJob(int priority, List<File> entries, DataManager dataManager, SnapshotProcessor snapshotProcessor, RecoveryJobManager recoveryManager, DominatingSelector dominatingSelector, DominatingPersistor dominatingPersister) {
@@ -135,6 +143,8 @@ public class ProcessJob implements Callable<Triple<Set<Condition>, List<Point>, 
 
 						if(dominating != lastDominating){
 							dominatingPersister.persistDominating(lastDominating, dominating, new Date(daq.getLastUpdate()));
+							handleController(logicResults, dominating);
+
 						}
 						lastDominating = dominating;
 
@@ -186,6 +196,53 @@ public class ProcessJob implements Callable<Triple<Set<Condition>, List<Point>, 
 		}
 
 		return Triple.of(result, points, lastDominating);
+	}
+
+	/**
+	 *
+	 * @param conditions conditions generated this round
+	 * @param dominating current active dominating condition
+	 */
+	private void handleController(Set<Condition> conditions, Condition dominating ){
+		// find the conditions that finished - send the 'finish' signals to Controller
+		for(Condition logicResult: conditions) {
+			if (logicResult.getState() == EntryState.FINISHED) {
+				if (recoveryConditionIds.contains(logicResult.getId())) {
+					Long id = logicResult.getId();
+					recoveryJobManager.notifyConditionFinished(id);
+					recoveryConditionIds.remove(id);
+				}
+				continue;
+			}
+		}
+
+		if (dominating != null && dominating.getProducer() instanceof ActionLogicModule) {
+
+
+			logger.info("Dominating problem has recovery steps: " + dominating.getActionSteps());
+			logger.info("Trying to delegate to controller");
+			ActionLogicModule actionDominating = (ActionLogicModule) dominating.getProducer();
+			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
+					actionDominating.getActionWithContextRawRecovery(),
+					actionDominating.getActionWithContext(),
+					actionDominating.getName(),
+					actionDominating.getDescriptionWithContext(),
+					dominating.getId());
+
+			if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
+				recoveryRequest.setCondition(dominating);
+				Long dominatingId = recoveryJobManager.runRecoveryJob(recoveryRequest);
+				if (dominatingId != null) {
+					recoveryConditionIds.add(dominatingId);
+					logger.info("Automatic recovery sent to the controller. Executable steps: " + recoveryRequest.getRecoverySteps());
+				}
+			} else{
+				logger.info("Recovery request was not build. No recovery steps that could be executed.");
+			}
+		}
+
+
 	}
 
 	public int getPriority() {

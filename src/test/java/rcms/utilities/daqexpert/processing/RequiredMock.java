@@ -33,4 +33,18 @@ public class RequiredMock implements Requiring {
     private Set<Requiring> required = new HashSet<>();
 
 
+    @Override
+    public int getLevel() {
+        return 0;
+    }
+
+    @Override
+    public void setLevel(int level) {
+
+    }
+
+    @Override
+    public String getNodeName() {
+        return null;
+    }
 }

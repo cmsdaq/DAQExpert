@@ -32,7 +32,7 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		ContextHandler context = fc3.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
 		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
-		assertNull("No FED in this state", context.getContext().get("PROBLEM-FED"));
+		assertEquals(new HashSet(Arrays.asList(619)), context.getContext().get("PROBLEM-FED"));
 	}
 
 	/* 2016-12-04T02:05:40 */
@@ -98,6 +98,21 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("TIBTID")), context.getContext().get("PROBLEM-PARTITION"));
 		assertEquals(new HashSet(Arrays.asList(96)), context.getContext().get("PROBLEM-FED"));
 		assertEquals("Partition TIBTID in TRACKER subsystem is in OUT_OF_SYNC TTS state. It's blocking triggers. The problem is caused by FED 96", fc3.getDescriptionWithContext());
+
+	}
+
+	@Test
+	public void fedIncludedInTheMessage() throws URISyntaxException {
+		DAQ snapshot = getSnapshot("1531705063978.json.gz");
+
+		assertSatisfiedLogicModules(snapshot, fc3);
+
+		ContextHandler context = fc3.getContextHandler();
+		ContextHandler.highlightMarkup = false;
+		assertEquals(new HashSet(Arrays.asList("ECAL")), context.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("EB-")), context.getContext().get("PROBLEM-PARTITION"));
+		assertEquals(new HashSet(Arrays.asList(619)), context.getContext().get("PROBLEM-FED"));
+		assertEquals("Partition EB- in ECAL subsystem is in ERROR TTS state. It's blocking triggers. The problem is caused by FED 619", fc3.getDescriptionWithContext());
 
 	}
 

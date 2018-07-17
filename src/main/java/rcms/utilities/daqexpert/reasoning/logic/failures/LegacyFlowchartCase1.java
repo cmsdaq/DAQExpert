@@ -41,23 +41,22 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 		this.briefDescription = "Run blocked by out-of-sync data from FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
 		/* Default action */
-		ConditionalAction action = new ConditionalAction("Try to recover (try up to 2 times)",
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> & <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>>",
+		ConditionalAction action = new ConditionalAction(
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
-		action.addContextSteps("TRACKER", "Try to recover (try up to 2 times)",
-				"<<StopAndStartTheRun>>",
+		action.addContextSteps("TRACKER",
+				"<<StopAndStartTheRun>> (try up to 2 times)",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
-		//TODO: adapt to multistep recovery
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Try to stop/start the run",
-				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
+				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<RedAndGreenRecycle::DAQ>>. (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data data)");
 

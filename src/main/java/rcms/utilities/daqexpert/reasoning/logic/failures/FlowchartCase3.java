@@ -1,5 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
+import java.util.Map;
+
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
@@ -27,7 +29,6 @@ public class FlowchartCase3 extends KnownFailure {
 	public FlowchartCase3() {
 		this.name = "Partition problem";
 		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers. The problem is caused by FED {{PROBLEM-FED}}";
-		this.briefDescription = "Deadtime of partition(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}} is {{DEADTIME}}";
 		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
 				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
@@ -36,11 +37,11 @@ public class FlowchartCase3 extends KnownFailure {
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 
 		action.addContextSteps("ECAL-LHC-UNSTABLE", "This problem is normal for ECAL in periods of unstable clock",
-				"Stop the run, Red recycle ECAL and start a new run",
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
 				"Do not call the ECAL DOC");
 
 		action.addContextSteps("ES-LHC-UNSTABLE", "This problem is normal for ES in periods of unstable clock",
-				"Stop the run, Red recycle ES and start a new run",
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::ES>>",
 				"Do not call the ES DOC");
 
 		this.action = action;
@@ -60,7 +61,7 @@ public class FlowchartCase3 extends KnownFailure {
 		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
 			return false;
 		assignPriority(results);
-
+		
 		boolean result = false;
 
 		boolean isLhcClockAndUnstable = false;
@@ -99,14 +100,14 @@ public class FlowchartCase3 extends KnownFailure {
                                     for (FED fed : entry.getValue()) {
 
                                         if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())
-                                                || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(fed.getTtsState())) {
+                                                || TTSState.ERROR.getCode().equalsIgnoreCase(fed.getTtsState())) {
                                             contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
                                         }
                                     }
 
                                 } else {
                                     if (TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())
-                                            || TTSState.OUT_OF_SYNC.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
+                                            || TTSState.ERROR.getCode().equalsIgnoreCase(entry.getKey().getTtsState())) {
                                         contextHandler.register("PROBLEM-FED", entry.getKey().getSrcIdExpected());
                                     }
                                 }

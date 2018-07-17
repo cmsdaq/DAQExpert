@@ -1,10 +1,10 @@
 package rcms.utilities.daqexpert.reasoning.causality;
 
-import rcms.utilities.daqexpert.processing.Requiring;
+import rcms.utilities.daqexpert.processing.HierarchicalNode;
 
 import java.util.Set;
 
-public interface CausalityNode {
+public interface CausalityNode extends HierarchicalNode {
 
     /**
      * Get list of Nodes that causes this one. The node is Logic module.
@@ -18,12 +18,6 @@ public interface CausalityNode {
      */
     Set<CausalityNode> getAffected();
 
-
-    int getLevel();
-
-    void setLevel(int level);
-
-    String getNodeName();
 
     default void declareCausing(CausalityNode causing) {getCausing().add(causing);}
 

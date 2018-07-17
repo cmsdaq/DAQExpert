@@ -28,13 +28,13 @@ public class CorruptedData extends BackpressureAnalyzer {
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
-				"Try to recover: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+				"Try to recover: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<RedAndGreenRecycle::DAQ>> (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
 		
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "Try to stop/start the run (Red recycle DAQ only)",
-				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
+				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<RedAndGreenRecycle::DAQ>> (Try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
 

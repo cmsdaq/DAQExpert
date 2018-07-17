@@ -5,6 +5,7 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -22,7 +23,7 @@ public class LinkProblem extends BackpressureAnalyzer {
 				+ "FED is in {{AFFECTED-TTCP-STATE}} and stopped sending data.";
 
 		this.briefDescription = "Link problem detected on RU {{AFFECTED-RU}}";
-		this.action = null;
+		this.action = new SimpleAction("Call the DAQ DOC during extended working hours to take a dump of the FEROL registers");
 
 	}
 

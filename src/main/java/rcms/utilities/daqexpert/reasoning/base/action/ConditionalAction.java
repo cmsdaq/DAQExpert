@@ -1,9 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.base.action;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -42,6 +39,10 @@ public class ConditionalAction implements Action {
 			return getSteps();
 		}
 
+	}
+
+	public Set<String> getActionKeys(){
+		return action.keySet();
 	}
 
 }

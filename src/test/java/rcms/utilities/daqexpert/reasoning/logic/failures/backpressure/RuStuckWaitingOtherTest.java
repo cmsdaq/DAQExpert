@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
@@ -161,7 +162,10 @@ public class RuStuckWaitingOtherTest extends FlowchartCaseTestBase {
 		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
 		DAQ snapshot = getSnapshot("1504266974356.json.gz");
 
+		ContextHandler.highlightMarkup = false;
 		assertSatisfiedLogicModules(snapshot,ruStuckWaitingOther, ruFailed);
+		Date date = new Date(snapshot.getLastUpdate());
+		System.out.println(date);
 
 	}
 }

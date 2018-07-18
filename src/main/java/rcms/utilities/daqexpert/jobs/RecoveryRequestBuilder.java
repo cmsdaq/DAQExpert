@@ -63,8 +63,10 @@ public class RecoveryRequestBuilder {
                 List<String> subsystems = job.getRight();
 
                 switch (recoverJob) {
+                    // This step is equivalent to R&G recycle and should be deleted
                     case RedRecycle:
                         subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
+                        subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         add = true;
                         break;
                     case GreenRecycle:

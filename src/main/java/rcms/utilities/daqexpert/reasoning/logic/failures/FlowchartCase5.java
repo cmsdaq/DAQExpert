@@ -34,14 +34,15 @@ public class FlowchartCase5 extends KnownFailure {
 
 		/* default action */
 		ConditionalAction action = new ConditionalAction(
-				"<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<GreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
+				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{PROBLEM-SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "<<StopAndStartTheRun>> (try up to 2 times)",
-				"Problem fixed: Make an e-log entry.", "Problem not fixed: Red recycle ECAL",
-				"Call the DOC for the ECAL");
+		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
+				"Problem fixed: Make an e-log entry including problematic FED number.",
+				"Problem not fixed: <<StopAndStartTheRun>> with <<RedRecycle::ECAL>>",
+				"Problem still not fixed: Call the DOC for the ECAL");
 
 		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
 		/* tracker specific case only when warning state */

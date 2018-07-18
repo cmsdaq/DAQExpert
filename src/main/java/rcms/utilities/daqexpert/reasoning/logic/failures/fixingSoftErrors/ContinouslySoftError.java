@@ -33,8 +33,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 		ConditionalAction action = new ConditionalAction("Call DOC of subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ES specific instructions */
-		action.addContextSteps("ES", "<<StopAndStartTheRun>>",
-				"If 1) doesn't work and DAQ is in the same condition as before, stop the run and red-recycle ES");
+		action.addContextSteps("ES", "<<StopAndStartTheRun>> with <<RedRecycle::ES>>");
 
 		/* Pixel specific instructions */
 		action.addContextSteps("Pixel", "Check DCS",

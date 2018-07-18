@@ -61,6 +61,10 @@
                 clickToUse: true,
                 autoResize: true,
                 edges: {
+                    smooth: {
+                        enabled: true,
+
+                    },
                     arrows: {
                         to: {
                             enabled: true,
@@ -69,7 +73,7 @@
                     }
                 },nodes:{
                     borderWidth: 0,
-                    shape: "text",
+                    color: "#D0E1FE",
                     widthConstraint:
                         { minimum: 17, maximum: 170,},
                     font:{
@@ -121,13 +125,35 @@
         }
     }
 
+    function replace(json){
+
+        for (var i = 0; i < json.length; i++) {
+            var curr = json[i];
+            if(curr.name in names){
+                curr.name = names[curr.name];
+            }
+        }
+    }
+
+    var names = {
+        "NoRateWhenExpected" : "DataflowStuck",
+        "FlowchartCase1" : "OutOfSequenceData(legacy)",
+        "FlowchartCase2" : "CorruptedData(legacy)",
+        "FlowchartCase3" : "PartitionProblem",
+        "FlowchartCase4" : "",
+        "FlowchartCase5" : "FedStuck",
+        "FlowchartCase6" : "",
+    }
+
     $.getJSON("causality.json", function(json) {
+        replace(json);
         shorten(json);
         draw(json, 'causality');
     });
 
 
     $.getJSON("requirement.json", function(json) {
+        replace(json);
         shorten(json);
         draw(json, 'requirement');
     });

@@ -118,7 +118,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals("CSC",context.getActionKey());
 		assertEquals(3,fc5.getActionWithContext().size());
 
-		assertEquals(Arrays.asList("Stop and start the run with Red recycle of subsystem CSC and Green recycle of subsystem CSC (try up to 2 times)" ,
+		assertEquals(Arrays.asList("Stop and start the run with Red & green recycle of subsystem CSC (try up to 2 times)" ,
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem CSC to inform",
 				"Problem not fixed: Call the DOC for the subsystem CSC"), fc5.getActionWithContext());
 
@@ -155,7 +155,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 		assertEquals(3,fc5.getActionWithContext().size());
 
 		assertEquals(Arrays.asList(
-				"Stop and start the run with Red recycle of subsystem HCAL and Green recycle of subsystem HCAL (try up to 2 times)" ,
+				"Stop and start the run with Red & green recycle of subsystem HCAL (try up to 2 times)" ,
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem HCAL to inform","Problem not fixed: Call the DOC for the subsystem HCAL"), fc5.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();

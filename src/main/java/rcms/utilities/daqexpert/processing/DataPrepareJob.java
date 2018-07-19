@@ -25,6 +25,7 @@ import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -62,6 +63,11 @@ public class DataPrepareJob implements Runnable {
 	private final boolean demoRun;
 
 	private boolean waiting;
+
+	private static Condition lastDominating;
+
+	/** List of conditions that has been started - kept in order to generate finish signals for controller */
+	private static final List<Long> recoveryConditionIds = new ArrayList<>();
 
 	public boolean isWaiting(){
 		return waiting;
@@ -117,6 +123,8 @@ public class DataPrepareJob implements Runnable {
 
 					Triple<Set<Condition>, List<Point>, Condition> result = future.get(10, TimeUnit.SECONDS);
 
+					Condition dominating = result.getRight();
+
 					if (result == null) {
 						logger.info("No result this round");
 						return;
@@ -136,16 +144,12 @@ public class DataPrepareJob implements Runnable {
 								+ (t3 - t2) + "ms");
 
 
-						//Condition lastDominating = conditionDashboard.getCurrentCondition();
 						conditionDashboard.update(result.getLeft(), result.getRight() != null? result.getRight().getId(): null);
-						//Condition currentlyDominating = conditionDashboard.getCurrentCondition();
 
 
-						/*if(currentlyDominating != lastDominating){
-							Date currentSnapshotTime = new Date(((ForwardReaderJob)readerJob).getLast());
-							dominatingPersistor.persistDominating(lastDominating, currentlyDominating, currentSnapshotTime);
-						}*/
-
+						if(dominating != lastDominating){
+							handleController(result.getLeft(), dominating);
+						}
 
 						if (demoRun && conditionDashboard.getCurrentCondition() != null
 								&& id != conditionDashboard.getCurrentCondition().getId()) {
@@ -165,6 +169,7 @@ public class DataPrepareJob implements Runnable {
 							eventRegister.getEvents().clear();
 						}
 
+						lastDominating = dominating;
 
 					} catch (RuntimeException e) {
 						logger.warn("Exception during result persistence - results will be forgotten");
@@ -188,4 +193,51 @@ public class DataPrepareJob implements Runnable {
 		return snapshotProcessor;
 	}
 
+	/**
+	 *
+	 * @param conditions conditions generated this round
+	 * @param dominating current active dominating condition
+	 */
+	private void handleController(Set<Condition> conditions, Condition dominating ){
+		// find the conditions that finished - send the 'finish' signals to Controller
+		for(Condition logicResult: conditions) {
+			if (logicResult.getState() == EntryState.FINISHED) {
+				if (recoveryConditionIds.contains(logicResult.getId())) {
+					Long id = logicResult.getId();
+					logger.info("Notifying controller condition " + id + "  finished");
+					recoveryJobManager.notifyConditionFinished(id);
+					recoveryConditionIds.remove(id);
+				}
+				continue;
+			}
+		}
+
+		if (dominating != null && dominating.getProducer() instanceof ActionLogicModule) {
+
+
+			logger.info("Dominating problem has recovery steps: " + dominating.getActionSteps());
+			logger.info("Trying to delegate to controller");
+			ActionLogicModule actionDominating = (ActionLogicModule) dominating.getProducer();
+			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
+					actionDominating.getActionWithContextRawRecovery(),
+					actionDominating.getActionWithContext(),
+					actionDominating.getName(),
+					actionDominating.getDescriptionWithContext(),
+					dominating.getId());
+
+			if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
+				recoveryRequest.setCondition(dominating);
+				Long dominatingId = recoveryJobManager.runRecoveryJob(recoveryRequest);
+				if (dominatingId != null) {
+					recoveryConditionIds.add(dominatingId);
+					logger.info("Automatic recovery sent to the controller. Executable steps: " + recoveryRequest.getRecoverySteps());
+				}
+			} else{
+				logger.info("Recovery request was not build. No recovery steps that could be executed.");
+			}
+		}
+
+
+	}
 }

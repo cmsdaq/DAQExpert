@@ -50,7 +50,7 @@ public class RecoveryJobManager {
         Date now = new Date();
 
         if(!(dominatingRequest.getCondition().getStart().getTime() > now.getTime()-threshold)){
-            logger.info("No recent recovery found. The threshold is " + threshold + "ms old. The threshold is " + threshold + "ms");
+            logger.info("No recent recovery found. The problem is " + (now.getTime()-threshold) + "ms old. The threshold is " + threshold + "ms");
             return null;
         }
 

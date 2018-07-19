@@ -174,14 +174,13 @@ public class JobManagerIT {
     }
 
     /**
-     *
-     * This case contains 38 conditions of Fedstuck due to fluctuating rate.
+     * This case contains many conditions of Fedstuck due to fluctuating rate.
      */
     @Test
     public void blackboxTest4() throws InterruptedException {
 
-        String startDateString = "2017-11-06T01:00:00Z";
-        String endDateString = "2017-11-06T05:25:00Z";
+        String startDateString = "2017-11-06T03:10:00Z";
+        String endDateString = "2017-11-06T03:12:10Z";
 
         Set<String> expectedConditions = new HashSet<>();
         expectedConditions.add("Partition deadtime");
@@ -196,20 +195,19 @@ public class JobManagerIT {
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
-        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC+, CSC-] in subsystem CSC");
+        expectedConditionDescriptions.add("FED 847 generates deadtime 100%, the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition CSC+ in subsystem CSC");
         expectedConditionDescriptions.add("CSC/CSC+/847 is stuck in TTS state WARNING");
-        expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
+        expectedConditionDescriptions.add("FED(s) CSC/CSC+/847 generates deadtime 100%");
 
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
 
-        runForBlackboxTest(startDateString, endDateString, false);
+        runForBlackboxTest(startDateString, endDateString, true);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
 
-        /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
-        assertExpectedRecoveryRequest(35, expectedRecoveryRequests, true);
+        assertExpectedRecoveryRequest(5, expectedRecoveryRequests, false);
 
     }
 
@@ -264,7 +262,7 @@ public class JobManagerIT {
         Set<RecoveryRequest> expectedRecoveryRequests = Stream.of(generateRecovery(1,fedStuckProblemDescription))
                 .collect(Collectors.toSet());
 
-        runForBlackboxTest(startDateString, endDateString,false);
+        runForBlackboxTest(startDateString, endDateString,true);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
@@ -461,7 +459,10 @@ public class JobManagerIT {
         }
 
         for (String conditionTitle : expectedConditions) {
-            assertThat(conditionsYielded, hasItem(Matchers.<Condition>hasProperty("title", equalTo(conditionTitle))));
+            assertThat(conditionsYielded, hasItem(allOf(
+                    Matchers.<Condition>hasProperty("title", equalTo(conditionTitle)),
+                    Matchers.<Condition>hasProperty("id", notNullValue())
+            )));
         }
 
     }
@@ -545,7 +546,7 @@ public class JobManagerIT {
         public Long runRecoveryJob(RecoveryRequest request) {
             logger.info("Recovery job called: " + request);
             recoveryRequestsYielded.add(request);
-            return 0L;
+            return request.getProblemId();
         }
 
         @Override

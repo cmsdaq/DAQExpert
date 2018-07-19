@@ -123,12 +123,13 @@ public class DataPrepareJob implements Runnable {
 
 					Triple<Set<Condition>, List<Point>, Condition> result = future.get(10, TimeUnit.SECONDS);
 
-					Condition dominating = result.getRight();
 
 					if (result == null) {
 						logger.info("No result this round");
 						return;
 					}
+
+					Condition dominating = result.getRight();
 
 
 					try {

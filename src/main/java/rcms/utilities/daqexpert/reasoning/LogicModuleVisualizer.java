@@ -202,18 +202,16 @@ public class LogicModuleVisualizer {
 
 
 
-
-
-
     @JsonIdentityInfo(generator = IdGenerators.ObjectUniqueIntIdGenerator.class, property = "id")
     @JsonIgnoreProperties({"priority", "logicModuleRegistry", "description", "holdNotifications","maturityThreshold", "contextHandler", "descriptionWithContext", "mature", "action", "actionWithContext", "last", "actionWithContextRawRecovery", "briefDescription", "problematic"})
     public interface CausalityNodeMixin {
 
-        @JsonProperty("required")
-        @JsonIdentityReference(alwaysAsId = true)
-        abstract List<CausalityNode> getCausing();
 
         @JsonIgnore
+        abstract List<CausalityNode> getCausing();
+
+        @JsonProperty("required")
+        @JsonIdentityReference(alwaysAsId = true)
         abstract List<CausalityNode> getAffected();
 
         @JsonProperty("name")

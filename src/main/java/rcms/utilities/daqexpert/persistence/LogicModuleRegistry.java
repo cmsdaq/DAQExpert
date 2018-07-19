@@ -103,7 +103,8 @@ public enum LogicModuleRegistry {
     FedDeadtimeDueToDaq(new FedDeadtimeDueToDaq(), ConditionGroup.OTHER, "", 1050),
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER, "", 2012),
     TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER, "", 2012),
-    HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),;
+    HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),
+    FedStuckDueToDaq(new FedStuckDueToDaq(), ConditionGroup.OTHER,"",2003);
 
     private final LogicModule logicModule;
     private final String description;

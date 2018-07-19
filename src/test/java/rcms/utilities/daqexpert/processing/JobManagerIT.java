@@ -1,17 +1,5 @@
 package rcms.utilities.daqexpert.processing;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
@@ -35,12 +23,18 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
+import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 public class JobManagerIT {
 
@@ -180,14 +174,13 @@ public class JobManagerIT {
     }
 
     /**
-     *
-     * This case contains 38 conditions of Fedstuck due to fluctuating rate.
+     * This case contains many conditions of Fedstuck due to fluctuating rate.
      */
     @Test
     public void blackboxTest4() throws InterruptedException {
 
-        String startDateString = "2017-11-06T01:00:00Z";
-        String endDateString = "2017-11-06T05:25:00Z";
+        String startDateString = "2017-11-06T03:10:00Z";
+        String endDateString = "2017-11-06T03:12:10Z";
 
         Set<String> expectedConditions = new HashSet<>();
         expectedConditions.add("Partition deadtime");
@@ -202,20 +195,19 @@ public class JobManagerIT {
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
         expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
-        expectedConditionDescriptions.add("FED [847, 852-853] generates deadtime ( last: 12.2%,  avg: 51.5%,  min: 12.2%,  max: 100%), the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition [CSC+, CSC-] in subsystem CSC");
+        expectedConditionDescriptions.add("FED 847 generates deadtime 100%, the threshold is 2.0%. There is no backpressure from DAQ on this FED. FED belongs to partition CSC+ in subsystem CSC");
         expectedConditionDescriptions.add("CSC/CSC+/847 is stuck in TTS state WARNING");
-        expectedConditionDescriptions.add("TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING");
+        expectedConditionDescriptions.add("FED(s) CSC/CSC+/847 generates deadtime 100%");
 
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(3,"TTCP CSC+ of CSC subsystem is blocking triggers, it's in WARNING TTS state, The problem is caused by FED 847 in WARNING"));
 
-        runForBlackboxTest(startDateString, endDateString, false);
+        runForBlackboxTest(startDateString, endDateString, true);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
 
-        /* TODO: should be exactly 39, but for some reason depending on test order it yields either 35 or 39 */
-        assertExpectedRecoveryRequest(35, expectedRecoveryRequests, true);
+        assertExpectedRecoveryRequest(5, expectedRecoveryRequests, false);
 
     }
 
@@ -248,6 +240,34 @@ public class JobManagerIT {
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
 
         assertExpectedRecoveryRequest(0, expectedRecoveryRequests, false);
+
+    }
+
+    @Test
+    public void blackboxTest8() throws InterruptedException {
+
+        String startDateString = "2018-07-17T01:20:00.000Z";
+        String endDateString = "2018-07-29T01:25:00.000Z";
+
+        Set<String> expectedConditions = Stream.of("FED stuck").collect(Collectors.toSet());
+
+        Set<String> expectedNotifications = Stream.of("Started: FED stuck","Ended: FED stuck").collect(Collectors.toSet());
+
+        String fedStuckProblemDescription =
+                "TTCP GEMPILOT1 of GEM subsystem is blocking triggers, it's in BUSY TTS state, The problem is caused by FED 1467 in BUSY";
+
+        Set<String> expectedConditionDescriptions = Stream.of(fedStuckProblemDescription
+        ).collect(Collectors.toSet());
+
+        Set<RecoveryRequest> expectedRecoveryRequests = Stream.of(generateRecovery(1,fedStuckProblemDescription))
+                .collect(Collectors.toSet());
+
+        runForBlackboxTest(startDateString, endDateString,true);
+        assertExpectedConditions(expectedConditions);
+        assertExpectedNotifications(expectedNotifications);
+        assertExpectedConditionDescriptions(expectedConditionDescriptions);
+
+        assertExpectedRecoveryRequest(1, expectedRecoveryRequests, false);
 
     }
 
@@ -439,7 +459,10 @@ public class JobManagerIT {
         }
 
         for (String conditionTitle : expectedConditions) {
-            assertThat(conditionsYielded, hasItem(Matchers.<Condition>hasProperty("title", equalTo(conditionTitle))));
+            assertThat(conditionsYielded, hasItem(allOf(
+                    Matchers.<Condition>hasProperty("title", equalTo(conditionTitle)),
+                    Matchers.<Condition>hasProperty("id", notNullValue())
+            )));
         }
 
     }
@@ -489,9 +512,13 @@ public class JobManagerIT {
         }
 
 
-        if(totalNumberOfRecovoveryRequests != 0){
+        if (totalNumberOfRecovoveryRequests != 0) {
             for (RecoveryRequest rr : expectedRecoveryRequests) {
-                assertThat(recoveryRequestsYielded, hasItem(Matchers.<RecoveryRequest>hasProperty("problemDescription", equalTo(rr.getProblemDescription()))));
+                assertThat(recoveryRequestsYielded, hasItem(allOf(
+                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription())),
+                        Matchers.hasProperty("status", equalTo("finished"))
+                        )
+                ));
             }
         }
 
@@ -519,9 +546,14 @@ public class JobManagerIT {
         public Long runRecoveryJob(RecoveryRequest request) {
             logger.info("Recovery job called: " + request);
             recoveryRequestsYielded.add(request);
-            return 0L;
+            return request.getProblemId();
         }
 
+        @Override
+        public void notifyConditionFinished(Long id) {
+            RecoveryRequest finished = recoveryRequestsYielded.stream().filter(r -> r.getProblemId() == id).findFirst().orElse(null);
+            finished.setStatus("finished");
+        }
     }
 
     class ExpertControllerClientStub extends ExpertControllerClient {

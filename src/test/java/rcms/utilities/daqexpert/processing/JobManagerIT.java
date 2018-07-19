@@ -251,6 +251,30 @@ public class JobManagerIT {
 
     }
 
+    @Test
+    public void blackboxTest8() throws InterruptedException {
+
+        String startDateString = "2018-07-17T00:0:00.000Z";
+        String endDateString = "2018-07-17T02:45:00.000Z";
+
+        Set<String> expectedConditions = Stream.of("").collect(Collectors.toSet());
+
+        Set<String> expectedNotifications = Stream.of("").collect(Collectors.toSet());
+
+        Set<String> expectedConditionDescriptions = Stream.of("").collect(Collectors.toSet());
+
+        Set<RecoveryRequest> expectedRecoveryRequests = Stream.of(generateRecovery(0,null))
+                .collect(Collectors.toSet());
+
+        runForBlackboxTest(startDateString, endDateString);
+        assertExpectedConditions(expectedConditions);
+        assertExpectedNotifications(expectedNotifications);
+        assertExpectedConditionDescriptions(expectedConditionDescriptions);
+
+        assertExpectedRecoveryRequest(0, expectedRecoveryRequests, false);
+
+    }
+
 
 
     @Test

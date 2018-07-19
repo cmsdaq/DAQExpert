@@ -1,17 +1,5 @@
 package rcms.utilities.daqexpert.processing;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
-
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
@@ -35,12 +23,18 @@ import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
+import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 public class JobManagerIT {
 
@@ -254,24 +248,28 @@ public class JobManagerIT {
     @Test
     public void blackboxTest8() throws InterruptedException {
 
-        String startDateString = "2018-07-17T00:0:00.000Z";
-        String endDateString = "2018-07-17T02:45:00.000Z";
+        String startDateString = "2018-07-17T01:20:00.000Z";
+        String endDateString = "2018-07-29T01:25:00.000Z";
 
-        Set<String> expectedConditions = Stream.of("").collect(Collectors.toSet());
+        Set<String> expectedConditions = Stream.of("FED stuck").collect(Collectors.toSet());
 
-        Set<String> expectedNotifications = Stream.of("").collect(Collectors.toSet());
+        Set<String> expectedNotifications = Stream.of("Started: FED stuck","Ended: FED stuck").collect(Collectors.toSet());
 
-        Set<String> expectedConditionDescriptions = Stream.of("").collect(Collectors.toSet());
+        String fedStuckProblemDescription =
+                "TTCP GEMPILOT1 of GEM subsystem is blocking triggers, it's in BUSY TTS state, The problem is caused by FED 1467 in BUSY";
 
-        Set<RecoveryRequest> expectedRecoveryRequests = Stream.of(generateRecovery(0,null))
+        Set<String> expectedConditionDescriptions = Stream.of(fedStuckProblemDescription
+        ).collect(Collectors.toSet());
+
+        Set<RecoveryRequest> expectedRecoveryRequests = Stream.of(generateRecovery(1,fedStuckProblemDescription))
                 .collect(Collectors.toSet());
 
-        runForBlackboxTest(startDateString, endDateString);
+        runForBlackboxTest(startDateString, endDateString,false);
         assertExpectedConditions(expectedConditions);
         assertExpectedNotifications(expectedNotifications);
         assertExpectedConditionDescriptions(expectedConditionDescriptions);
 
-        assertExpectedRecoveryRequest(0, expectedRecoveryRequests, false);
+        assertExpectedRecoveryRequest(1, expectedRecoveryRequests, false);
 
     }
 
@@ -513,9 +511,13 @@ public class JobManagerIT {
         }
 
 
-        if(totalNumberOfRecovoveryRequests != 0){
+        if (totalNumberOfRecovoveryRequests != 0) {
             for (RecoveryRequest rr : expectedRecoveryRequests) {
-                assertThat(recoveryRequestsYielded, hasItem(Matchers.<RecoveryRequest>hasProperty("problemDescription", equalTo(rr.getProblemDescription()))));
+                assertThat(recoveryRequestsYielded, hasItem(allOf(
+                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription())),
+                        Matchers.hasProperty("status", equalTo("finished"))
+                        )
+                ));
             }
         }
 
@@ -546,6 +548,11 @@ public class JobManagerIT {
             return 0L;
         }
 
+        @Override
+        public void notifyConditionFinished(Long id) {
+            RecoveryRequest finished = recoveryRequestsYielded.stream().filter(r -> r.getProblemId() == id).findFirst().orElse(null);
+            finished.setStatus("finished");
+        }
     }
 
     class ExpertControllerClientStub extends ExpertControllerClient {

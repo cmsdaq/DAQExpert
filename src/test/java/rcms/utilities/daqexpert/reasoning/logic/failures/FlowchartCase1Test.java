@@ -105,7 +105,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("FPIXM")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
-		assertEquals(3,legacyFc1.getActionWithContext().size());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 
@@ -124,7 +124,7 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 		assertEquals(new HashSet(Arrays.asList("BPIXP")), context.getContext().get("PROBLEM-PARTITION"));
 		
 		assertEquals("PIXEL",context.getActionKey());
-		assertEquals(3,legacyFc1.getActionWithContext().size());
+		assertEquals(4,legacyFc1.getActionWithContext().size());
 
 	}
 	

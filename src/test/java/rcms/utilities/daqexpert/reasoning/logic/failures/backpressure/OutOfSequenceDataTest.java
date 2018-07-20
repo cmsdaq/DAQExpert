@@ -194,7 +194,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getDescriptionWithContext());
 		assertEquals(Arrays.asList(
 				"Stop and start the run",
-				"If this doesn't help: Stop and start the run with both Red & green recycle of subsystem ECAL",
+				"If this doesn't help: Stop and start the run with Red & green recycle of subsystem ECAL",
 				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
 				"Problem not fixed: Call the DOC of ECAL"
 				), fc1.getActionWithContext());

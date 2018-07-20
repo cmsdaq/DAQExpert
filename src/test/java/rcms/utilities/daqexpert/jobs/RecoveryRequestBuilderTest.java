@@ -1,6 +1,8 @@
 package rcms.utilities.daqexpert.jobs;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
@@ -27,6 +29,7 @@ public class RecoveryRequestBuilderTest {
         List<ActionLogicModule> r = LogicModuleRegistry.getModulesInRunOrder()
                 .stream().filter(l->l instanceof ActionLogicModule).map(l->(ActionLogicModule)l).collect(Collectors.toList());
 
+        Logger.getLogger(RecoveryRequestBuilder.class).setLevel(Level.TRACE);
 
         for(ActionLogicModule lm : r){
 

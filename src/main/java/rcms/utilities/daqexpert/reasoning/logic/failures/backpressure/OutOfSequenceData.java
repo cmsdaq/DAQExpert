@@ -49,8 +49,8 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 
 		/* pixel specific case */
 		action.addContextSteps("PIXEL", "Try Pause and Resume",
-				"Problem not fixed:: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
-				"Problem still not fixed:: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
+				"Problem not fixed: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
+				"Problem still not fixed: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
 				"Make an e-log entry");
 
 		/* FED=1111 */

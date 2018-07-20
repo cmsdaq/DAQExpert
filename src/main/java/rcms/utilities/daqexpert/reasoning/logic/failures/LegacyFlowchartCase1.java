@@ -56,9 +56,15 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
-				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::ECAL>>",
+				"If this doesn't help: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
 				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
 				"Problem not fixed: Call the DOC of ECAL");
+
+		/* pixel specific case */
+		action.addContextSteps("PIXEL", "Try Pause and Resume",
+				"Problem not fixed:: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
+				"Problem still not fixed:: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
+				"Make an e-log entry");
 
 		/* FED=1111 */
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",

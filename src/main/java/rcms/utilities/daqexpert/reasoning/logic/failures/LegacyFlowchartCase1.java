@@ -56,9 +56,9 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
-				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<RedAndGreenRecycle::DAQ>>. (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data) to inform about the problem",
-				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data data)");
+				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::ECAL>>",
+				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
+				"Problem not fixed: Call the DOC of ECAL");
 
 		/* FED=1111 */
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",

@@ -92,7 +92,7 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	@Override
 	public void parametrize(Properties properties) {
 		this.maxCpuLoad = FailFastParameterReader.getFloatParameter(properties, Setting.EXPERT_LOGIC_HLT_CPU_LOAD_THRESHOLD, this.getClass());
-		this.description = String.format("HLT CPU load is high ({{HLT_CPU_LOAD}}, which exceeds the threshold of %.1f%%. [[NOTE]]", maxCpuLoad * 100);
+		this.description = String.format("HLT CPU load is high ({{HLT_CPU_LOAD}}, which exceeds the threshold of %.1f%%.", maxCpuLoad * 100);
 
 		// an integer in milliseconds is enough to describe 24 days of
 		// holdoff period...

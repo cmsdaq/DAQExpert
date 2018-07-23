@@ -70,7 +70,8 @@ public enum Setting {
 	DATABASE_MODE("hibernate.hbm2ddl.auto"),
 
 	MARKUP_ENABLED("markup.enabled",false),
-	;
+    PROBLEM_ESTABLISHED("expert.logic.problem-established.threshold"),
+	DATAFLOW_ESTABLISHED("expert.logic.dataflow-established.threshold");
 
 	private final String key;
 

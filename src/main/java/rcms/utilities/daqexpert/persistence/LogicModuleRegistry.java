@@ -15,6 +15,10 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.disconnected.ProblemWit
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.ContinouslySoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.LengthyFixingSoftError;
 import rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors.StuckAfterSoftError;
+import rcms.utilities.daqexpert.reasoning.logic.recovery.AutomaticRecoveryEnabled;
+import rcms.utilities.daqexpert.reasoning.logic.recovery.DataflowEstablished;
+import rcms.utilities.daqexpert.reasoning.logic.recovery.L0AutomaticRecovery;
+import rcms.utilities.daqexpert.reasoning.logic.recovery.ProblemEstablished;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -104,7 +108,12 @@ public enum LogicModuleRegistry {
     CmsswCrashes(new CmsswCrashes(), ConditionGroup.OTHER, "", 2012),
     TmpUpgradedFedProblem(new TmpUpgradedFedProblem(), ConditionGroup.OTHER, "", 2012),
     HltCpuLoad(new HltCpuLoad(), ConditionGroup.OTHER, "", 2013),
-    FedStuckDueToDaq(new FedStuckDueToDaq(), ConditionGroup.OTHER,"",2003);
+    FedStuckDueToDaq(new FedStuckDueToDaq(), ConditionGroup.OTHER,"",2003),
+
+    L0AutomaticRecoveryAction(new L0AutomaticRecovery(), ConditionGroup.RECOVERIES,"",1),
+    ProblemEstablished(new ProblemEstablished(), ConditionGroup.RECOVERIES,"",1),
+    DataflowEstablished(new DataflowEstablished(), ConditionGroup.RECOVERIES,"",1),
+    AutomaticRecoveryEnabled(new AutomaticRecoveryEnabled(), ConditionGroup.RECOVERIES,"",1);
 
     private final LogicModule logicModule;
     private final String description;

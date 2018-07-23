@@ -39,10 +39,10 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
 
 		/* ecal specific case */
-		action.addContextSteps("ECAL", "Try to stop/start the run (Red recycle DAQ only)",
-				"If this doesn't help: Stop the run. Red & green recycle both the DAQ and the subsystem {{PROBLEM-SUBSYSTEM}}. Start new Run. (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data) to inform about the problem",
-				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent corrupted data)");
+		action.addContextSteps("ECAL", "<<StopAndStartTheRun>> with <<RedAndGreenRecycle::DAQ>>",
+				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::ECAL>> and <<RedAndGreenRecycle::DAQ>>",
+				"Problem fixed: Make an e-log entry. If this happen during physics data taking call the DOC of ECAL (subsystem that sent corrupted data) to inform about the problem",
+				"Problem not fixed: Call the DOC of ECAL (subsystem that sent corrupted data)\n");
 
 
 		this.action = action;

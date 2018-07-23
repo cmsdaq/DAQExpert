@@ -5,16 +5,23 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 
-public class SubsystemRunningDegraded extends ContextLogicModule {
+public class SubsystemRunningDegraded extends ActionLogicModule {
 
 	public SubsystemRunningDegraded() {
 		this.name = "Subsystem running degraded";
 		this.description = "{{PROBLEM-SUBSYSTEM}} subsystem is in running degraded";
 		this.priority = ConditionPriority.DEFAULTT;
+		this.action = new SimpleAction("Subsytem {{PROBLEM-SUBSYSTEM}} is in RunningDegraded. " +
+				"Please check the message in the subsystem information section in the Level-0 FM for subsystem {{PROBLEM-SUBSYSTEM}}. " +
+				"It should contain a description of the problem. ",
+				"Use your common sense to decide whether a human expert needs to look at the problem or whether CMS can continue taking data despite the problem. ",
+				"If there is no problem description or if the description is unclear, call the DOC of subsystem {{PROBLEM-SUBSYSTEM}}.");
 	}
 
 	@Override

@@ -41,12 +41,17 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
-		//TODO: adapt to multistep recovery
 		/* ecal specific case */
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
-				"If this doesn't help: <<StopAndStartTheRun>> with both <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> and <<RedAndGreenRecycle::DAQ>> (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data) to inform about the problem",
-				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that sent out-of-sync data data)");
+				"If this doesn't help: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
+				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
+				"Problem not fixed: Call the DOC of ECAL");
+
+		/* pixel specific case */
+		action.addContextSteps("PIXEL", "Try Pause and Resume",
+				"Problem not fixed: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
+				"Problem still not fixed: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
+				"Make an e-log entry");
 
 		/* FED=1111 */
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",

@@ -126,11 +126,12 @@ public class RecoveryRequestBuilder {
         Pattern pattern = Pattern.compile(".*\\<\\<[\\w]*\\:?\\:?[\\w\\]\\[\\,\\s]*\\>\\>.*");
         Matcher matcher = pattern.matcher(step);
 
+        logger.trace("Getting jobs from step: " + step);
 
         while (matcher.matches()) {
 
             int start = step.indexOf("<<");
-            int delimiter = step.indexOf("::");
+            int delimiter = step.indexOf("::",start);
 
             int end = step.indexOf(">>", start);
 

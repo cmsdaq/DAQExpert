@@ -194,9 +194,9 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		System.out.println(fc1.getDescriptionWithContext());
 		assertEquals(Arrays.asList(
 				"Stop and start the run",
-				"If this doesn't help: Stop and start the run with both Red & green recycle of subsystem ECAL and Red & green recycle of subsystem DAQ (Try up to 2 times)",
-				"Problem fixed: Make an e-log entry. Call the DOC of ECAL (subsystem that sent out-of-sync data) to inform about the problem",
-				"Problem not fixed: Call the DOC of ECAL (subsystem that sent out-of-sync data data)"
+				"If this doesn't help: Stop and start the run with Red & green recycle of subsystem ECAL",
+				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
+				"Problem not fixed: Call the DOC of ECAL"
 				), fc1.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
@@ -207,8 +207,8 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 		i.next();
 		RecoveryStep secondStep = i.next();
 
-		assertThat(secondStep.getGreenRecycle(), contains("DAQ", "ECAL"));
-		assertThat(secondStep.getRedRecycle(), contains("DAQ", "ECAL"));
+		assertThat(secondStep.getGreenRecycle(), contains("ECAL"));
+		assertThat(secondStep.getRedRecycle(), contains("ECAL"));
 
 	}
 

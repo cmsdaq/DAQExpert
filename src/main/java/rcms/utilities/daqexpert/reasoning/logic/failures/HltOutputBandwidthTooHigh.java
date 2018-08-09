@@ -9,6 +9,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
+import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +35,8 @@ public class HltOutputBandwidthTooHigh extends KnownFailure implements Parameter
 
     @Override
     public void declareRelations(){
+	require(LogicModuleRegistry.RunOngoing);
+
         require(LogicModuleRegistry.BackpressureFromHlt);
         declareAffected(LogicModuleRegistry.BackpressureFromHlt);
     }

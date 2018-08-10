@@ -93,80 +93,63 @@ public class HltCpuLoadTest {
 		HltCpuLoad module = makeInstance(runOngoingHoldOffPeriod, selfHoldOffPeriod);
 
 		// prepare a sequence of events and expected results
-		List<HoldOffTestData> sequence = new ArrayList<HoldOffTestData>();
+		List<HltHoldOffTestData> sequence = new ArrayList<HltHoldOffTestData>();
 
 		//                      timestamp, runOngoing, cpuLoad, expectedResult
-		sequence.add(new HoldOffTestData(0, false, 0.5f, false));
+		sequence.add(new HltHoldOffTestData(0, false, false).setCpuLoad(0.5f));
 
 		// high HLT load outside run - but self holdoff
-		sequence.add(new HoldOffTestData(5, false, 0.95f, false));
+		sequence.add(new HltHoldOffTestData(5, false, false).setCpuLoad(0.95f));
 
 		// high HLT load outside run - and self holdoff ok
-		sequence.add(new HoldOffTestData(7, false, 0.95f, true));
+		sequence.add(new HltHoldOffTestData(7, false, true).setCpuLoad(0.95f));
 
 		// run starts with reasonable CPU load
-		sequence.add(new HoldOffTestData(10, true, 0.5f, false));
+		sequence.add(new HltHoldOffTestData(10, true, false).setCpuLoad(0.5f));
 
 		// too high CPU load but within holdoff period
-		sequence.add(new HoldOffTestData(19, true, 0.95f, false));
+		sequence.add(new HltHoldOffTestData(19, true, false).setCpuLoad(0.95f));
 
 		// too high CPU load after holdoff period
-		sequence.add(new HoldOffTestData(20, true, 0.95f, true));
+		sequence.add(new HltHoldOffTestData(20, true, true).setCpuLoad(0.95f));
 
 		// normal high CPU load after holdoff period
-		sequence.add(new HoldOffTestData(30, true, 0.5f, false));
+		sequence.add(new HltHoldOffTestData(30, true, false).setCpuLoad(0.5f));
 
 		// again too high CPU load after holdoff period - but result false as self holdoff timer
-		sequence.add(new HoldOffTestData(31, true, 0.95f, false));
+		sequence.add(new HltHoldOffTestData(31, true, false).setCpuLoad(0.95f));
 
 		// self holdoff timer now releasees
-		sequence.add(new HoldOffTestData(35, true, 0.95f, true));
+		sequence.add(new HltHoldOffTestData(35, true, true).setCpuLoad(0.95f));
 
 		//-----
 
 		Map<String, Output> results = new HashMap<>();
 
-		for (HoldOffTestData data : sequence) {
-			results.put(RunOngoing.class.getSimpleName(), new Output(data.runOngoing));
+		for (HltHoldOffTestData data : sequence) {
+			results.put(RunOngoing.class.getSimpleName(), new Output(data.isRunOngoing()));
 
 			// needed for assigning priorities
 			results.put(StableBeams.class.getSimpleName(), new Output(true));
 			results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
 
 			DAQ snapshot = new DAQ();
-			snapshot.setLastUpdate(data.timestamp);
+			snapshot.setLastUpdate(data.getTimestamp());
 
 			// for the moment we do not have a test case snapshot for this class
 			// so we have to put high CPU load by hand
 			HltInfo hltInfo = new HltInfo();
-			hltInfo.setCpuLoad(data.cpuLoad);
+			hltInfo.setCpuLoad(data.getCpuLoad());
 			snapshot.setHltInfo(hltInfo);
 
 			// run module to be tested
 			boolean result = module.satisfied(snapshot, results);
 
-			assertEquals("test failed for snapshot at time " + data.timestamp,
-							data.expectedResult, result);
+			assertEquals("test failed for snapshot at time " + data.getTimestamp(),
+							data.isExpectedResult(), result);
 
 		} // loop over test sequence
 
 	}
 
-	/** contains information about a point in time for the hold off test */
-	private static class HoldOffTestData {
-		private final long timestamp;
-
-		private final boolean runOngoing;
-
-		private final float cpuLoad;
-
-		private final boolean expectedResult;
-
-		public HoldOffTestData(long timestamp, boolean runOngoing, float cpuLoad, boolean expectedResult) {
-			this.timestamp = timestamp;
-			this.runOngoing = runOngoing;
-			this.cpuLoad = cpuLoad;
-			this.expectedResult = expectedResult;
-		}
-	}
 }

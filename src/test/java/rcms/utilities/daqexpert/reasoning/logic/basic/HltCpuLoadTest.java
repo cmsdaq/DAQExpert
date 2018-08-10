@@ -95,7 +95,7 @@ public class HltCpuLoadTest {
 		// prepare a sequence of events and expected results
 		List<HltHoldOffTestData> sequence = new ArrayList<HltHoldOffTestData>();
 
-		//                      timestamp, runOngoing, cpuLoad, expectedResult
+		//                       timestamp, runOngoing, expectedResult
 		sequence.add(new HltHoldOffTestData(0, false, false).setCpuLoad(0.5f));
 
 		// high HLT load outside run - but self holdoff

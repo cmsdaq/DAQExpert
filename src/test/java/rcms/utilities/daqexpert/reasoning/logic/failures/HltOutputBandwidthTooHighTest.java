@@ -36,6 +36,23 @@ import static org.junit.Assert.assertFalse;
 public class HltOutputBandwidthTooHighTest
 {
 
+	/** similar to HltCpuLoadTest.makeInstance() but for HltOutputBandwidthTooHigh */
+	private HltOutputBandwidthTooHigh makeInstance(long runOngoingHoldOffPeriod, long selfHoldOffPeriod) {
+		HltOutputBandwidthTooHigh result = new HltOutputBandwidthTooHigh();
+
+		// mock properties
+		Properties properties = new Properties();
+
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.5");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "" + runOngoingHoldOffPeriod);
+		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "" + selfHoldOffPeriod);
+
+		result.parametrize(properties);
+
+		return result;
+	}
+
 	@Test
 	public void test01() throws URISyntaxException
 	{

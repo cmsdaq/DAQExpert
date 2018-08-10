@@ -214,6 +214,11 @@ public class JobManagerIT {
 
     /**
      * Test that automated recovery is not issued here. It should not be issued on immature events.
+     *
+     * TODO: the snapshots in these tests do satisfy the condition anymore after the introduction
+     *       of holdoff periods in #233. For testing purposes, the holdoff periods are set to zero
+     *       in the integration test properties file.
+     *
      * @throws InterruptedException
      */
     @Test

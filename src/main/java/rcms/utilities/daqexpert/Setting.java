@@ -18,6 +18,9 @@ public enum Setting {
 	EXPERT_L1_RATE_MAX("expert.l1.rate.max"),
 	EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH("expert.hlt.output.bandwidth.high"),
 	EXPERT_HLT_OUTPUT_BANDWITH_EXTREME("expert.hlt.output.bandwidth.extreme"),
+	EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD("expert.hlt.output.bandwidth.runongoing.holdoff.period"),
+	EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD("expert.hlt.output.bandwidth.self.holdoff.period"),
+
 	EXPERT_CMSSW_CRASHES_THRESHOLD("expert.cmssw.crashes.increase"),
 	EXPERT_CMSSW_CRASHES_TIME_WINDOW("expert.cmssw.crashes.timewindow.seconds"),
 

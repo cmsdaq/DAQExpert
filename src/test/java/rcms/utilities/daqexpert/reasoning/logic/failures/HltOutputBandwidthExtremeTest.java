@@ -35,14 +35,19 @@ public class HltOutputBandwidthExtremeTest {
         Logger.getLogger(ContextHandler.class).setLevel(Level.INFO);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
+
+        // put holdoff periods equivalent to 'no holdoff' to mimick previous behaviour
+        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
+        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
+
         Map<String, Output> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), new Output(true));
         results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
         results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
+        results.put(RunOngoing.class.getSimpleName(), new Output(true));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
-
 
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
         Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
@@ -60,10 +65,16 @@ public class HltOutputBandwidthExtremeTest {
         Logger.getLogger(ContextHandler.class).setLevel(Level.INFO);
         Properties properties = new Properties();
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(), "6.0");
+
+        // put holdoff periods equivalent to 'no holdoff' to mimick previous behaviour
+        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
+        properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
+
         Map<String, Output> results = new HashMap<>();
         results.put(StableBeams.class.getSimpleName(), new Output(true));
         results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
         results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+        results.put(RunOngoing.class.getSimpleName(), new Output(true));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);

@@ -17,7 +17,6 @@ import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.TestSnapshotBuilder;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.HltHoldOffTestData;
-import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
@@ -59,15 +58,10 @@ public class HltOutputBandwidthTooHighTest
 	public void test01() throws URISyntaxException
 	{
 		Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
-		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.5");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
 
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
-		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
-		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);
+		KnownFailure hltOutputBandwidthTooHigh = makeInstance(0,0);
+
 		Map<String, Output> results = new HashMap<>();
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
@@ -81,15 +75,10 @@ public class HltOutputBandwidthTooHighTest
 	public void testWithAdditionalNote() throws URISyntaxException
 	{
 		Logger.getLogger(HltOutputBandwidthTooHigh.class).setLevel(Level.INFO);
-		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.5");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
 
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
-		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
-		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);
+		KnownFailure hltOutputBandwidthTooHigh = makeInstance(0,0);
+
 		Map<String, Output> results = new HashMap<>();
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
@@ -204,16 +193,8 @@ public class HltOutputBandwidthTooHighTest
 		List<DAQ> snapshots = makeStartOfRunHoldOffSequence();
 
 		// the class under test
-		KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
-		Properties properties = new Properties();
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_TOO_HIGH.getKey(),"4.5");
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_EXTREME.getKey(),"6.0");
-
-		// these values were effectively zero before the holdoff logic was introduced
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "" + beginningOfRunHoldoff);
-		properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "" + conditionHoldOff);
-
-		((Parameterizable)hltOutputBandwidthTooHigh).parametrize(properties);
+		// the holdoff values were effectively zero before the holdoff logic was introduced
+		KnownFailure hltOutputBandwidthTooHigh = makeInstance(beginningOfRunHoldoff, conditionHoldOff);
 
 		RunOngoing runOngoing = new RunOngoing();
 

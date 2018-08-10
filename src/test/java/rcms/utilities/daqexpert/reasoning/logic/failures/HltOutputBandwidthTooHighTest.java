@@ -10,11 +10,13 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import rcms.utilities.daqaggregator.data.BUSummary;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.TestSnapshotBuilder;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.logic.basic.HltHoldOffTestData;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -266,4 +268,78 @@ public class HltOutputBandwidthTooHighTest
 		// snapshots
 		testStartOfRunHoldOff01helper(300000, 120000, false);
 	}
+
+	/** synthetic test for holdoff timers, similar to HltCpuLoadTest.testHoldOffPeriod() */
+	@Test
+	public void testHoldOffPeriod() {
+
+		final int runOngoingHoldOffPeriod = 10;
+		final int selfHoldOffPeriod = 1;
+
+		// test bandwidths in MByte/sec
+		final float bandwidthOk = 4000f;
+		final float bandwidthTooHigh = 5000f;
+
+		HltOutputBandwidthTooHigh module = makeInstance(runOngoingHoldOffPeriod, selfHoldOffPeriod);
+
+		// prepare a sequence of events and expected results
+		List<HltHoldOffTestData> sequence = new ArrayList<HltHoldOffTestData>();
+
+		//                      timestamp, cpuLoad, expectedResult
+		sequence.add(new HltHoldOffTestData(0, false, false).setOutputBandwidth(bandwidthOk));
+
+		// high value outside run - but self holdoff
+		sequence.add(new HltHoldOffTestData(5, false, false).setOutputBandwidth(bandwidthTooHigh));
+
+		// high value outside run - and self holdoff ok
+		sequence.add(new HltHoldOffTestData(7, false, true).setOutputBandwidth(bandwidthTooHigh));
+
+		// run starts with reasonable value
+		sequence.add(new HltHoldOffTestData(10, true, false).setOutputBandwidth(bandwidthOk));
+
+		// too high value but within holdoff period
+		sequence.add(new HltHoldOffTestData(19, true, false).setOutputBandwidth(bandwidthTooHigh));
+
+		// too high value after holdoff period
+		sequence.add(new HltHoldOffTestData(20, true, true).setOutputBandwidth(bandwidthTooHigh));
+
+		// normal value after holdoff period
+		sequence.add(new HltHoldOffTestData(30, true, false).setOutputBandwidth(bandwidthOk));
+
+		// again too high value after holdoff period - but result false as self holdoff timer
+		sequence.add(new HltHoldOffTestData(31, true, false).setOutputBandwidth(bandwidthTooHigh));
+
+		// self holdoff timer now releasees
+		sequence.add(new HltHoldOffTestData(35, true, true).setOutputBandwidth(bandwidthTooHigh));
+
+		//-----
+
+		Map<String, Output> results = new HashMap<>();
+
+		for (HltHoldOffTestData data : sequence) {
+			results.put(RunOngoing.class.getSimpleName(), new Output(data.isRunOngoing()));
+
+			// needed for assigning priorities
+			results.put(StableBeams.class.getSimpleName(), new Output(true));
+			results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+
+			DAQ snapshot = new DAQ();
+			snapshot.setLastUpdate(data.getTimestamp());
+
+			// for the moment we do not have a test case snapshot for this class
+			// so we have to put high CPU load by hand
+			BUSummary buSummary = new BUSummary();
+			buSummary.setFuOutputBandwidthInMB(data.getOutputBandwidth());
+			snapshot.setBuSummary(buSummary);
+
+			// run module to be tested
+			boolean result = module.satisfied(snapshot, results);
+
+			assertEquals("test failed for snapshot at time " + data.getTimestamp(),
+							data.isExpectedResult(), result);
+
+		} // loop over test sequence
+
+	}
+
 }

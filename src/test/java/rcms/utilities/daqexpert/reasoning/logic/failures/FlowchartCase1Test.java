@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -156,4 +157,18 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 
   }
 
+  /** test for item 2 from issue #232 */
+	@Test
+  public void testGemInstructions() throws URISyntaxException {
+
+		DAQ snapshot = getSnapshot("1533649437939.json.gz");
+
+		assertSatisfiedLogicModules (snapshot,legacyFc1);
+
+		List<String> action = legacyFc1.getActionWithContext();
+
+		assertEquals(2, action.size());
+		assertEquals("Stop and start the run", action.get(0));
+		assertEquals("Call the GEM DOC", action.get(1));
+  }
 }

@@ -11,6 +11,9 @@ public class HltHoldOffTestData {
 
 	private float cpuLoad;
 
+	/** HLT output bandwidth */
+	private float outputBandwidth;
+
 	public HltHoldOffTestData(long timestamp, boolean runOngoing, boolean expectedResult) {
 		this.timestamp = timestamp;
 		this.runOngoing = runOngoing;
@@ -38,6 +41,15 @@ public class HltHoldOffTestData {
 	 */
 	public HltHoldOffTestData setCpuLoad(float cpuLoad) {
 		this.cpuLoad = cpuLoad;
+		return this;
+	}
+
+	public float getOutputBandwidth() {
+		return outputBandwidth;
+	}
+
+	public HltHoldOffTestData setOutputBandwidth(float outputBandwidth) {
+		this.outputBandwidth = outputBandwidth;
 		return this;
 	}
 }

@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.*;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
@@ -9,6 +10,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -82,6 +85,25 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		/* Assert affected FEDs */
 		assertEquals(1, affectedFed.getObjectSet().size());
 		assertEquals(735, affectedFed.getObjectSet().iterator().next().getSrcIdExpected());
+
+
+		ContextHandler.highlightMarkup = false;
+		System.out.println(ruStuckWaiting.getActionWithContext());
+		assertThat(ruStuckWaiting.getActionWithContext(), contains("Red recycle the HCAL","Contact HCAL on-call expert in the meantime"));
+	}
+
+
+	@Test
+	public void test2() throws URISyntaxException {
+		//Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		DAQ snapshot = getSnapshot("1533978694304.json.gz");
+
+		assertOnlyOneIsSatisified(ruStuckWaiting, snapshot);
+		ContextHandler.highlightMarkup = false;
+		assertEquals("RU ru-c2e12-14-01.cms is stuck waiting for FED 250. " +
+				"FED(s) belong(s) to partition TEC- in TRACKER subsystem. Minimum fragment count in FED-builder TEC-3b is 63556438 in TEC- partition and maximum is 63568796 in TEC- partition. " +
+				"This causes backpressure at FED 254 in the same FED-builder TEC-3b. Note that there is nothing wrong with backpressured FED 254.",ruStuckWaiting.getDescriptionWithContext());
+		assertThat(ruStuckWaiting.getActionWithContext(), contains("Red recycle the TRACKER","Contact TRACKER on-call expert in the meantime"));
 	}
 
 }

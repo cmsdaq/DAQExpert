@@ -5,6 +5,7 @@ import java.util.Map;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
 
 /**
@@ -24,7 +25,8 @@ public class RuStuckWaiting extends BackpressureAnalyzer {
 				+ "Note that there is nothing wrong with backpressured FED {{AFFECTED-FED}}.";
 		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
-		this.action = null;
+		this.action = new SimpleAction("Red recycle the {{PROBLEM-SUBSYSTEM}}",
+				"Contact {{PROBLEM-SUBSYSTEM}} on-call expert in the meantime");
 
 	}
 

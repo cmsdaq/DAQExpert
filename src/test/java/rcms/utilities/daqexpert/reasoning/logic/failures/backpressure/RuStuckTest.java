@@ -1,6 +1,8 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.contains;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -79,5 +81,20 @@ public class RuStuckTest extends FlowchartCaseTestBase {
 		assertEquals(new HashSet<>(Arrays.asList("DT")), context.getContext().get("FROZENSUBSYSTEM"));
 
 	}
+
+	@Test
+	public void test() throws URISyntaxException {
+		// Logger.getLogger(BackpressureAnalyzer.class).setLevel(Level.TRACE);
+		DAQ snapshot = getSnapshot("1531899490058.json.gz");
+
+		assertSatisfiedLogicModules(snapshot, ruStuck, backpressureFromFerol);
+
+		System.out.println(ruStuck.getContextHandler().getContext().getContextEntryMap());
+		ContextHandler.highlightMarkup=false;
+		assertEquals("RU ru-c2e13-25-01.cms is stuck. RU has more than 0 requests - 36. This causes backpressure at FED 1117 in partition HBHEC of HCAL",ruStuck.getDescriptionWithContext());
+		assertThat(ruStuck.getActionWithContext(),contains("Recovery suggestion not available for this problem, contact DAQ on-call to investigate"));
+
+	}
+
 
 }

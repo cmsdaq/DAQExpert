@@ -92,7 +92,7 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
                         }
                     }
                     contextHandler.registerForStatistics("DEADTIME", deadPercentage, "%", 1);
-                    contextHandler.registerForStatistics("BACKPRESSURE", deadPercentage, "%", 1);
+                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
 
                 }
             }

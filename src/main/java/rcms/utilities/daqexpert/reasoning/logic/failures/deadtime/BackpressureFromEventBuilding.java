@@ -28,10 +28,10 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
         this.name = "Backpressure from Event Builder";
 
         this.description = "Backpressure from Event Building (i.e. not from HLT). " +
-                "Exists FEDBuilders with backpressure to FEDs ({{P}}) and 0 requests on RU, 256 fragments in RU. " +
+                "Exists FEDBuilders with backpressure to FEDs {{PROBLEMATIC-FED}} ({{BACKPRESSURE}}) and 0 requests on RU, 256 fragments in RU. " +
                 "EVM has few ({{EVM-REQUESTS}}, the threshold is <100) requests. All BUs are enabled.";
 
-        this.briefDescription = "Backpressure from EVB to FEDs ({{P}})";
+        this.briefDescription = "Backpressure from EVB to FEDs ({{BACKPRESSURE}})";
 
         this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
 
@@ -77,15 +77,16 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         //TODO: LATER: looking at dead time of FED. need to take into account FED - pseudoFED relationship.
                         if (!fed.isFrlMasked()) {
 
-                            //TODO: use the result of other LMs instead of repeating the job
-                            if (fed.getPercentWarning() + fed.getPercentBusy() > deadtimeThresholdInPercentage) {
+                            // TODO: use the result of other LMs instead of repeating the job
+                            // note that the theshold is not used for upgraded feds
+                            if (fed.getPercentWarning() + fed.getPercentBusy() > deadtimeThresholdInPercentage || tmpUpgradedFedBackpressured) {
 
                                 float backpressure = fed.getPercentBackpressure();
                                 if (backpressure > fedBackpressureThreshold) {
 
                                     logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
                                     contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
+                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
                                     problematicFeds.add(fed);
                                     foundProblematicFeds = true;
                                 }

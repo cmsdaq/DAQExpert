@@ -59,6 +59,14 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
+		/** GEM FED 1467 , see item 2 of issue #232 .
+		 *  See also class LegacyFlowchartCase1
+		 */
+		action.addContextSteps("GEM-1467",
+						"<<StopAndStartTheRun>>",
+						"Call the GEM DOC"
+		);
+
 		this.action = action;
 	}
 

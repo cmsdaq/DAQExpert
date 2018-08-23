@@ -511,6 +511,8 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				if (fed.getSrcIdExpected() == 1111 || fed.getSrcIdExpected() == 1109) {
 					// exists specific instructions for some fedsD
 					contextHandler.setActionKey("FED1111or1109");
+				} else if (fed.getSrcIdExpected() == 1467) {
+					contextHandler.setActionKey("GEM-1467");
 				} else {
 					contextHandler.setActionKey(fed.getTtcp().getSubsystem().getName());
 				}

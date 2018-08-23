@@ -76,7 +76,7 @@ public class LogicModuleManager {
                 if (lm instanceof Parameterizable) {
                     Parameterizable updatable = (Parameterizable) lm;
 
-                    updatable.parametrize(Application.get().getProp());
+                    updatable.parametrize(getProperties());
                     logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
                 }
 
@@ -258,4 +258,7 @@ public class LogicModuleManager {
         return experimentalProcessor;
     }
 
+    protected Properties getProperties(){
+        return Application.get().getProp();
+    }
 }

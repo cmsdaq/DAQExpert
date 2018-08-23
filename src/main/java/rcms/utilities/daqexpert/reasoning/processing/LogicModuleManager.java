@@ -103,14 +103,6 @@ public class LogicModuleManager {
                 .getLogicModule();
         unidentifiedFailure.setKnownFailureClasses(knownFailureClasses);
 
-        try {
-            experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));
-            // experimentalProcessor.loadExperimentalLogicModules();
-        } catch (IOException | ResourceException | ScriptException e) {
-            experimentalProcessor = null;
-            e.printStackTrace();
-        }
-
     }
 
     /**

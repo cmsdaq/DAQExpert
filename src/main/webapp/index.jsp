@@ -110,7 +110,7 @@
 			<button id="mode2" type="button"
 				class="mode-btn btn btn-sm btn-default">Extended</button>
 			<button id="mode3" type="button"
-				class="mode-btn btn btn-sm btn-default">
+				class="mode-btn btn btn-sm btn-default hidden">
 				LMFactory <span><sup><b>beta</b></sup></span>
 			</button>
 		</div>

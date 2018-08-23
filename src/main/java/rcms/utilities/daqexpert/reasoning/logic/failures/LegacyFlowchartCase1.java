@@ -72,6 +72,12 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
+		/** GEM FED 1467 , see item 2 of issue #232 */
+		action.addContextSteps("GEM-1467",
+				"<<StopAndStartTheRun>>",
+				"Call the GEM DOC"
+		);
+
 		this.action = action;
 	}
 
@@ -189,6 +195,8 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 						if (problematicFED.getSrcIdExpected() == 1111 || problematicFED.getSrcIdExpected() == 1109) {
 							contextHandler.setActionKey("FED1111or1109");
+						} else if (problematicFED.getSrcIdExpected() == 1467) {
+							contextHandler.setActionKey("GEM-1467");
 						} else {
 							contextHandler.setActionKey(subsystemName);
 						}

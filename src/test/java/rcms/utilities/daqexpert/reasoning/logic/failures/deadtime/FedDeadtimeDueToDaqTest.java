@@ -9,6 +9,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.FEDDeadtime;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -50,16 +51,18 @@ public class FedDeadtimeDueToDaqTest {
 
     @Test
     public void test01() throws URISyntaxException {
+        ContextHandler.highlightMarkup = false;
         assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212900008.json.gz"), results));
         logger.info(module.getDescriptionWithContext());
-        assertEquals("FED <strong>622</strong> has a deadtime <strong>5.2%</strong>, due to DAQ backpressure <strong>21.4%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
+        assertEquals("FED 622 has a deadtime 5.2%, due to DAQ backpressure 21.4%. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
     }
 
     @Test
     public void test03() throws URISyntaxException {
+        ContextHandler.highlightMarkup = false;
         assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212240143.json.gz"), results));
         logger.info(module.getDescriptionWithContext());
-        assertEquals("FED <strong>359</strong> has a deadtime <strong>4.4%</strong>, due to DAQ backpressure <strong>2.6%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
+        assertEquals("FED 359 has a deadtime 4.4%, due to DAQ backpressure 2.6%. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
 
     }
 

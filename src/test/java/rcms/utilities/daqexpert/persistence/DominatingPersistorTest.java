@@ -26,6 +26,7 @@ public class DominatingPersistorTest {
     @Test
     public void simpleTest(){
 
+        LogicModuleRegistry.init();
         DominatingPersistor dp = new DominatingPersistor(new PersistenceManagerMock());
         Condition c2 = generate("c2", t1, null);
 

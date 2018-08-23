@@ -43,6 +43,8 @@ public class ConditionDashboardTest {
         conditionList.add(c3);
         conditionList.add(c4);
 
+        LogicModuleRegistry.init();
+
         conditionList.stream().forEach(c -> c.getLogicModule().getLogicModule().declareRelations());
         CausalityManager cm = new CausalityManager();
         Set<CausalityNode> a = conditionList.stream().map(c->c.getLogicModule().getLogicModule()).collect(Collectors.toSet());

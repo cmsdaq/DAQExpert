@@ -3,13 +3,16 @@ package rcms.utilities.daqexpert.reasoning.logic.failures;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 
 /**
  *
@@ -36,16 +39,21 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 	 * 
 	 * REMI: the real reason is in the 2nd (ru-failed) bullet. I guess the 1st (fc5, fed-stuck) one shows up because we
 	 * do not see the backpressure from DAQ on the BPIX FEDs.
+	 *
+	 *  Discussed issue #165, case 6
 	 */
-	@Ignore // this is due to known issue with the testBase - enable it back after new TestBase merged
 	@Test
 	public void case1Test() throws URISyntaxException {
 
-		DAQ snapshot = getSnapshot("1497021716430.smile");
 
-		// Discussed issue #165, case 6
-		assertSatisfiedLogicModules(snapshot, ruFailed, backpressureFromEventBuilding);
+		TestBase tester = new TestBase();
 
+		Map<String, Output> r = tester.runLogic("1497021716430.smile");
+
+
+        tester.assertSatisfied(LogicModuleRegistry.RuFailed);
+
+        Output output = tester.getOutputOf(LogicModuleRegistry.RuFailed);
 
 		// check the error message from ruFailed
 		// 9 RUs had the same error message, one had a slightly different one
@@ -60,17 +68,23 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 
 		// TODO: should we introduce named constants for the contextHandler keys ?
 		assertEquals(new HashSet<>(Arrays.asList(expectedMostFrequentErrorMessage)),
-				ruFailed.getContextHandler().getContext().get("MOSTFREQUENTERROR"));
+				output.getContext().get("MOSTFREQUENTERROR"));
 
 		assertEquals(new HashSet<>(Arrays.asList(expectedMostFrequentErrorCount)),
-				ruFailed.getContextHandler().getContext().get("MOSTFREQUENTERRORCOUNT"));
+				output.getContext().get("MOSTFREQUENTERRORCOUNT"));
 
 		assertEquals(new HashSet<>(Arrays.asList(expectedRUs.length)),
-				ruFailed.getContextHandler().getContext().get("NUMFAILEDRUS"));
+				output.getContext().get("NUMFAILEDRUS"));
 
-		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), ruFailed.getContextHandler().getContext().get("RU"));
+		assertEquals(new HashSet<>(Arrays.asList(expectedRUs)), output.getContext().get("RU"));
 
 		// ----------
+
+		Assert.assertEquals(LogicModuleRegistry.RuFailed, tester.dominating.getLogicModule());
+
+
+		// backpressure from EvB is also active in this case
+        tester.assertSatisfied(LogicModuleRegistry.BackpressureFromEventBuilding);
 
 	}
 

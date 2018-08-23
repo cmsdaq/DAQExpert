@@ -37,6 +37,8 @@ public class LogicModuleManager {
 
     private ExperimentalProcessor experimentalProcessor;
 
+    private HashMap<String, Output> lastRoundOutput;
+
     /**
      * Constructor, order of checker matters. Checkers may use results of
      * checkers added before.
@@ -74,7 +76,7 @@ public class LogicModuleManager {
                 if (lm instanceof Parameterizable) {
                     Parameterizable updatable = (Parameterizable) lm;
 
-                    updatable.parametrize(Application.get().getProp());
+                    updatable.parametrize(getProperties());
                     logger.info("LM " + updatable.getClass().getSimpleName() + " successfully parametrized");
                 }
 
@@ -100,14 +102,6 @@ public class LogicModuleManager {
         UnidentifiedFailure unidentifiedFailure = (UnidentifiedFailure) LogicModuleRegistry.UnidentifiedFailure
                 .getLogicModule();
         unidentifiedFailure.setKnownFailureClasses(knownFailureClasses);
-
-        try {
-            experimentalProcessor = new ExperimentalProcessor(Application.get().getProp(Setting.EXPERIMENTAL_DIR));
-            // experimentalProcessor.loadExperimentalLogicModules();
-        } catch (IOException | ResourceException | ScriptException e) {
-            experimentalProcessor = null;
-            e.printStackTrace();
-        }
 
     }
 
@@ -166,6 +160,7 @@ public class LogicModuleManager {
         }
         results.addAll(conditionProducer.getFinishedThisRound());
         conditionProducer.clearFinishedThisRound();
+        lastRoundOutput = checkerResultMap;
 
         return results;
     }
@@ -247,8 +242,15 @@ public class LogicModuleManager {
         return results;
     }
 
+    public HashMap<String, Output> getLastRoundOutput() {
+        return lastRoundOutput;
+    }
+
     public ExperimentalProcessor getExperimentalProcessor() {
         return experimentalProcessor;
     }
 
+    protected Properties getProperties(){
+        return Application.get().getProp();
+    }
 }

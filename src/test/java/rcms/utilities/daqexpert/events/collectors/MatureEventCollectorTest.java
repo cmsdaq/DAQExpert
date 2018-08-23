@@ -7,6 +7,7 @@ import rcms.utilities.daqexpert.events.collectors.MatureEventCollector;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import rcms.utilities.daqexpert.reasoning.processing.LogicModuleManager;
 
 public class MatureEventCollectorTest {
 
@@ -44,6 +45,7 @@ public class MatureEventCollectorTest {
 
 	private Condition generate(LogicModuleRegistry logicModule) {
 		Condition c = new Condition();
+		LogicModuleRegistry.init();
 		c.setLogicModule(logicModule);
 		c.setTitle("test condition");
 		c.setShow(true);

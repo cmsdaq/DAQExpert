@@ -60,6 +60,23 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
         if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
 
+
+            Set<FED> backpressuredFeds = new HashSet<>();
+
+            if(tmpUpgradedFedBackpressured) {
+                Output output = results.get(TmpUpgradedFedProblem.class.getSimpleName());
+                if(output.getContext() != null) {
+                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+                }
+            }
+
+            if(fedDeadtimeDueToDAQ){
+                Output output = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
+                if(output.getContext() != null) {
+                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+                }
+            }
+
             assignPriority(results);
             boolean result = false;
 
@@ -77,9 +94,8 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         //TODO: LATER: looking at dead time of FED. need to take into account FED - pseudoFED relationship.
                         if (!fed.isFrlMasked()) {
 
-                            // TODO: use the result of other LMs instead of repeating the job
-                            // note that the theshold is not used for upgraded feds
-                            if (fed.getPercentWarning() + fed.getPercentBusy() > deadtimeThresholdInPercentage || tmpUpgradedFedBackpressured) {
+                            // check only those
+                            if(backpressuredFeds.contains(fed)) {
 
                                 float backpressure = fed.getPercentBackpressure();
                                 if (backpressure > fedBackpressureThreshold) {
@@ -91,7 +107,6 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                                     foundProblematicFeds = true;
                                 }
                             }
-
                         }
                     }
                     if (foundProblematicFeds) {
@@ -108,10 +123,12 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
             boolean allBusEnabled = true;
 
             for (RU ru : daq.getRus()) {
-                if (ru.isEVM() && ru.getRequests() < evmFewRequestsThreshold) {
-                    logger.trace("EVM has: " + ru.getRequests() + " requests");
-                    contextHandler.registerForStatistics("EVM-REQUESTS", ru.getRequests());
-                    evmFewRequests = true;
+                if (ru.isEVM()) {
+                    if(ru.getRequests() < evmFewRequestsThreshold) {
+                        logger.trace("EVM has: " + ru.getRequests() + " requests");
+                        contextHandler.registerForStatistics("EVM-REQUESTS", ru.getRequests());
+                        evmFewRequests = true;
+                    }
                 }
             }
 

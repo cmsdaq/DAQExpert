@@ -85,10 +85,10 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
                     result = true;
 
                     if(problematicFedsBehindPseudoFed == null) {
-                        contextHandler.register("PROBLEM-FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.registerObject("PROBLEM-FED", topLevelFed, f->f.getSrcIdExpected() + "");
                     } else{
                         for(FED fed: problematicFedsBehindPseudoFed){
-                            contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
+                            contextHandler.registerObject("PROBLEM-FED", fed, f->f.getSrcIdExpected() + "");
                         }
                     }
                     contextHandler.registerForStatistics("DEADTIME", deadPercentage, "%", 1);

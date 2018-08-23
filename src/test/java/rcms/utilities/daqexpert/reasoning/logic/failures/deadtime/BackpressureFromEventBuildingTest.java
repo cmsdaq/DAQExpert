@@ -31,6 +31,7 @@ public class BackpressureFromEventBuildingTest extends FlowchartCaseTestBase {
         //assertOnlyOneIsSatisified(backpressureFromEventBuilding, snapshot);
     }
 
+    @Ignore // this test relies on resusable context - enable it after introducing updated test base class
     @Test
     public void test02() throws URISyntaxException {
         DAQ snapshot = getSnapshot("1534269198968.json.gz");

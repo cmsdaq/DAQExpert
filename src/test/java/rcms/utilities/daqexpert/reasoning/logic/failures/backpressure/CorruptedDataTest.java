@@ -5,10 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,8 +19,13 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
+import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.logic.failures.TestBase;
 
 /**
  * Test corrupted data discovery
@@ -35,6 +43,8 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 		// FIXME: why ruFailed is satisfied?
 		assertSatisfiedLogicModules(snapshot, fc2, ruFailed);
+
+		ContextHandler.highlightMarkup=false;
 
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
@@ -116,18 +126,48 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 	@Test
 	public void nonEcalTest() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1498274256030.smile");
 
-		// FIXME: why ruFailed is satisfied?
-		assertSatisfiedLogicModules(snapshot, fc2, ruFailed);
+		TestBase tester = new TestBase();
 
-		ContextHandler context = fc2.getContextHandler();
+		tester.runLogic("1498274256030.smile");
 
-		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("CSC")), context.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
-		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+		tester.assertSatisfied(LogicModuleRegistry.CorruptedData);
+		tester.assertSatisfied(LogicModuleRegistry.RuFailed); //? why satisfied?
 
-		assertEquals(3, fc2.getActionWithContext().size());
+		Output output = tester.getOutputOf(LogicModuleRegistry.CorruptedData);
+
+
+
+
+		assertEquals(new HashSet(Arrays.asList(833)), output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC")), output.getContext().getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), output.getContext().getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+
+		//assertEquals(3, fc2.getActionWithContext().size());
+	}
+
+	@Test
+	public void case2TestNew() {
+
+		TestBase tester = new TestBase();
+
+		Properties properties = tester.getEmptyProperties();
+		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_FED.getKey(),"2");
+		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(),"2");
+		properties.setProperty(Setting.EXPERT_LOGIC_EVM_FEW_EVENTS.getKey(),"100");
+		properties.setProperty(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TTS.getKey(), "2");
+
+		Map<String, Output> results = tester.runLogic("1497448564059.smile", properties);
+
+		Assert.assertEquals(LogicModuleRegistry.CorruptedData, tester.dominating.getLogicModule());
+
+		Context context = results.get(CorruptedData.class.getSimpleName()).getContext();
+		assertEquals(new HashSet(Arrays.asList(841,843)), context.getReusableContextEntry("PROBLEM-FED").getObjectSet().stream().map(f->((FED)f).getSrcIdExpected()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC")), context.getReusableContextEntry("PROBLEM-SUBSYSTEM").getObjectSet().stream().map(f->((SubSystem)f).getName()).collect(Collectors.toSet()));
+		assertEquals(new HashSet(Arrays.asList("CSC+")), context.getReusableContextEntry("PROBLEM-PARTITION").getObjectSet().stream().map(f->((TTCPartition)f).getName()).collect(Collectors.toSet()));
+
+
+
 	}
 
 	@Test
@@ -135,6 +175,7 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 		DAQ snapshot = getSnapshot("1497448564059.smile");
 
 		// NOTE multiple LMs satisfied
+		ContextHandler.highlightMarkup=false;
 		assertSatisfiedLogicModules(snapshot, fc2, fc3, ruFailed);
 
 		ContextHandler context = fc2.getContextHandler();

@@ -4,6 +4,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -35,6 +37,7 @@ public class RuFailedTest extends FlowchartCaseTestBase {
 	 * REMI: the real reason is in the 2nd (ru-failed) bullet. I guess the 1st (fc5, fed-stuck) one shows up because we
 	 * do not see the backpressure from DAQ on the BPIX FEDs.
 	 */
+	@Ignore // this is due to known issue with the testBase - enable it back after new TestBase merged
 	@Test
 	public void case1Test() throws URISyntaxException {
 

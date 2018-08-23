@@ -75,11 +75,10 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 	 * Get deadtime. Returns instant deadtimes if available. Per lumisection otherwise
 	 */
 	private Map<String, Double> getDeadtimes(DAQ daq){
-		try {
+		if(daq.getTcdsGlobalInfo().getDeadTimesInstant() != null && !daq.getTcdsGlobalInfo().getDeadTimesInstant().isEmpty()) {
 			return daq.getTcdsGlobalInfo().getDeadTimesInstant();
-		} catch (NullPointerException e) {
+		} else {
 			return daq.getTcdsGlobalInfo().getDeadTimes();
-
 		}
 	}
 

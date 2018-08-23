@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
@@ -28,5 +29,22 @@ public class BackpressureFromEventBuildingTest extends FlowchartCaseTestBase {
         /* This is expected to have satisfied two cases here. Confirmed with Remi and Andre*/
         assertSatisfiedLogicModules(snapshot, backpressureFromEventBuilding, backpressureFromFerol);
         //assertOnlyOneIsSatisified(backpressureFromEventBuilding, snapshot);
+    }
+
+    @Ignore // this test relies on resusable context - enable it after introducing updated test base class
+    @Test
+    public void test02() throws URISyntaxException {
+        DAQ snapshot = getSnapshot("1534269198968.json.gz");
+
+        Logger.getLogger(BackpressureFromEventBuilding.class).setLevel(Level.INFO);
+        Logger.getLogger(BackpressureFromFerol.class).setLevel(Level.INFO);
+        Logger.getLogger(FedDeadtimeDueToDaq.class).setLevel(Level.INFO);
+
+
+        ContextHandler.highlightMarkup=false;
+        assertSatisfiedLogicModules(snapshot, backpressureFromEventBuilding);
+
+        System.out.println(backpressureFromEventBuilding.getDescriptionWithContext());
+        System.out.println(backpressureFromEventBuilding.getActionWithContext());
     }
 }

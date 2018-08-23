@@ -52,14 +52,14 @@ public class FedDeadtimeDueToDaqTest {
     public void test01() throws URISyntaxException {
         assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212900008.json.gz"), results));
         logger.info(module.getDescriptionWithContext());
-        assertEquals("FED <strong>622</strong> has a deadtime <strong>5.2%</strong>, due to DAQ backpressure <strong>5.2%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
+        assertEquals("FED <strong>622</strong> has a deadtime <strong>5.2%</strong>, due to DAQ backpressure <strong>21.4%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
     }
 
     @Test
     public void test03() throws URISyntaxException {
         assertTrue(module.satisfied(FlowchartCaseTestBase.getSnapshot("1507212240143.json.gz"), results));
         logger.info(module.getDescriptionWithContext());
-        assertEquals("FED <strong>359</strong> has a deadtime <strong>4.4%</strong>, due to DAQ backpressure <strong>4.4%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
+        assertEquals("FED <strong>359</strong> has a deadtime <strong>4.4%</strong>, due to DAQ backpressure <strong>2.6%</strong>. The threshold for deadtime is 2.0%, backpressure: 2.0%", module.getDescriptionWithContext());
 
     }
 

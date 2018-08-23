@@ -37,6 +37,8 @@ public class LogicModuleManager {
 
     private ExperimentalProcessor experimentalProcessor;
 
+    private HashMap<String, Output> lastRoundOutput;
+
     /**
      * Constructor, order of checker matters. Checkers may use results of
      * checkers added before.
@@ -166,6 +168,7 @@ public class LogicModuleManager {
         }
         results.addAll(conditionProducer.getFinishedThisRound());
         conditionProducer.clearFinishedThisRound();
+        lastRoundOutput = checkerResultMap;
 
         return results;
     }
@@ -245,6 +248,10 @@ public class LogicModuleManager {
 
         }
         return results;
+    }
+
+    public HashMap<String, Output> getLastRoundOutput() {
+        return lastRoundOutput;
     }
 
     public ExperimentalProcessor getExperimentalProcessor() {

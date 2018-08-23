@@ -116,7 +116,6 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
                     } else {
                         for (FED fed : problematicFedsBehindPseudoFed) {
                             contextHandler.registerObject("PROBLEM-FED", fed, f->f.getSrcIdExpected() + "");
-                            System.out.println("Registering upgraded fed problem: " + fed.getSrcIdExpected());
                         }
                     }
                     TTCPartition p = topLevelFed.getTtcp();

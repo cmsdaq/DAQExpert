@@ -6,6 +6,7 @@ import java.util.Properties;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
+import rcms.utilities.daqexpert.FailFastParameterReader;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
@@ -63,18 +64,8 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 
 	@Override
 	public void parametrize(Properties properties) {
-
-		try {
-			this.max = Integer.parseInt(properties.getProperty(Setting.EXPERT_L1_RATE_MAX.getKey()));
-			this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
-
-		} catch (NumberFormatException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException, "Could not update LM "
-					+ this.getClass().getSimpleName() + ", number parsing problem: " + e.getMessage());
-		} catch (NullPointerException e) {
-			throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-					"Could not update LM " + this.getClass().getSimpleName() + ", other problem: " + e.getMessage());
-		}
+		this.max = FailFastParameterReader.getIntegerParameter(properties,Setting.EXPERT_L1_RATE_MAX, this.getClass());
+		this.description = "The readout rate is {{ACTUAL_READOUT_RATE}} which is above the expected maximum " + max + " Hz. This may be a problem with the L1 trigger.";
 	}
 
 }

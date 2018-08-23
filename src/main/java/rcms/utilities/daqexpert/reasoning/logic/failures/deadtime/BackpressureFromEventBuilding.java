@@ -28,10 +28,10 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
         this.name = "Backpressure from Event Builder";
 
         this.description = "Backpressure from Event Building (i.e. not from HLT). " +
-                "Exists FEDBuilders with backpressure to FEDs ({{P}}) and 0 requests on RU, 256 fragments in RU. " +
+                "Exists FEDBuilders with backpressure to FEDs {{PROBLEMATIC-FED}} ({{BACKPRESSURE}}) and 0 requests on RU, 256 fragments in RU. " +
                 "EVM has few ({{EVM-REQUESTS}}, the threshold is <100) requests. All BUs are enabled.";
 
-        this.briefDescription = "Backpressure from EVB to FEDs ({{P}})";
+        this.briefDescription = "Backpressure from EVB to FEDs ({{BACKPRESSURE}})";
 
         this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
 
@@ -60,6 +60,23 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
         if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
 
+
+            Set<FED> backpressuredFeds = new HashSet<>();
+
+            if(tmpUpgradedFedBackpressured) {
+                Output output = results.get(TmpUpgradedFedProblem.class.getSimpleName());
+                if(output.getContext() != null) {
+                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+                }
+            }
+
+            if(fedDeadtimeDueToDAQ){
+                Output output = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
+                if(output.getContext() != null) {
+                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+                }
+            }
+
             assignPriority(results);
             boolean result = false;
 
@@ -77,20 +94,19 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         //TODO: LATER: looking at dead time of FED. need to take into account FED - pseudoFED relationship.
                         if (!fed.isFrlMasked()) {
 
-                            //TODO: use the result of other LMs instead of repeating the job
-                            if (fed.getPercentWarning() + fed.getPercentBusy() > deadtimeThresholdInPercentage) {
+                            // check only those
+                            if(backpressuredFeds.contains(fed)) {
 
                                 float backpressure = fed.getPercentBackpressure();
                                 if (backpressure > fedBackpressureThreshold) {
 
                                     logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
                                     contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
+                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
                                     problematicFeds.add(fed);
                                     foundProblematicFeds = true;
                                 }
                             }
-
                         }
                     }
                     if (foundProblematicFeds) {
@@ -107,10 +123,12 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
             boolean allBusEnabled = true;
 
             for (RU ru : daq.getRus()) {
-                if (ru.isEVM() && ru.getRequests() < evmFewRequestsThreshold) {
-                    logger.trace("EVM has: " + ru.getRequests() + " requests");
-                    contextHandler.registerForStatistics("EVM-REQUESTS", ru.getRequests());
-                    evmFewRequests = true;
+                if (ru.isEVM()) {
+                    if(ru.getRequests() < evmFewRequestsThreshold) {
+                        logger.trace("EVM has: " + ru.getRequests() + " requests");
+                        contextHandler.registerForStatistics("EVM-REQUESTS", ru.getRequests());
+                        evmFewRequests = true;
+                    }
                 }
             }
 

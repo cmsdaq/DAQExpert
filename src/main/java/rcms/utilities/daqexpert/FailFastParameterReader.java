@@ -16,7 +16,7 @@ public class FailFastParameterReader {
 
         } catch (NullPointerException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,
-                    "Could not update LM " + logicModuleClass.getSimpleName() + ", other problem: " + e.getMessage());
+                    "Could not parametrize LM " + logicModuleClass.getSimpleName() + ", properties not provided");
         }
 
     }

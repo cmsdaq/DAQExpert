@@ -73,9 +73,9 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     @Override
     public boolean satisfied(DAQ daq, Map<String, Output> results) {
 
-        boolean ttsDeadtime = false;
-        ttsDeadtime = results.get(TTSDeadtime.class.getSimpleName()).getResult();
-        if (!ttsDeadtime)
+        Output ttsDeadtimeOutput;
+        ttsDeadtimeOutput = results.get(TTSDeadtime.class.getSimpleName());
+        if (ttsDeadtimeOutput == null || !ttsDeadtimeOutput.getResult())
             return false;
 
         boolean result = false;
@@ -112,10 +112,10 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
                     result = true;
                     contextHandler.registerForStatistics("VALUE", backpressure, "%", 1);
                     if (problematicFedsBehindPseudoFed == null) {
-                        contextHandler.register("PROBLEM-FED", topLevelFed.getSrcIdExpected());
+                        contextHandler.registerObject("PROBLEM-FED", topLevelFed, f->f.getSrcIdExpected() + "");
                     } else {
                         for (FED fed : problematicFedsBehindPseudoFed) {
-                            contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
+                            contextHandler.registerObject("PROBLEM-FED", fed, f->f.getSrcIdExpected() + "");
                         }
                     }
                     TTCPartition p = topLevelFed.getTtcp();

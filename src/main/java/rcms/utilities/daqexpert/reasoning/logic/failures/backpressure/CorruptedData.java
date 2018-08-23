@@ -22,7 +22,7 @@ public class CorruptedData extends BackpressureAnalyzer {
 		this.name = "Corrupted data received";
 		this.description = "Run blocked by corrupted data from FED {{PROBLEM-FED}} received by RU {{PROBLEM-RU}} which is now in failed state. "
 				+ "Problem FED belongs to partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem "
-				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-TTCP}} of {{AFFECTED-SUBSYSTEM}}";
+				+ "This causes backpressure at FED {{AFFECTED-FED}} in partition {{AFFECTED-PARTITION}} of {{AFFECTED-SUBSYSTEM}}";
 
 		this.briefDescription = "Run blocked by corrupted data from FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 

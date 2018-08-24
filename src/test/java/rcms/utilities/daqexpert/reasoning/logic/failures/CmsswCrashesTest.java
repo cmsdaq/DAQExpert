@@ -9,7 +9,9 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.HltInfo;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
@@ -24,16 +26,19 @@ public class CmsswCrashesTest {
 
 
     CmsswCrashes module;
-    Map<String, Output> results;
+    ResultSupplier resultSupplier = new ResultSupplier();
     Logger logger = Logger.getLogger(CmsswCrashes.class);
 
     @Before
     public void prepare() {
         Logger.getLogger(CmsswCrashes.class).setLevel(Level.INFO);
-        results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+
+        resultSupplier.clear();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
+
         module = new CmsswCrashes();
+        module.setResultSupplier(resultSupplier);
 
         // mock parameters
         Properties config = new Properties();
@@ -45,36 +50,36 @@ public class CmsswCrashesTest {
     @Test
     public void simpleThresholdOverrunTest() throws URISyntaxException {
 
-        Assert.assertFalse(module.satisfied(mockTestObject(0, 0), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(1, 21), results));
+        Assert.assertFalse(module.satisfied(mockTestObject(0, 0)));
+        Assert.assertTrue(module.satisfied(mockTestObject(1, 21)));
 
     }
 
     @Test
     public void lastMomentInTimeWindowThresholdOverrunTest() throws URISyntaxException {
 
-        Assert.assertFalse(module.satisfied(mockTestObject(1, 0), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(19, 19), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(20, 21), results));
+        Assert.assertFalse(module.satisfied(mockTestObject(1, 0)));
+        Assert.assertFalse(module.satisfied(mockTestObject(19, 19)));
+        Assert.assertTrue(module.satisfied(mockTestObject(20, 21)));
 
     }
 
     @Test
     public void slidingWindowThresholdNonOverrunTest() throws URISyntaxException {
 
-        Assert.assertFalse(module.satisfied(mockTestObject(0, 10), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(20, 20), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(40, 30), results));
+        Assert.assertFalse(module.satisfied(mockTestObject(0, 10)));
+        Assert.assertFalse(module.satisfied(mockTestObject(20, 20)));
+        Assert.assertFalse(module.satisfied(mockTestObject(40, 30)));
 
     }
 
     @Test
     public void slidingWindowThresholdOverrunTest() throws URISyntaxException {
 
-        Assert.assertFalse(module.satisfied(mockTestObject(0, 10), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(15, 20), results));
-        Assert.assertFalse(module.satisfied(mockTestObject(30, 30), results));
-        Assert.assertTrue(module.satisfied(mockTestObject(35, 40), results));
+        Assert.assertFalse(module.satisfied(mockTestObject(0, 10)));
+        Assert.assertFalse(module.satisfied(mockTestObject(15, 20)));
+        Assert.assertFalse(module.satisfied(mockTestObject(30, 30)));
+        Assert.assertTrue(module.satisfied(mockTestObject(35, 40)));
 
     }
 

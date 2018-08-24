@@ -40,14 +40,14 @@ public class ContinouslySoftErrorTest {
 
 	@Test
 	public void stuckDoesNotFireTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 7), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 8), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 7)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 8)));
 
 		// TODO: check list of previous occ
 
@@ -56,14 +56,14 @@ public class ContinouslySoftErrorTest {
 
 	@Test
 	public void forthOccurrenceSatisfiesTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8)));
 
 		Set<String> problematicSubsystems = ((ObjectContextEntry<String>)lm.getContextHandler().getContext().getContextEntryMap().get("SUBSYSTEM_WITH_COUNTS")).getObjectSet() ;
 		Assert.assertNotNull(problematicSubsystems);
@@ -73,121 +73,121 @@ public class ContinouslySoftErrorTest {
 
 	@Test
 	public void connectOccurrencesWithShortBreakTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14)));
 
 	}
 
 	@Test
 	public void toggleOffAfterTimeThresholdTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18)));
 		// last timestamp of FIX is 14, with threshold 5, 19 should not pass
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 22), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 22)));
 	}
 
 	@Test
 	public void doNotConnectOccurrencesWithLongerBreakTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18)));
 		// last timestamp of FIX is 14, with threshold 5, 19 should not pass
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21)));
 		// last FIX timestamps in last 100 are: 14, 12, 10... - it's more than 3
 		// - any FIX before 114 will satisfy
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 22), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 23), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 24), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 25), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 26), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 27), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 28), null));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 22)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 23)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 24)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 25)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 26)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 27)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 28)));
 	}
 
 	@Test
 	public void resetAfterPeriodTest() {
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 1)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 2)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 3)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 4)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 5)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 6)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 7)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 8)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 9)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 10)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 11)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 12)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 13)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 14)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 15)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 16)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 17)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(ELSE, 18)));
 		// last timestamp of FIX is 14, with threshold 5, 19 should not pass
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 22), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 19)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 20)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 21)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 22)));
 		// the last FIX was 14
 		// period of 100 passed, next FIX should not satisfy, at least 3 will
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 114), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 115), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 116), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 117), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 118), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 119), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 120), null));
-		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 121), null));
-		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 122), null));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 114)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 115)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 116)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 117)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 118)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 119)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(FIX, 120)));
+		Assert.assertEquals(false, lm.satisfied(generateSnapshot(ELSE, 121)));
+		Assert.assertEquals(true, lm.satisfied(generateSnapshot(FIX, 122)));
 	}
 
 	/** configures the ContinouslySoftError module with thresholds used in/closer to
@@ -223,7 +223,7 @@ public class ContinouslySoftErrorTest {
 			lm.getContextHandler().clearContext();
 
 			// run the test
-			boolean actualResult = lm.satisfied(snapshot, null);
+			boolean actualResult = lm.satisfied(snapshot);
 			
 			// module should fire only from a certain point in time on
 			boolean expectedResult = (snapshot.getLastUpdate() >= 1525297407394L);
@@ -268,7 +268,7 @@ public class ContinouslySoftErrorTest {
 			// clear any previous messages
 			lm.getContextHandler().clearContext();
 
-			if (! lm.satisfied(snapshot, null)) {
+			if (! lm.satisfied(snapshot)) {
 				continue;
 			}
 							

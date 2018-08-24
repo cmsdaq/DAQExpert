@@ -21,49 +21,49 @@ public class RunOngoingTest {
 	@Test
 	public void toggleOnFromTcdsSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral), null));
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning), null));
+		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral)));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning)));
 	}
 
 	@Test
 	public void toggleOnFromLevelZeroSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral), null));
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral), null));
+		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral)));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral)));
 	}
 
 	@Test
 	public void toggleOffFromTcdsSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning), null));
-		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNotRunning), null));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning)));
+		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNeutral, tcdsNotRunning)));
 	}
 
 	@Test
 	public void toggleOffFromLevelZeroSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral), null));
-		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNotRunning, tcdsNeutral), null));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral)));
+		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNotRunning, tcdsNeutral)));
 	}
 
 	@Test
 	public void keepOnFromTcdsSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning), null));
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral), null));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsRunning)));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral)));
 	}
 
 	@Test
 	public void keepOnFromLevelZeroSimpleTest() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral), null));
-		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral), null));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzRunning, tcdsNeutral)));
+		Assert.assertEquals(true, ro.satisfied(getMockDAQ(lzNeutral, tcdsNeutral)));
 	}
 
 	@Test
 	public void bothNotRunning() {
 		RunOngoing ro = new RunOngoing();
-		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNotRunning, tcdsNotRunning), null));
+		Assert.assertEquals(false, ro.satisfied(getMockDAQ(lzNotRunning, tcdsNotRunning)));
 	}
 
 	private DAQ getMockDAQ(String levelZeroState, String tcdsState) {

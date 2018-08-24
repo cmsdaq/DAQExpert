@@ -12,8 +12,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -40,17 +42,20 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
-        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
-        results.put(RunOngoing.class.getSimpleName(), new Output(true));
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.HltOutputBandwidthTooHigh, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(false));
+        resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(true));
+
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
+        hltOutputBandwidthExtreme.setResultSupplier(resultSupplier);
 
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
-        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
+        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions. " +
@@ -70,18 +75,21 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
-        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
-        results.put(RunOngoing.class.getSimpleName(), new Output(true));
+
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.HltOutputBandwidthTooHigh, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(true));
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
+        hltOutputBandwidthExtreme.setResultSupplier(resultSupplier);
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
 
 
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
-        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
+        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions." +
@@ -101,28 +109,33 @@ public class HltOutputBandwidthExtremeTest {
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_RUNONGOING_HOLDOFF_PERIOD.getKey(), "0");
         properties.setProperty(Setting.EXPERT_HLT_OUTPUT_BANDWITH_SELF_HOLDOFF_PERIOD.getKey(), "0");
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(HltOutputBandwidthTooHigh.class.getSimpleName(), new Output(true));
-        results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
-        results.put(RunOngoing.class.getSimpleName(), new Output(true));
+
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.HltOutputBandwidthTooHigh, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(false));
+        resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(true));
+
 
         KnownFailure hltOutputBandwidthExtreme = new HltOutputBandwidthExtreme();
         ((Parameterizable) hltOutputBandwidthExtreme).parametrize(properties);
+        hltOutputBandwidthExtreme.setResultSupplier(resultSupplier);
 
         KnownFailure hltOutputBandwidthTooHigh = new HltOutputBandwidthTooHigh();
         ((Parameterizable) hltOutputBandwidthTooHigh).parametrize(properties);
+        hltOutputBandwidthTooHigh.setResultSupplier(resultSupplier);
 
 
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1509050129571.json");
-        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot, results));
+        Assert.assertTrue(hltOutputBandwidthExtreme.satisfied(snapshot));
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions. " +
                 "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
                 hltOutputBandwidthExtreme.getDescriptionWithContext());
 
-        Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot, results));
+        Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot));
 
 
     }

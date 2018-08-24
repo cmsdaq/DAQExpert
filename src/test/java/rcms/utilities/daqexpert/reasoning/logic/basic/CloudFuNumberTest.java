@@ -47,30 +47,29 @@ public class CloudFuNumberTest
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510706999513.json.gz");
 		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();
-		assertTrue(module.satisfied(snapshot, results));
+		assertTrue(module.satisfied(snapshot));
 	}
 
 
 	@Test
 	public void generatedSnapshotSequenceTest(){
 
-		Map<String, Output> results = new HashMap<>();
 		CloudFuNumber module = makeInstance();
 
 		/* Do not fire in allowed LHC beam modes */
-		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 1), results));
-		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 45), results));
-		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 90), results));
+		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 1)));
+		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 45)));
+		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 90)));
 
 		/* once in disallowed state count holdoff period and fire */
-		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.RAMP, 50, 50, 100), results));
-		assertTrue(module.satisfied(generateSnapshot(LHCBeamMode.RAMP, 50, 50, 130), results));
+		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.RAMP, 50, 50, 100)));
+		assertTrue(module.satisfied(generateSnapshot(LHCBeamMode.RAMP, 50, 50, 130)));
 
 		/* turn off when back into allowed LHC beam mode and don't fire*/
-		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 131), results));
+		assertFalse(module.satisfied(generateSnapshot(LHCBeamMode.PREPARE_RAMP, 50, 50, 131)));
 
 		/* ignore holdoff when in critical state and fire */
-		assertTrue(module.satisfied(generateSnapshot(LHCBeamMode.STABLE_BEAMS, 50, 50, 132), results));
+		assertTrue(module.satisfied(generateSnapshot(LHCBeamMode.STABLE_BEAMS, 50, 50, 132)));
 
 	}
 
@@ -121,7 +120,7 @@ public class CloudFuNumberTest
 
 		Map<String, Output> results = new HashMap<>();
 
-		boolean result = instance.satisfied(daq, results);
+		boolean result = instance.satisfied(daq);
 		assertEquals("result after taking into account holdoff for snapshot " + daq.getLastUpdate(),
 						expectedResult, result);
 

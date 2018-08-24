@@ -8,10 +8,7 @@ import rcms.utilities.daqaggregator.data.RU;
 import rcms.utilities.daqaggregator.persistence.StructureSerializer;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
-import rcms.utilities.daqexpert.reasoning.base.LogicModule;
-import rcms.utilities.daqexpert.reasoning.base.Output;
-import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.*;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromEventBuilding;
@@ -37,7 +34,7 @@ import java.util.*;
  */
 public class FlowchartCaseTestBase {
 
-	protected Map<String, Output> results = new HashMap<>();
+	protected final ResultSupplier resultSupplier = new ResultSupplier();
 
 	protected final KnownFailure fc1 = new OutOfSequenceData();
 	protected final KnownFailure legacyFc1 = new LegacyFlowchartCase1();
@@ -139,6 +136,7 @@ public class FlowchartCaseTestBase {
 			if (lm != null && lm instanceof Parameterizable) {
 				((Parameterizable) lm).parametrize(properties);
 			}
+			lm.setResultSupplier(resultSupplier);
 		}
 		unidentified.setKnownFailureClasses(logicModules);
 	}
@@ -149,7 +147,7 @@ public class FlowchartCaseTestBase {
 
 		for(RU ru: snapshot.getRus()){
 			if(ru.isEVM() && ru.getRate() > 0){
-				results.put(NoRateWhenExpected.class.getSimpleName(),new Output(false));
+				resultSupplier.update(LogicModuleRegistry.NoRateWhenExpected, new Output(false));
 			}
 		}
 
@@ -184,7 +182,7 @@ public class FlowchartCaseTestBase {
 	 * chain of reasoning (where later modules potentially depend on the results of earlier ones) at each step.
 	 */
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
-		boolean result = logicModule.satisfied(snapshot, results);
+		boolean result = logicModule.satisfied(snapshot);
 		if (result != expected) {
 			String output = "";
 			if (logicModule instanceof ContextLogicModule) {
@@ -214,21 +212,22 @@ public class FlowchartCaseTestBase {
 		}
 		Assert.assertEquals(logicModule.getClass().getSimpleName() + " is expected to return " + expected, expected,
 				result);
-		results.put(logicModule.getClass().getSimpleName(), new Output(result));
+		resultSupplier.update(logicModule.getLogicModuleRegistry(), new Output(result));
 	}
 
 	@Before
 	public void cleanResult() {
-		results.clear();
+		resultSupplier.clear();
 
 		// put results of prerequisite tests by hand
 		// (as opposed to get them from a series of snapshots
 		// which introduces a dependency on other tests)
-		results.put(StableBeams.class.getSimpleName(), new Output(true));
-		results.put(NoRateWhenExpected.class.getSimpleName(), new Output(true));
-		results.put(ExpectedRate.class.getSimpleName(), new Output(true));
-		results.put(FedDeadtimeDueToDaq.class.getSimpleName(), new Output(true));
-		results.put(TmpUpgradedFedProblem.class.getSimpleName(), new Output(true));
+
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.NoRateWhenExpected, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.FedDeadtimeDueToDaq, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.TmpUpgradedFedProblem, new Output(true));
 
 		}
 

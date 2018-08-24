@@ -32,27 +32,27 @@ public class LengthyFixingSoftErrorTest {
         ((Parameterizable)lm).parametrize(props);
 
         daq.setLastUpdate(1000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLevelZeroState("FixingSoftError");
 
         daq.setLastUpdate(2000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(6000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(7000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(7001);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         daq.setLastUpdate(8000);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         daq.setLastUpdate(11000);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         ContextHandler.highlightMarkup = false;
         Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
@@ -76,30 +76,30 @@ public class LengthyFixingSoftErrorTest {
         ((Parameterizable)lm).parametrize(props);
 
         daq.setLastUpdate(1000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLevelZeroState("FixingSoftError");
         subsystem.setStatus("FixingSoftError");
         daq.setLastUpdate(2000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(7000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         /* Subsystem going back to running will reset its counter - continuous errors will be caught by other LM */
         subsystem.setStatus("Running");
         daq.setLastUpdate(8000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         subsystem.setStatus("FixingSoftError");
         daq.setLastUpdate(9000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(14000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(14001);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         ContextHandler.highlightMarkup = false;
         Assert.assertEquals("Level zero in FixingSoftError longer than expected. This is caused by subsystem(s) TEST. The default threshold is 5 s. ",lm.getDescriptionWithContext());
@@ -131,26 +131,26 @@ public class LengthyFixingSoftErrorTest {
         ((Parameterizable)lm).parametrize(props);
 
         daq.setLastUpdate(1000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLevelZeroState("FixingSoftError");
         subsystem.setStatus("FixingSoftError");
         subsystem2.setStatus("FixingSoftError");
         daq.setLastUpdate(2000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(7000);
-        Assert.assertFalse(lm.satisfied(daq,null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLastUpdate(7001);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
         Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
         daq.setLastUpdate(8000);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         daq.setLastUpdate(12000);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
         Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 
         ContextHandler.highlightMarkup = false;
@@ -158,7 +158,7 @@ public class LengthyFixingSoftErrorTest {
 
 
         daq.setLastUpdate(12001);
-        Assert.assertTrue(lm.satisfied(daq,null));
+        Assert.assertTrue(lm.satisfied(daq));
 
         Assert.assertEquals(new LinkedHashSet(Arrays.asList("ECAL", "Tracker")),lm.getContextHandler().getContext().get("PROBLEM-SUBSYSTEM"));
 

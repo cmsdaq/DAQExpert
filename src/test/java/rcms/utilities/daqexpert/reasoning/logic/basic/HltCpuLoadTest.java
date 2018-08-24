@@ -10,7 +10,9 @@ import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.HltInfo;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.failures.deadtime.BackpressureFromHlt;
 
 /**
@@ -29,6 +31,8 @@ public class HltCpuLoadTest {
 
 		result.parametrize(properties);
 
+		result.setLogicModuleRegistry(LogicModuleRegistry.HltCpuLoad);
+
 		return result;
 	}
 
@@ -38,13 +42,11 @@ public class HltCpuLoadTest {
 	 */
 	private void runTest(Float actualCpuLoad, boolean expectedResult) {
 
-		Map<String, Output> results = new HashMap<>();
 
-		results.put(RunOngoing.class.getSimpleName(), new Output(true));
-
-		// needed for assigning priorities
-		results.put(StableBeams.class.getSimpleName(), new Output(true));
-		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
 
 		// ensure that the RateTooHighTest module fires
 		//
@@ -52,6 +54,7 @@ public class HltCpuLoadTest {
 		// run into unexpected results due to being in the holdoff period
 		// after the start of a run
 		HltCpuLoad module = makeInstance(0, 0);
+		module.setResultSupplier(resultSupplier);
 
 		DAQ snapshot = new DAQ();
 
@@ -62,7 +65,7 @@ public class HltCpuLoadTest {
 		snapshot.setHltInfo(hltInfo);
 
 		// run module to be tested
-		boolean result = module.satisfied(snapshot, results);
+		boolean result = module.satisfied(snapshot);
 
 		assertEquals(expectedResult, result);
 	}
@@ -124,14 +127,15 @@ public class HltCpuLoadTest {
 
 		//-----
 
-		Map<String, Output> results = new HashMap<>();
+
+		ResultSupplier resultSupplier = new ResultSupplier();
+		module.setResultSupplier(resultSupplier);
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
+
 
 		for (HltHoldOffTestData data : sequence) {
-			results.put(RunOngoing.class.getSimpleName(), new Output(data.isRunOngoing()));
-
-			// needed for assigning priorities
-			results.put(StableBeams.class.getSimpleName(), new Output(true));
-			results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+			resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(data.isRunOngoing()));
 
 			DAQ snapshot = new DAQ();
 			snapshot.setLastUpdate(data.getTimestamp());
@@ -143,7 +147,7 @@ public class HltCpuLoadTest {
 			snapshot.setHltInfo(hltInfo);
 
 			// run module to be tested
-			boolean result = module.satisfied(snapshot, results);
+			boolean result = module.satisfied(snapshot);
 
 			assertEquals("test failed for snapshot at time " + data.getTimestamp(),
 							data.isExpectedResult(), result);

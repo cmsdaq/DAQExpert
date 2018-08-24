@@ -6,8 +6,10 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSGlobalInfo;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,8 @@ public class CriticalDeadtimeTest {
     DAQ snapshot;
 
     CriticalDeadtime lm;
+    ResultSupplier resultSupplier;
+
 
     Logger logger = Logger.getLogger(CriticalDeadtimeTest.class);
 
@@ -25,6 +29,10 @@ public class CriticalDeadtimeTest {
 
 
         lm = new CriticalDeadtime();
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        lm.setResultSupplier(resultSupplier);
+
 
         Properties p = new Properties();
         p.put(Setting.EXPERT_LOGIC_DEADTIME_THESHOLD_TOTAL.getKey(), "1");
@@ -65,11 +73,11 @@ public class CriticalDeadtimeTest {
     @Test
     public void testNoBeamactive() throws Exception {
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(ExpectedRate.class.getSimpleName(), new Output(true));
-        results.put(BeamActive.class.getSimpleName(), new Output(false));
 
-        lm.satisfied(snapshot, results);
+        resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BeamActive, new Output(false));
+
+        lm.satisfied(snapshot);
         ContextHandler.highlightMarkup = false;
         lm.getContextHandler().getContext().getContextEntryMap().entrySet().stream().map(c -> c.getKey() + "=" + c.getValue().getTextRepresentation()).forEach(logger::info);
 
@@ -82,11 +90,10 @@ public class CriticalDeadtimeTest {
     @Test
     public void testBeamactive() throws Exception {
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(ExpectedRate.class.getSimpleName(), new Output(true));
-        results.put(BeamActive.class.getSimpleName(), new Output(true));
+        resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BeamActive, new Output(true));
 
-        lm.satisfied(snapshot, results);
+        lm.satisfied(snapshot);
         ContextHandler.highlightMarkup = false;
         lm.getContextHandler().getContext().getContextEntryMap().entrySet().stream().map(c -> c.getKey() + "=" + c.getValue().getTextRepresentation()).forEach(logger::info);
 
@@ -98,15 +105,14 @@ public class CriticalDeadtimeTest {
 
     @Test
     public void multipleValues() {
-        Map<String, Output> results = new HashMap<>();
-        results.put(ExpectedRate.class.getSimpleName(), new Output(true));
-        results.put(BeamActive.class.getSimpleName(), new Output(true));
+        resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.BeamActive, new Output(true));
 
-        lm.satisfied(snapshot, results);
+        lm.satisfied(snapshot);
 
         snapshot.getTcdsGlobalInfo().getDeadTimesInstant().put("beamactive_apve", 0d);
 
-        lm.satisfied(snapshot, results);
+        lm.satisfied(snapshot);
         ContextHandler.highlightMarkup = false;
         lm.getContextHandler().getContext().getContextEntryMap().entrySet().stream().map(c -> c.getKey() + "=" + c.getValue().getTextRepresentation()).forEach(logger::info);
 

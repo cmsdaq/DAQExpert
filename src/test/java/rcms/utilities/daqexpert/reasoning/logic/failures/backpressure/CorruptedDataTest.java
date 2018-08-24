@@ -112,7 +112,8 @@ public class CorruptedDataTest extends FlowchartCaseTestBase {
 
 		// TODO: why ruFailed?
 
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+
+		assertEquals(false, unidentified.satisfied(snapshot));
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 

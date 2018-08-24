@@ -5,7 +5,9 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.util.HashMap;
@@ -23,9 +25,12 @@ public class TmpUpgradedFedProblemTest extends FlowchartCaseTestBase{
         Properties p = new Properties();
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         lm.parametrize(p);
-        Map<String, Output> r = new HashMap<>();
-        r.put(TTSDeadtime.class.getSimpleName(), new Output(true));
-        Assert.assertTrue(lm.satisfied(daq, r));
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.TTSDeadtime, new Output(true));
+        lm.setResultSupplier(resultSupplier);
+
+        Assert.assertTrue(lm.satisfied(daq));
 
     }
 
@@ -37,9 +42,12 @@ public class TmpUpgradedFedProblemTest extends FlowchartCaseTestBase{
         Properties p = new Properties();
         p.setProperty(Setting.EXPERT_LOGIC_DEADTIME_BACKPRESSURE_FED.getKey(), "2");
         lm.parametrize(p);
-        Map<String, Output> r = new HashMap<>();
-        r.put(TTSDeadtime.class.getSimpleName(), new Output(true));
-        Assert.assertFalse(lm.satisfied(daq, r));
+
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.TTSDeadtime, new Output(true));
+        lm.setResultSupplier(resultSupplier);
+
+        Assert.assertFalse(lm.satisfied(daq));
 
     }
 }

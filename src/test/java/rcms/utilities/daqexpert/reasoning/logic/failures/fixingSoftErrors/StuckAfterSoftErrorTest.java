@@ -28,25 +28,25 @@ public class StuckAfterSoftErrorTest {
 
         DAQ daq = new DAQ();
         daq.setSubSystems(subsystems);
-        Assert.assertFalse(lm.satisfied(daq, null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLevelZeroState("FixingSoftError");
 
-        Assert.assertFalse(lm.satisfied(daq, null));
+        Assert.assertFalse(lm.satisfied(daq));
 
         daq.setLevelZeroState("Error");
 
-        Assert.assertTrue("Satisfied when preceding state to Error is FixingSoftError", lm.satisfied(daq, null));
-        Assert.assertTrue(lm.satisfied(daq, null));
+        Assert.assertTrue("Satisfied when preceding state to Error is FixingSoftError", lm.satisfied(daq));
+        Assert.assertTrue(lm.satisfied(daq));
 
         Assert.assertEquals("Level zero is stuck after fixing soft error. This is caused by subsystem(s) <strong>TEST</strong>", lm.getDescriptionWithContext());
 
         daq.setLevelZeroState("Other");
-        Assert.assertFalse(lm.satisfied(daq, null));
+        Assert.assertFalse(lm.satisfied(daq));
 
 
         daq.setLevelZeroState("Error");
-        Assert.assertFalse("Will not fire if preceding state is other than FixingSoftError", lm.satisfied(daq, null));
+        Assert.assertFalse("Will not fire if preceding state is other than FixingSoftError", lm.satisfied(daq));
     }
 
 }

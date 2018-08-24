@@ -9,6 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
 /**
@@ -39,7 +40,7 @@ public class BeamActiveTest
 			LHCBeamMode.STABLE_BEAMS
 		}));
 
-		Map<String, Output> results = new HashMap<>();
+		//ResultSupplier resultSupplier = new ResultSupplier();
 
 		BeamActive instance = new BeamActive();
 
@@ -51,7 +52,10 @@ public class BeamActiveTest
 
 			boolean expectedResult = activeModeSet.contains(mode);
 
-			boolean result = instance.satisfied(snapshot, results);
+			//instance.setResultSupplier(new ResultSupplier());
+
+
+			boolean result = instance.satisfied(snapshot);
 
 			assertEquals("unexpected result for beam mode " + modeName, expectedResult, result);
 

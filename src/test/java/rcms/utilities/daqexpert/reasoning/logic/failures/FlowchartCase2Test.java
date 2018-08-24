@@ -46,7 +46,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
@@ -77,7 +77,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
 
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
@@ -116,7 +116,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 
 		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(833)), context.getContext().get("PROBLEM-FED"));
@@ -144,7 +144,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 		System.out.println("Output: " + fc2.getDescriptionWithContext());
 		System.out.println("Output: " + fc2.getActionWithContext());
 
@@ -176,7 +176,7 @@ public class FlowchartCase2Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		//assertEqualsAndUpdateResults(false, fc6, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 
 		ContextHandler context = fc2.getContextHandler();
 		assertEquals(new HashSet(Arrays.asList(622)), context.getContext().get("PROBLEM-FED"));

@@ -5,8 +5,10 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FEDBuilderSummary;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.base.enums.LHCBeamMode;
 
 import java.util.HashMap;
@@ -27,11 +29,14 @@ public class RateOutOfRangeTest {
 
         DAQ snapshot = generateSnapshot(45100);
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(NoRate.class.getSimpleName(), new Output(false));
 
-        Assert.assertTrue(rateOutOfRange.satisfied(snapshot, results));
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.NoRate, new Output(false));
+
+        rateOutOfRange.setResultSupplier(resultSupplier);
+
+        Assert.assertTrue(rateOutOfRange.satisfied(snapshot));
 
         ContextHandler.highlightMarkup = false;
         Assert.assertEquals("L1 rate 45.1kHz is out of expected range (50.0 - 100.0 kHz)", rateOutOfRange.getDescriptionWithContext());
@@ -48,11 +53,14 @@ public class RateOutOfRangeTest {
 
         DAQ snapshot = generateSnapshot(0);
 
-        Map<String, Output> results = new HashMap<>();
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(NoRate.class.getSimpleName(), new Output(true));
 
-        Assert.assertFalse(rateOutOfRange.satisfied(snapshot, results));
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.NoRate, new Output(true));
+
+        rateOutOfRange.setResultSupplier(resultSupplier);
+
+        Assert.assertFalse(rateOutOfRange.satisfied(snapshot));
     }
 
 

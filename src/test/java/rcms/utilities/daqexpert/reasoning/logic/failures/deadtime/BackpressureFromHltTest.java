@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
@@ -45,26 +46,26 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         DAQ snapshot = getSnapshot("1480508609145.smile.gz");
         Logger.getLogger(BackpressureFromHlt.class).setLevel(Level.INFO);
 
-        Map<String, Output> r = new HashMap<>();
-        r.put(StableBeams.class.getSimpleName(), new Output(true));
-        r.put(ExpectedRate.class.getSimpleName(),new Output(true));
-        r.put(FEDDeadtime.class.getSimpleName(),new Output(true));
-        r.put(TTSDeadtime.class.getSimpleName(),new Output(true));
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.FEDDeadtime, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.TTSDeadtime, new Output(true));
 
 
         FedDeadtimeDueToDaq fd = new FedDeadtimeDueToDaq();
         fd.parametrize(properties);
-        Assert.assertFalse(fd.satisfied(snapshot,r));
-        r.put(FedDeadtimeDueToDaq.class.getSimpleName(), new Output(false));
+        Assert.assertFalse(fd.satisfied(snapshot));
+
+        resultSupplier.update(LogicModuleRegistry.FedDeadtimeDueToDaq, new Output(false));
 
         TmpUpgradedFedProblem tfd = new TmpUpgradedFedProblem();
         tfd.parametrize(properties);
-        Assert.assertFalse(tfd.satisfied(snapshot,r));
-        r.put(TmpUpgradedFedProblem.class.getSimpleName(), new Output(false));
+        Assert.assertFalse(tfd.satisfied(snapshot));
+        resultSupplier.update(LogicModuleRegistry.TmpUpgradedFedProblem, new Output(false));
 
 
         BackpressureFromHlt module = new BackpressureFromHlt();
         module.parametrize(properties);
-        Assert.assertFalse(module.satisfied(snapshot, r));
+        Assert.assertFalse(module.satisfied(snapshot));
     }
 }

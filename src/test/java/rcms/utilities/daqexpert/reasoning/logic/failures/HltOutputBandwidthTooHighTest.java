@@ -15,7 +15,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.TestSnapshotBuilder;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.basic.HltHoldOffTestData;
 import rcms.utilities.daqexpert.reasoning.logic.basic.RunOngoing;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
@@ -66,7 +68,16 @@ public class HltOutputBandwidthTooHighTest
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 		results.put(RunOngoing.class.getSimpleName(), new Output(true));
-		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
+
+
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(false));
+		resultSupplier.update(LogicModuleRegistry.RunOngoing, new Output(true));
+		hltOutputBandwidthTooHigh.setResultSupplier(resultSupplier);
+
+
+		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot));
 		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
@@ -79,10 +90,14 @@ public class HltOutputBandwidthTooHighTest
 		DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1507212269717.json");
 		KnownFailure hltOutputBandwidthTooHigh = makeInstance(0,0);
 
-		Map<String, Output> results = new HashMap<>();
-		results.put(StableBeams.class.getSimpleName(), new Output(true));
-		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
-		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
+
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
+		hltOutputBandwidthTooHigh.setResultSupplier(resultSupplier);
+
+
+		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot));
 		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. <strong>Note that there is also backpressure from HLT.</strong>",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
@@ -201,6 +216,12 @@ public class HltOutputBandwidthTooHighTest
 		Map<String, Output> results = new HashMap<>();
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 
+
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		hltOutputBandwidthTooHigh.setResultSupplier(resultSupplier);
+
+
 		long firstSnapshotTime = snapshots.get(0).getLastUpdate();
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -217,10 +238,11 @@ public class HltOutputBandwidthTooHighTest
 			snapshot.setSubSystems(new ArrayList<>());
 			snapshot.getSubSystems().add(tcds);
 
-			boolean runOngoingResult = runOngoing.satisfied(snapshot, results);
+
+			boolean runOngoingResult = runOngoing.satisfied(snapshot);
 			results.put(runOngoing.getClass().getSimpleName(), new Output(runOngoingResult));
 
-			boolean satisfied = hltOutputBandwidthTooHigh.satisfied(snapshot, results);
+			boolean satisfied = hltOutputBandwidthTooHigh.satisfied(snapshot);
 
 			atLeastOneSatisfied |= satisfied;
 
@@ -295,14 +317,19 @@ public class HltOutputBandwidthTooHighTest
 
 		//-----
 
+
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+		resultSupplier.update(LogicModuleRegistry.BackpressureFromHlt, new Output(true));
+		module.setResultSupplier(resultSupplier);
+
+
+
 		Map<String, Output> results = new HashMap<>();
 
 		for (HltHoldOffTestData data : sequence) {
-			results.put(RunOngoing.class.getSimpleName(), new Output(data.isRunOngoing()));
 
-			// needed for assigning priorities
-			results.put(StableBeams.class.getSimpleName(), new Output(true));
-			results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
+			resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(data.isRunOngoing()));
 
 			DAQ snapshot = new DAQ();
 			snapshot.setLastUpdate(data.getTimestamp());
@@ -314,7 +341,7 @@ public class HltOutputBandwidthTooHighTest
 			snapshot.setBuSummary(buSummary);
 
 			// run module to be tested
-			boolean result = module.satisfied(snapshot, results);
+			boolean result = module.satisfied(snapshot);
 
 			assertEquals("test failed for snapshot at time " + data.getTimestamp(),
 							data.isExpectedResult(), result);

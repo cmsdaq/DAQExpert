@@ -134,7 +134,7 @@ public class FlowchartCase6Test extends FlowchartCaseTestBase {
 		assertEqualsAndUpdateResults(false, fmmProblem, snapshot);
 		assertEqualsAndUpdateResults(false, fc5, snapshot);
 		assertEqualsAndUpdateResults(false, ferolFifoStuck, snapshot);
-		assertEquals(false, unidentified.satisfied(snapshot, results));
+		assertEquals(false, unidentified.satisfied(snapshot));
 
 		/*
 		 * ContextHandler contextHandler = fc6.getContextHandler(); assertEquals(new HashSet(Arrays.asList(1386)),

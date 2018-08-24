@@ -10,7 +10,9 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.TCDSGlobalInfo;
 import rcms.utilities.daqaggregator.data.TCDSTriggerRates;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 
 /**
@@ -43,12 +45,13 @@ public class HighTcdsInputRateTest
 
 		//-----
 
-		Map<String, Output> results = new HashMap<>();
-
-		results.put(StableBeams.class.getSimpleName(), new Output(true));
+		ResultSupplier resultSupplier = new ResultSupplier();
+		resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
 
 		// ensure that the VeryHighTcdsInputRate module fires
 		HighTcdsInputRate module = new HighTcdsInputRate();
+
+		module.setResultSupplier(resultSupplier);
 
 		// mock parameters
 		Properties config = new Properties();
@@ -57,7 +60,7 @@ public class HighTcdsInputRateTest
 		module.parametrize(config);
 
 		// run module to be tested
-		boolean result = module.satisfied(snapshot, results);
+		boolean result = module.satisfied(snapshot);
 
 		assertEquals(true, result);
 

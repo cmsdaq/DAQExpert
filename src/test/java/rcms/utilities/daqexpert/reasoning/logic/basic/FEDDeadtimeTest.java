@@ -7,7 +7,9 @@ import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 import rcms.utilities.daqexpert.reasoning.logic.failures.RateTooHigh;
 
@@ -23,14 +25,15 @@ public class FEDDeadtimeTest {
     @Test
     public void test01() throws URISyntaxException {
         DAQ snapshot = FlowchartCaseTestBase.getSnapshot("1510239315441.json.gz");
-        Map<String, Output> results = new HashMap<>();
 
+        ResultSupplier resultSupplier = new ResultSupplier();
+        resultSupplier.update(LogicModuleRegistry.ExpectedRate, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.StableBeams, new Output(true));
+        resultSupplier.update(LogicModuleRegistry.LongTransition, new Output(false));
 
-        results.put(ExpectedRate.class.getSimpleName(), new Output(true));
-        results.put(StableBeams.class.getSimpleName(), new Output(true));
-        results.put(LongTransition.class.getSimpleName(), new Output(false));
 
         FEDDeadtime module = new FEDDeadtime();
+        module.setResultSupplier(resultSupplier);
 
         // mock parameters
         Properties config = new Properties();
@@ -38,7 +41,7 @@ public class FEDDeadtimeTest {
         module.parametrize(config);
 
         // run module to be tested
-        boolean result = module.satisfied(snapshot, results);
+        boolean result = module.satisfied(snapshot);
 
         assertEquals(true, result);
 

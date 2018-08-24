@@ -21,6 +21,8 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
+import javax.xml.transform.Result;
+
 /**
  * Manager of checking process
  *
@@ -134,12 +136,16 @@ public class LogicModuleManager {
         List<Condition> results = new ArrayList<>();
         HashMap<String, Output> checkerResultMap = new HashMap<>();
 
+        ResultSupplier resultSupplier = null;
+
         for (SimpleLogicModule checker : checkers) {
             try {
-                boolean result = checker.satisfied(daq, checkerResultMap);
+                boolean result = checker.satisfied(daq);
                 logger.debug(checker.getName() + ": " + result);
 
-                postprocess(checkerResultMap, checker, result, daq, results);
+                Output output = postprocess(checker, result, daq, results);
+                checker.getResultSupplier().update(checker.getLogicModuleRegistry(),output);
+                resultSupplier = checker.getResultSupplier(); //TODO fix this: result supplier is same for all LM
             } catch(RuntimeException e){
                 logger.error("Logic module " + checker.getClass().getSimpleName() + " failed with: " + e.getClass());
             }
@@ -151,7 +157,7 @@ public class LogicModuleManager {
 
                 logger.debug("Experimental logic modules returned: " + a);
                 for (Pair<LogicModule, Boolean> b : a) {
-                    postprocess(checkerResultMap, b.getLeft(), b.getRight(), daq, results);
+                    postprocess(b.getLeft(), b.getRight(), daq, results);
                 }
             } catch (RuntimeException e) {
                 e.printStackTrace();
@@ -162,17 +168,18 @@ public class LogicModuleManager {
         conditionProducer.clearFinishedThisRound();
         lastRoundOutput = checkerResultMap;
 
+        resultSupplier.clear();
+
         return results;
     }
 
     /**
-     * @param checkerResultMap
      * @param checker
      * @param result
      * @param daq
      * @param results
      */
-    private void postprocess(Map<String, Output> checkerResultMap, LogicModule checker, boolean result, DAQ daq,
+    private Output postprocess( LogicModule checker, boolean result, DAQ daq,
                              List<Condition> results) {
         Date curr = null;
         Output lmOutput = new Output(result);
@@ -181,7 +188,6 @@ public class LogicModuleManager {
             lmOutput.setContext(((ContextLogicModule) checker).getContextHandler().getContext());
         }
 
-        checkerResultMap.put(checker.getClass().getSimpleName(), lmOutput);
         curr = new Date(daq.getLastUpdate());
 
         if (checker instanceof SimpleLogicModule) {
@@ -215,6 +221,7 @@ public class LogicModuleManager {
                 results.add(produceResult.getRight());
             }
         }
+        return lmOutput;
 
     }
 

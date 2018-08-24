@@ -39,11 +39,12 @@ public class FedGeneratesDeadtime extends KnownFailure implements Parameterizabl
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
-        assignPriority(results);
+        //assignPriority(results);
 
-        Output fedDeadtimeOutput = results.get(FEDDeadtime.class.getSimpleName());
+        Output fedDeadtimeOutput = getOutputOf(LogicModuleRegistry.FEDDeadtime);
+
         if (!fedDeadtimeOutput.getResult()) {
             return false;
         }

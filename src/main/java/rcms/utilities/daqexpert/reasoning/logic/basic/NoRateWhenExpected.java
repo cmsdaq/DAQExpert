@@ -26,14 +26,14 @@ public class NoRateWhenExpected extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 		boolean stableBeams = false;
 		boolean expectedRate = false;
 		boolean noRate = false;
 
-		stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
-		expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
-		noRate = results.get(NoRate.class.getSimpleName()).getResult();
+		stableBeams = getOutputOf(LogicModuleRegistry.StableBeams).getResult();
+		expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
+		noRate = getOutputOf(LogicModuleRegistry.NoRate).getResult();
 
 		if (stableBeams)
 			this.priority = ConditionPriority.CRITICAL;

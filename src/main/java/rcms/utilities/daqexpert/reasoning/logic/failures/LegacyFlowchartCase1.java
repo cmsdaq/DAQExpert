@@ -101,15 +101,15 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+		if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
 			return false;
 
-		if (results.get(OutOfSequenceData.class.getSimpleName()).getResult())
+		if (getOutputOf(LogicModuleRegistry.OutOfSequenceData).getResult())
 			return false;
 
-		assignPriority(results);
+		//assignPriority(results);
 
 		String daqstate = daq.getDaqState();
 		// note that the l0state may e.g. be 'Error'

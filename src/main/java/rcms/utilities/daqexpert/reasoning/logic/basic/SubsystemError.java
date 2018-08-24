@@ -26,17 +26,18 @@ public class SubsystemError extends ContextLogicModule {
 
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
+		boolean runOngoing =
+				getOutputOf(LogicModuleRegistry.RunOngoing).getResult();
 		if (!runOngoing)
 			return false;
 		
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+		boolean expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
 		if (!expectedRate)
 			return false;
 		
-		boolean transition = results.get(LongTransition.class.getSimpleName()).getResult();
+		boolean transition = getOutputOf(LogicModuleRegistry.LongTransition).getResult();
 		if (transition)
 			return false;
 

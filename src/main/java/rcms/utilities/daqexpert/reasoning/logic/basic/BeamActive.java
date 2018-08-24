@@ -24,7 +24,7 @@ public class BeamActive extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
+	public boolean satisfied(DAQ snapshot) {
 
 		LHCBeamMode currentMode = LHCBeamMode.getModeByCode(snapshot.getLhcBeamMode());
 		if (currentMode == LHCBeamMode.INJECTION_PROBE_BEAM || currentMode == LHCBeamMode.INJECTION_SETUP_BEAM

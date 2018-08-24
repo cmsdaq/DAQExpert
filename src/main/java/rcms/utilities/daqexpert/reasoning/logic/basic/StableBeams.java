@@ -23,7 +23,7 @@ public class StableBeams extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
+	public boolean satisfied(DAQ snapshot) {
 
 		if (LHCBeamMode.STABLE_BEAMS == LHCBeamMode.getModeByCode(snapshot.getLhcBeamMode()))
 			return true;

@@ -18,6 +18,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
+import sun.rmi.runtime.Log;
 
 /**
  * This logic module identifies deadtime
@@ -47,11 +48,11 @@ public class CriticalDeadtime extends ContextLogicModule implements Parameteriza
 	 * Dead time during running
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-        boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+        boolean expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
 
-        boolean beamActive = results.get(BeamActive.class.getSimpleName()).getResult();
+        boolean beamActive = getOutputOf(LogicModuleRegistry.BeamActive).getResult();
 
         if (!expectedRate) {
             return false;

@@ -34,13 +34,13 @@ public class LinkProblem extends BackpressureAnalyzer {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+		if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
 			return false;
 
 		boolean result = false;
-		assignPriority(results);
+		//assignPriority(results);
 
 		Subcase backpressureRootCase = detectBackpressure(daq);
 		if (backpressureRootCase == Subcase.LinkProblem) {

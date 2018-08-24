@@ -32,15 +32,15 @@ public class HltOutputBandwidthExtreme extends HltOutputBandwidthExceeded {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         // do not fire if the (lower threshold) warning does not fire
         // (for consistency reasons)
-        if (!results.get(HltOutputBandwidthTooHigh.class.getSimpleName()).getResult()) {
+        if (!getOutputOf(LogicModuleRegistry.HltOutputBandwidthTooHigh).getResult()) {
             return false;
         }
 
-	return super.satisfied(daq, results);
+	return super.satisfied(daq);
     }
 
     @Override

@@ -31,11 +31,12 @@ public class ExpectedRate extends SimpleLogicModule {
 	private long started;
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
 		boolean expectedRate = false;
 
-		boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
+
+		boolean runOngoing = getOutputOf(LogicModuleRegistry.RunOngoing).getResult();
 
 		boolean fixingSoftError = daq.getLevelZeroState().equalsIgnoreCase("FixingSoftError") ? true : false;
 		boolean dcsPauseResume = daq.getLevelZeroState().equalsIgnoreCase("PerformingDCSPauseResume") ? true : false;

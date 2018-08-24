@@ -51,15 +51,15 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 	 * Dead time during running
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-        boolean expectedRate;
-		expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+        boolean expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
+		boolean beamActive = getOutputOf(LogicModuleRegistry.BeamActive).getResult();
         if (!expectedRate) {
             return false;
         }
 
-        double deadtime = getDeadtime(daq, results);
+        double deadtime = getDeadtime(daq, beamActive);
 
         if (deadtime > threshold) {
             contextHandler.registerForStatistics("DEADTIME", deadtime, "%", 1);
@@ -68,9 +68,9 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 		return false;
 	}
 
-	private double getDeadtime(DAQ daq, Map<String, Output> results){
+	private double getDeadtime(DAQ daq, boolean beamActive){
 		try {
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+			if (beamActive) {
 				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
 						.get("beamactive_tts");
 
@@ -79,7 +79,7 @@ public class TTSDeadtime extends KnownFailure implements Parameterizable {
 			}
 		} catch (NullPointerException e) {
 			logger.warn("Instantaneous TTS deadtime value is not available. Using per lumi section.");
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+			if (beamActive) {
 				return daq.getTcdsGlobalInfo().getDeadTimes()
 						.get("beamactive_tts");
 

@@ -34,9 +34,11 @@ public class FedDeadtimeDueToDaq extends KnownFailure implements Parameterizable
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
-        boolean fedDeadtime = results.get(FEDDeadtime.class.getSimpleName()).getResult();
+
+        boolean fedDeadtime = getOutputOf(LogicModuleRegistry.FEDDeadtime).getResult();
+
         if (!fedDeadtime) {
             return false;
         }

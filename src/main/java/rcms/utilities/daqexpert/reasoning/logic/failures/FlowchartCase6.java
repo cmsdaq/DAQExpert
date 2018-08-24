@@ -10,6 +10,7 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
@@ -42,12 +43,12 @@ public class FlowchartCase6 extends KnownFailure {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+		if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
 			return false;
 
-		assignPriority(results);
+		//assignPriority(results);
 
 		boolean result = false;
 

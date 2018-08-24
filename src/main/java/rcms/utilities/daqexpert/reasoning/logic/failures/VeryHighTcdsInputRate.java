@@ -53,15 +53,15 @@ public class VeryHighTcdsInputRate extends KnownFailure implements Parameterizab
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
 
-        if (!results.get(HighTcdsInputRate.class.getSimpleName()).getResult()) {
+        if (!getOutputOf(LogicModuleRegistry.HighTcdsInputRate).getResult()) {
             return false;
         }
 
         // assign the priority based on whether we are in stable beams or not
-        assignPriority(results);
+        //assignPriority(results);
 
         TCDSTriggerRates rates = daq.getTcdsGlobalInfo().getTriggerRatesInstant();
 

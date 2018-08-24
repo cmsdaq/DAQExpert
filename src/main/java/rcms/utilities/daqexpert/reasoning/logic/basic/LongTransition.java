@@ -35,9 +35,9 @@ public class LongTransition extends SimpleLogicModule {
 	private long started;
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+		boolean expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
 
 		// first check
 		if (started == 0) {

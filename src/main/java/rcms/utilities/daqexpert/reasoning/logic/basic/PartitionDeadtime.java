@@ -37,10 +37,10 @@ public class PartitionDeadtime extends ContextLogicModule implements Parameteriz
      * Dead time when greater than 5%
      */
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         boolean expectedRate = false;
-        expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+        expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
         if (!expectedRate)
             return false;
 

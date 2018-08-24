@@ -5,7 +5,6 @@ import rcms.utilities.daqexpert.processing.Requiring;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

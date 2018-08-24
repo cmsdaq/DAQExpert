@@ -39,13 +39,13 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		assignPriority(results);
+		//assignPriority(results);
 
 		// check if we are in a run now
 		// (rely on the fact that RunOngoing has been run already)
-		Boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
+		Boolean runOngoing = getOutputOf(LogicModuleRegistry.RunOngoing).getResult();
 
 		long now = daq.getLastUpdate();
 

@@ -71,10 +71,10 @@ public class TmpUpgradedFedProblem extends ContextLogicModule implements Paramet
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         Output ttsDeadtimeOutput;
-        ttsDeadtimeOutput = results.get(TTSDeadtime.class.getSimpleName());
+        ttsDeadtimeOutput = getOutputOf(LogicModuleRegistry.TTSDeadtime);
         if (ttsDeadtimeOutput == null || !ttsDeadtimeOutput.getResult())
             return false;
 

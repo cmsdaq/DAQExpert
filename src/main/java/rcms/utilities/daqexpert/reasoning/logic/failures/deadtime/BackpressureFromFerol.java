@@ -51,15 +51,14 @@ public class BackpressureFromFerol extends KnownFailure implements Parameterizab
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
-        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName()).getResult();
-        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName()).getResult();
-
+        boolean fedDeadtimeDueToDAQ = getOutputOf(LogicModuleRegistry.FedDeadtimeDueToDaq).getResult();
+        boolean tmpUpgradedFedBackpressured = getOutputOf(LogicModuleRegistry.TmpUpgradedFedProblem).getResult();
 
         if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
 
-            assignPriority(results);
+            //assignPriority(results);
             boolean result = false;
 
             Iterator<RU> i = daq.getRus().iterator();

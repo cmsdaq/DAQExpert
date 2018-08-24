@@ -20,7 +20,7 @@ public class EvmEnabled extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 		List<FEDBuilder> a = daq.getFedBuilders();
 		for (FEDBuilder b : a) {
 			RU ru = b.getRu();

@@ -38,7 +38,7 @@ public class NoRate extends SimpleLogicModule implements Parameterizable {
 	 * No rate when sum of FedBuilders rate equals 0 Hz
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 		if (daq.getFedBuilderSummary().getRate() <= threshold)
 			return true;
 		else

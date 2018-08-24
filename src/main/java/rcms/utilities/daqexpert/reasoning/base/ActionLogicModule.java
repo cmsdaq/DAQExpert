@@ -32,6 +32,7 @@ public abstract class ActionLogicModule extends ContextLogicModule {
 		require(LogicModuleRegistry.StableBeams);
 	}
 
+	@Deprecated
 	protected void assignPriority(Map<String, Output> results) {
 		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
 		this.priority = stableBeams ? ConditionPriority.CRITICAL : ConditionPriority.WARNING;

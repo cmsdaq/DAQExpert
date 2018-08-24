@@ -31,11 +31,13 @@ public class FEDDisconnected extends DisconnectedAnalyzer {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+	public boolean satisfied(DAQ daq) {
+
+
+		if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
 			return false;
 
-		assignPriority(results);
+		//assignPriority(results);
 
 		boolean result = false;
 

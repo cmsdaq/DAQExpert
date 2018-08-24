@@ -32,10 +32,10 @@ public class Downtime extends SimpleLogicModule {
 	 * Avoidable downtime when downtime and no action being executed
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		boolean noRate = results.get(NoRate.class.getSimpleName()).getResult();
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+		boolean noRate = getOutputOf(LogicModuleRegistry.NoRate).getResult();
+		boolean stableBeams = getOutputOf(LogicModuleRegistry.StableBeams).getResult();
 
 		if (stableBeams && noRate)
 			return true;

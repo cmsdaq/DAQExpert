@@ -53,7 +53,7 @@ public class StuckAfterSoftError extends KnownFailure {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         boolean result = false;
         String currentState = daq.getLevelZeroState();

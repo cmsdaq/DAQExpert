@@ -9,6 +9,7 @@ public class AccessController {
 
     public boolean grantAccess(Requiring calling, Requiring called){
 
+        logger.info(calling.getNodeName() + " requests access to results of: " + calling.getNodeName());
         if(calling.getRequired().contains(called)){
 
             logger.info("Granting access to output of " + called.getNodeName() + " to " + calling.getNodeName());

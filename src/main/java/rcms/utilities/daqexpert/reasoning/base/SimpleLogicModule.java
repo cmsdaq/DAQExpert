@@ -21,12 +21,10 @@ public abstract class SimpleLogicModule extends LogicModule {
 	 * 
 	 * @param daq
 	 *            Snapshot to examine by this Logic Module
-	 * @param results
-	 *            Results from other Logic Modules for this DAQ snapshot.
 	 * @return condition satisfied, <code>true</code> when satisfied,
 	 *         <code>false</code> otherwise.
 	 */
-	public abstract boolean satisfied(DAQ daq, Map<String, Output> results);
+	public abstract boolean satisfied(DAQ daq);
 
 	/**
 	 * Is condition stable i.e. is condition lasting for some time or it's only

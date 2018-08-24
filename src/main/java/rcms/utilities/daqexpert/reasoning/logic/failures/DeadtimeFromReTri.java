@@ -35,15 +35,16 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         boolean result = false;
-        if (!results.get(CriticalDeadtime.class.getSimpleName()).getResult())
+        if (!getOutputOf(LogicModuleRegistry.CriticalDeadtime).getResult())
             return false;
 
-        assignPriority(results);
+        //assignPriority(results);
 
-        double retriContributionToDeadtime = getReTriDeadtime(daq, results);
+        boolean beamActive = getOutputOf(LogicModuleRegistry.BeamActive).getResult();
+        double retriContributionToDeadtime = getReTriDeadtime(daq, beamActive);
 
         if (retriContributionToDeadtime > contributionThresholdInPercent) {
             contextHandler.registerForStatistics("RETRI_CONTRIBUTION", retriContributionToDeadtime, "%", 1);
@@ -53,9 +54,9 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
         return result;
     }
 
-    private double getReTriDeadtime(DAQ daq, Map<String, Output> results) {
+    private double getReTriDeadtime(DAQ daq, boolean beamActive) {
         try {
-            if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+            if (beamActive) {
                 return daq.getTcdsGlobalInfo().getDeadTimesInstant()
                         .get("beamactive_retri");
 
@@ -63,7 +64,7 @@ public class DeadtimeFromReTri extends KnownFailure implements Parameterizable {
                 return daq.getTcdsGlobalInfo().getDeadTimesInstant().get("retri");
             }
         } catch (NullPointerException e) {
-            if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+            if (beamActive) {
                 return daq.getTcdsGlobalInfo().getDeadTimes()
                         .get("beamactive_retri");
 

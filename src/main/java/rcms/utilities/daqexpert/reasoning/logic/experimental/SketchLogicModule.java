@@ -27,7 +27,7 @@ public class SketchLogicModule extends SimpleLogicModule {
 	 * otherwise returns false.
 	 */
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
+	public boolean satisfied(DAQ snapshot) {
 
 		/* TODO: 2. implement your condition here */
 		return false;

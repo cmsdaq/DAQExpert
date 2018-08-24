@@ -33,11 +33,11 @@ public class RateOutOfRange extends ContextLogicModule implements Parameterizabl
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
         float a = daq.getFedBuilderSummary().getRate();
 
-        boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
-        boolean noRate = results.get(NoRate.class.getSimpleName()).getResult();
+        boolean stableBeams = getOutputOf(LogicModuleRegistry.StableBeams).getResult();
+        boolean noRate = getOutputOf(LogicModuleRegistry.NoRate).getResult();
 
         if (!stableBeams || noRate) {
             return false;

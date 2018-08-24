@@ -48,7 +48,7 @@ public class RunOngoing extends SimpleLogicModule {
 	private static final Logger logger = Logger.getLogger(RunOngoing.class);
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
 		String tcdsState = "", levelZeroState;
 

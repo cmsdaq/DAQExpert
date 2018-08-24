@@ -48,9 +48,9 @@ public class CmsswCrashes extends KnownFailure implements Parameterizable {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
-        assignPriority(results);
+        //assignPriority(results);
 
         if(daq.getHltInfo() == null){
             return false;

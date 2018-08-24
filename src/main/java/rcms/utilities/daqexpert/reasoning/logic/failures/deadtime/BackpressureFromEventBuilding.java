@@ -52,32 +52,30 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
-        boolean fedDeadtimeDueToDAQ = results.get(FedDeadtimeDueToDaq.class.getSimpleName()).getResult();
-        boolean tmpUpgradedFedBackpressured = results.get(TmpUpgradedFedProblem.class.getSimpleName()).getResult();
+        Output fedDeadtimeDueToDAQ = getOutputOf(LogicModuleRegistry.FedDeadtimeDueToDaq);
+        Output tmpUpgradedFedBackpressured = getOutputOf(LogicModuleRegistry.TmpUpgradedFedProblem);
 
 
-        if(fedDeadtimeDueToDAQ || tmpUpgradedFedBackpressured) {
+        if(fedDeadtimeDueToDAQ.getResult() || tmpUpgradedFedBackpressured.getResult()) {
 
 
             Set<FED> backpressuredFeds = new HashSet<>();
 
-            if(tmpUpgradedFedBackpressured) {
-                Output output = results.get(TmpUpgradedFedProblem.class.getSimpleName());
-                if(output.getContext() != null) {
-                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+            if(tmpUpgradedFedBackpressured.getResult()) {
+                if(tmpUpgradedFedBackpressured.getContext() != null) {
+                    backpressuredFeds.addAll(tmpUpgradedFedBackpressured.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
                 }
             }
 
-            if(fedDeadtimeDueToDAQ){
-                Output output = results.get(FedDeadtimeDueToDaq.class.getSimpleName());
-                if(output.getContext() != null) {
-                    backpressuredFeds.addAll(output.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
+            if(fedDeadtimeDueToDAQ.getResult()){
+                if(fedDeadtimeDueToDAQ.getContext() != null) {
+                    backpressuredFeds.addAll(fedDeadtimeDueToDAQ.getContext().getReusableContextEntry("PROBLEM-FED").getObjectSet());
                 }
             }
 
-            assignPriority(results);
+            //assignPriority(results);
             boolean result = false;
 
             Iterator<RU> i = daq.getRus().iterator();

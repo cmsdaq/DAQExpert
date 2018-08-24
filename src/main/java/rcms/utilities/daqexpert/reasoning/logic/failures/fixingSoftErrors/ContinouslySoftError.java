@@ -80,7 +80,7 @@ public class ContinouslySoftError extends KnownFailure implements Parameterizabl
 	private List<String> problemStates = Arrays.asList("FixingSoftError", "RunningSoftErrorDetected");
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 		boolean currentResult = false;
 		String currentState = daq.getLevelZeroState();
 

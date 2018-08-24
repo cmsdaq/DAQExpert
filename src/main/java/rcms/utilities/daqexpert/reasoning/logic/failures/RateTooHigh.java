@@ -47,10 +47,10 @@ public class RateTooHigh extends KnownFailure implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
 		// assign the priority based on whether we are in stable beams or not
-		assignPriority(results);
+		//assignPriority(results);
 
 		float readoutRate = daq.getFedBuilderSummary().getRate();
 

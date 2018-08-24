@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.reasoning.logic.basic;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.SimpleLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -22,11 +23,11 @@ public class AvoidableDowntime extends SimpleLogicModule {
 	 * No rate when sum of FedBuilders rate equals 0 Hz
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+		boolean stableBeams = getOutputOf(LogicModuleRegistry.StableBeams).getResult();
 		if (stableBeams)
-			return results.get(NoRateWhenExpected.class.getSimpleName()).getResult();
+			return getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult();
 		return false;
 
 	}

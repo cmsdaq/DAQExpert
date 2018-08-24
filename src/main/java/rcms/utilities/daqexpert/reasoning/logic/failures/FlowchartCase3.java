@@ -56,11 +56,11 @@ public class FlowchartCase3 extends KnownFailure {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+		if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
 			return false;
-		assignPriority(results);
+		//assignPriority(results);
 		
 		boolean result = false;
 

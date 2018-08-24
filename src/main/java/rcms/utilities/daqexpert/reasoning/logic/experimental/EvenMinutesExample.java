@@ -24,7 +24,7 @@ public class EvenMinutesExample extends SimpleLogicModule {
 	}
 
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
+	public boolean satisfied(DAQ snapshot) {
 
 		Date snapshotDate = new Date(snapshot.getLastUpdate());
 		if (snapshotDate.getMinutes() % 2 == 0) {

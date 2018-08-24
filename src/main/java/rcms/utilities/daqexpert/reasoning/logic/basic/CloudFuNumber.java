@@ -150,7 +150,7 @@ public class CloudFuNumber extends ContextLogicModule implements Parameterizable
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
 		LHCBeamMode lhcBeamMode = LHCBeamMode.getModeByCode(daq.getLhcBeamMode());
 		LHCMachineMode lhcMachineMode = LHCMachineMode.getModeByCode(daq.getLhcMachineMode());

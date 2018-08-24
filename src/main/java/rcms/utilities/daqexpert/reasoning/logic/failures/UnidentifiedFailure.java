@@ -40,20 +40,20 @@ public class UnidentifiedFailure extends ActionLogicModule {
     }
 
     @Override
-    public boolean satisfied(DAQ daq, Map<String, Output> results) {
+    public boolean satisfied(DAQ daq) {
 
         // fire only if NoRateWhenExpected holds
         // (assume this module always has produced a result)
-        if (!results.get(NoRateWhenExpected.class.getSimpleName()).getResult())
+        if (!getOutputOf(LogicModuleRegistry.NoRateWhenExpected).getResult())
             return false;
 
-        assignPriority(results);
+        //assignPriority(results);
 
         // look for any module inheriting from KnownFailure which identified
         // a problem. We treat a non-existing result as 'not identified'
         for (LogicModule module : knownFailureClasses) {
 
-            Boolean thisResult = results.get(module.getClass().getSimpleName()).getResult();
+            Boolean thisResult = getOutputOf(module.getLogicModuleRegistry()).getResult();
 
             if (thisResult != null && thisResult)
                 // found a logic module which identified the problem

@@ -46,13 +46,13 @@ public class HltOutputBandwidthExceeded extends KnownFailure implements Paramete
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
 		// assign the priority based on whether we are in stable beams or not
-		assignPriority(results);
+		//assignPriority(results);
 
 		// check if we are in a run now
-		Boolean runOngoing = results.get(RunOngoing.class.getSimpleName()).getResult();
+		Boolean runOngoing = getOutputOf(LogicModuleRegistry.RunOngoing).getResult();
 
 		long now = daq.getLastUpdate();
 

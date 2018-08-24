@@ -30,13 +30,11 @@ public class SimpleSketchLogicModule extends SimpleLogicModule {
 	 * 
 	 * @param snapshot
 	 *            access any parameter of DAQ system using this object
-	 * @param results
-	 *            access results of other LMs using this map, name is the key
 	 * @return return true when condition satisfied, false otherwise.
 	 * 
 	 */
 	@Override
-	public boolean satisfied(DAQ snapshot, Map<String, Output> results) {
+	public boolean satisfied(DAQ snapshot) {
 
 		/*
 		 * TODO: 2a. implement your condition here

@@ -37,9 +37,10 @@ public class FEDDeadtime extends ContextLogicModule implements Parameterizable {
 	}
 
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		boolean expectedRate = results.get(ExpectedRate.class.getSimpleName()).getResult();
+		boolean expectedRate = getOutputOf(LogicModuleRegistry.ExpectedRate).getResult();
+
 		if (!expectedRate)
 			return false;
 

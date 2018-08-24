@@ -39,9 +39,10 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 	 * Dead time when greater than a threshold%
 	 */
 	@Override
-	public boolean satisfied(DAQ daq, Map<String, Output> results) {
+	public boolean satisfied(DAQ daq) {
 
-		double deadtime = getDeadtime(daq, results);
+		boolean beamActive = getOutputOf(LogicModuleRegistry.BeamActive).getResult();
+		double deadtime = getDeadtime(daq, beamActive);
 		if (deadtime > threshold){
 			contextHandler.registerForStatistics("DEADTIME", deadtime,"%",1);
 			return true;
@@ -51,9 +52,10 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 	}
 
 
-	private double getDeadtime(DAQ daq, Map<String, Output> results){
+	private double getDeadtime(DAQ daq, boolean beamActive){
+
 		try {
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+			if (beamActive) {
 				return daq.getTcdsGlobalInfo().getDeadTimesInstant()
 						.get("beamactive_total");
 
@@ -62,7 +64,7 @@ public class Deadtime extends ContextLogicModule implements Parameterizable {
 			}
 		} catch (NullPointerException e) {
 			logger.debug("Instantaneous deadtime value is not available. Using per lumi section.");
-			if (results.get(BeamActive.class.getSimpleName()).getResult()) {
+			if (beamActive) {
 				return daq.getTcdsGlobalInfo().getDeadTimes()
 						.get("beamactive_total");
 

@@ -4,6 +4,7 @@ import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.processing.OrderManager;
 import rcms.utilities.daqexpert.reasoning.base.LogicModule;
+import rcms.utilities.daqexpert.reasoning.base.ResultSupplier;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRate;
 
@@ -129,6 +130,8 @@ public enum LogicModuleRegistry {
 
     public static void init(){
 
+        ResultSupplier resultSupplier = new ResultSupplier();
+
         for (LogicModuleRegistry logicModuleRegistry : LogicModuleRegistry.values()) {
             if (logicModuleRegistry.getLogicModuleClassName() != null) {
                 Class<?> clazz = null;
@@ -137,6 +140,7 @@ public enum LogicModuleRegistry {
                     Constructor<?> ctor = clazz.getConstructor();
                     LogicModule object = (LogicModule) ctor.newInstance();
                     logicModuleRegistry.setLogicModule(object);
+                    object.setResultSupplier(resultSupplier);
                 } catch (ClassNotFoundException | NoSuchMethodException |InstantiationException|IllegalAccessException |InvocationTargetException e) {
                     e.printStackTrace();
                     throw new ExpertException(ExpertExceptionCode.ExpertProblem, "Could not initialize the LM "

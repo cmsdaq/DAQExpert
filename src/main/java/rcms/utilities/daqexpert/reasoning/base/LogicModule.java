@@ -54,6 +54,8 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 
 	protected LogicModuleRegistry logicModuleRegistry;
 
+	private ResultSupplier resultSupplier;
+
 	/**
 	 * Condition description
 	 */
@@ -172,6 +174,10 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 		declareAffected(logicModuleRegistry.getLogicModule());
 	}
 
+	public ResultSupplier getResultSupplier() {
+		return resultSupplier;
+	}
+
 	@Override
 	public Set<CausalityNode> getCausing() {
 		return causing;
@@ -216,5 +222,13 @@ public abstract class LogicModule implements Requiring, CausalityNode {
 
 	public void setBriefDescription(String briefDescription) {
 		this.briefDescription = briefDescription;
+	}
+
+	public void setResultSupplier(ResultSupplier resultSupplier) {
+		this.resultSupplier = resultSupplier;
+	}
+
+	public Output getOutputOf(LogicModuleRegistry logicModule){
+		return resultSupplier.get(this.getLogicModuleRegistry(), logicModule);
 	}
 }

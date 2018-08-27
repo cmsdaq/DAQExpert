@@ -3,10 +3,7 @@ package rcms.utilities.daqexpert.jobs;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,6 +17,11 @@ public class RecoveryRequestBuilder {
 
     private static final Logger logger = Logger.getLogger(RecoveryRequestBuilder.class);
 
+
+    public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, List<String> humanReadableSteps, String title, String problemDescription, Long problemId) {
+        return buildRecoveryRequest(rawSteps,humanReadableSteps,title,problemDescription,problemId, new HashSet<>());
+    }
+
     public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, String title, String problemDescription, Long problemId) {
         return buildRecoveryRequest(rawSteps, rawSteps, title, problemDescription, problemId);
     }
@@ -29,7 +31,7 @@ public class RecoveryRequestBuilder {
      *
      * @return recovery request
      */
-    public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, List<String> humanReadableSteps, String title, String problemDescription, Long problemId) {
+    public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, List<String> humanReadableSteps, String title, String problemDescription, Long problemId, Set<String> causingSubsystems) {
 
         if (rawSteps == null || rawSteps.size() == 0) {
             return null;
@@ -67,19 +69,23 @@ public class RecoveryRequestBuilder {
                     case RedRecycle:
                         subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
+                        subsystems.forEach(s -> recoveryStep.getFault().add(s));
                         add = true;
                         break;
                     case GreenRecycle:
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
+                        subsystems.forEach(s -> recoveryStep.getFault().add(s));
                         add = true;
                         break;
                     case RedAndGreenRecycle:
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
+                        subsystems.forEach(s -> recoveryStep.getFault().add(s));
                         add = true;
                         break;
                     case StopAndStartTheRun:
                         add = true;
+                        causingSubsystems.forEach(s->recoveryStep.getFault().add(s));
                         break;
                     default:
                         break;

@@ -40,6 +40,9 @@ public class RecoveryStep {
     @Transient
     Set<String> reset;
 
+
+    private Boolean issueTTCHardReset;
+
     @JsonIgnore
     String status;
 
@@ -119,6 +122,14 @@ public class RecoveryStep {
         this.humanReadable = humanReadable;
     }
 
+    public Boolean getIssueTTCHardReset() {
+        return issueTTCHardReset;
+    }
+
+    public void setIssueTTCHardReset(Boolean issueTTCHardReset) {
+        this.issueTTCHardReset = issueTTCHardReset;
+    }
+
     @Override
     public String toString() {
         return "RecoveryRequest{" +
@@ -126,6 +137,7 @@ public class RecoveryStep {
                 ", greenRecycle=" + greenRecycle +
                 ", fault=" + fault +
                 ", reset=" + reset +
+                ", issueTTCHardReset=" + issueTTCHardReset +
                 '}';
     }
 }

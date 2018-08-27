@@ -8,6 +8,8 @@ import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Manages the recovery job distribution to the controller given output from Logic Modules (set of conditions with
  * recovery suggestions)
@@ -37,6 +39,7 @@ public class RecoveryJobManager {
 
     public RecoveryJobManager(ExpertControllerClient expertControllerClient) {
         this.expertControllerClient = expertControllerClient;
+        this.dominatingSelector = new DominatingSelector();;
     }
 
 
@@ -188,7 +191,11 @@ public class RecoveryJobManager {
             twoConditions.add(currentlyDominating);
             twoConditions.add(currentlyRejecting);
 
-            Condition top = dominatingSelector.selectDominating(twoConditions);
+            logger.info("Comparing: " + twoConditions.stream().map(f->f.getId() + "("+f.getTitle()+")").collect(Collectors.toList()));
+
+            Condition top = dominatingSelector.selectDominating(twoConditions,true);
+
+            logger.info("Dominating selector chooses: " + top.getId() + "("+top.getTitle()+") as dominating");
 
             if(top.getId() == currentlyRejecting.getId()){
                 //TODO: two cases here: "postpone" and "ignore"

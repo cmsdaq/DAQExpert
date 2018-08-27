@@ -12,6 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
 
+import org.springframework.web.client.RestTemplate;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
@@ -76,8 +77,8 @@ public class ServletListener implements ServletContextListener {
 			DataManager dataManager = Application.get().getDataManager();
 
 			/* Notification manager client initialization */
-			HttpClient client = HttpClientBuilder.create().build();
-			EventSender eventSender = new EventSender(client, Application.get().getProp(Setting.NM_API_CREATE));
+			RestTemplate restTemplate = new RestTemplate();
+			EventSender eventSender = new EventSender(restTemplate, Application.get().getProp(Setting.NM_API_CREATE));
 
 			/* Clean startup verifier initialization */
 			PersistenceManager persistenceManager = Application.get().getPersistenceManager();

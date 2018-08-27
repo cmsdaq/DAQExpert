@@ -28,10 +28,10 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
         this.name = "Backpressure from Event Builder";
 
         this.description = "Backpressure from Event Building (i.e. not from HLT). " +
-                "Exists FEDBuilders with backpressure to FEDs {{PROBLEMATIC-FED}} ({{BACKPRESSURE}}) and 0 requests on RU, 256 fragments in RU. " +
+                "Exists FEDBuilders with backpressure to FEDs ({{P}}) and 0 requests on RU, 256 fragments in RU. " +
                 "EVM has few ({{EVM-REQUESTS}}, the threshold is <100) requests. All BUs are enabled.";
 
-        this.briefDescription = "Backpressure from EVB to FEDs ({{BACKPRESSURE}})";
+        this.briefDescription = "Backpressure from EVB to FEDs ({{P}})";
 
         this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
 
@@ -102,7 +102,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
                                     logger.debug("Found problematic FED: " + fed.getSrcIdExpected());
                                     contextHandler.register("PROBLEMATIC-FED", fed.getSrcIdExpected());
-                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure, "%", 1);
+                                    contextHandler.registerForStatistics("BACKPRESSURE", backpressure);
                                     problematicFeds.add(fed);
                                     foundProblematicFeds = true;
                                 }

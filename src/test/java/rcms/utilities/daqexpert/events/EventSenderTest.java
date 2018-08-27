@@ -16,14 +16,18 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.internal.configuration.injection.MockInjection;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 public class EventSenderTest {
 
 	@Test
 	public void connectionRefusedTest() {
 		List<ConditionEventResource> list = new ArrayList<>();
-		HttpClient client = HttpClientBuilder.create().build();
-		EventSender sut = new EventSender(client, "http://localhost:80/a/b/c");
+		RestTemplate restTemplate = new RestTemplate();
+		EventSender sut = new EventSender(restTemplate, "http://localhost:80/a/b/c");
 		list.add(generate());
 		int result = sut.sendEventsIndividually(list);
 		Assert.assertEquals("Cannot send", 0, result);
@@ -32,17 +36,15 @@ public class EventSenderTest {
 	@Test
 	public void successfulTest() throws ClientProtocolException, IOException {
 		// given:
-		HttpClient httpClient = mock(HttpClient.class);
-		HttpResponse httpResponse = mock(HttpResponse.class);
-		StatusLine statusLine = mock(StatusLine.class);
+		RestTemplate restTemplate = mock(RestTemplate.class);
+		ResponseEntity responseEntity = mock(ResponseEntity.class);
 
 		// and:
-		when(statusLine.getStatusCode()).thenReturn(201);
-		when(httpResponse.getStatusLine()).thenReturn(statusLine);
-		when(httpClient.execute(Mockito.any(HttpPost.class))).thenReturn(httpResponse);
+		when(responseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
+		when(restTemplate.postForEntity(Mockito.any(String.class), Mockito.any(), Mockito.any())).thenReturn(responseEntity);
 
 		List<ConditionEventResource> list = new ArrayList<>();
-		EventSender sut = new EventSender(httpClient, "http://localhost:80/a/b/c");
+		EventSender sut = new EventSender(restTemplate, "http://localhost:80/a/b/c");
 		list.add(generate());
 		int result = sut.sendEventsIndividually(list);
 		Assert.assertEquals("One sent", 1, result);
@@ -51,17 +53,15 @@ public class EventSenderTest {
 	@Test
 	public void wrongStatusReturned() throws ClientProtocolException, IOException {
 		// given:
-		HttpClient httpClient = mock(HttpClient.class);
-		HttpResponse httpResponse = mock(HttpResponse.class);
-		StatusLine statusLine = mock(StatusLine.class);
+		RestTemplate restTemplate = mock(RestTemplate.class);
+		ResponseEntity responseEntity = mock(ResponseEntity.class);
 
 		// and:
-		when(statusLine.getStatusCode()).thenReturn(200);
-		when(httpResponse.getStatusLine()).thenReturn(statusLine);
-		when(httpClient.execute(Mockito.any(HttpPost.class))).thenReturn(httpResponse);
+		when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+		when(restTemplate.postForEntity(Mockito.any(String.class), Mockito.any(), Mockito.any())).thenReturn(responseEntity);
 
 		List<ConditionEventResource> list = new ArrayList<>();
-		EventSender sut = new EventSender(httpClient, "http://localhost:80/a/b/c");
+		EventSender sut = new EventSender(restTemplate, "http://localhost:80/a/b/c");
 		list.add(generate());
 		int result = sut.sendEventsIndividually(list);
 		Assert.assertEquals("One sent", 0, result);

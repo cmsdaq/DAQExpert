@@ -67,4 +67,15 @@ public class RecoveryResponse {
     public void setContinuesTheConditionId(Long continuesTheConditionId) {
         this.continuesTheConditionId = continuesTheConditionId;
     }
+
+    @Override
+    public String toString() {
+        return "RecoveryResponse{" +
+                "status='" + status + '\'' +
+                ", recoveryId=" + recoveryId +
+                ", conditionId=" + conditionId +
+                ", rejectedDueToConditionId=" + rejectedDueToConditionId +
+                ", continuesTheConditionId=" + continuesTheConditionId +
+                '}';
+    }
 }

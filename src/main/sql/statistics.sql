@@ -1,8 +1,8 @@
 -- this script is to generate histograms of recovery times (reaction times or intervention times?)
 DECLARE
-    stat_from                       TIMESTAMP := TIMESTAMP '2018-04-26 00:00:00'; -- localtime
-    stat_to                         TIMESTAMP := TIMESTAMP '2018-07-05 19:00:00'; -- localtime
-    outside_of_stable_beams         BOOLEAN := TRUE;
+    stat_from                       TIMESTAMP := TIMESTAMP '2018-01-01 14:00:00'; -- localtime
+    stat_to                         TIMESTAMP := TIMESTAMP '2018-09-01 23:00:00'; -- localtime
+    outside_of_stable_beams         BOOLEAN := FALSE;
 
 
 
@@ -30,6 +30,7 @@ DECLARE
     auto_rec_available_entries      PLS_INTEGER := 0;
     automated_recovery_available    BOOLEAN := FALSE;
 
+
     recovery_used_entries           PLS_INTEGER := 0;
     recovery_used                   BOOLEAN := FALSE;
 
@@ -52,6 +53,10 @@ DECLARE
     stable_beams                    BOOLEAN := FALSE;
 
 
+    resync_or_hard_reset_entries    PLS_INTEGER := 0;
+    resync_or_hard_reset            BOOLEAN := FALSE;
+
+
     no_rate_before_entries          PLS_INTEGER := 0;
 
     -- this is probably subsequent step
@@ -64,6 +69,8 @@ DECLARE
 
 BEGIN
     dbms_output.put_line('Producing result for ' || TO_CHAR(stat_from, 'yyyy-mm-dd"T"hh24:mi:ss') || '-' || TO_CHAR(stat_to, 'yyyy-mm-dd"T"hh24:mi:ss'));
+
+    dbms_output.put_line('link; start; stable beams; identified; automated available; automated used; duration');
 
     FOR i IN (
         SELECT
@@ -119,6 +126,26 @@ BEGIN
             automated_recovery_available := FALSE;
             IF auto_rec_available_entries > 0
             THEN automated_recovery_available := TRUE;END IF;
+
+
+            --- check if specific type of recovery in first step
+            SELECT COUNT(*)
+            INTO resync_or_hard_reset_entries
+            FROM condition tc inner join action ta
+            on tc.id = ta.condition_id
+            WHERE
+                tc.start_date >= ( i.start_date )
+                AND tc.start_date <= ( i.end_date )
+
+                and (
+                    UPPER(ta.action) like '%HARDRESET%'
+                    or
+                    UPPER(ta.action) like '%TTCRESYNC%'
+                );
+
+            resync_or_hard_reset := FALSE;
+            IF resync_or_hard_reset_entries > 0
+            THEN resync_or_hard_reset := TRUE;END IF;
 
 
             -- check if recovery was used
@@ -187,6 +214,7 @@ BEGIN
                 ignored_entries.extend;
                 ignored_entries(ignored_entries_i) :=
                 'http://daq-expert.cms/DAQExpert/?start=' || TO_CHAR(i.start_date, 'yyyy-mm-dd"T"hh24:mi:ss') || '&'||'end=' || TO_CHAR(i.end_date, 'yyyy-mm-dd"T"hh24:mi:ss') || ' ; '
+                || TO_CHAR(i.start_date, 'yyyy-mm-dd"T"hh24:mi:ss') || ' ; '
                 || sys.diutil.bool_to_int(automated_recovery_available) || ' ; '
                 || sys.diutil.bool_to_int(recovery_used) || ' ; '
                 || i.duration || ' ; '
@@ -213,15 +241,20 @@ BEGIN
 
             END IF;
 
-            IF not ttchr_next AND not probably_subsequent and  no_rate_before_entries = 0 THEN
+
+            IF --not ttchr_next AND
+            not probably_subsequent and
+            no_rate_before_entries = 0 THEN
 
                 dbms_output.put_line(
                     'http://daq-expert.cms/DAQExpert/?start=' || TO_CHAR(i.start_date, 'yyyy-mm-dd"T"hh24:mi:ss') || '&'||'end=' || TO_CHAR(i.end_date, 'yyyy-mm-dd"T"hh24:mi:ss') || ' ; '
+                    || TO_CHAR(i.start_date, 'yyyy-mm-dd"T"hh24:mi:ss') || ' ; '
                     || sys.diutil.bool_to_int(stable_beams) || ' ; '
                     || sys.diutil.bool_to_int(not exist_unidentified) || ' ; '
                     || sys.diutil.bool_to_int(automated_recovery_available) || ' ; '
                     || sys.diutil.bool_to_int(recovery_used) || ' ; '
                     || i.duration
+                    || ' ; ' || sys.diutil.bool_to_int(resync_or_hard_reset)
                     --|| ' ; '|| sys.diutil.bool_to_int(probably_subsequent) || ' ; '
                     --|| sys.diutil.bool_to_int(ttchr_next) || ' ; '
 

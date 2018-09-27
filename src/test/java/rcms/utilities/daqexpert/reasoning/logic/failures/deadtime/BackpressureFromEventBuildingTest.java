@@ -4,8 +4,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.*;
 import rcms.utilities.daqexpert.Setting;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.TestBase;
+import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -106,6 +110,17 @@ public class BackpressureFromEventBuildingTest {
     }
 
 
+    @Test
+    public void test02() throws URISyntaxException {
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        tester.runLogic("1534269198968.json.gz");
+        Assert.assertEquals(LogicModuleRegistry.BackpressureFromEventBuilding,tester.dominating.getLogicModule());
+
+    }
+
     private void fakeEvmBackpressure(DAQ daq, int fedNumber, String ruHostname, boolean fakeOnRu){
 
 
@@ -170,4 +185,5 @@ public class BackpressureFromEventBuildingTest {
             return false;
         }
     }
+
 }

@@ -3,18 +3,20 @@ package rcms.utilities.daqexpert.events;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 
@@ -30,12 +32,13 @@ public class EventSender {
 	private final ObjectMapper objectMapper;
 
 	private final String address;
-	private final HttpClient client;
 
-	public EventSender(HttpClient httpClient, String address) {
+	RestTemplate restTemplate;
 
-		client = httpClient;
+	public EventSender( RestTemplate restTemplate, String address) {
+
 		this.address = address;
+		this.restTemplate = restTemplate;
 		objectMapper = new ObjectMapper();
 		objectMapper.configure(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -47,9 +50,14 @@ public class EventSender {
 			logger.debug("Sending: " + event.getConditionId() + " " + event.getEventType() + " :   " + event.getTitle());
 		}
 		try {
-			sendEvents(events);
-			return events.size();
+			boolean successful = sendEvents(events);
+			if(successful){
+				return events.size();
+			} else {
+				return 0;
+			}
 		} catch (ExpertException e) {
+			logger.warn("Problem sending events to NM: " + e.getMessage());
 			return 0;
 		}
 	}
@@ -62,8 +70,11 @@ public class EventSender {
 		for (ConditionEventResource event : events) {
 
 			try {
-				sendEvent(event);
-				success++;
+				boolean successful = sendEvents(Stream.of(event).collect(Collectors.toList()));
+				if(successful)
+					success++;
+				else
+					failed++;
 			} catch (ExpertException e) {
 				failed++;
 				exceptionSample = e.getMessage();
@@ -78,66 +89,30 @@ public class EventSender {
 		return success;
 	}
 
-	private void sendEvents(List<ConditionEventResource> events) {
+	private boolean sendEvents(List<ConditionEventResource> events) {
+
 		try {
+			logger.info("Sending events: "  + events);
+			ResponseEntity<Void> response = restTemplate.postForEntity(address, events, Void.class);
 
-			String input = objectMapper.writeValueAsString(events);
+			if(response.getStatusCode() != HttpStatus.CREATED){
+				logger.warn("Problem sending events to NM");
+				return false;
+			}
+			return true;
 
-			logger.debug("Request: " + input);
-			sendJson(input);
-		} catch (JsonProcessingException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception converting event to json: " + e.getMessage());
-		} catch (UnsupportedEncodingException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception converting event to json, endcoding: " + e.getMessage());
-		} catch (ClientProtocolException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception sending event to NM, protocol: " + e.getMessage());
-		} catch (IOException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception sending event to NM, IO: " + e.getMessage());
+		}catch(RestClientException e){
+			try {
+				logger.error("Requests to " + address + " failed. Body: " + objectMapper.writeValueAsString(events));
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace();
+			}
+			logger.error(e);
+			e.printStackTrace();
+
+			return false;
 		}
 
-	}
-
-	private void sendEvent(ConditionEventResource event) {
-		try {
-
-			String input = objectMapper.writeValueAsString(event);
-
-			logger.debug("Request: " + input);
-			sendJson(input);
-		} catch (JsonProcessingException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception converting event to json: " + e.getMessage());
-		} catch (UnsupportedEncodingException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception converting event to json, endcoding: " + e.getMessage());
-		} catch (ClientProtocolException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception sending event to NM, protocol: " + e.getMessage());
-		} catch (IOException e) {
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception sending event to NM, IO: " + e.getMessage());
-		}
-
-	}
-
-	private void sendJson(String event) throws ClientProtocolException, IOException {
-		HttpPost post = new HttpPost(address);
-		post.addHeader("content-type", "application/json");
-
-		StringEntity entity = new StringEntity(event);
-		post.setEntity(entity);
-		HttpResponse response = client.execute(post);
-
-		if (response.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) {
-			logger.info(response);
-			throw new ExpertException(ExpertExceptionCode.ExpertProblem,
-					"Exception sending event to NM, status differend than 201: "
-							+ response.getStatusLine().getStatusCode());
-		}
 	}
 
 }

@@ -54,10 +54,11 @@ public class RecoveryRequestBuilder {
             recoveryStep.setGreenRecycle(new HashSet<>());
             recoveryStep.setReset(new HashSet<>());
             recoveryStep.setFault(new HashSet<>());
+            recoveryStep.setIssueTTCHardReset(false);
 
             recoveryStep.setStepIndex(stepsOfJobs.indexOf(jobs));
             recoveryStep.setHumanReadable(humanReadableSteps.get(recoveryStep.getStepIndex()));
-            boolean add = false;
+            boolean enableAutomaticRecoveryForStep = false;
 
             for (Pair<RecoveryJob, List<String>> job : jobs) {
 
@@ -70,29 +71,33 @@ public class RecoveryRequestBuilder {
                         subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getFault().add(s));
-                        add = true;
+                        enableAutomaticRecoveryForStep = true;
                         break;
                     case GreenRecycle:
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getFault().add(s));
-                        add = true;
+                        enableAutomaticRecoveryForStep = true;
                         break;
                     case RedAndGreenRecycle:
                         subsystems.forEach(s -> recoveryStep.getGreenRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getRedRecycle().add(s));
                         subsystems.forEach(s -> recoveryStep.getFault().add(s));
-                        add = true;
+                        enableAutomaticRecoveryForStep = true;
                         break;
                     case StopAndStartTheRun:
-                        add = true;
                         causingSubsystems.forEach(s->recoveryStep.getFault().add(s));
+                        enableAutomaticRecoveryForStep = true;
                         break;
+                    case TTCHardReset:
+                        recoveryStep.setIssueTTCHardReset(true);
+                        causingSubsystems.forEach(s->recoveryStep.getFault().add(s));
+                        enableAutomaticRecoveryForStep = true;
                     default:
                         break;
                 }
 
             }
-            if (add) {
+            if (enableAutomaticRecoveryForStep) {
                 recoveryRequest.getRecoverySteps().add(recoveryStep);
             }
         }

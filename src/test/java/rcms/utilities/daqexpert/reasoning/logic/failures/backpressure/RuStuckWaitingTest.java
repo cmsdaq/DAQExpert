@@ -89,7 +89,7 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 
 		ContextHandler.highlightMarkup = false;
 		System.out.println(ruStuckWaiting.getActionWithContext());
-		assertThat(ruStuckWaiting.getActionWithContext(), contains("Red recycle the HCAL","Contact HCAL on-call expert in the meantime"));
+		assertThat(ruStuckWaiting.getActionWithContext(), contains("Stop and start the run with Red & green recycle of subsystem HCAL","Contact HCAL on-call expert in the meantime"));
 	}
 
 
@@ -103,7 +103,7 @@ public class RuStuckWaitingTest extends FlowchartCaseTestBase {
 		assertEquals("RU ru-c2e12-14-01.cms is stuck waiting for FED 250. " +
 				"FED(s) belong(s) to partition TEC- in TRACKER subsystem. Minimum fragment count in FED-builder TEC-3b is 63556438 in TEC- partition and maximum is 63568796 in TEC- partition. " +
 				"This causes backpressure at FED 254 in the same FED-builder TEC-3b. Note that there is nothing wrong with backpressured FED 254.",ruStuckWaiting.getDescriptionWithContext());
-		assertThat(ruStuckWaiting.getActionWithContext(), contains("Red recycle the TRACKER","Contact TRACKER on-call expert in the meantime"));
+		assertThat(ruStuckWaiting.getActionWithContext(), contains("Stop and start the run with Red & green recycle of subsystem TRACKER","Contact TRACKER on-call expert in the meantime"));
 	}
 
 }

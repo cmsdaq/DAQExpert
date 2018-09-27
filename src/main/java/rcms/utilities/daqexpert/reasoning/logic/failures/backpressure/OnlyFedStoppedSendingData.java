@@ -22,8 +22,8 @@ public class OnlyFedStoppedSendingData extends BackpressureAnalyzer {
 
 		this.briefDescription = "FED {{PROBLEM-FED}} stopped sending data.";
 
-		this.action = new SimpleAction("Red recycle the {{PROBLEM-SUBSYSTEM}}",
-						"Contact {{PROBLEM-SUBSYSTEM}} on-call expert in the meantime");;
+		this.action = new SimpleAction("<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>>",
+						"Contact {{PROBLEM-SUBSYSTEM}} on-call expert in the meantime");
 
 	}
 

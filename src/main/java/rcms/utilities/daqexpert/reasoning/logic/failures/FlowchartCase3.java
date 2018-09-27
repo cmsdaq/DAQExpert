@@ -29,10 +29,10 @@ public class FlowchartCase3 extends KnownFailure {
 	public FlowchartCase3() {
 		this.name = "Partition problem";
 		this.description = "Partition {{PROBLEM-PARTITION}} in {{PROBLEM-SUBSYSTEM}} subsystem is in {{STATE}} TTS state. It's blocking triggers. The problem is caused by FED {{PROBLEM-FED}}";
-		ConditionalAction action = new ConditionalAction("Issue a TTCHardReset",
-				"If DAQ is still stuck after a few seconds, issue another TTCHardReset (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
+		ConditionalAction action = new ConditionalAction("<<TTCHardReset>>",
+				"If DAQ is still stuck after a few seconds: <<TTCHardReset>> (HardReset includes a Resync, so it may be used for both OOS and ERROR)",
 				"Problem fixed: Make an e-log entry",
-				"Problem not fixed: Try to recover: Stop the run. Red & Green recycle the subsystem {{PROBLEM-SUBSYSTEM}}. Start a new run. Try up to 2 times",
+				"Problem not fixed: Try to recover: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>>. Try up to 2 times",
 				"Problem still not fixed after recover: Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}})",
 				"Problem fixed after recover: Make an e-log entry. Call the DOC of {{PROBLEM-SUBSYSTEM}} (for the partition in {{STATE}}) to inform");
 

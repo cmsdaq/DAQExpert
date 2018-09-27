@@ -102,8 +102,14 @@ public class EventSender {
 			return true;
 
 		}catch(RestClientException e){
-			logger.error("Requests to " + address + " failed");
+			try {
+				logger.error("Requests to " + address + " failed. Body: " + objectMapper.writeValueAsString(events));
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace();
+			}
 			logger.error(e);
+			e.printStackTrace();
+
 			return false;
 		}
 

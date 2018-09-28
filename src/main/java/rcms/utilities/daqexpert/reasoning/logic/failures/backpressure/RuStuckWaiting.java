@@ -25,7 +25,7 @@ public class RuStuckWaiting extends BackpressureAnalyzer {
 				+ "Note that there is nothing wrong with backpressured FED {{AFFECTED-FED}}.";
 		this.briefDescription = "RU {{AFFECTED-RU}} is stuck waiting for FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
-		this.action = new SimpleAction("Red recycle the {{PROBLEM-SUBSYSTEM}}",
+		this.action = new SimpleAction("<<StopAndStartTheRun>> with <<RedRecycle::{{PROBLEM-SUBSYSTEM}}>>",
 				"Contact {{PROBLEM-SUBSYSTEM}} on-call expert in the meantime");
 
 	}

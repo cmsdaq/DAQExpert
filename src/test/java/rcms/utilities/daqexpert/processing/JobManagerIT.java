@@ -8,6 +8,7 @@ import org.junit.*;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.model.Delay;
 import org.mockserver.model.Header;
+import org.springframework.web.client.RestTemplate;
 import rcms.utilities.daqexpert.Application;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.Setting;
@@ -586,8 +587,8 @@ public class JobManagerIT {
             super(null,null);
         }
 
-        public EventSenderStub(HttpClient httpClient, String address) {
-            super(httpClient, address);
+        public EventSenderStub(RestTemplate restTemplate, String address) {
+            super(restTemplate, address);
         }
 
         @Override

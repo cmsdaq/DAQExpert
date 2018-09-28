@@ -16,14 +16,22 @@ public class DominatingSelector {
 
     private static Logger logger = Logger.getLogger(DominatingSelector.class);
 
-    public Condition selectDominating(Collection<Condition> conditions) {
+    public Condition selectDominating(Collection<Condition> conditions){
+        return selectDominating(conditions, false);
+    }
+
+    public Condition selectDominating(Collection<Condition> conditions, boolean includeFinished) {
 
         if(conditions.size() == 0){
             return null;
         }
 
-        // ignore conditions that has end date
-        Set<Condition> filtered = conditions.stream().filter(c->c.getEnd() == null).collect(Collectors.toSet());
+        Set<Condition> filtered = conditions.stream().collect(Collectors.toSet());
+
+        if(!includeFinished) {
+            // ignore conditions that has end date
+            filtered = conditions.stream().filter(c -> c.getEnd() == null).collect(Collectors.toSet());
+        }
 
         // ignore conditions that are not problematic
         filtered = filtered.stream().filter(c->c.isProblematic()).collect(Collectors.toSet());

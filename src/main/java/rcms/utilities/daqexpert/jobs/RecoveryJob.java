@@ -8,7 +8,7 @@ public enum RecoveryJob {
     //TODO: delete next step - same as R&G recycle
     RedRecycle("Red & green recycle"),
     GreenRecycle("Green recycle"),
-    TTCHardReset("Issue TTC hard reset");
+    TTCHardReset("Issue a TTC hard reset");
 
     RecoveryJob(String readable){
         this.readable = readable;

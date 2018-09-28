@@ -35,7 +35,8 @@ public class ExpertControllerClient {
         RestTemplate restTemplate = new RestTemplate();
 
         try {
-            logger.info("Sending recovery request: "  + recoveryRequest);
+            logger.info("Sending recovery request: " + recoveryRequest.getProblemId() + "("+recoveryRequest.getProblemTitle()+")");
+            logger.debug("Details: "  + recoveryRequest);
             RecoveryResponse recoveryResponse = restTemplate.postForObject(postJobUri, recoveryRequest, RecoveryResponse.class);
 
             logger.info("Recovery request id: " + recoveryResponse);

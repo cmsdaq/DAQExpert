@@ -3,6 +3,7 @@ package rcms.utilities.daqexpert.processing;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
+import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqexpert.DataManager;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
@@ -17,6 +18,8 @@ import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.processing.context.ContextEntry;
+import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.EntryState;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
@@ -24,8 +27,9 @@ import rcms.utilities.daqexpert.reasoning.processing.SnapshotProcessor;
 import rcms.utilities.daqexpert.websocket.ConditionDashboard;
 
 import java.io.File;
+import java.util.*;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -67,7 +71,7 @@ public class DataPrepareJob implements Runnable {
 	private static Condition lastDominating;
 
 	/** List of conditions that has been started - kept in order to generate finish signals for controller */
-	private static final List<Long> recoveryConditionIds = new ArrayList<>();
+	private static final List<Long> recoveryConditionIds = Collections.synchronizedList(new ArrayList());
 
 	public boolean isWaiting(){
 		return waiting;
@@ -100,6 +104,7 @@ public class DataPrepareJob implements Runnable {
 	@Override
 	public void run() {
 
+		logger.trace("Running main job");
 		try {
 			Pair<Long, List<File>> snapshots;
 
@@ -149,7 +154,12 @@ public class DataPrepareJob implements Runnable {
 
 
 						if(dominating != lastDominating){
-							handleController(result.getLeft(), dominating);
+							try {
+								handleController(result.getLeft(), dominating);
+							} catch(ExpertException e){
+								logger.error("Handling controller failed with: " + e.getMessage());
+								e.printStackTrace();
+							}
 						}
 
 						if (demoRun && conditionDashboard.getCurrentCondition() != null
@@ -161,6 +171,9 @@ public class DataPrepareJob implements Runnable {
 						logger.debug(conditionDashboard.toString());
 
 						if (eventRegister.getEvents().size() > 0) {
+
+							logger.trace("Sending " + eventRegister.getEvents().size() + " events to NM");
+
 							List<ConditionEventResource> eventsToSend = new ArrayList<>();
 							for (ConditionEvent conditionEvent : eventRegister.getEvents()) {
 								eventsToSend.add(conditionEvent.generateEventToSend());
@@ -168,6 +181,8 @@ public class DataPrepareJob implements Runnable {
 							int sent = eventSender.sendBatchEvents(eventsToSend);
 							logger.info(sent + " events successfully sent to NotificationManager");
 							eventRegister.getEvents().clear();
+
+							logger.trace("Event register cleaned");
 						}
 
 						lastDominating = dominating;
@@ -185,8 +200,10 @@ public class DataPrepareJob implements Runnable {
 			}
 
 		} catch (Exception e) {
+			logger.error("PROBLEM: " + e.getMessage());
 			throw new ExpertException(ExpertExceptionCode.ExpertProblem, e.getMessage());
 		}
+		logger.trace("Finished main job");
 
 	}
 
@@ -218,14 +235,36 @@ public class DataPrepareJob implements Runnable {
 
 			logger.info("Dominating problem has recovery steps: " + dominating.getActionSteps());
 			logger.info("Trying to delegate to controller");
+
 			ActionLogicModule actionDominating = (ActionLogicModule) dominating.getProducer();
+
+
+			Set<String> causingSubsystems = new HashSet<>();
+			if (dominating.getContext() != null) {
+				ContextEntry contextEntry = dominating.getContext().get("PROBLEM-SUBSYSTEM");
+				if (contextEntry != null) {
+					if (contextEntry instanceof ObjectContextEntry) {
+						Set set = ((ObjectContextEntry) contextEntry).getObjectSet();
+						for (Object object : set) {
+							if (object instanceof SubSystem) {
+								causingSubsystems.add(((SubSystem) object).getName());
+							} else if (object instanceof String) {
+								causingSubsystems.add((String) object);
+							}
+						}
+					}
+				}
+			}
+
+
 			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
 					actionDominating.getActionWithContextRawRecovery(),
 					actionDominating.getActionWithContext(),
 					actionDominating.getName(),
 					actionDominating.getDescriptionWithContext(),
-					dominating.getId());
+					dominating.getId(),
+					causingSubsystems);
 
 			if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
 				recoveryRequest.setCondition(dominating);

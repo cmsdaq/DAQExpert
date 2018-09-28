@@ -68,9 +68,12 @@ public class ForwardReaderJob implements ReaderJob {
 			// remember last explored snapshot timestamp
 			if (entry != null && entry.getLeft() != null && entry.getLeft() != 0) {
 				last = entry.getLeft();
+				logger.trace("Finished reading normally");
 				return entry;
+
 			} else {
 				List<File> emptyList = new ArrayList<>();
+				logger.trace("Finished reading empty");
 				return Pair.of(last, emptyList);
 			}
 		} catch (FileNotFoundException e) {

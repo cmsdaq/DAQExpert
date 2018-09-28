@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.jobs;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -182,6 +183,25 @@ public class RecoveryRequestBuilderTest {
         Assert.assertEquals(1, rr.getGreenRecycle().size());
         Iterator<String> it2 = rr.getGreenRecycle().iterator();
         Assert.assertEquals("ECAL",it2.next());
+
+        Assert.assertEquals(1, rr.getFault().size());
+        Iterator<String> it3 = rr.getFault().iterator();
+        Assert.assertEquals("ECAL",it3.next());
+
+    }
+
+    @Test
+    public void stopAndStartWithFault(){
+        RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+        List<String> steps = new ArrayList<String>(){{add("D <<StopAndStartTheRun>> to fix");}};
+        RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L, Sets.newHashSet("ECAL"));
+
+        Assert.assertEquals(1, recovery.getRecoverySteps().size());
+        RecoveryStep rr = recovery.getRecoverySteps().iterator().next();
+
+        Assert.assertEquals(1, rr.getFault().size());
+        Iterator<String> it = rr.getFault().iterator();
+        Assert.assertEquals("ECAL",it.next());
 
     }
 }

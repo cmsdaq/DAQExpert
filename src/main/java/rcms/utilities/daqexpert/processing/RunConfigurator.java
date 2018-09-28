@@ -31,6 +31,12 @@ public class RunConfigurator {
 			logger.info("Expert run try to find the date of last expert end");
 			startDate = persistenceManager.getLastFinish();
 
+
+			if(startDate == null){
+				startDate = new Date();
+				logger.info("There is no previous run of expert, starting processing from now: " + startDate.toString());
+			}
+
 		} else {
 			try {
 				startDate = DatatypeConverter.parseDateTime(startDateString).getTime();

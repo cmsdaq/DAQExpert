@@ -67,7 +67,7 @@ public class HltOutputBandwidthTooHighTest
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(false));
 		results.put(RunOngoing.class.getSimpleName(), new Output(true));
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.",hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which transfers to tier 0 will be delayed. This mode of operation may be normal for special runs or during heavy-ion data taking.",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
 	@Ignore // no longer using notes to indicate that other problem is active. Will now use causality graph (affected nodes will be displayed)
@@ -83,7 +83,7 @@ public class HltOutputBandwidthTooHighTest
 		results.put(StableBeams.class.getSimpleName(), new Output(true));
 		results.put(BackpressureFromHlt.class.getSimpleName(), new Output(true));
 		Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot,results));
-		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring. <strong>Note that there is also backpressure from HLT.</strong>",hltOutputBandwidthTooHigh.getDescriptionWithContext());
+		Assert.assertEquals("The HLT output bandwidth is <strong>4.7GB/s</strong> which is above the threshold of 4.5 GB/s at which transfers to tier 0 will be delayed. This mode of operation may be normal for special runs or during heavy-ion data taking.",hltOutputBandwidthTooHigh.getDescriptionWithContext());
 	}
 
 	/**

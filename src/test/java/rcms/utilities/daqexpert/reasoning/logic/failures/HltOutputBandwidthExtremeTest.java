@@ -54,7 +54,7 @@ public class HltOutputBandwidthExtremeTest {
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions. " +
-                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
+                "The merging will be delayed causing long latencies for time-critcal monitoring and express streams. DQM files may get truncated resulting in lower statistics.",
                 hltOutputBandwidthExtreme.getDescriptionWithContext());
     }
 
@@ -119,7 +119,7 @@ public class HltOutputBandwidthExtremeTest {
         Assert.assertEquals("The HLT output bandwidth is <strong>25.5GB/s</strong> " +
                 "which is above the expected maximum 6.0 GB/s. " +
                 "You should not continue running in these conditions. " +
-                "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ",
+                "The merging will be delayed causing long latencies for time-critcal monitoring and express streams. DQM files may get truncated resulting in lower statistics.",
                 hltOutputBandwidthExtreme.getDescriptionWithContext());
 
         Assert.assertTrue(hltOutputBandwidthTooHigh.satisfied(snapshot, results));

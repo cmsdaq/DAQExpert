@@ -235,7 +235,7 @@ public class JobManagerIT {
         expectedNotifications.add("Started: Too high HLT output bandwidth");
 
         Set<String> expectedConditionDescriptions = new HashSet<>();
-        expectedConditionDescriptions.add("The HLT output bandwidth is 4.6GB/s which is above the threshold of 4.5 GB/s at which delays to Rate Monitoring and Express streams can appear. DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.");
+        expectedConditionDescriptions.add("The HLT output bandwidth is 4.6GB/s which is above the threshold of 4.5 GB/s at which transfers to tier 0 will be delayed. This mode of operation may be normal for special runs or during heavy-ion data taking.");
 
         Set<RecoveryRequest> expectedRecoveryRequests = new HashSet<>();
         expectedRecoveryRequests.add(generateRecovery(0,null));

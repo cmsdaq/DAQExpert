@@ -20,7 +20,7 @@ public class HltOutputBandwidthExtreme extends HltOutputBandwidthExceeded {
         this.name = "Extreme HLT output bandwidth";
 
         this.briefDescription = "The HLT output bandwidth is extreme: {{BANDWIDTH}}";
-        this.action = new SimpleAction( "Talk to the trigger shifter and shift leader. Have them check the pre-scale column. ",
+        this.action = new SimpleAction( "Talk to the trigger shifter and shift leader. Have them check the pre-scale column.",
                 "Check the per-stream bandwidths in F3Mon. You may need to call the HLT DOC."
         );
     }
@@ -51,9 +51,7 @@ public class HltOutputBandwidthExtreme extends HltOutputBandwidthExceeded {
         // TODO: even if bandwidthThresholdInGbps is null we should not
         //       get a NullPointerException here
         try {
-            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. " +
-                    "You should not continue running in these conditions. " +
-                    "Otherwise you risk problems with the NFS mounts on the FUs which can take a long time to recover. ";
+            this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the expected maximum " + bandwidthThresholdInGbps + " GB/s. You should not continue running in these conditions. The merging will be delayed causing long latencies for time-critcal monitoring and express streams. DQM files may get truncated resulting in lower statistics.";
 
         } catch (NullPointerException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,

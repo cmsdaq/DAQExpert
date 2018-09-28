@@ -16,8 +16,7 @@ public class HltOutputBandwidthTooHigh extends HltOutputBandwidthExceeded {
         this.name = "Too high HLT output bandwidth";
 
         this.briefDescription = "The HLT output bandwidth is high: {{BANDWIDTH}}";
-        this.action = new SimpleAction("Talk to the trigger shifter and shift leader. " +
-                "Have them check the pre-scale column. You may need to call the HLT DOC.");
+        this.action = new SimpleAction("Talk to the trigger shifter and shift leader. Have them check the pre-scale column.");
     }
 
     @Override
@@ -29,8 +28,7 @@ public class HltOutputBandwidthTooHigh extends HltOutputBandwidthExceeded {
         //       get a NullPointerException here
         try {
             this.description = "The HLT output bandwidth is {{BANDWIDTH}} which is above the threshold of "
-                    + bandwidthThresholdInGbps + " GB/s at which delays to Rate Monitoring and Express streams can appear. " +
-                    "DQM files may get truncated resulting in lower statistics. This mode of operation may be normal for special runs if experts are monitoring.";
+                    + bandwidthThresholdInGbps + " GB/s at which transfers to tier 0 will be delayed. This mode of operation may be normal for special runs or during heavy-ion data taking.";
 
         } catch (NullPointerException e) {
             throw new ExpertException(ExpertExceptionCode.LogicModuleUpdateException,

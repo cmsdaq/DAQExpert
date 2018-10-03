@@ -32,6 +32,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>ConditionsAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.ConditionsAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ConditionsAPI</servlet-name>
+		<url-pattern>/conditions</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>RawAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.RawAPI</servlet-class>
 	</servlet>

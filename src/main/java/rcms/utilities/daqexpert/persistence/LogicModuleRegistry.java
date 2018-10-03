@@ -197,4 +197,13 @@ public enum LogicModuleRegistry {
     public void setLogicModule(LogicModule logicModule) {
         this.logicModule = logicModule;
     }
+
+    public static LogicModuleRegistry searchEnum(String name){
+        for(LogicModuleRegistry each: values()){
+            if(each.name().compareToIgnoreCase(name) == 0){
+                return each;
+            }
+        }
+        return null;
+    }
 }

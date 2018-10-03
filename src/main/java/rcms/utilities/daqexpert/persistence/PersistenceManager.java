@@ -6,7 +6,6 @@ import java.util.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,11 +19,11 @@ import org.hibernate.criterion.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hibernate.transform.Transformers;
-import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
+import rcms.utilities.daqexpert.servlets.ConditionDTO;
 
 /**
  * Unit managing persistence of analysis results and multiple resolutions of raw
@@ -223,6 +222,43 @@ public class PersistenceManager {
 
 		List<Condition> result = elementsCriteria.setProjection(projection)
 				.setResultTransformer(Transformers.aliasToBean(Condition.class)).list();
+
+		entityManager.close();
+
+		return result;
+	}
+
+	public List<ConditionDTO> getSpecificEntries(Date startDate, Date endDate, Collection values) {
+		// TODO: close session?
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+		// elementsCriteria.addOrder(Order.desc("start"));
+
+		// 1. Event finished
+		Conjunction eventFinishedRestrictions = Restrictions.conjunction();
+		eventFinishedRestrictions.add(Restrictions.le("start", endDate));
+		eventFinishedRestrictions.add(Restrictions.ge("end", startDate));
+		eventFinishedRestrictions.add(Restrictions.eq("mature", true));
+		eventFinishedRestrictions.add(Restrictions.in("logicModule", values));
+
+
+		elementsCriteria.add(eventFinishedRestrictions);
+
+		// Events not hidden
+		elementsCriteria.add(Restrictions.ne("group", ConditionGroup.HIDDEN));
+
+		ProjectionList projection = Projections.projectionList()
+				.add(Projections.property("id"),"id")
+				.add(Projections.property("title"), "title")
+				.add(Projections.property("start"),"start")
+				.add(Projections.property("end"),"end")
+				.add(Projections.property("logicModule"),"logicModule")
+				.add(Projections.property("duration"),"duration");
+
+		List<ConditionDTO> result = elementsCriteria.setProjection(projection)
+				.setResultTransformer(Transformers.aliasToBean(ConditionDTO.class)).list();
 
 		entityManager.close();
 

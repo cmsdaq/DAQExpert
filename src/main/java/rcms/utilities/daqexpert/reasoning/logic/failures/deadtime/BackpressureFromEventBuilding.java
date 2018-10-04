@@ -33,7 +33,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
         this.briefDescription = "Backpressure from EVB to FEDs ({{BACKPRESSURE}})";
 
-        this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
+        this.action = new SimpleAction("Pause/resume the run", "If not fixed, stop/start the run", "If still not fixed, red-recycle DAQ");
 
     }
 
@@ -95,7 +95,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         if (!fed.isFrlMasked()) {
 
                             // check only those
-                            if(backpressuredFeds.contains(fed)) {
+                            if(backpressuredFeds.stream().mapToInt(f->f.getSrcIdExpected()).anyMatch(e->e == fed.getSrcIdExpected())) {
 
                                 float backpressure = fed.getPercentBackpressure();
                                 if (backpressure > fedBackpressureThreshold) {

@@ -48,7 +48,13 @@ public class BackpressureFromEventBuildingTest {
         TestBase tester = new TestBase();
         Properties properties = tester.getDefaultProperties();
 
-        tester.runLogic("1534269198968.json.gz");
+        Map<String, Output> r = tester.runLogic("1534269198968.json.gz");
+
+        Assert.assertTrue(r.get("BackpressureFromEventBuilding").getResult());
+        Output output = r.get("BackpressureFromEventBuilding");
+
+        Assert.assertEquals("1386", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+
         Assert.assertEquals(LogicModuleRegistry.BackpressureFromEventBuilding,tester.dominating.getLogicModule());
 
     }
@@ -85,9 +91,7 @@ public class BackpressureFromEventBuildingTest {
 
         Map<String, Output> r2 = tester.runLogic(daq2, properties);
         r2.entrySet().stream().forEach(System.out::println);
-        Assert.assertTrue(r2.get("BackpressureFromEventBuilding").getResult());
-        Output output2 = r2.get("BackpressureFromEventBuilding");
-        Assert.assertEquals("1386", output2.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+        Assert.assertFalse(r2.get("BackpressureFromEventBuilding").getResult()); // Here the requests on RU are non-0, 2
 
     }
 

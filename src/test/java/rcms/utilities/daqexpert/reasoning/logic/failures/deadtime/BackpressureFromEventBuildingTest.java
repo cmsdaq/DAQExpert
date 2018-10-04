@@ -36,7 +36,62 @@ public class BackpressureFromEventBuildingTest {
 
         Assert.assertEquals("1386", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
 
+
         //Assert.assertEquals("", tester.dominating);
+
+    }
+
+
+    @Test
+    public void test02() throws URISyntaxException {
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        Map<String, Output> r = tester.runLogic("1534269198968.json.gz");
+
+        Assert.assertTrue(r.get("BackpressureFromEventBuilding").getResult());
+        Output output = r.get("BackpressureFromEventBuilding");
+
+        Assert.assertEquals("1386", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+
+        Assert.assertEquals(LogicModuleRegistry.BackpressureFromEventBuilding,tester.dominating.getLogicModule());
+
+    }
+
+    /*
+    1538577612360 2018-10-03T16:40:12+02:00
+    1538577699073 2018-10-03T16:41:39+02:00
+    1538577956916 2018-10-03T16:45:56+02:00
+    1538578074626 2018-10-03T16:47:54+02:00
+     */
+    @Test
+    public void testDyniarCase() throws URISyntaxException {
+
+
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        final DAQ daq0 = tester.getSnapshot("1538577940601.json.gz"); // 2018-10-03T16:45:40+02:00
+        final DAQ daq1 = tester.getSnapshot("1538577917939.json.gz"); // 2018-10-03T16:45:17+02:00
+        final DAQ daq2 = tester.getSnapshot("1538577962206.json.gz"); // 2018-10-03T16:46:02+02:00
+
+
+        Map<String, Output> r0 = tester.runLogic(daq0, properties);
+        r0.entrySet().stream().forEach(System.out::println);
+        Assert.assertThat(r0.keySet(), hasItem(is("BackpressureFromEventBuilding")));
+
+        Map<String, Output> r1 = tester.runLogic(daq1, properties);
+        r1.entrySet().stream().forEach(System.out::println);
+        Assert.assertThat(r1.keySet(), hasItem(is("BackpressureFromEventBuilding")));
+        Output output = r1.get("BackpressureFromEventBuilding");
+        Assert.assertEquals("1386", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+
+
+        Map<String, Output> r2 = tester.runLogic(daq2, properties);
+        r2.entrySet().stream().forEach(System.out::println);
+        Assert.assertFalse(r2.get("BackpressureFromEventBuilding").getResult()); // Here the requests on RU are non-0, 2
 
     }
 
@@ -110,16 +165,6 @@ public class BackpressureFromEventBuildingTest {
     }
 
 
-    @Test
-    public void test02() throws URISyntaxException {
-
-        TestBase tester = new TestBase();
-        Properties properties = tester.getDefaultProperties();
-
-        tester.runLogic("1534269198968.json.gz");
-        Assert.assertEquals(LogicModuleRegistry.BackpressureFromEventBuilding,tester.dominating.getLogicModule());
-
-    }
 
     private void fakeEvmBackpressure(DAQ daq, int fedNumber, String ruHostname, boolean fakeOnRu){
 

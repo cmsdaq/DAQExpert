@@ -40,6 +40,21 @@ public class BackpressureFromEventBuildingTest {
 
     }
 
+    @Test
+    public void testDyniarCase() throws URISyntaxException {
+
+
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        final DAQ daq1 = tester.getSnapshot("1538577917939.json.gz");
+
+
+        Map<String, Output> r = tester.runLogic(daq1, properties);
+        r.entrySet().stream().forEach(System.out::println);
+    }
+
 
 
     @Test

@@ -33,7 +33,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
 
         this.briefDescription = "Backpressure from EVB to FEDs ({{BACKPRESSURE}})";
 
-        this.action = new SimpleAction("Call the DAQ on-call mentioning that we have backpressure from the event building.");
+        this.action = new SimpleAction("Pause/resume the run", "If not fixed, stop/start the run", "If still not fixed, red-recycle DAQ");
 
     }
 

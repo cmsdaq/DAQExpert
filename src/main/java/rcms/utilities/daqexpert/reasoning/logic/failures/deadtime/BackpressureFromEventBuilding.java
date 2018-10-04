@@ -95,7 +95,7 @@ public class BackpressureFromEventBuilding extends KnownFailure implements Param
                         if (!fed.isFrlMasked()) {
 
                             // check only those
-                            if(backpressuredFeds.contains(fed)) {
+                            if(backpressuredFeds.stream().mapToInt(f->f.getSrcIdExpected()).anyMatch(e->e == fed.getSrcIdExpected())) {
 
                                 float backpressure = fed.getPercentBackpressure();
                                 if (backpressure > fedBackpressureThreshold) {

@@ -7,6 +7,11 @@ import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.TestBase;
 
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
@@ -21,6 +26,10 @@ public class LinkProblemTest {
 
         final DAQ daq1 = tester.getSnapshot("1538866072902.json.gz");
 
+        LocalDateTime localDateTime =
+                Instant.ofEpochMilli(daq1.getLastUpdate()).atZone(ZoneId.of("Europe/Zurich")).toLocalDateTime();
+
+
         Map<String, Output> r = tester.runLogic(daq1, properties);
 
         Output output = r.get("LinkProblem");
@@ -34,8 +43,16 @@ public class LinkProblemTest {
         Assert.assertEquals("UNKNOWN@FMM, UNKNOWN@APV, BUSY@PM", output.getContext().getTextRepresentation("AFFECTED-TTCP-STATE"));
 
 
+        // This problem happened outside of working hours (2018-10-07T00:47:52.902)
+        System.out.println(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        Assert.assertEquals(Arrays.asList("Red recycle the DAQ"),tester.dominating.getActionSteps());
 
-        //Assert.assertEquals("", tester.dominating);
+        // Recovery suggestion would be different if it happened inside extended working hours:
+        daq1.setLastUpdate(1538897072902L);
+        System.out.println(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        Map<String, Output> r2 = tester.runLogic(daq1, properties);
+        Assert.assertEquals(Arrays.asList("Call DAQ on-call and ask him to dump FEROL / FEROL40 registers"),tester.dominating.getActionSteps());
+
 
     }
 

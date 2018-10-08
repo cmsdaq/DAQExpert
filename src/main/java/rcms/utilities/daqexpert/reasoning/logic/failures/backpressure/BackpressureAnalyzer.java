@@ -173,8 +173,8 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 		TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
 
 		String combinedTtsState = "";
-		combinedTtsState += ttsState != null ? ttsState + "@FMM" : "";
-		combinedTtsState += ttsStateAtAPV != null ? ttsStateAtAPV + "@APV" : "";
+		combinedTtsState += ttsState != null ? ttsState + "@FMM, " : "";
+		combinedTtsState += ttsStateAtAPV != null ? ttsStateAtAPV + "@APV, " : "";
 		combinedTtsState += ttsStateAtPM != null ? ttsStateAtPM + "@PM" : "";
 
 		contextHandler.registerObject("AFFECTED-PARTITION", ttcp, p->p.getName());

@@ -47,12 +47,6 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
 				"Problem not fixed: Call the DOC of ECAL");
 
-		/* pixel specific case */
-		action.addContextSteps("PIXEL", "Try Pause and Resume",
-				"Problem not fixed: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
-				"Problem still not fixed: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
-				"Make an e-log entry");
-
 		/* FED=1111 */
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",

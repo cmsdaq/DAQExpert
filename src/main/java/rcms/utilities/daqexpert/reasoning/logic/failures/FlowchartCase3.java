@@ -44,6 +44,12 @@ public class FlowchartCase3 extends KnownFailure {
 				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::ES>>",
 				"Do not call the ES DOC");
 
+		/* pixel specific case */
+		action.addContextSteps("PIXEL-OOS", "Try Pause and Resume",
+							   "Problem not fixed: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
+							   "Problem still not fixed: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
+							   "Make an e-log entry");
+
 		this.action = action;
 
 	}
@@ -88,6 +94,8 @@ public class FlowchartCase3 extends KnownFailure {
 
 							if(isLhcClockAndUnstable){
 								contextHandler.setActionKey(subSystem.getName() + "-LHC-UNSTABLE");
+							} else if("PIXEL".equalsIgnoreCase(subSystem.getName()) && currentState == TTSState.OUT_OF_SYNC){
+								contextHandler.setActionKey("PIXEL-OOS");
 							} else{
 								contextHandler.setActionKey(subSystem.getName());
 							}

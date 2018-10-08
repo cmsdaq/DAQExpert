@@ -75,8 +75,6 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
     @Test
     public void test() throws URISyntaxException {
 
-        Assert.fail("Get feedback from Remi what should be the output for this case");
-
         TestBase tester = new TestBase();
         Properties properties = tester.getDefaultProperties();
 
@@ -87,9 +85,7 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         Output output = r.get("BackpressureFromHlt");
 
         Assert.assertNotNull(output);
-        Assert.assertTrue(output.getResult());
-
-        Assert.assertEquals("[1118-1123, 1386, 1404]", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+        Assert.assertFalse(output.getResult());
 
     }
 }

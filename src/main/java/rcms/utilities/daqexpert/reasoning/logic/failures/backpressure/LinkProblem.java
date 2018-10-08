@@ -19,7 +19,7 @@ public class LinkProblem extends BackpressureAnalyzer {
 
 		this.description = "Link problem detected. "
 				+ "RU {{AFFECTED-RU}} is waiting for backpressured FED {{AFFECTED-FED}}. "
-				+ "FED belongs to TTCP {{AFFECTED-TTCP}} in {{AFFECTED-SUBSYSTEM}} subsystem. "
+				+ "FED belongs to TTCP {{AFFECTED-PARTITION}} in {{AFFECTED-SUBSYSTEM}} subsystem. "
 				+ "FED is in {{AFFECTED-TTCP-STATE}} and stopped sending data.";
 
 		this.briefDescription = "Link problem detected on RU {{AFFECTED-RU}}";

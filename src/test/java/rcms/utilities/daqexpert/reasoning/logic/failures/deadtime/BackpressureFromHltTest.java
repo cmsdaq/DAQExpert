@@ -9,8 +9,12 @@ import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.logic.failures.TestBase;
 
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -66,5 +70,26 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         BackpressureFromHlt module = new BackpressureFromHlt();
         module.parametrize(properties);
         Assert.assertFalse(module.satisfied(snapshot, r));
+    }
+
+    @Test
+    public void test() throws URISyntaxException {
+
+        Assert.fail("Get feedback from Remi what should be the output for this case");
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        final DAQ daq1 = tester.getSnapshot("1538866289766.json.gz");
+
+        Map<String, Output> r = tester.runLogic(daq1, properties);
+
+        Output output = r.get("BackpressureFromHlt");
+
+        Assert.assertNotNull(output);
+        Assert.assertTrue(output.getResult());
+
+        Assert.assertEquals("[1118-1123, 1386, 1404]", output.getContext().getTextRepresentation("PROBLEMATIC-FED"));
+
     }
 }

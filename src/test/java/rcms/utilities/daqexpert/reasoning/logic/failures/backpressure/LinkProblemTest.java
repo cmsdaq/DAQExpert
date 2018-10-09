@@ -40,18 +40,16 @@ public class LinkProblemTest {
         Assert.assertEquals("BPIXP", output.getContext().getTextRepresentation("AFFECTED-PARTITION"));
         Assert.assertEquals("PIXEL", output.getContext().getTextRepresentation("AFFECTED-SUBSYSTEM"));
 
-        Assert.assertEquals("UNKNOWN@FMM, UNKNOWN@APV, BUSY@PM", output.getContext().getTextRepresentation("AFFECTED-TTCP-STATE"));
+        Assert.assertEquals("UNKNOWN@FMM, UNKNOWN@APV, BUSY@PM", output.getContext().getTextRepresentation
+                ("AFFECTED-TTCP-STATE"));
 
 
         // This problem happened outside of working hours (2018-10-07T00:47:52.902)
         System.out.println(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        Assert.assertEquals(Arrays.asList("Red recycle the DAQ"),tester.dominating.getActionSteps());
-
-        // Recovery suggestion would be different if it happened inside extended working hours:
-        daq1.setLastUpdate(1538897072902L);
-        System.out.println(localDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
-        Map<String, Output> r2 = tester.runLogic(daq1, properties);
-        Assert.assertEquals(Arrays.asList("Call DAQ on-call and ask him to dump FEROL / FEROL40 registers"),tester.dominating.getActionSteps());
+        Assert.assertEquals(Arrays.asList("Red recycle the DAQ (if in stable beams or outside extended working hours)." +
+                                                  " Call DAQ on-call and ask him to dump FEROL / FEROL40 registers  " +
+                                                  "during extended working hours and outside stable beams."
+        ), tester.dominating.getActionSteps());
 
 
     }

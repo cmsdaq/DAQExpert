@@ -3,14 +3,19 @@ package rcms.utilities.daqexpert.reasoning.logic.failures.deadtime;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.basic.*;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
+import rcms.utilities.daqexpert.reasoning.logic.failures.TestBase;
 
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -66,5 +71,23 @@ public class BackpressureFromHltTest extends FlowchartCaseTestBase {
         BackpressureFromHlt module = new BackpressureFromHlt();
         module.parametrize(properties);
         Assert.assertFalse(module.satisfied(snapshot, r));
+    }
+
+    @Test
+    @Ignore // TODO: fix this problem in next hotfix
+    public void test() throws URISyntaxException {
+
+        TestBase tester = new TestBase();
+        Properties properties = tester.getDefaultProperties();
+
+        final DAQ daq1 = tester.getSnapshot("1538866289766.json.gz");
+
+        Map<String, Output> r = tester.runLogic(daq1, properties);
+
+        Output output = r.get("BackpressureFromHlt");
+
+        Assert.assertNotNull(output);
+        Assert.assertFalse(output.getResult());
+
     }
 }

@@ -185,6 +185,10 @@ public class FlowchartCaseTestBase {
 	 */
 	protected void assertEqualsAndUpdateResults(boolean expected, SimpleLogicModule logicModule, DAQ snapshot) {
 		boolean result = logicModule.satisfied(snapshot, results);
+		if(result && logicModule instanceof ContextLogicModule && logicModule instanceof HavingSpecialInstructions){
+			String key = ((HavingSpecialInstructions) logicModule).selectSpecialInstructionKey(snapshot,results);
+			((ContextLogicModule) logicModule).getContextHandler().setActionKey(key);
+		}
 		if (result != expected) {
 			String output = "";
 			if (logicModule instanceof ContextLogicModule) {

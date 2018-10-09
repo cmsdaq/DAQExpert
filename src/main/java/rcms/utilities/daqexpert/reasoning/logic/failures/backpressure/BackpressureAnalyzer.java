@@ -173,8 +173,8 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 		TTSState currentFedState = TTSState.getByCode(fed.getTtsState());
 
 		String combinedTtsState = "";
-		combinedTtsState += ttsState != null ? ttsState + "@FMM" : "";
-		combinedTtsState += ttsStateAtAPV != null ? ttsStateAtAPV + "@APV" : "";
+		combinedTtsState += ttsState != null ? ttsState + "@FMM, " : "";
+		combinedTtsState += ttsStateAtAPV != null ? ttsStateAtAPV + "@APV, " : "";
 		combinedTtsState += ttsStateAtPM != null ? ttsStateAtPM + "@PM" : "";
 
 		contextHandler.registerObject("AFFECTED-PARTITION", ttcp, p->p.getName());
@@ -472,7 +472,6 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 					contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
 					contextHandler.registerObject("PROBLEM-PARTITION", fed.getTtcp(), p->p.getName());
 					contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
-					contextHandler.setActionKey(fed.getTtcp().getSubsystem().getName());
 					result = true;
 				}
 			}
@@ -508,14 +507,6 @@ public abstract class BackpressureAnalyzer extends KnownFailure {
 				contextHandler.registerObject("PROBLEM-PARTITION", fed.getTtcp(), p->p.getName());
 				contextHandler.registerObject("PROBLEM-SUBSYSTEM", fed.getTtcp().getSubsystem(), s->s.getName());
 				contextHandler.registerObject("PROBLEM-FED", fed, f->Integer.toString(f.getSrcIdExpected()));
-				if (fed.getSrcIdExpected() == 1111 || fed.getSrcIdExpected() == 1109) {
-					// exists specific instructions for some fedsD
-					contextHandler.setActionKey("FED1111or1109");
-				} else if (fed.getSrcIdExpected() == 1467) {
-					contextHandler.setActionKey("GEM-1467");
-				} else {
-					contextHandler.setActionKey(fed.getTtcp().getSubsystem().getName());
-				}
 			}
 			return Subcase.OutOfSequenceDataReceived;
 		}

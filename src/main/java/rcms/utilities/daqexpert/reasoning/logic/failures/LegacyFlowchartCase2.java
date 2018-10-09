@@ -13,6 +13,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
 
 /**
@@ -44,6 +45,12 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 				"Problem fixed: Make an e-log entry. If this happen during physics data taking call the DOC of ECAL (subsystem that sent corrupted data) to inform about the problem",
 				"Problem not fixed: Call the DOC of ECAL (subsystem that sent corrupted data)\n");
 
+		/* GEM in collisions */
+		action.addContextSteps("GEM-collisions", "Stop the run",
+							   "Select the keepAlive option for GEM in the FED panel",
+							   "Put GEM in local", "Start a new run without GEM",
+							   "Call the GEM DOC. - This way the GEM DOC will take debug information");
+
 
 		this.action = action;
 
@@ -52,6 +59,7 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		require(LogicModuleRegistry.StableBeams);
 		require(LogicModuleRegistry.CorruptedData);
 		declareAffected(LogicModuleRegistry.FlowchartCase5);
 	}
@@ -68,6 +76,8 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 		if(results.get(CorruptedData.class.getSimpleName()).getResult())
 			return false;
 
+
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
 		assignPriority(results);
 
 		String l0state = daq.getLevelZeroState();
@@ -109,7 +119,17 @@ public class LegacyFlowchartCase2 extends KnownFailure {
 							contextHandler.register("PROBLEM-FED", fed.getSrcIdExpected());
 							contextHandler.register("PROBLEM-PARTITION", ttcpName);
 							contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
-							contextHandler.setActionKey(subsystemName);
+
+							if("GEM".equalsIgnoreCase(subsystemName)){
+								if(stableBeams){
+									contextHandler.setActionKey("GEM-collisions");
+								} else{
+									contextHandler.setActionKey("GEM");
+								}
+							} else{
+								contextHandler.setActionKey(subsystemName);
+							}
+
 							i++;
 
 							result = true;

@@ -12,6 +12,7 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
 /**
@@ -23,7 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSeque
  * @author holzner
  *
  */
-public class LegacyFlowchartCase1 extends KnownFailure {
+public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialInstructions {
 
 	/**
 	 * regex for getting ttc partition and FED source id which caused the sync
@@ -78,6 +79,13 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 				"Call the GEM DOC"
 		);
 
+		/* GEM in collisions */
+		action.addContextSteps("GEM-collisions", "Stop the run",
+							   "Select the keepAlive option for GEM in the FED panel",
+							   "Put GEM in local", "Start a new run without GEM",
+							   "Call the GEM DOC. - This way the GEM DOC will take debug information");
+
+
 		this.action = action;
 	}
 
@@ -85,6 +93,7 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
 		require(LogicModuleRegistry.OutOfSequenceData);
+		require(LogicModuleRegistry.StableBeams);
 		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
@@ -193,13 +202,6 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 						contextHandler.register("PROBLEM-PARTITION", ttcpName);
 						contextHandler.register("PROBLEM-SUBSYSTEM", subsystemName);
 
-						if (problematicFED.getSrcIdExpected() == 1111 || problematicFED.getSrcIdExpected() == 1109) {
-							contextHandler.setActionKey("FED1111or1109");
-						} else if (problematicFED.getSrcIdExpected() == 1467) {
-							contextHandler.setActionKey("GEM-1467");
-						} else {
-							contextHandler.setActionKey(subsystemName);
-						}
 					} else {
 						setContextValues("(FED not found)");
 					}
@@ -216,6 +218,36 @@ public class LegacyFlowchartCase1 extends KnownFailure {
 
 			return true;
 		}
+	}
+
+	@Override
+	public String selectSpecialInstructionKey(DAQ daq, Map<String, Output> results) {
+
+
+		String problemFED = contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation();
+		String problemSubsystem = contextHandler.getContextEntry("PROBLEM-SUBSYSTEM").getTextRepresentation();
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+
+		if(problemSubsystem!=null) {
+			switch (problemSubsystem) {
+
+				case "HCAL":
+					if ("1111".equalsIgnoreCase(problemFED) || "1109".equalsIgnoreCase(problemFED)) {
+						return "FED1111or1109";
+					}
+					break;
+				case "GEM":
+					if (stableBeams) {
+						return "GEM-collisions";
+					}
+					if ( "1467".equalsIgnoreCase(problemFED)){
+						return "GEM-1467";
+					}
+					break;
+			}
+			return problemSubsystem;
+		}
+		return null;
 	}
 
 }

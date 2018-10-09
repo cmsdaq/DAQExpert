@@ -1,9 +1,5 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.SubSystem;
@@ -13,8 +9,12 @@ import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.enums.TTSState;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
-import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.CorruptedData;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
 import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetriever;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Logic module identifying 5 flowchart case.
@@ -24,7 +24,7 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.helper.FEDHierarchyRetr
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase5 extends KnownFailure {
+public class FlowchartCase5 extends KnownFailure implements HavingSpecialInstructions {
 
 	public FlowchartCase5() {
 		this.name = "FED stuck";
@@ -50,6 +50,12 @@ public class FlowchartCase5 extends KnownFailure {
 				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",
 				"Problem still not fixed: Call the DOC for the TRACKER");
 
+		/* GEM in collisions */
+		action.addContextSteps("GEM-collisions", "Stop the run",
+							   "Select the keepAlive option for GEM in the FED panel",
+							   "Put GEM in local", "Start a new run without GEM",
+							   "Call the GEM DOC. - This way the GEM DOC will take debug information");
+
 		/* gem 1467 specific case */
 		action.addContextSteps("GEM-1467-BUSY", "<<StopAndStartTheRun>> with <<GreenRecycle::GEM>> (try up to 3 times)",
 				"Whether the above helped or not, call the GEM DOC and write an ELOG about the actions taken and the results obtained");
@@ -61,6 +67,7 @@ public class FlowchartCase5 extends KnownFailure {
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		require(LogicModuleRegistry.StableBeams);
 
 		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 
@@ -86,6 +93,7 @@ public class FlowchartCase5 extends KnownFailure {
 		assignPriority(results);
 
 		boolean result = false;
+
 
 		String daqstate = daq.getDaqState();
 
@@ -141,13 +149,6 @@ public class FlowchartCase5 extends KnownFailure {
 										contextHandler.register("TTCPSTATE", currentState.name());
 										contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 
-										if("GEM".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-SUBSYSTEM").getTextRepresentation())
-												&& "1467".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation())
-												&& "BUSY".equalsIgnoreCase(contextHandler.getContextEntry("FEDSTATE").getTextRepresentation())){
-											contextHandler.setActionKey("GEM-1467-BUSY");
-										} else {
-											contextHandler.setActionKey(subSystem.getName());
-										}
 									}
 								}
 							}
@@ -166,4 +167,33 @@ public class FlowchartCase5 extends KnownFailure {
 		return result;
 	}
 
+    @Override
+    public String selectSpecialInstructionKey(DAQ daq, Map<String, Output> results) {
+
+
+        boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+
+        String problematicSubsystemRegistered = contextHandler.getContextEntry("PROBLEM-SUBSYSTEM")
+                .getTextRepresentation();
+
+
+        if(problematicSubsystemRegistered != null) {
+            switch (problematicSubsystemRegistered) {
+                case "GEM":
+                    if (stableBeams) {
+                        return "GEM-collisions";
+                    }
+                    if ("1467".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation())
+                            && "BUSY".equalsIgnoreCase(contextHandler.getContextEntry("FEDSTATE").getTextRepresentation()
+
+                    )) {
+                        return "GEM-1467-BUSY";
+                    }
+                    break;
+
+            }
+            return problematicSubsystemRegistered;
+        }
+        return null;
+    }
 }

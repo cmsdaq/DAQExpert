@@ -1,6 +1,7 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -12,7 +13,10 @@ import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.jobs.RecoveryStep;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
+import rcms.utilities.daqexpert.reasoning.base.Output;
 
 /**
  *
@@ -196,25 +200,32 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void specialInstructionForGemFed() throws URISyntaxException {
-		DAQ snapshot = getSnapshot("1531120902204.json.gz");
 
-		assertOnlyOneIsSatisified(fc5, snapshot);
-		ContextHandler context = fc5.getContextHandler();
-		assertEquals(new HashSet(Arrays.asList("GEM")), context.getContext().get("PROBLEM-SUBSYSTEM"));
-		assertEquals(new HashSet(Arrays.asList("GEMPILOT1")), context.getContext().get("PROBLEM-PARTITION"));
-		assertEquals(new HashSet(Arrays.asList(1467)), context.getContext().get("PROBLEM-FED"));
+		TestBase testBase = new TestBase();
+		DAQ daq = testBase.getSnapshot("1531120902204.json.gz");
+		System.out.println(daq.getLhcBeamMode());
+		testBase.runLogic(daq);
+
+		Output output = testBase.result.get("FlowchartCase5");
+		assertTrue(output.getResult());
+
+		assertEquals(new HashSet(Arrays.asList("GEM")), output.getContext().get("PROBLEM-SUBSYSTEM"));
+		assertEquals(new HashSet(Arrays.asList("GEMPILOT1")), output.getContext().get("PROBLEM-PARTITION"));
+		assertEquals(new HashSet(Arrays.asList(1467)), output.getContext().get("PROBLEM-FED"));
 
 
-		assertEquals(new HashSet(Arrays.asList("BUSY")), context.getContext().get("FEDSTATE"));
+		assertEquals(new HashSet(Arrays.asList("BUSY")), output.getContext().get("FEDSTATE"));
 
-		assertEquals("GEM-1467-BUSY", context.getActionKey());
-		assertEquals(2,fc5.getActionWithContext().size());
+		KnownFailure logicModule = ((KnownFailure)LogicModuleRegistry.FlowchartCase5.getLogicModule());
+
+		assertEquals("GEM-1467-BUSY", logicModule.getContextHandler().getActionKey());
+		assertEquals(2,logicModule.getActionWithContext().size());
 
 		assertEquals(Arrays.asList("Stop and start the run with Green recycle of subsystem GEM (try up to 3 times)",
-		"Whether the above helped or not, call the GEM DOC and write an ELOG about the actions taken and the results obtained"), fc5.getActionWithContext());
+		"Whether the above helped or not, call the GEM DOC and write an ELOG about the actions taken and the results obtained"), logicModule.getActionWithContext());
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
-		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
+		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(logicModule.getActionWithContextRawRecovery(),logicModule.getName(), logicModule.getDescriptionWithContext(), 0L);
 		assertEquals(1, recoveryRequests.getRecoverySteps().size());
 		assertEquals("GEM", recoveryRequests.getRecoverySteps().iterator().next().getGreenRecycle().iterator().next());
 	}

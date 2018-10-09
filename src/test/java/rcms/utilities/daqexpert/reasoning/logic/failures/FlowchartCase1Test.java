@@ -7,11 +7,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import rcms.utilities.daqaggregator.data.DAQ;
+import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.logic.failures.backpressure.OutOfSequenceData;
 
@@ -161,11 +164,22 @@ public class FlowchartCase1Test extends FlowchartCaseTestBase {
 	@Test
   public void testGemInstructions() throws URISyntaxException {
 
-		DAQ snapshot = getSnapshot("1533649437939.json.gz");
+		TestBase testBase = TestBase.getInstance();
 
-		assertSatisfiedLogicModules (snapshot,legacyFc1);
 
-		List<String> action = legacyFc1.getActionWithContext();
+
+		DAQ snapshot = testBase.getSnapshot("1533649437939.json.gz");
+
+		testBase.runLogic(snapshot);
+
+		Output output = testBase.getOutputOf(LogicModuleRegistry.FlowchartCase1);
+
+
+		Assert.assertTrue(output.getResult());
+
+		KnownFailure knownFailure = (KnownFailure)LogicModuleRegistry.FlowchartCase1.getLogicModule();
+		Assert.assertEquals("GEM-1467", knownFailure.getContextHandler().getActionKey());
+		List<String> action = knownFailure.getActionWithContext();
 
 		assertEquals(2, action.size());
 		assertEquals("Stop and start the run", action.get(0));

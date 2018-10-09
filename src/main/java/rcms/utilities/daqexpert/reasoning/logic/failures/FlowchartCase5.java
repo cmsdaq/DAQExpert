@@ -24,7 +24,7 @@ import java.util.Set;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class FlowchartCase5 extends KnownFailure {
+public class FlowchartCase5 extends KnownFailure implements HavingSpecialInstructions {
 
 	public FlowchartCase5() {
 		this.name = "FED stuck";
@@ -94,7 +94,6 @@ public class FlowchartCase5 extends KnownFailure {
 
 		boolean result = false;
 
-		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
 
 		String daqstate = daq.getDaqState();
 
@@ -150,20 +149,6 @@ public class FlowchartCase5 extends KnownFailure {
 										contextHandler.register("TTCPSTATE", currentState.name());
 										contextHandler.register("PROBLEM-SUBSYSTEM", subSystem.getName());
 
-										if ("GEM".equalsIgnoreCase(
-												contextHandler.getContextEntry("PROBLEM-SUBSYSTEM").getTextRepresentation())) {
-											if (stableBeams) {
-												contextHandler.setActionKey("GEM-collisions");
-											} else if ("1467".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation())
-													&& "BUSY".equalsIgnoreCase(contextHandler.getContextEntry("FEDSTATE").getTextRepresentation())) {
-												contextHandler.setActionKey("GEM-1467-BUSY");
-
-											} else {
-												contextHandler.setActionKey("GEM");
-											}
-										} else {
-											contextHandler.setActionKey(subSystem.getName());
-										}
 									}
 								}
 							}
@@ -182,4 +167,33 @@ public class FlowchartCase5 extends KnownFailure {
 		return result;
 	}
 
+    @Override
+    public String selectSpecialInstructionKey(DAQ daq, Map<String, Output> results) {
+
+
+        boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+
+        String problematicSubsystemRegistered = contextHandler.getContextEntry("PROBLEM-SUBSYSTEM")
+                .getTextRepresentation();
+
+
+        if(problematicSubsystemRegistered != null) {
+            switch (problematicSubsystemRegistered) {
+                case "GEM":
+                    if (stableBeams) {
+                        return "GEM-collisions";
+                    }
+                    if ("1467".equalsIgnoreCase(contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation())
+                            && "BUSY".equalsIgnoreCase(contextHandler.getContextEntry("FEDSTATE").getTextRepresentation()
+
+                    )) {
+                        return "GEM-1467-BUSY";
+                    }
+                    break;
+
+            }
+            return problematicSubsystemRegistered;
+        }
+        return null;
+    }
 }

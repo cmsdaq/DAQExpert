@@ -7,6 +7,8 @@ import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
+import rcms.utilities.daqexpert.reasoning.logic.basic.StableBeams;
+import rcms.utilities.daqexpert.reasoning.logic.failures.HavingSpecialInstructions;
 
 /**
  * Logic module identifying out of sequence data received (1st flowchart case)
@@ -16,7 +18,7 @@ import rcms.utilities.daqexpert.reasoning.logic.basic.NoRateWhenExpected;
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
-public class OutOfSequenceData extends BackpressureAnalyzer {
+public class OutOfSequenceData extends BackpressureAnalyzer implements HavingSpecialInstructions {
 
 	public OutOfSequenceData() {
 		this.name = "Out of sequence data received";
@@ -61,12 +63,20 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 						"Call the GEM DOC"
 		);
 
+		/* GEM in collisions */
+		action.addContextSteps("GEM-collisions", "Stop the run",
+							   "Select the keepAlive option for GEM in the FED panel",
+							   "Put GEM in local", "Start a new run without GEM",
+							   "Call the GEM DOC. - This way the GEM DOC will take debug information");
+
+
 		this.action = action;
 	}
 
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
+		require(LogicModuleRegistry.StableBeams);
 		declareAffected(LogicModuleRegistry.NoRateWhenExpected);
 	}
 
@@ -88,4 +98,33 @@ public class OutOfSequenceData extends BackpressureAnalyzer {
 		return result;
 	}
 
+	@Override
+	public String selectSpecialInstructionKey(DAQ daq, Map<String, Output> results) {
+
+
+		String problemFED = contextHandler.getContextEntry("PROBLEM-FED").getTextRepresentation();
+		String problemSubsystem = contextHandler.getContextEntry("PROBLEM-SUBSYSTEM").getTextRepresentation();
+		boolean stableBeams = results.get(StableBeams.class.getSimpleName()).getResult();
+
+		if(problemSubsystem!=null) {
+			switch (problemSubsystem) {
+
+				case "HCAL":
+					if ("1111".equalsIgnoreCase(problemFED) || "1109".equalsIgnoreCase(problemFED)) {
+						return "FED1111or1109";
+					}
+					break;
+				case "GEM":
+					if (stableBeams) {
+						return "GEM-collisions";
+					}
+					if ( "1467".equalsIgnoreCase(problemFED)){
+						return "GEM-1467";
+					}
+					break;
+			}
+			return problemSubsystem;
+		}
+		return null;
+	}
 }

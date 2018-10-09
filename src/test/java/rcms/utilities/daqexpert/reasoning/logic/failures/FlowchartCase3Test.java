@@ -118,6 +118,9 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 	@Test
 	public void ecalEsInUnstableLHCClockSpecificCaseTest() throws URISyntaxException {
+
+		TestBase testBase = new TestBase();
+
 		DAQ daq = new DAQ();
 
 		Map<String, Output> r = new HashMap<>();
@@ -141,7 +144,11 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 		daq.setSubSystems(subsystemList);
 
 		ContextHandler.highlightMarkup= false;
+
+
+
 		fc3.satisfied(daq, r);
+		fc3.getContextHandler().setActionKey(((HavingSpecialInstructions)fc3).selectSpecialInstructionKey(daq,r));
 
 		System.out.println(fc3.getDescriptionWithContext());
 		System.out.println(fc3.getActionWithContext());
@@ -155,6 +162,8 @@ public class FlowchartCase3Test extends FlowchartCaseTestBase {
 
 		daq.setLhcClockStable(true);
 		fc3.satisfied(daq, r);
+		fc3.getContextHandler().setActionKey(((HavingSpecialInstructions)fc3).selectSpecialInstructionKey(daq,r));
+
 		assertEquals(6, fc3.getActionWithContext().size());
 
 

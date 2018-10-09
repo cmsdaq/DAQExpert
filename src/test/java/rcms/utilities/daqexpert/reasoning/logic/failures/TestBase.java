@@ -26,6 +26,8 @@ public class TestBase {
 
     public Map<String, Output> result;
 
+    public static TestBase getInstance(){ return new TestBase();}
+
     public DAQ getSnapshot(String fileName) throws URISyntaxException {
 
         StructureSerializer serializer = new StructureSerializer();
@@ -49,6 +51,10 @@ public class TestBase {
 
     public Map<String, Output> runLogic(String filaname) throws URISyntaxException {
         return runLogic(getSnapshot(filaname), getDefaultProperties());
+    }
+
+    public Map<String, Output> runLogic(DAQ daq){
+        return runLogic(daq, getDefaultProperties());
     }
 
     public Map<String, Output> runLogic(DAQ daq, Properties properties) {

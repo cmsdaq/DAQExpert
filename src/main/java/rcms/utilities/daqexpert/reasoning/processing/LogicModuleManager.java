@@ -1,16 +1,13 @@
 package rcms.utilities.daqexpert.reasoning.processing;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
+import org.mockito.internal.matchers.Null;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.Application;
-import rcms.utilities.daqexpert.Setting;
 import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.reasoning.LogicModuleVisualizer;
@@ -19,6 +16,7 @@ import rcms.utilities.daqexpert.reasoning.causality.CausalityManager;
 import rcms.utilities.daqexpert.reasoning.causality.CausalityNode;
 import rcms.utilities.daqexpert.reasoning.logic.basic.Parameterizable;
 import rcms.utilities.daqexpert.reasoning.logic.failures.KnownFailure;
+import rcms.utilities.daqexpert.reasoning.logic.failures.HavingSpecialInstructions;
 import rcms.utilities.daqexpert.reasoning.logic.failures.UnidentifiedFailure;
 
 /**
@@ -138,6 +136,17 @@ public class LogicModuleManager {
             try {
                 boolean result = checker.satisfied(daq, checkerResultMap);
                 logger.debug(checker.getName() + ": " + result);
+
+                if(result && checker instanceof ContextLogicModule && checker instanceof HavingSpecialInstructions){
+                    try {
+                        HavingSpecialInstructions havingSpecialInstructions = (HavingSpecialInstructions) checker;
+                        String key = havingSpecialInstructions.selectSpecialInstructionKey(daq, checkerResultMap);
+                        ContextLogicModule contextLogicModule = (ContextLogicModule) checker;
+                        contextLogicModule.getContextHandler().setActionKey(key);
+                    } catch (NullPointerException e){
+
+                    }
+                }
 
                 postprocess(checkerResultMap, checker, result, daq, results);
             } catch(RuntimeException e){

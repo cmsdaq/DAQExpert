@@ -10,7 +10,7 @@ public class WorkingHourResolver {
         LocalTime localTime = LocalTime.from(localDateTime);
 
 
-        LocalTime startExtendedWorkingHour = LocalTime.of(7,0);
+        LocalTime startExtendedWorkingHour = LocalTime.of(8,0);
         LocalTime startWorkingHour = LocalTime.of(8,30);
         LocalTime endWorkingHour = LocalTime.of(17,30);
         LocalTime endExtendedWorkingHour = LocalTime.of(22,0);

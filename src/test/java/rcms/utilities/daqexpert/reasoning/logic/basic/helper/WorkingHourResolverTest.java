@@ -14,10 +14,10 @@ public class WorkingHourResolverTest {
         Assert.assertEquals(Time.OUTSIDE_OF_EXTENDED_WORKING_HOURS,
                             WorkingHourResolver.determineTime(convert(LocalTime.of(0, 0, 0))));
         Assert.assertEquals(Time.OUTSIDE_OF_EXTENDED_WORKING_HOURS,
-                            WorkingHourResolver.determineTime(convert(LocalTime.of(7, 0, 0))));
+                            WorkingHourResolver.determineTime(convert(LocalTime.of(8, 0, 0))));
 
         Assert.assertEquals(Time.EXTENDED_WORKING_HOURS,
-                            WorkingHourResolver.determineTime(convert(LocalTime.of(7, 0, 1))));
+                            WorkingHourResolver.determineTime(convert(LocalTime.of(8, 0, 1))));
         Assert.assertEquals(Time.EXTENDED_WORKING_HOURS,
                             WorkingHourResolver.determineTime(convert(LocalTime.of(8, 30, 0))));
 

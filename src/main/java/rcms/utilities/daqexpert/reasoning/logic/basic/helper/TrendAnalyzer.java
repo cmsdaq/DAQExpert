@@ -18,73 +18,88 @@ public class TrendAnalyzer {
         return currentTrend;
     }
 
-    public TrendAnalyzer(TrendConfiguration configuration){
+    public TrendAnalyzer(TrendConfiguration configuration) {
         this.configuration = configuration;
-        this.queue = new CircularFifoQueue<>(configuration.getTrendEstablishCount() * 2);
+        this.queue = new CircularFifoQueue<>(configuration.getTrendEstablishCount());
 
     }
 
-    public TrendAnalyzer update(Long value){
-        queue.add(value.floatValue());
+    public TrendAnalyzer update(Long value) {
+        update(value.floatValue());
         return this;
     }
 
-    public TrendAnalyzer update(Integer value){
-        queue.add(value.floatValue());
+    public TrendAnalyzer update(Integer value) {
+        update(value.floatValue());
         return this;
     }
 
     public TrendAnalyzer update(Double value) {
-        queue.add(value.floatValue());
+        update(value.floatValue());
         return this;
     }
 
     public TrendAnalyzer update(Float value) {
+        logger.debug("Current value: " + value);
         queue.add(value);
         return this;
     }
 
     public TrendAnalyzer calculate() {
 
-        if(queue.size() < configuration.getTrendEstablishCount()){
+
+        if (queue.size() < configuration.getTrendEstablishCount()) {
             this.currentTrend = Trend.NOT_ESTABLISHED;
             return this;
         }
 
-        int increasing = 0, decreasing = 0, same = 0;
+        float accumulatedDelta = 0.0f;
+
+        int increasing = 0, decreasing = 0;
 
         Float previous = null;
-        for(Float current : queue){
-            if(previous != null && current != null){
+        for (Float current : queue) {
+            if (previous != null && current != null) {
 
                 Float delta = current - previous;
 
-                if(Math.abs(delta) <= configuration.getDelta()){
-                    same++;
-                } else if(delta > configuration.getDelta()){
+                accumulatedDelta += delta;
+
+                if (delta > 0) {
                     increasing++;
-                } else if(-delta > configuration.getDelta()){
+                } else if (delta < 0) {
                     decreasing++;
                 }
 
-
                 logger.trace("delta: " + delta + " between: " + previous + " and " + current);
             }
-            previous= current;
+            previous = current;
         }
-        logger.debug("Same: " + same);
-        logger.debug("Increasing: " + increasing);
-        logger.debug("Decreasing: " + decreasing);
 
-        if(same >= configuration.getTrendEstablishCount()){
+        // detect varying - incrasing and decreasing similar
+        int numberOfComparisons = queue.size() - 1;
+        float incrasingFraction = 1.0f * increasing / numberOfComparisons;
+        float decreasingFraction = 1.0f * decreasing / numberOfComparisons;
+
+        boolean possiblyVarying = false;
+        if (incrasingFraction > 0.25 && decreasingFraction > 0.25) {
+            possiblyVarying = true;
+        }
+        logger.trace("Fraction of increasing/decreasing: " + incrasingFraction + "/" + decreasingFraction);
+        logger.trace("Accumulated delta: " + accumulatedDelta);
+        logger.trace("Possibly varying: " + possiblyVarying);
+
+
+        if (Math.abs(accumulatedDelta) <= configuration.getDelta()) {
             this.currentTrend = Trend.STABLE;
-        }else if(increasing >= configuration.getTrendEstablishCount()){
+        } else if (accumulatedDelta > configuration.getDelta() && !possiblyVarying) {
             this.currentTrend = Trend.INCREASING;
-        } else if(decreasing >= configuration.getTrendEstablishCount()){
+        } else if (-accumulatedDelta > configuration.getDelta() && !possiblyVarying) {
             this.currentTrend = Trend.DECREASING;
-        }else {
+        } else {
             this.currentTrend = Trend.VARYING;
         }
+        logger.trace("Result: " + currentTrend);
 
         return this;
     }

@@ -20,7 +20,7 @@ public class TrendConfiguration {
      */
     private final Double delta;
 
-    public static TrendConfiguration STRICT = TrendConfiguration.builder().trendEstablishCount(4).delta(0.0).build();
+    public static TrendConfiguration STRICT = TrendConfiguration.builder().trendEstablishCount(6).delta(0.0).build();
 
-    public static TrendConfiguration NON_STRICT = TrendConfiguration.builder().trendEstablishCount(4).delta(1.0).build();
+    public static TrendConfiguration NON_STRICT = TrendConfiguration.builder().trendEstablishCount(6).delta(1.0).build();
 }

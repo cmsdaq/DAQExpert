@@ -31,7 +31,7 @@ public class HltCpuLoad extends KnownFailure implements Parameterizable {
     private BeginningOfRunHoldOffLogic holdOffLogic;
 
     private TrendAnalyzer ramDiskTrend =
-            new TrendAnalyzer(TrendConfiguration.builder().delta(0.5).trendEstablishCount(20).build());
+            new TrendAnalyzer(TrendConfiguration.builder().delta(2.0).trendEstablishCount(20).build());
 
     public HltCpuLoad() {
         this.name = "HLT CPU load";

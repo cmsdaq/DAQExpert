@@ -92,7 +92,7 @@ public class EventSender {
 	private boolean sendEvents(List<ConditionEventResource> events) {
 
 		try {
-			logger.info("Sending events: "  + events);
+			logger.info("Sending events: "  + events.stream().limit(4).collect(Collectors.toList()));
 			ResponseEntity<Void> response = restTemplate.postForEntity(address, events, Void.class);
 
 			if(response.getStatusCode() != HttpStatus.CREATED){
@@ -102,14 +102,8 @@ public class EventSender {
 			return true;
 
 		}catch(RestClientException e){
-			try {
-				logger.error("Requests to " + address + " failed. Body: " + objectMapper.writeValueAsString(events));
-			} catch (JsonProcessingException e1) {
-				e1.printStackTrace();
-			}
+			logger.error("Requests to " + address + " failed.");
 			logger.error(e);
-			e.printStackTrace();
-
 			return false;
 		}
 

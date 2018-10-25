@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.sound.midi.Track;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -89,7 +90,6 @@ public class TrendAnalyzerTest {
      */
     @Test
     public void testRealData() {
-        Logger.getLogger(TrendAnalyzer.class).setLevel(Level.TRACE);
         TrendAnalyzer trendAnalyzer = new TrendAnalyzer(TrendConfiguration.builder().delta(0.5).trendEstablishCount(10)
                                                                 .build());
         DoubleStream.of(64.30113220214844, 63.722511291503906, 63.13095474243164,

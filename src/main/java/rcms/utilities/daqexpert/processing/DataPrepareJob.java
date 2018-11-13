@@ -266,12 +266,12 @@ public class DataPrepareJob implements Runnable {
 					dominating.getId(),
 					causingSubsystems);
 
-			if(recoveryRequest != null && recoveryRequest.getRecoverySteps().size() > 0) {
+			if(recoveryRequest != null && recoveryRequest.getRecoveryRequestSteps().size() > 0) {
 				recoveryRequest.setCondition(dominating);
 				Long dominatingId = recoveryJobManager.runRecoveryJob(recoveryRequest);
 				if (dominatingId != null) {
 					recoveryConditionIds.add(dominatingId);
-					logger.info("Automatic recovery sent to the controller. Executable steps: " + recoveryRequest.getRecoverySteps());
+					logger.info("Automatic recovery sent to the controller. Executable steps: " + recoveryRequest.getRecoveryRequestSteps());
 				}
 			} else{
 				logger.info("Recovery request was not build. No recovery steps that could be executed.");

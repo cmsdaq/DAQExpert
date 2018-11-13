@@ -14,7 +14,6 @@ import rcms.utilities.daqexpert.reasoning.base.action.ConditionalAction;
 import rcms.utilities.daqexpert.reasoning.base.action.SimpleAction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,7 +71,7 @@ public class RecoveryRequestBuilderTest {
 
                 RecoveryRequest rr = recoveryRequestBuilder.buildRecoveryRequest(fakeContextSteps, "", "", 1L);
 
-                if (rr != null && rr.getRecoverySteps().size() > 0) {
+                if (rr != null && rr.getRecoveryRequestSteps().size() > 0) {
                     System.out.println("Name: " + lm.getName());
                     //System.out.println("Rec:  " + lm.getActionWithContextRawRecovery());
                     System.out.println(rr);
@@ -144,8 +143,8 @@ public class RecoveryRequestBuilderTest {
         List<String> steps = new ArrayList<String>(){{add("D <<RedRecycle::ECAL>> to fix");}};
         RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps,steps,"","",0L);
 
-        Assert.assertEquals(1, recovery.getRecoverySteps().size());
-        RecoveryStep rr = recovery.getRecoverySteps().iterator().next();
+        Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
+        RecoveryRequestStep rr = recovery.getRecoveryRequestSteps().iterator().next();
 
         Assert.assertEquals(1, rr.getRedRecycle().size());
         Assert.assertEquals("ECAL",rr.getRedRecycle().iterator().next());
@@ -157,8 +156,8 @@ public class RecoveryRequestBuilderTest {
         List<String> steps = new ArrayList<String>(){{add("D <<RedRecycle::[ECAL,TRACKER]>> to fix");}};
         RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L);
 
-        Assert.assertEquals(1, recovery.getRecoverySteps().size());
-        RecoveryStep rr = recovery.getRecoverySteps().iterator().next();
+        Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
+        RecoveryRequestStep rr = recovery.getRecoveryRequestSteps().iterator().next();
 
         Assert.assertEquals(2, rr.getRedRecycle().size());
         Iterator<String> it = rr.getRedRecycle().iterator();
@@ -173,8 +172,8 @@ public class RecoveryRequestBuilderTest {
         List<String> steps = new ArrayList<String>(){{add("D <<RedAndGreenRecycle::[ECAL]>> to fix");}};
         RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L);
 
-        Assert.assertEquals(1, recovery.getRecoverySteps().size());
-        RecoveryStep rr = recovery.getRecoverySteps().iterator().next();
+        Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
+        RecoveryRequestStep rr = recovery.getRecoveryRequestSteps().iterator().next();
 
         Assert.assertEquals(1, rr.getRedRecycle().size());
         Iterator<String> it = rr.getRedRecycle().iterator();
@@ -196,8 +195,8 @@ public class RecoveryRequestBuilderTest {
         List<String> steps = new ArrayList<String>(){{add("D <<StopAndStartTheRun>> to fix");}};
         RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L, Sets.newHashSet("ECAL"));
 
-        Assert.assertEquals(1, recovery.getRecoverySteps().size());
-        RecoveryStep rr = recovery.getRecoverySteps().iterator().next();
+        Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
+        RecoveryRequestStep rr = recovery.getRecoveryRequestSteps().iterator().next();
 
         Assert.assertEquals(1, rr.getFault().size());
         Iterator<String> it = rr.getFault().iterator();

@@ -64,7 +64,7 @@ public class RecoveryJobManager {
             return null;
         }
 
-        if (dominatingRequest.getRecoverySteps().size() == 0) {
+        if (dominatingRequest.getRecoveryRequestSteps().size() == 0) {
             logger.info("No executable recovery steps. The recovery request cannot be automated.");
             return null;
         }
@@ -75,7 +75,7 @@ public class RecoveryJobManager {
         recentIssuedRecoveryConditions.add(dominatingRequest.getCondition());
         RecoveryResponse recoveryResponse = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-        String status = recoveryResponse.getStatus();
+        String status = recoveryResponse.getAcceptanceDecision();
         if ("rejected".equalsIgnoreCase(status)) {
             // check if this is the same now
 
@@ -116,7 +116,7 @@ public class RecoveryJobManager {
 
             RecoveryResponse secondRecoveryRespons = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getStatus())) {
+            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getAcceptanceDecision())) {
                 logger.warn("Second request resulted with rejection." + dominatingRequest);
             } else {
                 logger.info("Recovery accepted by controller with second request");

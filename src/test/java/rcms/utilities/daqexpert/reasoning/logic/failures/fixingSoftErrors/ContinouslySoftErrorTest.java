@@ -1,6 +1,5 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.fixingSoftErrors;
 
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
 import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
-import rcms.utilities.daqexpert.jobs.RecoveryStep;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestStep;
 
 public class ContinouslySoftErrorTest {
 
@@ -280,15 +279,15 @@ public class ContinouslySoftErrorTest {
 							lm.getDescriptionWithContext(),
 							0L);
 			
-			assertEquals(1, recoveryRequests.getRecoverySteps().size());
+			assertEquals(1, recoveryRequests.getRecoveryRequestSteps().size());
 			
-			RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
+			RecoveryRequestStep recoveryRequestStep = recoveryRequests.getRecoveryRequestSteps().iterator().next();
 			
 			// ensure that we have exactly one recovery step
-			assertEquals(1, recoveryStep.getRedRecycle().size());
+			assertEquals(1, recoveryRequestStep.getRedRecycle().size());
 			
 			// ensure that this is a red recycle
-			assertEquals("CTPPS", recoveryStep.getRedRecycle().iterator().next());
+			assertEquals("CTPPS", recoveryRequestStep.getRedRecycle().iterator().next());
 			
 			// just check the first occurrence. Some of the later occurrences
 			// do not have a subsystem due to the merging mechanism.

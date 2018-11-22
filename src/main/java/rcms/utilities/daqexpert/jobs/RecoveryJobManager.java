@@ -32,7 +32,7 @@ public class RecoveryJobManager {
      * Note that to this queue we add only those conditions that generated recovery requests that were passed to
      * controller.
      */
-    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(5);
+    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(15);
 
 
     /**
@@ -76,7 +76,12 @@ public class RecoveryJobManager {
         RecoveryResponse recoveryResponse = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
         String status = recoveryResponse.getAcceptanceDecision();
-        if ("rejected".equalsIgnoreCase(status)) {
+
+        if("rejectedDueToManualRecovery".equalsIgnoreCase(status)){
+            logger.info("Recovery has been rejected due to manual recovery. Abandoning this recovery.");
+            return dominatingRequest.getProblemId();
+        }
+        else if ("rejected".equalsIgnoreCase(status)) {
             // check if this is the same now
 
             Long rejectionConditionReasonId = recoveryResponse.getRejectedDueToConditionId();

@@ -32,7 +32,7 @@ public class RecoveryJobManager {
      * Note that to this queue we add only those conditions that generated recovery requests that were passed to
      * controller.
      */
-    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(5);
+    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(15);
 
 
     /**
@@ -64,7 +64,7 @@ public class RecoveryJobManager {
             return null;
         }
 
-        if (dominatingRequest.getRecoverySteps().size() == 0) {
+        if (dominatingRequest.getRecoveryRequestSteps().size() == 0) {
             logger.info("No executable recovery steps. The recovery request cannot be automated.");
             return null;
         }
@@ -75,8 +75,13 @@ public class RecoveryJobManager {
         recentIssuedRecoveryConditions.add(dominatingRequest.getCondition());
         RecoveryResponse recoveryResponse = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-        String status = recoveryResponse.getStatus();
-        if ("rejected".equalsIgnoreCase(status)) {
+        String status = recoveryResponse.getAcceptanceDecision();
+
+        if("rejectedDueToManualRecovery".equalsIgnoreCase(status)){
+            logger.info("Recovery has been rejected due to manual recovery. Abandoning this recovery.");
+            return dominatingRequest.getProblemId();
+        }
+        else if ("rejected".equalsIgnoreCase(status)) {
             // check if this is the same now
 
             Long rejectionConditionReasonId = recoveryResponse.getRejectedDueToConditionId();
@@ -116,7 +121,7 @@ public class RecoveryJobManager {
 
             RecoveryResponse secondRecoveryRespons = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getStatus())) {
+            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getAcceptanceDecision())) {
                 logger.warn("Second request resulted with rejection." + dominatingRequest);
             } else {
                 logger.info("Recovery accepted by controller with second request");

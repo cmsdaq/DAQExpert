@@ -345,9 +345,9 @@ public class JobManagerIT {
     private RecoveryRequest generateRecovery(int steps, String problemDescription){
         RecoveryRequest rr = new RecoveryRequest();
 
-        rr.setRecoverySteps(new ArrayList());
+        rr.setRecoveryRequestSteps(new ArrayList());
         for(int i = 0; i< steps; i++){
-            rr.getRecoverySteps().add(new RecoveryStep());
+            rr.getRecoveryRequestSteps().add(new RecoveryRequestStep());
         }
 
         rr.setProblemDescription(problemDescription);
@@ -521,8 +521,7 @@ public class JobManagerIT {
         if (totalNumberOfRecovoveryRequests != 0) {
             for (RecoveryRequest rr : expectedRecoveryRequests) {
                 assertThat(recoveryRequestsYielded, hasItem(allOf(
-                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription())),
-                        Matchers.hasProperty("status", equalTo("finished"))
+                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription()))
                         )
                 ));
             }
@@ -558,7 +557,6 @@ public class JobManagerIT {
         @Override
         public void notifyConditionFinished(Long id) {
             RecoveryRequest finished = recoveryRequestsYielded.stream().filter(r -> r.getProblemId() == id).findFirst().orElse(null);
-            finished.setStatus("finished");
         }
     }
 

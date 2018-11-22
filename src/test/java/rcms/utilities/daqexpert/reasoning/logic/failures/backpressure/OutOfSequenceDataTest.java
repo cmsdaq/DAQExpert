@@ -21,7 +21,7 @@ import rcms.utilities.daqaggregator.data.SubSystem;
 import rcms.utilities.daqaggregator.data.TTCPartition;
 import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
-import rcms.utilities.daqexpert.jobs.RecoveryStep;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestStep;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.logic.failures.FlowchartCaseTestBase;
 
@@ -73,10 +73,10 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(legacyFc1.getActionWithContextRawRecovery(), legacyFc1.getName(),legacyFc1.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequest.getRecoverySteps().size());
-		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
-		assertEquals(1, recoveryStep.getRedRecycle().size());
-		assertEquals(1, recoveryStep.getGreenRecycle().size());
+		assertEquals(1, recoveryRequest.getRecoveryRequestSteps().size());
+		RecoveryRequestStep recoveryRequestStep = recoveryRequest.getRecoveryRequestSteps().iterator().next();
+		assertEquals(1, recoveryRequestStep.getRedRecycle().size());
+		assertEquals(1, recoveryRequestStep.getGreenRecycle().size());
 
 	}
 
@@ -171,7 +171,7 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(),fc1.getName(), fc1.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequest.getRecoverySteps().size());
+		assertEquals(1, recoveryRequest.getRecoveryRequestSteps().size());
 	}
 
 	/**
@@ -201,11 +201,11 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getName(),fc1.getDescriptionWithContext(), 0L);
-		assertEquals(2, recoveryRequest.getRecoverySteps().size());
+		assertEquals(2, recoveryRequest.getRecoveryRequestSteps().size());
 
-		Iterator<RecoveryStep> i = recoveryRequest.getRecoverySteps().iterator();
+		Iterator<RecoveryRequestStep> i = recoveryRequest.getRecoveryRequestSteps().iterator();
 		i.next();
-		RecoveryStep secondStep = i.next();
+		RecoveryRequestStep secondStep = i.next();
 
 		assertThat(secondStep.getGreenRecycle(), contains("ECAL"));
 		assertThat(secondStep.getRedRecycle(), contains("ECAL"));
@@ -301,10 +301,10 @@ public class OutOfSequenceDataTest extends FlowchartCaseTestBase {
 
  		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
  		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc1.getActionWithContextRawRecovery(), fc1.getName(),fc1.getDescriptionWithContext(), 0L);
- 		assertEquals(1, recoveryRequest.getRecoverySteps().size());
- 		RecoveryStep recoveryStep = recoveryRequest.getRecoverySteps().iterator().next();
- 		assertEquals(0, recoveryStep.getRedRecycle().size());
-		assertEquals(0, recoveryStep.getGreenRecycle().size());
+ 		assertEquals(1, recoveryRequest.getRecoveryRequestSteps().size());
+ 		RecoveryRequestStep recoveryRequestStep = recoveryRequest.getRecoveryRequestSteps().iterator().next();
+ 		assertEquals(0, recoveryRequestStep.getRedRecycle().size());
+		assertEquals(0, recoveryRequestStep.getGreenRecycle().size());
   }
 
 }

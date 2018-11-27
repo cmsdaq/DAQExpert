@@ -47,6 +47,8 @@ public class RecoveryRequest {
 
     private List<RecoveryRequestStep> recoveryRequestSteps;
 
+    private boolean isAutomatedRecoveryEnabled;
+
     @JsonIgnore
     private Condition condition;
 

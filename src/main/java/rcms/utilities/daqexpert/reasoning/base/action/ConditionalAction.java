@@ -2,6 +2,7 @@ package rcms.utilities.daqexpert.reasoning.base.action;
 
 import java.util.*;
 
+import lombok.Getter;
 import org.apache.log4j.Logger;
 
 public class ConditionalAction implements Action {
@@ -10,13 +11,26 @@ public class ConditionalAction implements Action {
 
 	private static final String DEFAULT_KEY = "default";
 
+	@Getter
+	private boolean isAutomationEnabled;
+
 	private Map<String, List<String>> action = new HashMap<>();
 
 	public ConditionalAction(String... steps) {
 		this.action.put(DEFAULT_KEY, Arrays.asList(steps));
 	}
 
+	public ConditionalAction(Boolean isAutomationEnabled, String... steps) {
+		this.isAutomationEnabled = isAutomationEnabled;
+		this.action.put(DEFAULT_KEY, Arrays.asList(steps));
+	}
+
 	public void addContextSteps(String key, String... steps) {
+		this.action.put(key.toLowerCase(), Arrays.asList(steps));
+	}
+
+	public void addContextSteps(String key, Boolean isAutomationEnabled, String... steps) {
+		this.isAutomationEnabled = isAutomationEnabled;
 		this.action.put(key.toLowerCase(), Arrays.asList(steps));
 	}
 

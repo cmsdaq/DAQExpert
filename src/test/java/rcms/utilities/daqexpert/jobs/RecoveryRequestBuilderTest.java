@@ -193,7 +193,7 @@ public class RecoveryRequestBuilderTest {
     public void stopAndStartWithFault(){
         RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
         List<String> steps = new ArrayList<String>(){{add("D <<StopAndStartTheRun>> to fix");}};
-        RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L, Sets.newHashSet("ECAL"));
+        RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L, Sets.newHashSet("ECAL"),false);
 
         Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
         RecoveryRequestStep rr = recovery.getRecoveryRequestSteps().iterator().next();
@@ -203,4 +203,17 @@ public class RecoveryRequestBuilderTest {
         Assert.assertEquals("ECAL",it.next());
 
     }
+
+    @Test
+    public void automatedRecoveryRequestTest(){
+
+        RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
+
+        List<String> steps = new ArrayList<String>(){{add("D <<StopAndStartTheRun>> to fix");}};
+        RecoveryRequest recovery = recoveryRequestBuilder.buildRecoveryRequest(steps, steps,"","",0L, Sets.newHashSet("ECAL"),true);
+
+        Assert.assertEquals(1, recovery.getRecoveryRequestSteps().size());
+        Assert.assertTrue(recovery.isAutomatedRecoveryEnabled());
+    }
+
 }

@@ -33,18 +33,21 @@ public class FlowchartCase5 extends KnownFailure implements HavingSpecialInstruc
 		this.briefDescription = "{{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}} is stuck in TTS state {{TTCPSTATE}}";
 
 		/* default action */
+		// TODO: avoid automation: try 2 times
 		ConditionalAction action = new ConditionalAction(
 				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
 				"Problem fixed: Make an e-log entry. Call the DOC of the subsystem {{PROBLEM-SUBSYSTEM}} to inform",
 				"Problem not fixed: Call the DOC for the subsystem {{PROBLEM-SUBSYSTEM}}");
 
 		/* ecal specific case */
+		// TODO: avoid automation: S/S only
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
 				"Problem fixed: Make an e-log entry including problematic FED number.",
 				"Problem not fixed: <<StopAndStartTheRun>> with <<RedRecycle::ECAL>>",
 				"Problem still not fixed: Call the DOC for the ECAL");
 
 		//TODO: update multistep recovery: when fixed update integration test JobManagerIt.blackboxTest1
+		// TODO: avoid automation: TRACKER
 		/* tracker specific case only when warning state */
 		action.addContextSteps("TRACKER", "Issue a TTCResync once", "Problem fixed: Make an e-log entry.",
 				"Problem not fixed: Stop the run, red recycle TRACKER, start a new run",
@@ -57,6 +60,7 @@ public class FlowchartCase5 extends KnownFailure implements HavingSpecialInstruc
 							   "Call the GEM DOC. - This way the GEM DOC will take debug information");
 
 		/* gem 1467 specific case */
+		// TODO: avoid automation: try 3 times
 		action.addContextSteps("GEM-1467-BUSY", "<<StopAndStartTheRun>> with <<GreenRecycle::GEM>> (try up to 3 times)",
 				"Whether the above helped or not, call the GEM DOC and write an ELOG about the actions taken and the results obtained");
 

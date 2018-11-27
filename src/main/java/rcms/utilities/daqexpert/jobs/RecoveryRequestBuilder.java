@@ -19,19 +19,27 @@ public class RecoveryRequestBuilder {
 
 
     public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, List<String> humanReadableSteps, String title, String problemDescription, Long problemId) {
-        return buildRecoveryRequest(rawSteps,humanReadableSteps,title,problemDescription,problemId, new HashSet<>());
+        return buildRecoveryRequest(rawSteps,humanReadableSteps,title,problemDescription,problemId, new HashSet<>(),false);
     }
 
     public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, String title, String problemDescription, Long problemId) {
         return buildRecoveryRequest(rawSteps, rawSteps, title, problemDescription, problemId);
     }
 
+
     /**
      * Build recovery request from given recovery rawSteps
      *
      * @return recovery request
      */
-    public RecoveryRequest buildRecoveryRequest(List<String> rawSteps, List<String> humanReadableSteps, String title, String problemDescription, Long problemId, Set<String> causingSubsystems) {
+    public RecoveryRequest buildRecoveryRequest(
+            List<String> rawSteps,
+            List<String> humanReadableSteps,
+            String title,
+            String problemDescription,
+            Long problemId,
+            Set<String> causingSubsystems,
+            boolean isAutomatedRecoveryEnabled) {
 
         if (rawSteps == null || rawSteps.size() == 0) {
             return null;
@@ -42,6 +50,7 @@ public class RecoveryRequestBuilder {
         List<List<Pair<RecoveryJob, List<String>>>> stepsOfJobs = getJobs(rawSteps);
 
         RecoveryRequest recoveryRequest = new RecoveryRequest();
+        recoveryRequest.setAutomatedRecoveryEnabled(isAutomatedRecoveryEnabled);
         recoveryRequest.setProblemDescription(problemDescription);
         recoveryRequest.setProblemId(problemId);
         recoveryRequest.setProblemTitle(title);

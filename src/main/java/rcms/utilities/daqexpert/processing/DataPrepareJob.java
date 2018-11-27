@@ -257,6 +257,7 @@ public class DataPrepareJob implements Runnable {
 			}
 
 
+
 			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
 					actionDominating.getActionWithContextRawRecovery(),
@@ -264,7 +265,8 @@ public class DataPrepareJob implements Runnable {
 					actionDominating.getName(),
 					actionDominating.getDescriptionWithContext(),
 					dominating.getId(),
-					causingSubsystems);
+					causingSubsystems,
+					actionDominating.getAction().isAutomationEnabled());
 
 			if(recoveryRequest != null && recoveryRequest.getRecoveryRequestSteps().size() > 0) {
 				recoveryRequest.setCondition(dominating);

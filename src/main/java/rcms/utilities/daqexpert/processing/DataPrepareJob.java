@@ -257,12 +257,6 @@ public class DataPrepareJob implements Runnable {
 			}
 
 
-			boolean isAutomationEnabled = false;
-
-			if(actionDominating != null && actionDominating.getAction() != null){
-				isAutomationEnabled = actionDominating.getAction().isAutomationEnabled();
-			}
-
 			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
 					actionDominating.getActionWithContextRawRecovery(),
@@ -271,7 +265,7 @@ public class DataPrepareJob implements Runnable {
 					actionDominating.getDescriptionWithContext(),
 					dominating.getId(),
 					causingSubsystems,
-					isAutomationEnabled);
+					actionDominating.isAutomationAvailable());
 
 			if(recoveryRequest != null && recoveryRequest.getRecoveryRequestSteps().size() > 0) {
 				recoveryRequest.setCondition(dominating);

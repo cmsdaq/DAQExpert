@@ -25,6 +25,7 @@ import rcms.utilities.daqexpert.jobs.RecoveryJobManager;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.processing.CleanStartupVerifier;
 import rcms.utilities.daqexpert.processing.JobManager;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.segmentation.DataResolutionManager;
 
 public class ServletListener implements ServletContextListener {
@@ -88,7 +89,7 @@ public class ServletListener implements ServletContextListener {
 			/* Expert controller client initialization */
 			String controllerUrl = Application.get().getProp(Setting.CONTROLLER_URL);
 			ExpertControllerClient expertControllerClient = new ExpertControllerClient(controllerUrl);
-			RecoveryJobManager recoveryJobManager = new RecoveryJobManager(expertControllerClient);
+			RecoveryJobManager recoveryJobManager = new RecoveryJobManager(expertControllerClient, new DominatingSelector());
 
 			jobManager = new JobManager(sourceDirectory, dataManager, eventSender, cleanStartupVerifier, recoveryJobManager);
 			jobManager.startJobs();

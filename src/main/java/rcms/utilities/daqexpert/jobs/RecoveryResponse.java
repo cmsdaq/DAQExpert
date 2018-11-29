@@ -1,9 +1,17 @@
 package rcms.utilities.daqexpert.jobs;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RecoveryResponse {
 
     /**
@@ -24,7 +32,8 @@ public class RecoveryResponse {
     /**
      * Id of the same condition it continues
      */
-    private Long continuesTheConditionId;
+    private List<Long> continuesTheConditionIds;
+
 
 
 
@@ -34,7 +43,7 @@ public class RecoveryResponse {
                 "acceptanceDecision='" + acceptanceDecision +
                 ", recoveryProcedureId=" + recoveryProcedureId +
                 ", rejectedDueToConditionId=" + rejectedDueToConditionId +
-                ", continuesTheConditionId=" + continuesTheConditionId +
+                ", continuesTheConditionIds=" + continuesTheConditionIds +
                 '}';
     }
 }

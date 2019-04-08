@@ -24,6 +24,7 @@ import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 import rcms.utilities.daqexpert.segmentation.RangeResolver;
 import rcms.utilities.daqexpert.servlets.ConditionDTO;
+import rcms.utilities.daqexpert.servlets.ConditionDetailedDTO;
 
 /**
  * Unit managing persistence of analysis results and multiple resolutions of raw
@@ -222,6 +223,39 @@ public class PersistenceManager {
 
 		List<Condition> result = elementsCriteria.setProjection(projection)
 				.setResultTransformer(Transformers.aliasToBean(Condition.class)).list();
+
+		entityManager.close();
+
+		return result;
+	}
+
+	public List<ConditionDetailedDTO> getRootProblemEntries(Date startDate, Date endDate){
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Session session = entityManager.unwrap(Session.class);
+
+
+		Criteria elementsCriteria = session.createCriteria(Condition.class);
+
+		Conjunction eventFinishedRestrictions = Restrictions.conjunction();
+		eventFinishedRestrictions.add(Restrictions.le("start", endDate));
+		eventFinishedRestrictions.add(Restrictions.ge("end", startDate));
+		eventFinishedRestrictions.add(Restrictions.eq("mature", true));
+		eventFinishedRestrictions.add(Restrictions.eq("group", ConditionGroup.DOMINATING));
+
+
+		elementsCriteria.add(eventFinishedRestrictions);
+
+		ProjectionList projection = Projections.projectionList()
+				.add(Projections.property("id"),"id")
+				.add(Projections.property("title"), "title")
+				.add(Projections.property("start"),"start")
+				.add(Projections.property("end"),"end")
+				.add(Projections.property("description"),"description")
+				.add(Projections.property("logicModule"),"logicModule")
+				.add(Projections.property("duration"),"duration");
+
+		List<ConditionDetailedDTO> result = elementsCriteria.setProjection(projection)
+				.setResultTransformer(Transformers.aliasToBean(ConditionDetailedDTO.class)).list();
 
 		entityManager.close();
 

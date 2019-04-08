@@ -1,11 +1,13 @@
 package rcms.utilities.daqexpert.jobs;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Set;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class RecoveryRequestStep {
 

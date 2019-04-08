@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.reasoning.logic.failures.backpressure;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import rcms.utilities.daqaggregator.data.DAQ;
@@ -17,6 +18,8 @@ import rcms.utilities.daqexpert.reasoning.logic.failures.HavingSpecialInstructio
  * 
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
+ * TODO: enable automation
+ *
  */
 public class OutOfSequenceData extends BackpressureAnalyzer implements HavingSpecialInstructions {
 
@@ -29,14 +32,17 @@ public class OutOfSequenceData extends BackpressureAnalyzer implements HavingSpe
 
 		this.briefDescription = "Run blocked by out-of-sync data from FED(s) {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
+
 		/* Default action */
 		ConditionalAction action = new ConditionalAction(
+				true,
 				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> using L0 Automator",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
+		// TODO: avoid automation here: 2 times, S/S only
 		action.addContextSteps("TRACKER",
 				"<<StopAndStartTheRun>> (try up to 2 times)",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
@@ -44,12 +50,14 @@ public class OutOfSequenceData extends BackpressureAnalyzer implements HavingSpe
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* ecal specific case */
+		// TODO: avoid automation: S/S only
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
 				"If this doesn't help: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
 				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
 				"Problem not fixed: Call the DOC of ECAL");
 
 		/* FED=1111 */
+		// TODO: avoid automation: S/S only
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
@@ -58,6 +66,7 @@ public class OutOfSequenceData extends BackpressureAnalyzer implements HavingSpe
 		/** GEM FED 1467 , see item 2 of issue #232 .
 		 *  See also class LegacyFlowchartCase1
 		 */
+		// TODO: avoid automation: S/S only
 		action.addContextSteps("GEM-1467",
 						"<<StopAndStartTheRun>>",
 						"Call the GEM DOC"

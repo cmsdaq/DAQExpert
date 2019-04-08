@@ -18,6 +18,7 @@ import rcms.utilities.daqexpert.persistence.Condition;
 import rcms.utilities.daqexpert.persistence.DominatingPersistor;
 import rcms.utilities.daqexpert.persistence.PersistenceManager;
 import rcms.utilities.daqexpert.persistence.Point;
+import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
@@ -239,9 +240,16 @@ public class DataPrepareJob implements Runnable {
 			ActionLogicModule actionDominating = (ActionLogicModule) dominating.getProducer();
 
 
+
+
+			Context dominatingContext = null;
+			if(actionDominating != null && actionDominating.getContextHandler() != null){
+				dominatingContext = actionDominating.getContextHandler().getContext();
+			}
+
 			Set<String> causingSubsystems = new HashSet<>();
-			if (dominating.getContext() != null) {
-				ContextEntry contextEntry = dominating.getContext().get("PROBLEM-SUBSYSTEM");
+			if (dominatingContext != null && dominatingContext.getContextEntryMap() != null && dominatingContext.getContextEntryMap().containsKey("PROBLEM-SUBSYSTEM")) {
+				ContextEntry contextEntry = dominatingContext.getContextEntryMap().get("PROBLEM-SUBSYSTEM");
 				if (contextEntry != null) {
 					if (contextEntry instanceof ObjectContextEntry) {
 						Set set = ((ObjectContextEntry) contextEntry).getObjectSet();
@@ -256,7 +264,6 @@ public class DataPrepareJob implements Runnable {
 				}
 			}
 
-
 			RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 			RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(
 					actionDominating.getActionWithContextRawRecovery(),
@@ -264,13 +271,15 @@ public class DataPrepareJob implements Runnable {
 					actionDominating.getName(),
 					actionDominating.getDescriptionWithContext(),
 					dominating.getId(),
-					causingSubsystems);
+					causingSubsystems,
+					actionDominating.isAutomationAvailable());
 
 			if(recoveryRequest != null && recoveryRequest.getRecoveryRequestSteps().size() > 0) {
 				recoveryRequest.setCondition(dominating);
-				Long dominatingId = recoveryJobManager.runRecoveryJob(recoveryRequest);
-				if (dominatingId != null) {
-					recoveryConditionIds.add(dominatingId);
+				Triple<String,String,String> result = recoveryJobManager.runRecoveryJob(recoveryRequest);
+				logger.info(String.format("First request: %s, decision: %s, second request: %s", result.getLeft(), result.getMiddle(), result.getRight()));
+				if (recoveryRequest.getProblemId() != null) {
+					recoveryConditionIds.add(recoveryRequest.getProblemId());
 					logger.info("Automatic recovery sent to the controller. Executable steps: " + recoveryRequest.getRecoveryRequestSteps());
 				}
 			} else{

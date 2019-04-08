@@ -25,6 +25,7 @@ public class RuFailed extends KnownFailure {
 				;
 		this.briefDescription = "{{NUMFAILEDRUS}} RUs ({{RU}}) are in failed state";
 
+		//TODO: avoid automation: try 2 times
 		this.action = new SimpleAction(
 				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::DAQ>> (try up to 2 times)",
 				"Make an e-log entry.");

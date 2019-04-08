@@ -5,6 +5,7 @@ import rcms.utilities.daqexpert.processing.context.functions.ObjectListOptimizer
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -79,5 +80,21 @@ public class ObjectContextEntry<T> extends ContextEntry<Set<T>>{
 
     public void setTextRepresentationSet(Set<String> textRepresentationSet){
         this.textRepresentationSet = textRepresentationSet;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ObjectContextEntry<?> that = (ObjectContextEntry<?>) o;
+        return Objects.equals(objectType, that.objectType) &&
+                Objects.equals(objectSet, that.objectSet);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(objectType, objectSet);
     }
 }

@@ -54,5 +54,9 @@ public abstract class ActionLogicModule extends ContextLogicModule {
 		return this.getContextHandler().getActionWithContext(this.action,false);
 	}
 
+	public boolean isAutomationAvailable(){
+		return this.getContextHandler().isAutomationAvailable(this.action);
+	}
+
 
 }

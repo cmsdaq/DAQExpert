@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.processing;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ import rcms.utilities.daqexpert.processing.context.ContextHandler;
 import rcms.utilities.daqexpert.reasoning.base.ActionLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
+import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 import rcms.utilities.daqexpert.segmentation.DataResolution;
 
 import javax.xml.bind.DatatypeConverter;
@@ -345,9 +347,9 @@ public class JobManagerIT {
     private RecoveryRequest generateRecovery(int steps, String problemDescription){
         RecoveryRequest rr = new RecoveryRequest();
 
-        rr.setRecoverySteps(new ArrayList());
+        rr.setRecoveryRequestSteps(new ArrayList());
         for(int i = 0; i< steps; i++){
-            rr.getRecoverySteps().add(new RecoveryStep());
+            rr.getRecoveryRequestSteps().add(new RecoveryRequestStep());
         }
 
         rr.setProblemDescription(problemDescription);
@@ -521,8 +523,7 @@ public class JobManagerIT {
         if (totalNumberOfRecovoveryRequests != 0) {
             for (RecoveryRequest rr : expectedRecoveryRequests) {
                 assertThat(recoveryRequestsYielded, hasItem(allOf(
-                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription())),
-                        Matchers.hasProperty("status", equalTo("finished"))
+                        Matchers.hasProperty("problemDescription", equalTo(rr.getProblemDescription()))
                         )
                 ));
             }
@@ -545,20 +546,19 @@ public class JobManagerIT {
 
 
         public RecoveryJobManagerStub() {
-            super(new ExpertControllerClientStub(""));
+            super(new ExpertControllerClientStub(""), new DominatingSelector());
         }
 
         @Override
-        public Long runRecoveryJob(RecoveryRequest request) {
+        public Triple<String, String, String> runRecoveryJob(RecoveryRequest request) {
             logger.info("Recovery job called: " + request);
             recoveryRequestsYielded.add(request);
-            return request.getProblemId();
+            return Triple.of(null,null,null);
         }
 
         @Override
         public void notifyConditionFinished(Long id) {
             RecoveryRequest finished = recoveryRequestsYielded.stream().filter(r -> r.getProblemId() == id).findFirst().orElse(null);
-            finished.setStatus("finished");
         }
     }
 

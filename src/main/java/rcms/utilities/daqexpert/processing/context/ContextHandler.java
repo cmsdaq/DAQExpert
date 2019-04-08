@@ -312,6 +312,16 @@ public class ContextHandler {
         return text;
     }
 
+    public boolean isAutomationAvailable(Action action){
+        if (action instanceof ConditionalAction) {
+            String key = getActionKey();
+            return ((ConditionalAction) action).isAutomationEnabled(key);
+        } else if (action instanceof SimpleAction){
+            return action.isAutomationEnabled();
+        }
+        return false;
+    }
+
     public List<String> getRawAction(Action action) {
         List<String> actionSteps = null;
 

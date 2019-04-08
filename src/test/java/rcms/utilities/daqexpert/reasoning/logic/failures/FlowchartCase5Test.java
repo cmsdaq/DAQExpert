@@ -12,10 +12,9 @@ import org.junit.Test;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqexpert.jobs.RecoveryRequestBuilder;
 import rcms.utilities.daqexpert.jobs.RecoveryRequest;
-import rcms.utilities.daqexpert.jobs.RecoveryStep;
+import rcms.utilities.daqexpert.jobs.RecoveryRequestStep;
 import rcms.utilities.daqexpert.persistence.LogicModuleRegistry;
 import rcms.utilities.daqexpert.processing.context.ContextHandler;
-import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.base.Output;
 
 /**
@@ -47,7 +46,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(), fc5.getName(), fc5.getDescriptionWithContext(), 0L);
-		assertEquals(0, recoveryRequests.getRecoverySteps().size());
+		assertEquals(0, recoveryRequests.getRecoveryRequestSteps().size());
 
 	}
 
@@ -73,7 +72,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequest = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
-		assertEquals(0, recoveryRequest.getRecoverySteps().size());
+		assertEquals(0, recoveryRequest.getRecoveryRequestSteps().size());
 	}
 
 	@Test
@@ -128,12 +127,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequests.getRecoverySteps().size());
-		RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
-		assertEquals(1, recoveryStep.getRedRecycle().size());
-		assertEquals(1, recoveryStep.getGreenRecycle().size());
-		assertEquals("CSC", recoveryStep.getRedRecycle().iterator().next());
-		assertEquals("CSC", recoveryStep.getGreenRecycle().iterator().next());
+		assertEquals(1, recoveryRequests.getRecoveryRequestSteps().size());
+		RecoveryRequestStep recoveryRequestStep = recoveryRequests.getRecoveryRequestSteps().iterator().next();
+		assertEquals(1, recoveryRequestStep.getRedRecycle().size());
+		assertEquals(1, recoveryRequestStep.getGreenRecycle().size());
+		assertEquals("CSC", recoveryRequestStep.getRedRecycle().iterator().next());
+		assertEquals("CSC", recoveryRequestStep.getGreenRecycle().iterator().next());
 
 	}
 
@@ -164,12 +163,12 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequests.getRecoverySteps().size());
-		RecoveryStep recoveryStep = recoveryRequests.getRecoverySteps().iterator().next();
-		assertEquals(1, recoveryStep.getRedRecycle().size());
-		assertEquals(1, recoveryStep.getGreenRecycle().size());
-		assertEquals("HCAL", recoveryStep.getRedRecycle().iterator().next());
-		assertEquals("HCAL", recoveryStep.getGreenRecycle().iterator().next());
+		assertEquals(1, recoveryRequests.getRecoveryRequestSteps().size());
+		RecoveryRequestStep recoveryRequestStep = recoveryRequests.getRecoveryRequestSteps().iterator().next();
+		assertEquals(1, recoveryRequestStep.getRedRecycle().size());
+		assertEquals(1, recoveryRequestStep.getGreenRecycle().size());
+		assertEquals("HCAL", recoveryRequestStep.getRedRecycle().iterator().next());
+		assertEquals("HCAL", recoveryRequestStep.getGreenRecycle().iterator().next());
 	}
 
 	/* http://daq-expert.cms/daq2view-react/index.html?setup=cdaq&time=2017-06-15-09:52:16 */
@@ -195,7 +194,7 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(fc5.getActionWithContextRawRecovery(),fc5.getName(), fc5.getDescriptionWithContext(), 0L);
-		assertEquals(0, recoveryRequests.getRecoverySteps().size());
+		assertEquals(0, recoveryRequests.getRecoveryRequestSteps().size());
 	}
 
 	@Test
@@ -226,8 +225,8 @@ public class FlowchartCase5Test extends FlowchartCaseTestBase {
 
 		RecoveryRequestBuilder recoveryRequestBuilder = new RecoveryRequestBuilder();
 		RecoveryRequest recoveryRequests = recoveryRequestBuilder.buildRecoveryRequest(logicModule.getActionWithContextRawRecovery(),logicModule.getName(), logicModule.getDescriptionWithContext(), 0L);
-		assertEquals(1, recoveryRequests.getRecoverySteps().size());
-		assertEquals("GEM", recoveryRequests.getRecoverySteps().iterator().next().getGreenRecycle().iterator().next());
+		assertEquals(1, recoveryRequests.getRecoveryRequestSteps().size());
+		assertEquals("GEM", recoveryRequests.getRecoveryRequestSteps().iterator().next().getGreenRecycle().iterator().next());
 	}
 
 

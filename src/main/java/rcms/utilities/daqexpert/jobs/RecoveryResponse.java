@@ -1,22 +1,28 @@
 package rcms.utilities.daqexpert.jobs;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RecoveryResponse {
 
     /**
-     * Result of the recovery request, may be accepted or rejected
+     * Result of the recovery request, eg. accepted, rejected
      */
-    private String status;
+    private String acceptanceDecision;
 
     /**
-     * Id of the recovery that was accepted or rejected
+     * Id of the recovery procedure that is executed in controller
      */
-    private Long recoveryId;
-
-    /**
-     * Id of the condition that generated recovery
-     */
-    private Long conditionId;
+    private Long recoveryProcedureId;
 
     /**
      * Id of the condition that was a reason of rejection
@@ -26,56 +32,18 @@ public class RecoveryResponse {
     /**
      * Id of the same condition it continues
      */
-    private Long continuesTheConditionId;
+    private List<Long> continuesTheConditionIds;
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
-    public Long getRecoveryId() {
-        return recoveryId;
-    }
-
-    public void setRecoveryId(Long recoveryId) {
-        this.recoveryId = recoveryId;
-    }
-
-    public Long getConditionId() {
-        return conditionId;
-    }
-
-    public void setConditionId(Long conditionId) {
-        this.conditionId = conditionId;
-    }
-
-    public Long getRejectedDueToConditionId() {
-        return rejectedDueToConditionId;
-    }
-
-    public void setRejectedDueToConditionId(Long rejectedDueToConditionId) {
-        this.rejectedDueToConditionId = rejectedDueToConditionId;
-    }
-
-    public Long getContinuesTheConditionId() {
-        return continuesTheConditionId;
-    }
-
-    public void setContinuesTheConditionId(Long continuesTheConditionId) {
-        this.continuesTheConditionId = continuesTheConditionId;
-    }
 
     @Override
     public String toString() {
         return "RecoveryResponse{" +
-                "status='" + status + '\'' +
-                ", recoveryId=" + recoveryId +
-                ", conditionId=" + conditionId +
+                "acceptanceDecision='" + acceptanceDecision +
+                ", recoveryProcedureId=" + recoveryProcedureId +
                 ", rejectedDueToConditionId=" + rejectedDueToConditionId +
-                ", continuesTheConditionId=" + continuesTheConditionId +
+                ", continuesTheConditionIds=" + continuesTheConditionIds +
                 '}';
     }
 }

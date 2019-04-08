@@ -22,7 +22,7 @@ public class ExpertControllerClientTest {
 
     @BeforeClass
     public static void prepareControllerStub() throws JsonProcessingException {
-        MockServerClient mockServer = startClientAndServer(8082);
+        MockServerClient mockServer = startClientAndServer(28082);
         RecoveryResponse recoveryResponse = new RecoveryResponse();
         ObjectMapper om = new ObjectMapper();
         String body = om.writeValueAsString(recoveryResponse);
@@ -46,16 +46,16 @@ public class ExpertControllerClientTest {
     @Test
     public void test(){
 
-        ExpertControllerClient job = new ExpertControllerClient("http://localhost:8082");
+        ExpertControllerClient job = new ExpertControllerClient("http://localhost:28082");
         RecoveryRequest r = new RecoveryRequest();
 
         Set<String> list = new HashSet<>();
         list.add("ECAL");
 
-        RecoveryStep step = new RecoveryStep();
+        RecoveryRequestStep step = new RecoveryRequestStep();
         step.setRedRecycle(list);
         r.setProblemDescription("Test problem");
-        r.setRecoverySteps(Arrays.asList(step));
+        r.setRecoveryRequestSteps(Arrays.asList(step));
 
         RecoveryResponse response =  job.sendRecoveryRequest(r);
         Assert.assertNotNull(response);

@@ -6,4 +6,6 @@ public interface Action {
 
 	public List<String> getSteps();
 
+	public boolean isAutomationEnabled();
+
 }

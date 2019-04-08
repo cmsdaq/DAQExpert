@@ -1,10 +1,13 @@
 package rcms.utilities.daqexpert.jobs;
 
 import com.google.common.collect.EvictingQueue;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.persistence.Condition;
+import rcms.utilities.daqexpert.processing.context.Context;
 import rcms.utilities.daqexpert.processing.context.ContextEntry;
 import rcms.utilities.daqexpert.processing.context.ObjectContextEntry;
+import rcms.utilities.daqexpert.reasoning.base.ContextLogicModule;
 import rcms.utilities.daqexpert.reasoning.causality.DominatingSelector;
 
 import java.util.*;
@@ -32,7 +35,7 @@ public class RecoveryJobManager {
      * Note that to this queue we add only those conditions that generated recovery requests that were passed to
      * controller.
      */
-    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(5);
+    private final Queue<Condition> recentIssuedRecoveryConditions = EvictingQueue.create(15);
 
 
     /**
@@ -40,20 +43,28 @@ public class RecoveryJobManager {
      */
     private long threshold = 20000;
 
-    private DominatingSelector dominatingSelector;
+    protected DominatingSelector dominatingSelector;
 
 
-    public RecoveryJobManager(ExpertControllerClient expertControllerClient) {
+    public RecoveryJobManager(ExpertControllerClient expertControllerClient, DominatingSelector dominatingSelector) {
         this.expertControllerClient = expertControllerClient;
-        this.dominatingSelector = new DominatingSelector();
+        this.dominatingSelector = dominatingSelector;
         ;
     }
 
-
     /**
      * Run recovery job TODO: accept single request. reuse dominating mechanism
+     *
+     *
+     * Too many things happening
+     * - handling rejection decision
+     * - preventing from sending requests for old conditions && no step recoveries
+     * - saving recent conditions to the tmp queue
+     * - sending recovery requests
+     * - modification of request flags for 2nd request
+     *
      */
-    public Long runRecoveryJob(RecoveryRequest dominatingRequest) {
+    public Triple<String, String, String> runRecoveryJob(RecoveryRequest dominatingRequest) {
 
         logger.info(dominatingRequest.getProblemTitle() + " recovery job submitted. Now checking the age.");
 
@@ -61,12 +72,12 @@ public class RecoveryJobManager {
 
         if (!(dominatingRequest.getCondition().getStart().getTime() > now.getTime() - threshold)) {
             logger.info("No recent recovery found. The problem is " + (now.getTime() - threshold) + "ms old. The threshold is " + threshold + "ms");
-            return null;
+            return Triple.of("abandoned, too old",null,null);
         }
 
-        if (dominatingRequest.getRecoverySteps().size() == 0) {
+        if (dominatingRequest.getRecoveryRequestSteps().size() == 0) {
             logger.info("No executable recovery steps. The recovery request cannot be automated.");
-            return null;
+            return Triple.of("abandoned, no steps",null,null);
         }
 
 
@@ -75,8 +86,13 @@ public class RecoveryJobManager {
         recentIssuedRecoveryConditions.add(dominatingRequest.getCondition());
         RecoveryResponse recoveryResponse = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-        String status = recoveryResponse.getStatus();
-        if ("rejected".equalsIgnoreCase(status)) {
+        String status = recoveryResponse.getAcceptanceDecision();
+
+        if("rejectedDueToManualRecovery".equalsIgnoreCase(status)){
+            logger.info("Recovery has been rejected due to manual recovery. Abandoning this recovery.");
+            return Triple.of(status, null, null);
+        }
+        else if ("rejected".equalsIgnoreCase(status)) {
             // check if this is the same now
 
             Long rejectionConditionReasonId = recoveryResponse.getRejectedDueToConditionId();
@@ -85,10 +101,11 @@ public class RecoveryJobManager {
             Optional<Condition> conditionOptional = recentIssuedRecoveryConditions.stream().filter(c -> c.getId().equals(rejectionConditionReasonId)).findFirst();
 
 
+            String decision;
             if (conditionOptional.isPresent()) {
 
                 Condition rejectionConditionReason = conditionOptional.get();
-                String decision = handleRejection(dominatingRequest.getCondition(), rejectionConditionReason);
+                decision = handleRejection(dominatingRequest.getCondition(), rejectionConditionReason);
 
                 logger.info("Handling rejection with decision to: " + decision);
 
@@ -105,34 +122,40 @@ public class RecoveryJobManager {
                     case "ignore":
                     default:
                         logger.info("Will not try second request");
-                        return dominatingRequest.getProblemId();
+                        return Triple.of(status, decision, null);
 
                 }
 
             } else {
                 logger.warn("Could not find condition by id " + rejectionConditionReasonId + " that was the reason to reject. Most likely the DAQExpert was redeployed.");
                 dominatingRequest.setWithInterrupt(true);
+                decision = "interrupt due to unknown condition";
             }
 
             RecoveryResponse secondRecoveryRespons = expertControllerClient.sendRecoveryRequest(dominatingRequest);
 
-            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getStatus())) {
+            if (!"accepted".equalsIgnoreCase(secondRecoveryRespons.getAcceptanceDecision())) {
                 logger.warn("Second request resulted with rejection." + dominatingRequest);
             } else {
                 logger.info("Recovery accepted by controller with second request");
             }
+            return Triple.of(status,decision, secondRecoveryRespons.getAcceptanceDecision());
 
 
         } else {
             logger.info("Recovery accepted by controller with first request");
+            return Triple.of(status, null, null);
         }
-        return dominatingRequest.getProblemId();
 
 
     }
 
 
-    private boolean isSameCondition(Condition currentlyDominating, Condition currentlyRejecting) {
+    protected boolean isSameCondition(Condition currentlyDominating, Condition currentlyRejecting) {
+
+        logger.info("Checking if the same recovery: ");
+        logger.info(" - currently dominating: " + currentlyDominating.getDescription());
+        logger.info(" - currently rejecting : " + currentlyRejecting.getDescription());
 
         if (currentlyDominating.getLogicModule() != currentlyRejecting.getLogicModule()) {
             return false;
@@ -142,21 +165,41 @@ public class RecoveryJobManager {
             return false;
         }
 
-        if (currentlyDominating.getContext() != null) {
 
-            if (currentlyRejecting.getContext() == null) {
-                return false;
-            } else {
+        Map<String, ContextEntry> currentlyDominatingContextEntryMap = null;
+        if (currentlyDominating.getContext() == null) {
+
+            if (currentlyDominating.getProducer() != null && currentlyDominating.getProducer() instanceof ContextLogicModule) {
+
+                ContextLogicModule contextLogicModule = ((ContextLogicModule) currentlyDominating.getProducer());
+                if (contextLogicModule.getContextHandler() != null && contextLogicModule.getContextHandler().getContext() != null)
+                    currentlyDominatingContextEntryMap =
+                            contextLogicModule.getContextHandler().getContext().getContextEntryMap();
+
+            }
+        } else {
+            currentlyDominatingContextEntryMap = currentlyDominating.getContext();
+        }
+
+        /* both have some context */
+        if (currentlyDominatingContextEntryMap != null && currentlyRejecting.getContext() != null) {
+
                 // compare only objects in context
+                logger.info("Comparing objects in the context");
 
-                for (Map.Entry<String, ContextEntry> e : currentlyDominating.getContext().entrySet()) {
+                for (Map.Entry<String, ContextEntry> e : currentlyDominatingContextEntryMap.entrySet()) {
 
                     if (e.getValue() instanceof ObjectContextEntry) {
 
                         if (!currentlyRejecting.getContext().containsKey(e.getKey())) {
                             return false;
                         } else {
-                            if (!currentlyRejecting.getContext().get(e.getKey()).equals(e.getValue())) {
+                            if (!currentlyRejecting.getContext().get(e.getKey()).getTextRepresentation().equals(e.getValue().getTextRepresentation())) {
+                                logger.info(String.format(
+                                        "Context value for key %s is different: %s vs %s, (dominating vs rejecting)",
+                                        e.getKey(),
+                                        e.getValue().getTextRepresentation(),
+                                        currentlyRejecting.getContext().get(e.getKey()).getTextRepresentation()));
                                 return false;
                             }
                         }
@@ -168,8 +211,22 @@ public class RecoveryJobManager {
 
                 }
 
-            }
 
+
+        }
+
+        /* If both have context null */
+        else if(currentlyDominatingContextEntryMap == null && currentlyRejecting.getContext() == null){
+            logger.info("Both have context null");
+            return true;
+        }
+
+        /* one have context other doesn't*/
+        else {
+            logger.info("One have context, other doesn't: ");
+            logger.info("Dominating: " + currentlyDominatingContextEntryMap);
+            logger.info("Rejecting : " + currentlyRejecting.getContext());
+            return false;
         }
 
         return true;

@@ -42,6 +42,7 @@ public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialI
 		this.briefDescription = "Run blocked by out-of-sync data from FED {{PROBLEM-SUBSYSTEM}}/{{PROBLEM-PARTITION}}/{{PROBLEM-FED}}";
 
 		/* Default action */
+		// TODO: avoid automation - try 2 times
 		ConditionalAction action = new ConditionalAction(
 				"<<StopAndStartTheRun>> with <<RedAndGreenRecycle::{{PROBLEM-SUBSYSTEM}}>> (try up to 2 times)",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
@@ -49,6 +50,7 @@ public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialI
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* SUBSYSTEM=Tracker action */
+		// TODO: avoid automation - try 2 times
 		action.addContextSteps("TRACKER",
 				"<<StopAndStartTheRun>> (try up to 2 times)",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
@@ -56,23 +58,27 @@ public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialI
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
 		/* ecal specific case */
+		// TODO: avoid automation - call
 		action.addContextSteps("ECAL", "<<StopAndStartTheRun>>",
 				"If this doesn't help: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::ECAL>>",
 				"Call ECAL DOC during the Red Recycle (only if beam is not in RAMP mode)",
 				"Problem not fixed: Call the DOC of ECAL");
 
 		/* pixel specific case */
+		// TODO: avoid automation - pause and resume
 		action.addContextSteps("PIXEL", "Try Pause and Resume",
 				"Problem not fixed: <<StopAndStartTheRun>> with <<GreenRecycle::PIXEL>>",
 				"Problem still not fixed: <<StopAndStartTheRun>> with <<RedAndGreenRecycle::PIXEL>>",
 				"Make an e-log entry");
 
 		/* FED=1111 */
+		// TODO: avoid automation - call
 		action.addContextSteps("FED1111or1109", "<<StopAndStartTheRun>>",
 				"Problem not fixed: Call the DOC of {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss)",
 				"Problem fixed: Make an e-log entry."
 						+ "Call the DOC {{PROBLEM-SUBSYSTEM}} (subsystem that caused the SyncLoss) to inform about the problem");
 
+		// TODO: avoid automation - call
 		/** GEM FED 1467 , see item 2 of issue #232 */
 		action.addContextSteps("GEM-1467",
 				"<<StopAndStartTheRun>>",

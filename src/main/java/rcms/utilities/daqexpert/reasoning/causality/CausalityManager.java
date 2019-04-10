@@ -39,7 +39,7 @@ public class CausalityManager {
 
         tsc.setGraph(directedGraph);
         List<List<CausalityNode>> cycles = tsc.findSimpleCycles();
-        System.out.println("Result: " + cycles);
+        logger.info("Result: " + cycles);
 
         if(cycles.size() > 0){
             throw new ExpertException(ExpertExceptionCode.LogicModuleMisconfiguration, "Detected cycle in following Logic Modules: " + cycles.get(0).stream().map(c->c.getNodeName()).collect(Collectors.toList()));

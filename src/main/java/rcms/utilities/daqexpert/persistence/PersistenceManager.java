@@ -1,23 +1,11 @@
 package rcms.utilities.daqexpert.persistence;
 
-import java.sql.Timestamp;
-import java.util.*;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.hibernate.transform.Transformers;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionGroup;
 import rcms.utilities.daqexpert.reasoning.base.enums.ConditionPriority;
@@ -26,21 +14,33 @@ import rcms.utilities.daqexpert.segmentation.RangeResolver;
 import rcms.utilities.daqexpert.servlets.ConditionDTO;
 import rcms.utilities.daqexpert.servlets.ConditionDetailedDTO;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Unit managing persistence of analysis results and multiple resolutions of raw
  * parameters
- * 
- * 
+ *
+ *
  * Performance test: Time to insert 10000 Entries individually was 55315 ms
  * Performance test: Time to insert 10000 Entries at once was 456 ms
- * 
+ *
  * @author Maciej Gladki (maciej.szymon.gladki@cern.ch)
  *
  */
 public class PersistenceManager {
 
 	private final EntityManagerFactory entityManagerFactory;
-	
+
 	private EntityManager entityManager;
 
 	private static final Logger logger = Logger.getLogger(PersistenceManager.class);
@@ -52,7 +52,7 @@ public class PersistenceManager {
 
 	/**
 	 * Persiste multipe entries in one transaction
-	 * 
+	 *
 	 * @param entries
 	 */
 	public void persist(Set<Condition> entries) {
@@ -79,7 +79,7 @@ public class PersistenceManager {
 		tx.commit();
 		//entityManager.close();
 	}
-	
+
 	private void ensureConditionEntityManagerOpen(){
 		if(entityManager == null || ! entityManager.isOpen()){
 			entityManager = entityManagerFactory.createEntityManager();
@@ -88,7 +88,7 @@ public class PersistenceManager {
 
 	/**
 	 * Persist analysis entry
-	 * 
+	 *
 	 * @param entry
 	 */
 	public void persist(Condition entry) {
@@ -170,7 +170,7 @@ public class PersistenceManager {
 	/**
 	 * Get entries with threshold. Inclusion of filtered entries as mask is
 	 * parameterized
-	 * 
+	 *
 	 * @param startDate
 	 * @param endDate
 	 * @param durationThreshold
@@ -229,38 +229,82 @@ public class PersistenceManager {
 		return result;
 	}
 
-	public List<ConditionDetailedDTO> getRootProblemEntries(Date startDate, Date endDate){
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Session session = entityManager.unwrap(Session.class);
+    public Collection<ConditionDetailedDTO> getRootProblemEntries(Date startDate, Date endDate) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Session session = entityManager.unwrap(Session.class);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("select c.id, c.title, c.logic_module, c.start_date, c.end_date, c.description, c.duration, cco.objecttype, ccov.value ");
+        sb.append("from Condition c ");
+
+        sb.append("left join condition_context_map ccm on c.id=ccm.condition_id ");
+        sb.append("left join condition_context cc on ccm.context_id=cc.id ");
+        sb.append("left join condition_context_object cco on ccm.context_id = cco.id ");
+        sb.append("left join condition_context_object_value ccov on cco.id = ccov.context_object_id ");
+
+        sb.append("where start_date < :endDate ");
+        sb.append("and end_date > :startDate ");
+        sb.append("and mature = true ");
+        //sb.append("and cc.type like 'O' ");
+        sb.append("and group_name = :group");
+
+        SQLQuery q2 = session.createSQLQuery(sb.toString());
+        q2.setParameter("endDate", endDate);
+        q2.setParameter("startDate", startDate);
+        q2.setParameter("group", ConditionGroup.DOMINATING.ordinal());
+        List<Object[]> result = q2.list();
+
+        logger.info("Returned joined table");
+        result.stream().map(c -> Arrays.stream(c).toArray()).collect(Collectors.toList()).forEach(logger::info);
+
+        Map<Long, ConditionDetailedDTO> conditionDetailedDTOMap = new HashMap<>();
+
+        result.stream().forEach(e -> {
+
+            long id = ((BigInteger) e[0]).longValue();
+            String title = (String) e[1];
+            //int logicModule  = (int) e[2];
+            Date startDateVal = (Date) e[3];
+            Date endDateVal = (Date) e[4];
+            String description = (String) e[5];
+            long duration = ((BigInteger) e[6]).longValue();
+            String objecttype = (String) e[7];
+            String value = (String) e[8];
+            if (!conditionDetailedDTOMap.containsKey(id)) {
+
+                ConditionDetailedDTO cdto = ConditionDetailedDTO.builder()
+                        .id(id)
+                        .title(title)
+                        .description(description)
+                        .start(startDateVal)
+                        .end(endDateVal)
+                        .duration(duration)
+                        .problematicFed(new HashSet<>())
+                        .problematicSubsystem(new HashSet<>())
+                        .problematicPartition(new HashSet<>()).build();
+
+                conditionDetailedDTOMap.put(id, cdto);
+            }
+
+            ConditionDetailedDTO current = conditionDetailedDTOMap.get(id);
+            if ("FED".equalsIgnoreCase(objecttype)) {
+                current.getProblematicFed().add(value);
+            } else if ("TTCPARTITION".equalsIgnoreCase(objecttype)) {
+                current.getProblematicPartition().add(value);
+            } else if ("SUBSYSTEM".equalsIgnoreCase(objecttype)) {
+                current.getProblematicSubsystem().add(value);
+            }
 
 
-		Criteria elementsCriteria = session.createCriteria(Condition.class);
+        });
 
-		Conjunction eventFinishedRestrictions = Restrictions.conjunction();
-		eventFinishedRestrictions.add(Restrictions.le("start", endDate));
-		eventFinishedRestrictions.add(Restrictions.ge("end", startDate));
-		eventFinishedRestrictions.add(Restrictions.eq("mature", true));
-		eventFinishedRestrictions.add(Restrictions.eq("group", ConditionGroup.DOMINATING));
+        conditionDetailedDTOMap.values().stream().forEach(logger::info);
+
+        entityManager.close();
 
 
-		elementsCriteria.add(eventFinishedRestrictions);
-
-		ProjectionList projection = Projections.projectionList()
-				.add(Projections.property("id"),"id")
-				.add(Projections.property("title"), "title")
-				.add(Projections.property("start"),"start")
-				.add(Projections.property("end"),"end")
-				.add(Projections.property("description"),"description")
-				.add(Projections.property("logicModule"),"logicModule")
-				.add(Projections.property("duration"),"duration");
-
-		List<ConditionDetailedDTO> result = elementsCriteria.setProjection(projection)
-				.setResultTransformer(Transformers.aliasToBean(ConditionDetailedDTO.class)).list();
-
-		entityManager.close();
-
-		return result;
-	}
+        return conditionDetailedDTOMap.values();
+    }
 
 	public List<ConditionDTO> getSpecificEntries(Date startDate, Date endDate, Collection values) {
 		// TODO: close session?
@@ -371,7 +415,7 @@ public class PersistenceManager {
 	/**
 	 * Gets entries with a threshold on duration and a pseudo entries
 	 * representing small, invisible entries.
-	 * 
+	 *
 	 * @param startDate
 	 * @param endDate
 	 * @return
@@ -473,7 +517,7 @@ public class PersistenceManager {
 
 	/**
 	 * Returns entries without any duration threshold
-	 * 
+	 *
 	 * @param startDate
 	 * @param endDate
 	 * @return
@@ -484,7 +528,7 @@ public class PersistenceManager {
 
 	/**
 	 * Get entries with threshold
-	 * 
+	 *
 	 * @param startDate
 	 * @param endDate
 	 * @param threshold

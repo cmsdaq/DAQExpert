@@ -317,7 +317,6 @@ public class PersistenceManager {
 		List<Object[]> result = q2.getResultList();
 		Calendar calendar = Calendar.getInstance();
 		for (Object[] row : result) {
-			// System.out.println(result);
 			TinyEntryMapObject curr = new TinyEntryMapObject();
 
 			ConditionGroup group = (ConditionGroup) row[0];
@@ -484,7 +483,7 @@ public class PersistenceManager {
 		entityManager.getTransaction().begin();
 		List<Condition> result = entityManager.createQuery("from Conditions", Condition.class).getResultList();
 		for (Condition event : result) {
-			System.out.println("Event (" + event.getStart() + ") : " + event.getTitle());
+			logger.debug("Event (" + event.getStart() + ") : " + event.getTitle());
 		}
 		entityManager.getTransaction().commit();
 		entityManager.close();

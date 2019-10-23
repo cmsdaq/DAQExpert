@@ -21,6 +21,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.*;
@@ -234,7 +235,7 @@ public class PersistenceManager {
         Session session = entityManager.unwrap(Session.class);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select c.id, c.title, c.logic_module, c.start_date, c.end_date, c.description, c.duration, cco.objecttype, ccov.value ");
+        sb.append("select c.id, c.title, c.logic_module, c.start_date, c.end_date, c.description, c.duration, ccm.context_key, ccov.value ");
         sb.append("from Condition c ");
 
         sb.append("left join condition_context_map ccm on c.id=ccm.condition_id ");
@@ -244,7 +245,7 @@ public class PersistenceManager {
 
         sb.append("where start_date < :endDate ");
         sb.append("and end_date > :startDate ");
-        sb.append("and mature = true ");
+        sb.append("and mature = 1 ");
         //sb.append("and cc.type like 'O' ");
         sb.append("and group_name = :group");
 
@@ -261,14 +262,14 @@ public class PersistenceManager {
 
         result.stream().forEach(e -> {
 
-            long id = ((BigInteger) e[0]).longValue();
+            long id = ((BigDecimal) e[0]).longValue();
             String title = (String) e[1];
             //int logicModule  = (int) e[2];
             Date startDateVal = (Date) e[3];
             Date endDateVal = (Date) e[4];
             String description = (String) e[5];
-            long duration = ((BigInteger) e[6]).longValue();
-            String objecttype = (String) e[7];
+            long duration = ((BigDecimal) e[6]).longValue();
+            String contextKey = (String) e[7];
             String value = (String) e[8];
             if (!conditionDetailedDTOMap.containsKey(id)) {
 
@@ -287,11 +288,11 @@ public class PersistenceManager {
             }
 
             ConditionDetailedDTO current = conditionDetailedDTOMap.get(id);
-            if ("FED".equalsIgnoreCase(objecttype)) {
+            if ("PROBLEM-FED".equalsIgnoreCase(contextKey)) {
                 current.getProblematicFed().add(value);
-            } else if ("TTCPARTITION".equalsIgnoreCase(objecttype)) {
+            } else if ("PROBLEM-PARTITION".equalsIgnoreCase(contextKey) || "PROBLEM-TTCP".equalsIgnoreCase(contextKey)) {
                 current.getProblematicPartition().add(value);
-            } else if ("SUBSYSTEM".equalsIgnoreCase(objecttype)) {
+            } else if ("PROBLEM-SUBSYSTEM".equalsIgnoreCase(contextKey)) {
                 current.getProblematicSubsystem().add(value);
             }
 

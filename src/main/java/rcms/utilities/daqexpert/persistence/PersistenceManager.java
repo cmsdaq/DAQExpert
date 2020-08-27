@@ -264,7 +264,7 @@ public class PersistenceManager {
 
             long id = ((BigDecimal) e[0]).longValue();
             String title = (String) e[1];
-            //int logicModule  = (int) e[2];
+			int logicModule = ((BigDecimal) e[2]).intValue();
             Date startDateVal = (Date) e[3];
             Date endDateVal = (Date) e[4];
             String description = (String) e[5];
@@ -280,6 +280,7 @@ public class PersistenceManager {
                         .start(startDateVal)
                         .end(endDateVal)
                         .duration(duration)
+						.code(LogicModuleRegistry.values()[logicModule].name())
                         .problematicFed(new HashSet<>())
                         .problematicSubsystem(new HashSet<>())
                         .problematicPartition(new HashSet<>()).build();

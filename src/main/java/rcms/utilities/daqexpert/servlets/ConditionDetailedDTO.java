@@ -23,6 +23,8 @@ public class ConditionDetailedDTO {
 
     String description;
 
+    String code;
+
     Set<String> problematicFed;
     Set<String> problematicPartition;
     Set<String> problematicSubsystem;

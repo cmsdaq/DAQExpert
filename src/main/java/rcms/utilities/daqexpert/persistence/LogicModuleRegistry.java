@@ -1,5 +1,6 @@
 package rcms.utilities.daqexpert.persistence;
 
+import org.apache.log4j.Logger;
 import rcms.utilities.daqexpert.ExpertException;
 import rcms.utilities.daqexpert.ExpertExceptionCode;
 import rcms.utilities.daqexpert.processing.OrderManager;
@@ -110,6 +111,8 @@ public enum LogicModuleRegistry {
     private final ConditionGroup group;
     private final int usefulness;
 
+    private static final Logger logger = Logger.getLogger(LogicModuleRegistry.class);
+
     LogicModuleRegistry(String logicModuleClassName, ConditionGroup group, String description) {
         this(logicModuleClassName, group, description, 1);
 
@@ -150,7 +153,7 @@ public enum LogicModuleRegistry {
         for (LogicModuleRegistry logicModuleRegistry : LogicModuleRegistry.values()) {
             if (logicModuleRegistry.getLogicModuleClassName() != null) {
 
-                System.out.println(logicModuleRegistry + ": " + logicModuleRegistry.getLogicModule());
+                logger.debug(logicModuleRegistry + ": " + logicModuleRegistry.getLogicModule());
 
             }
         }

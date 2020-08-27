@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
  * between updates is higher than threshold (see configuration) and vast majority of deltas were positive - there is
  * increasing trend. If accumulated delta between updates is lower than negated threshold and vast majority of deltas
  * were negative - there is decreasing trend. If absolute value of accumulated deltas is lower than threshold - there is
- * stable trend. Otherwise it’s varying trend
+ * stable trend. Otherwise it's varying trend
  */
 public class TrendAnalyzer {
 

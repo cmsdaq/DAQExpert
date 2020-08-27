@@ -32,6 +32,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>RootProblemAPI</servlet-name>
+		<servlet-class>rcms.utilities.daqexpert.servlets.RootProblemAPI</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RootProblemAPI</servlet-name>
+		<url-pattern>/cause</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>ConditionsAPI</servlet-name>
 		<servlet-class>rcms.utilities.daqexpert.servlets.ConditionsAPI</servlet-class>
 	</servlet>

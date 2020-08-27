@@ -41,6 +41,7 @@ public class ServletListener implements ServletContextListener {
 						"No configuration file supplied with environment variable EXPERT_CONF");
 			}
 
+			logger.info(String.format("Configuration log.directory=%s",System.getProperty("log-directory")));
 			Application.initialize(propertyFilePath);
 
 			logger.info("Database mode: " + Application.get().getProp(Setting.DATABASE_MODE));

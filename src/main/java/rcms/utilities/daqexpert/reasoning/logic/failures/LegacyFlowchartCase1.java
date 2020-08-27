@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import rcms.utilities.daqaggregator.data.DAQ;
 import rcms.utilities.daqaggregator.data.FED;
 import rcms.utilities.daqaggregator.data.RU;
@@ -95,6 +96,8 @@ public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialI
 		this.action = action;
 	}
 
+	private static final Logger logger = Logger.getLogger(LegacyFlowchartCase1.class);
+
 	@Override
 	public void declareRelations(){
 		require(LogicModuleRegistry.NoRateWhenExpected);
@@ -168,7 +171,7 @@ public class LegacyFlowchartCase1 extends KnownFailure implements HavingSpecialI
 							// the only quotes, we can trim
 							trimmedMessage = originalMessage.substring(openingQuote, closingQuote);
 						} else {
-							System.out.println("Cannot trim the message: " + originalMessage + " too many quotes: "
+							logger.debug("Cannot trim the message: " + originalMessage + " too many quotes: "
 									+ openingQuote + ", " + closingQuote + ", " + additionalQuote);
 						}
 					}

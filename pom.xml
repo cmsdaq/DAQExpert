@@ -7,19 +7,10 @@
 
 	<name>DAQExpert</name>
 
-
 	<repositories>
 		<repository>
 			<id>libs-release-local</id>
-			<url>http://dev-daq-expert.cern.ch:8080/artifactory/libs-release-local</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>ext-release-local</id>
-			<url>http://dev-daq-expert.cern.ch:8080/artifactory/ext-release-local</url>
+			<url>https://gitlab.cern.ch/cms-rcms-artifacts/maven/raw/master/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -61,7 +52,7 @@
 		<dependency>
 			<groupId>ch.cern</groupId>
 			<artifactId>DAQAggregator</artifactId>
-			<version>1.17.12</version>
+			<version>1.19.1</version>
 		</dependency>
 
 		<!-- JSP -->
@@ -197,9 +188,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>oracle6</artifactId>
-			<version>1.0</version>
+			<groupId>oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
 		</dependency>
 
 		<dependency>
@@ -278,8 +269,9 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
